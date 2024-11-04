@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <!-- Section 2:  -->
+            <!-- Section 2: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
                     <div class="row">
@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            <!-- Section 3:  -->
+            <!-- Section 3: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
 
@@ -152,7 +152,7 @@
                 </div>
             </div>
 
-            <!-- Section 4:  -->
+            <!-- Section 4: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
                     <div class="row">
@@ -178,7 +178,7 @@
                 </div>
             </div>
 
-            <!-- Section 5:  -->
+            <!-- Section 5: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
                     <div class="row">
@@ -206,7 +206,7 @@
                 </div>
             </div>
 
-            <!-- Section 6:  -->
+            <!-- Section 6: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
 
@@ -256,7 +256,7 @@
                 </div>
             </div>        
 
-            <!-- Section 7:  -->
+            <!-- Section 7: -->
             <div class="col-md-12 section" id="">
                 <div class="box-content">
                 <div class="row">
