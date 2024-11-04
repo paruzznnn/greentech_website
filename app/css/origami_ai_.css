@@ -60,6 +60,10 @@
     justify-content: center;
 }
 
+.box-origami-ai button {
+    align-self: flex-end; /* Aligns the button to the right */
+}
+
 @media (max-width: 768px) {
     .box-origami-ai {
         flex-direction: column; 

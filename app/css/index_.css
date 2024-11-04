@@ -17,6 +17,7 @@ body {
     z-index: 1000;
     display: flex;
     justify-content: space-between;
+    position: relative;
 }
 
 .header-top a {
@@ -49,8 +50,8 @@ body {
 
 .header-center {
     background-color: #f1f1f178;
-    margin-top: 80px; /* กำหนดให้ตรงกับความสูงของ header-top */
-    padding-top: 10px; /* สามารถปรับเปลี่ยนตามต้องการ */
+    /* margin-top: 80px; */
+    padding-top: 10px; 
 }
 
 
@@ -62,7 +63,7 @@ body {
     top: 0;
     background-color: #fafafa;
     white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);
     font-size: 16px;
     z-index: 1000; /* Keep navbar on top */
 }
@@ -116,7 +117,7 @@ body {
 .over-menu {
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: thin;
+    /* scrollbar-width: thin; */
 }
 
 .over-menu::-webkit-scrollbar {
@@ -139,7 +140,7 @@ body {
     padding: 16px;
     background-color: #F1F1F1;
 }
-  
+
 .section {
     padding-top: 10px;
     padding-bottom: 10px;

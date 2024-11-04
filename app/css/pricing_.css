@@ -1,85 +1,86 @@
 .content-pricing {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Creates 3 equal columns */
-  gap: 20px; /* Space between items */
+  grid-template-columns: repeat(3, 1fr); /* สามคอลัมน์บนหน้าจอขนาดใหญ่ */
+  gap: 20px;
   padding: 20px;
   justify-items: center;
 }
 
 .box-pricing {
-  width: 100%; /* Full width within the grid */
-  max-width: 250px;
-  height: 100%;
+  width: 100%;
+  /* max-width: 250px; */
+  height: 550px; /* ความสูงคงที่ของกล่อง */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
   border-radius: 8px;
   background-color: #ffffff;
   padding: 10px;
   box-sizing: border-box;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a soft shadow */
-  transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 }
 
-.box-pricing:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
+.box-pricing > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* กำหนดความสูงของแต่ละส่วน */
+.box-pricing > div:first-child {
+  height: 100px; /* ส่วนหัวสูง 60px */
+  flex: 0 0 auto; /* ขนาดคงที่ */
+}
+
+.box-pricing > div:nth-child(2) {
+  /* flex: 1;  */
+  height: auto;
+}
+
+.box-pricing > div:last-child {
+  height: 120px; /* ส่วนท้ายสูง 80px */
+  flex: 0 0 auto; /* ขนาดคงที่ */
+}
+
+.box-pricing h6 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
 }
 
 .box-pricing img {
   width: 100%;
-  height: 100px;
+  height: auto; /* ปรับให้เป็นอัตโนมัติ */
+  max-height: 100px; /* ความสูงสูงสุดของภาพ */
   object-fit: contain;
   transition: transform 0.3s ease;
 }
 
 .box-pricing img:hover {
-  transform: scale(1.1); 
+  transform: scale(1.1);
 }
 
-.box-pricing h6 {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 10px 0 5px 0;
-  text-align: center;
-  color: #555;
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .content-pricing {
+      grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์สำหรับขนาดหน้าจอขนาดกลาง */
+  }
 }
-
-.box-pricing p {
-  font-size: 14px;
-  color: #666666;
-  text-align: center;
-  flex-grow: 1;
-  padding: 0 10px;
-  margin: 0;
-}
-
-.box-pricing div {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.btn {
-  margin-top: 10px;
-  align-self: center;
-  max-width: 100%; /* Prevents the button from overflowing horizontally */
-  box-sizing: border-box;
-}
-
 
 @media (max-width: 768px) {
   .content-pricing {
-      grid-template-columns: repeat(2, 1fr); /* Two columns for tablet view */
+      grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์สำหรับแท็บเล็ต */
   }
 }
 
 @media (max-width: 480px) {
   .content-pricing {
-      grid-template-columns: 1fr; /* Single column for mobile view */
+      grid-template-columns: 1fr; /* คอลัมน์เดียวสำหรับมือถือ */
   }
 }
+
+
+
 
 /* Overflow Menu Styles */
 /* .over-pricing-menu {
@@ -138,7 +139,33 @@
 
 .line-clamp {
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;  
   overflow: hidden;
+}
+
+.tab-pane {
+  display: none; /* ซ่อนเนื้อหาทั้งหมดในตอนแรก */
+}
+
+.tab-pane.show {
+  display: block; /* แสดงเฉพาะเนื้อหาของแท็บที่ถูกเลือก */
+}
+
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  position: relative; 
+  padding-left: 30px;
+}
+li::before {
+  content: '\f00c'; 
+  font-family: 'Font Awesome 5 Free'; 
+  font-weight: 900; 
+  position: absolute; 
+  left: 0; 
+  color: rgb(41, 41, 41); /* เปลี่ยนสีตามต้องการ */
 }
