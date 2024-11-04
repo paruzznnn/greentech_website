@@ -1,37 +1,16 @@
-// function toggleDropdown() {
-//     const dropdownContent = document.getElementById("dropdownContent");
-//     dropdownContent.classList.toggle("show");
-// }
-
-// // Close dropdown if clicked outside
-// window.onclick = function(event) {
-//     if (!event.target.matches('.dropbtn') && !event.target.closest('.dropdown')) {
-//         const dropdowns = document.getElementsByClassName("dropdown-content");
-//         for (let i = 0; i < dropdowns.length; i++) {
-//             const openDropdown = dropdowns[i];
-//             if (openDropdown.classList.contains('show')) {
-//                 openDropdown.classList.remove('show');
-//             }
-//         }
-//     }
-// };
-
-$(document).ready(function(){
-
-
-});
-
-
-
 function toggleDropdown(id) {
     closeAllDropdowns(); // Close any open dropdowns first
     const dropdown = document.getElementById(id);
-    dropdown.style.display = 'block'; // Show the selected dropdown
     
-    // Check if any dropdown is open to toggle the class
-    if (dropdown.style.display === 'block') {
-        $('#background-blur').addClass('tab-open');
-        // $('#navbar-menu').addClass('tab-open');
+    if (dropdown) { // Check if dropdown exists
+        dropdown.style.display = 'block'; // Show the selected dropdown
+        
+        // Check if any dropdown is open to toggle the class
+        if (dropdown.style.display === 'block') {
+            $('#background-blur').addClass('tab-open');
+        }
+    } else {
+        // console.error(`Dropdown with id '${id}' does not exist.`);
     }
 }
 
@@ -54,20 +33,41 @@ function closeAllDropdowns() {
 
 
 
+
 let lastScrollTop = 0;
 const headerTop = document.querySelector('.header-top');
+// const sections = document.querySelectorAll('.box-transform'); 
 
 window.addEventListener('scroll', function() {
-let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-if (scrollTop > lastScrollTop) {
-    headerTop.style.top = "-100px";
-} else {
-    headerTop.style.top = "0";
-}
+    // ซ่อน header เมื่อเลื่อนลง
+    if (scrollTop > lastScrollTop) {
+        headerTop.style.top = "-100px"; // ซ่อน header
 
-// lastScrollTop = scrollTop;
+        // วนลูปผ่านทุก .section
+        // sections.forEach(section => {
+        //     const img = section.querySelector('img'); 
+        //     if (img) {
+        //         img.style.transform = 'translateY(-20px)'; 
+        //     }
+        // });
+
+    } else {
+        headerTop.style.top = "0"; // แสดง header
+
+        // วนลูปผ่านทุก .section
+        // sections.forEach(section => {
+        //     const img = section.querySelector('img'); // เลือกรูปภาพในแต่ละ section
+        //     if (img) {
+        //         img.style.transform = 'translateY(0)'; // ส่งภาพกลับไปที่ตำแหน่งเดิม
+        //     }
+        // });
+    }
+
+    lastScrollTop = scrollTop; // อัปเดต lastScrollTop
 });
+
 
 
 

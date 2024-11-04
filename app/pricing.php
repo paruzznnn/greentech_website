@@ -54,6 +54,7 @@
     
 
     <script src="js/index_.js?v=<?php echo time();?>"></script>
+    <script src="js/pricing/controller_.js?v=<?php echo time();?>"></script>
 
 </body>
 </html>

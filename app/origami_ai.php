@@ -27,7 +27,7 @@
 
     <?php include 'template/header.php'?>
 
-    <div class="content-sticky" id="page_pricing">
+    <div class="content-sticky" id="page_AI">
         <div class="container">
             <div class="box-content">
                 <div class="row">

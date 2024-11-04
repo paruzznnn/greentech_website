@@ -53,12 +53,18 @@ $pricingBoxes = [
                 <img src="<?php echo $box['image']; ?>" alt="">
             </div>
             <div>
+
                 <h6><?php echo $box['title']; ?></h6>
+
                 <ul>
                     <?php foreach ($box['ul_items'] as $item): ?>
                         <li><?php echo $item; ?></li>
                     <?php endforeach; ?>
                 </ul>
+
+                
+                <!-- <button type="button" class="btn btn-warning">อ่านเพิ่มเติม</button> -->
+                
             </div>
         </div>
     <?php endforeach; ?>

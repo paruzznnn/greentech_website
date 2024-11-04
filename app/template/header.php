@@ -1,121 +1,91 @@
 <div id="background-blur"></div>
 
-<div class="header-top">
-    <a href="#">
-        <img class="logo" src="../public/img/logo-ALLABLE-06.png" alt="">
-    </a>
-
-    <div class="header-top-right">
-        <!-- <a href="#"><i class="fas fa-ellipsis-v"></i></a> -->
-    </div>
-
-</div>
-
 <?php
-// Array of image sources
-$images = [
-    '../public/img/1730258479586.jpg',
-    '../public/img/1730258513335.jpg',
-    '../public/img/1730258519837.jpg',
-    '../public/img/1AllableBannerSlideWebsite.png',
-];
+    $navbarItems = [
+        // ['text' => 'Home', 'link' => 'index.php?tab=page_home'],
+        ['text' => 'Home', 'link' => 'index.php'],
+        [
+            'text' => 'Origami Platforms',
+            'link' => '#',
+            'isDropdown' => true,
+            'id' => 'dropdown1', // Dropdown ID for unique reference
+        ],
+        [
+            'text' => 'Another Dropdown',
+            'link' => '#',
+            'isDropdown' => true,
+            'id' => 'dropdown2', // Dropdown ID for second dropdown
+        ],
+        // ['text' => 'Origami Ai', 'link' => 'https://devrev.ai/pricing/plug', 'target' => '_blank'],
+        ['text' => 'Origami AI', 'link' => 'origami_ai.php?tab=page_AI'],
+        ['text' => 'Allable Cloud', 'link' => 'allable_cloud.php?tab=page_allable_cloud'],
+        ['text' => 'News', 'link' => '#'],
+        ['text' => 'About Us', 'link' => 'about.php?tab=page_about'],
+        ['text' => 'Contact us', 'link' => 'contact.php?tab=page_contact'],
+        ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
+    ];
 
-// Initialize carousel items
-$carouselItems = '';
-foreach ($images as $index => $image) {
-    // Check if the item is the first one to set the active class
-    $activeClass = ($index === 0) ? 'active' : '';
-    $carouselItems .= '
-        <div class="carousel-item ' . $activeClass . '">
-            <img src="' . $image . '" class="d-block w-100" alt="...">
-        </div>';
-}
+    // Dropdown items array
+    $dropdownItems = [
+        [
+            'id' => 'dropdown1',
+            'items' => [
+                ['text' => 'HRM', 'link' => '#subsection1'],
+                ['text' => 'CRM', 'link' => '#subsection2'],
+                ['text' => 'Project Management', 'link' => '#subsection3'],
+                ['text' => 'Expense Management', 'link' => '#subsection4'],
+                ['text' => 'iDoc', 'link' => '#subsection5'],
+                ['text' => 'Event Management', 'link' => '#subsection6'],
+                ['text' => 'Asset Management', 'link' => '#subsection7'],
+                ['text' => 'Helpdesk Service', 'link' => '#subsection8'],
+                ['text' => 'Learning Management System', 'link' => '#subsection8'],
+            ]
+        ],
+        [
+            'id' => 'dropdown2',
+            'items' => [
+                ['text' => 'Expense Management', 'link' => '#subsection4'],
+                ['text' => 'iDoc', 'link' => '#subsection5'],
+                ['text' => 'Event Management', 'link' => '#subsection6'],
+            ]
+        ],
+    ];
 ?>
 
-<div class="header-center">
+<?php
+    // Array of image sources
+    $images = [
+        '../public/img/1730258479586.jpg',
+        '../public/img/1730258513335.jpg',
+        '../public/img/1730258519837.jpg',
+        '../public/img/1AllableBannerSlideWebsite.png',
+    ];
+
+    // Initialize carousel items
+    $carouselItems = '';
+    foreach ($images as $index => $image) {
+        // Check if the item is the first one to set the active class
+        $activeClass = ($index === 0) ? 'active' : '';
+        $carouselItems .= '
+            <div class="carousel-item ' . $activeClass . '">
+                <img src="' . $image . '" class="d-block w-100" alt="...">
+            </div>';
+    }
+?>
+
+<div class="header-top">
+
     <div class="container">
-        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+        <a href="#">
+            <img class="logo" src="../public/img/logo-ALLABLE-06.png" alt="">
+        </a>
 
-            <div class="carousel-indicators">
-                <?php foreach ($images as $index => $image): ?>
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="<?= $index ?>" 
-                        class="<?= ($index === 0) ? 'active' : '' ?>" 
-                        aria-current="<?= ($index === 0) ? 'true' : 'false' ?>" 
-                        aria-label="Slide <?= $index + 1 ?>"></button>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="carousel-inner">
-                <?= $carouselItems ?>
-            </div>
-
-            <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-
+        <div class="header-top-right">
+            <!-- <a href="#"><i class="fas fa-ellipsis-v"></i></a> -->
         </div>
     </div>
+
 </div>
-
-
-<?php
-$navbarItems = [
-    ['text' => 'Home', 'link' => 'index.php?tab=page_home'],
-    [
-        'text' => 'Origami Platforms',
-        'link' => '#',
-        'isDropdown' => true,
-        'id' => 'dropdown1', // Dropdown ID for unique reference
-    ],
-    [
-        'text' => 'Another Dropdown',
-        'link' => '#',
-        'isDropdown' => true,
-        'id' => 'dropdown2', // Dropdown ID for second dropdown
-    ],
-    // ['text' => 'Origami Ai', 'link' => 'https://devrev.ai/pricing/plug', 'target' => '_blank'],
-    ['text' => 'Origami Ai', 'link' => 'origami_ai.php'],
-    ['text' => 'Allable Cloud', 'link' => 'allable_cloud.php?tab=page_allable_cloud'],
-    ['text' => 'News', 'link' => '#'],
-    ['text' => 'About Us', 'link' => 'about.php?tab=page_about'],
-    ['text' => 'Contact us', 'link' => 'contact.php?tab=page_contact'],
-    ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
-];
-
-// Dropdown items array
-$dropdownItems = [
-    [
-        'id' => 'dropdown1',
-        'items' => [
-            ['text' => 'HRM', 'link' => '#subsection1'],
-            ['text' => 'CRM', 'link' => '#subsection2'],
-            ['text' => 'Project Management', 'link' => '#subsection3'],
-            ['text' => 'Expense Management', 'link' => '#subsection4'],
-            ['text' => 'iDoc', 'link' => '#subsection5'],
-            ['text' => 'Event Management', 'link' => '#subsection6'],
-            ['text' => 'Asset Management', 'link' => '#subsection7'],
-            ['text' => 'Helpdesk Service', 'link' => '#subsection8'],
-            ['text' => 'Learning Management System', 'link' => '#subsection8'],
-        ]
-    ],
-    [
-        'id' => 'dropdown2',
-        'items' => [
-            ['text' => 'Expense Management', 'link' => '#subsection4'],
-            ['text' => 'iDoc', 'link' => '#subsection5'],
-            ['text' => 'Event Management', 'link' => '#subsection6'],
-        ]
-    ],
-];
-?>
-
-<!-- <div id="navbar-menu" onmouseleave="closeAllDropdowns()"> -->
-<!-- onmouseenter="toggleDropdown('<?php echo $item['id']; ?>')" -->
 
 <div id="navbar-menu" onmouseleave="closeAllDropdowns()">
     <div class="container">
@@ -157,3 +127,35 @@ $dropdownItems = [
         </div>
     <?php endforeach; ?>
 </div>
+
+
+<div class="header-center">
+    <div class="container">
+        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+
+            <div class="carousel-indicators">
+                <?php foreach ($images as $index => $image): ?>
+                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="<?= $index ?>" 
+                        class="<?= ($index === 0) ? 'active' : '' ?>" 
+                        aria-current="<?= ($index === 0) ? 'true' : 'false' ?>" 
+                        aria-label="Slide <?= $index + 1 ?>"></button>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="carousel-inner">
+                <?= $carouselItems ?>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+
+        </div>
+    </div>
+</div>
+
