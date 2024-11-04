@@ -1,0 +1,100 @@
+.box-origami-ai {
+    width: 100%; 
+    /* max-width: 600px;  */
+    height: auto; 
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    transition: box-shadow 0.3s ease; 
+    margin: 10px;
+}
+
+.box-origami-ai:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* จัดการขนาดรูปภาพ */
+.box-origami-ai img {
+    width: 100%; 
+    /* ปรับขนาดให้เต็มความกว้างของฝั่ง */
+    height: auto; 
+    object-fit: contain;
+    margin-right: 10px;
+    transition: transform 0.3s ease; 
+    /* กำหนดความนุ่มนวลและความเร็วของการขยาย */
+}
+
+.box-origami-ai ul{
+    font-size: 14px;
+}
+
+.box-origami-ai img:hover {
+    transform: scale(1.1); 
+    /* ปรับขนาดให้ใหญ่ขึ้นเล็กน้อยเมื่อเอาเมาส์วาง */
+}
+
+
+/* จัดขนาดและการจัดวางเนื้อหา */
+.box-origami-ai > div:first-child {
+    padding: 10px;
+    flex: 1;
+    max-width: 50%; 
+    /* จำกัดให้ครึ่งหนึ่งของความกว้างทั้งหมด */
+}
+
+.box-origami-ai > div:last-child {
+    padding: 10px;
+    flex: 1;
+    max-width: 50%; 
+    /* จำกัดให้ครึ่งหนึ่งของความกว้างทั้งหมด */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .box-origami-ai {
+        flex-direction: column; 
+        /* เปลี่ยนเป็นแนวตั้งในหน้าจอขนาดเล็ก */
+        max-width: 100%;
+    }
+
+    .box-origami-ai > div:first-child,
+    .box-origami-ai > div:last-child {
+        max-width: 100%; /* ให้ขยายเต็มพื้นที่ในแนวตั้ง */
+    }
+
+    .box-origami-ai img {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+
+
+/* .over-origami-ai-menu {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    height: 100vh;
+}
+
+.over-origami-ai-menu::-webkit-scrollbar {
+    height: 6px;
+}
+
+.over-origami-ai-menu::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 10px;
+}
+
+.over-origami-ai-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+} */
