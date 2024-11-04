@@ -11,18 +11,18 @@
             'id' => 'dropdown1', // Dropdown ID for unique reference
         ],
         [
-            'text' => 'Another Dropdown',
+            'text' => 'Origami AI',
             'link' => '#',
             'isDropdown' => true,
             'id' => 'dropdown2', // Dropdown ID for second dropdown
         ],
         // ['text' => 'Origami Ai', 'link' => 'https://devrev.ai/pricing/plug', 'target' => '_blank'],
-        ['text' => 'Origami AI', 'link' => 'origami_ai.php?tab=page_AI'],
+        // ['text' => 'Origami AI', 'link' => 'origami_ai.php?tab=page_AI'],
         ['text' => 'Allable Cloud', 'link' => 'allable_cloud.php?tab=page_allable_cloud'],
         ['text' => 'News', 'link' => '#'],
         ['text' => 'About Us', 'link' => 'about.php?tab=page_about'],
         ['text' => 'Contact us', 'link' => 'contact.php?tab=page_contact'],
-        ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
+        // ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
     ];
 
     // Dropdown items array
@@ -30,23 +30,22 @@
         [
             'id' => 'dropdown1',
             'items' => [
-                ['text' => 'HRM', 'link' => '#subsection1'],
-                ['text' => 'CRM', 'link' => '#subsection2'],
-                ['text' => 'Project Management', 'link' => '#subsection3'],
-                ['text' => 'Expense Management', 'link' => '#subsection4'],
-                ['text' => 'iDoc', 'link' => '#subsection5'],
-                ['text' => 'Event Management', 'link' => '#subsection6'],
-                ['text' => 'Asset Management', 'link' => '#subsection7'],
-                ['text' => 'Helpdesk Service', 'link' => '#subsection8'],
-                ['text' => 'Learning Management System', 'link' => '#subsection8'],
+                ['text' => 'HRM', 'link' => '#'],
+                ['text' => 'CRM', 'link' => '#'],
+                ['text' => 'Project Management', 'link' => '#'],
+                ['text' => 'Expense Management', 'link' => '#'],
+                ['text' => 'iDoc', 'link' => '#'],
+                ['text' => 'Event Management', 'link' => '#'],
+                ['text' => 'Asset Management', 'link' => '#'],
+                ['text' => 'Helpdesk Service', 'link' => '#'],
+                ['text' => 'Learning Management System', 'link' => '#'],
             ]
         ],
         [
             'id' => 'dropdown2',
             'items' => [
-                ['text' => 'Expense Management', 'link' => '#subsection4'],
-                ['text' => 'iDoc', 'link' => '#subsection5'],
-                ['text' => 'Event Management', 'link' => '#subsection6'],
+                ['text' => 'DevRev', 'link' => 'origami_ai.php?tab=page_AI'],
+                ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
             ]
         ],
     ];
@@ -94,6 +93,7 @@
                 <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
                     <div class="dropdown">
                         <a 
+                        href="<?php echo $item['link']; ?>"
                         class="dropbtn" 
                         onmouseenter="toggleDropdown('<?php echo $item['id']; ?>')"
                         >
@@ -128,34 +128,4 @@
     <?php endforeach; ?>
 </div>
 
-
-<div class="header-center">
-    <div class="container">
-        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-
-            <div class="carousel-indicators">
-                <?php foreach ($images as $index => $image): ?>
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="<?= $index ?>" 
-                        class="<?= ($index === 0) ? 'active' : '' ?>" 
-                        aria-current="<?= ($index === 0) ? 'true' : 'false' ?>" 
-                        aria-label="Slide <?= $index + 1 ?>"></button>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="carousel-inner">
-                <?= $carouselItems ?>
-            </div>
-
-            <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-
-        </div>
-    </div>
-</div>
 
