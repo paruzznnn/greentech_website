@@ -26,6 +26,7 @@
 <body>
 
     <?php include 'template/header.php'?>
+    <?php include 'template/banner_slide.php'?>
 
     <?php include 'template/content.php'?>
 

@@ -48,7 +48,7 @@ $boxesSupport = [
     [
         'image' => '../public/img/expense.jpg',
         'title' => 'Starter',
-        'label' => '679.66 THB <br>
+        'label' => '679 THB <br>
         per user/month',
         'description' => 'The easiest way to get started with AI
         Embed GenAI powered Search across your website, help center, & mobile/desktop experience',
@@ -63,7 +63,7 @@ $boxesSupport = [
     [
         'image' => '../public/img/expense.jpg',
         'title' => 'Pro',
-        'label' => '2,039.66 THB <br>
+        'label' => '2,039 THB <br>
         per user/month',
         'description' => 'Full featured support and engagement platform for scaling support orgs',
         'text-btn' => 'Get started free',
@@ -97,7 +97,7 @@ $boxesBuild = [
     [
         'image' => '../public/img/expense.jpg',
         'title' => 'Starter',
-        'label' => '339.66 THB <br>
+        'label' => '339 THB <br>
         per user/month',
         'description' => 'For startups and small engineering teams',
         'text-btn' => 'Get started - free forever',
@@ -111,7 +111,7 @@ $boxesBuild = [
     [
         'image' => '../public/img/expense.jpg',
         'title' => 'Pro',
-        'label' => '849.66 THB <br>
+        'label' => '849 THB <br>
         per user/month',
         'description' => 'Full featured product development platform for scaling teams',
         'text-btn' => 'Get started free',
