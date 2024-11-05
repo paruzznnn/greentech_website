@@ -2,27 +2,23 @@
 
 <?php
     $navbarItems = [
-        // ['text' => 'Home', 'link' => 'index.php?tab=page_home'],
         ['text' => 'Home', 'link' => 'index.php'],
         [
             'text' => 'Origami Platforms',
             'link' => '#',
             'isDropdown' => true,
-            'id' => 'dropdown1', // Dropdown ID for unique reference
+            'id' => 'dropdown1', 
         ],
         [
             'text' => 'Origami AI',
             'link' => '#',
             'isDropdown' => true,
-            'id' => 'dropdown2', // Dropdown ID for second dropdown
+            'id' => 'dropdown2',
         ],
-        // ['text' => 'Origami Ai', 'link' => 'https://devrev.ai/pricing/plug', 'target' => '_blank'],
-        // ['text' => 'Origami AI', 'link' => 'origami_ai.php?tab=page_AI'],
         ['text' => 'Allable Cloud', 'link' => 'allable_cloud.php?tab=page_allable_cloud'],
         ['text' => 'News', 'link' => '#'],
         ['text' => 'About Us', 'link' => 'about.php?tab=page_about'],
         ['text' => 'Contact us', 'link' => 'contact.php?tab=page_contact'],
-        // ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
     ];
 
     // Dropdown items array
