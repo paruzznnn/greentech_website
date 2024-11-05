@@ -1,5 +1,0 @@
-RewriteEngine On
-
-# ซ่อนทุก URL ที่เกินจาก /allable/app
-RewriteCond %{REQUEST_URI} !^/allable/app
-RewriteRule ^(.*)$ /allable/app/$1 [L,R=301]
