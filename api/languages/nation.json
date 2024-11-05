@@ -1,0 +1,14 @@
+{
+    "nationalities": [
+        {
+            "name": "Thai",
+            "abbreviation": "TH",
+            "flag": "https://flagcdn.com/w320/th.png"
+        },
+        {
+            "name": "English",
+            "abbreviation": "EN",
+            "flag": "https://flagcdn.com/w320/gb.png"
+        }
+    ]
+}

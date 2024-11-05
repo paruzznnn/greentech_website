@@ -8,7 +8,7 @@ body {
 .header-top {
     overflow: hidden;
     background-color: #fafafafa;
-    box-shadow: 0px 3px 4px 0px #d9d9d9;
+    /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 5px 10px;
     position: fixed; /* ทำให้ header อยู่ติดด้านบน */
     top: 0;
@@ -22,11 +22,11 @@ body {
 
 .header-top a {
     float: left;
-    color: black;
+    color: #55555569;
     text-align: center;
     padding: 12px;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 25px;
     border-radius: 4px;
 }
@@ -35,14 +35,30 @@ body {
 }
 .header-top-right {
     float: right;
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    border-bottom: 2px solid #eeeeeea3;
 }
+
+.header-top-left {
+    float: left;
+    display: flex; 
+    align-items: center; 
+}
+
 @media screen and (max-width: 500px) {
     .header-top a {
         float: none;
         display: block;
         text-align: left;
+        padding: 6px;
     }
     .header-top-right {
+        float: none;
+    }
+
+    .header-top-left {
         float: none;
     }
 }
@@ -419,3 +435,36 @@ iframe {
     font-size: 16px;
     z-index: 1000;
 } */
+
+.language-select {
+    width: 120px;
+    padding: 5px;
+    font-size: 16px;
+    border: none;
+    /* border: 1px solid #ddd; */
+    border-radius: 4px;
+    background-color: #fafafa;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-left: 30px; /* Space for the flag on the left */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.language-select option {
+    padding: 8px;
+}
+
+/* Hover state */
+.language-select:hover {
+    background-color: #e9ecef; 
+    border-color: #ccc; 
+}
+
+/* Focus/Active state */
+.language-select:focus {
+    /* background-color: #f0f8ff; 
+    border-color: #007bff; */
+    outline: none; /* Remove default outline */
+}
+

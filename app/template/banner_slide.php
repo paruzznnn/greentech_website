@@ -1,9 +1,31 @@
+<?php
+
+// Array of image sources
+$imagesItems = [
+    '../public/img/1730258479586.jpg',
+    '../public/img/1730258513335.jpg',
+    '../public/img/1730258519837.jpg',
+    '../public/img/1AllableBannerSlideWebsite.png',
+];
+
+// Initialize carousel items
+$carouselItems = '';
+foreach ($imagesItems as $index => $image) {
+    // Check if the item is the first one to set the active class
+    $activeClass = ($index === 0) ? 'active' : '';
+    $carouselItems .= '
+        <div class="carousel-item ' . $activeClass . '">
+            <img src="' . $image . '" class="d-block w-100" alt="...">
+        </div>';
+}
+
+?>
 <div class="header-center">
     <div class="container">
         <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
 
             <div class="carousel-indicators">
-                <?php foreach ($images as $index => $image): ?>
+                <?php foreach ($imagesItems as $index => $image): ?>
                     <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="<?= $index ?>" 
                         class="<?= ($index === 0) ? 'active' : '' ?>" 
                         aria-current="<?= ($index === 0) ? 'true' : 'false' ?>" 
