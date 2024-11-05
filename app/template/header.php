@@ -1,24 +1,55 @@
-<div id="background-blur"></div>
-
 <?php
+
+    $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+    $isFile = ($isProtocol === 'http') ? '.php' : '';
+
     $navbarItems = [
-        ['text' => 'Home', 'link' => 'index.php'],
         [
+            'icon' => '',
+            'text' => '', 
+            'translate' => 'Home', 
+            'link' => 'index'.$isFile
+        ],
+        [
+            'icon' => '',
             'text' => 'Origami Platforms',
+            'translate' => '',
             'link' => '#',
             'isDropdown' => true,
             'id' => 'dropdown1', 
         ],
         [
+            'icon' => '',
             'text' => 'Origami AI',
+            'translate' => '',
             'link' => '#',
             'isDropdown' => true,
             'id' => 'dropdown2',
         ],
-        ['text' => 'Allable Cloud', 'link' => 'allable_cloud.php?tab=page_allable_cloud'],
-        ['text' => 'News', 'link' => '#'],
-        ['text' => 'About Us', 'link' => 'about.php?tab=page_about'],
-        ['text' => 'Contact us', 'link' => 'contact.php?tab=page_contact'],
+        [
+            'icon' => '',
+            'text' => 'Allable Cloud', 
+            'translate' => '',
+            'link' => 'allable_cloud'.$isFile.'?tab=page_allable_cloud'
+        ],
+        [
+            'icon' => '',
+            'text' => '',
+            'translate' => 'News',
+            'link' => '#'
+        ],
+        [
+            'icon' => '',
+            'text' => '', 
+            'translate' => 'About_us',
+            'link' => 'about'.$isFile.'?tab=page_about'
+        ],
+        [
+            'icon' => '',
+            'text' => 'Contact us', 
+            'translate' => 'Contact_us',
+            'link' => 'contact'.$isFile.'?tab=page_contact'
+        ],
     ];
 
     // Dropdown items array
@@ -26,60 +57,132 @@
         [
             'id' => 'dropdown1',
             'items' => [
-                ['text' => 'HRM', 'link' => '#'],
-                ['text' => 'CRM', 'link' => '#'],
-                ['text' => 'Project Management', 'link' => '#'],
-                ['text' => 'Expense Management', 'link' => '#'],
-                ['text' => 'iDoc', 'link' => '#'],
-                ['text' => 'Event Management', 'link' => '#'],
-                ['text' => 'Asset Management', 'link' => '#'],
-                ['text' => 'Helpdesk Service', 'link' => '#'],
-                ['text' => 'Learning Management System', 'link' => '#'],
+                [
+                    'icon' => '',
+                    'text' => 'HRM', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'CRM', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Project Management', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Expense Management', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'iDoc', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Event Management', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Asset Management',
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Helpdesk Service', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Learning Management System', 
+                    'translate' => '',
+                    'link' => '#'
+                ],
             ]
         ],
         [
             'id' => 'dropdown2',
             'items' => [
-                ['text' => 'DevRev', 'link' => 'origami_ai.php?tab=page_AI'],
-                ['text' => 'Pricing', 'link' => 'pricing.php?tab=page_pricing'],
+                [
+                    'icon' => '',
+                    'text' => 'DevRev', 
+                    'translate' => '',
+                    'link' => 'origami_ai'.$isFile.'?tab=page_AI'
+                ],
+                [
+                    'icon' => '',
+                    'text' => 'Pricing', 
+                    'translate' => '',
+                    'link' => 'pricing'.$isFile.'?tab=page_pricing'
+                ],
             ]
         ],
     ];
-?>
 
-<?php
-    // Array of image sources
-    $images = [
-        '../public/img/1730258479586.jpg',
-        '../public/img/1730258513335.jpg',
-        '../public/img/1730258519837.jpg',
-        '../public/img/1AllableBannerSlideWebsite.png',
+    //header-top-right
+    $menuItems = [
+        [
+            'icon' => 'fas fa-user-plus',
+            'text' => '',
+            'translate' => 'Sign_up',
+            'link' => '#'
+        ],
+        [
+            'icon' => 'fas fa-sign-in-alt',
+            'text' => '',
+            'translate' => 'Sign_in',
+            'link' => '#'
+        ],
     ];
 
-    // Initialize carousel items
-    $carouselItems = '';
-    foreach ($images as $index => $image) {
-        // Check if the item is the first one to set the active class
-        $activeClass = ($index === 0) ? 'active' : '';
-        $carouselItems .= '
-            <div class="carousel-item ' . $activeClass . '">
-                <img src="' . $image . '" class="d-block w-100" alt="...">
-            </div>';
-    }
 ?>
 
-<div class="header-top">
 
+<div id="background-blur"></div>
+
+<div class="header-top">
     <div class="container">
-        <a href="#">
-            <img class="logo" src="../public/img/logo-ALLABLE-06.png" alt="">
-        </a>
+
+
+        <div class="header-top-left">
+            <a href="#">
+                <img class="logo" src="../public/img/logo-ALLABLE-06.png" alt="">
+            </a>
+        </div>
+            
 
         <div class="header-top-right">
-            <!-- <a href="#"><i class="fas fa-ellipsis-v"></i></a> -->
+            <?php foreach ($menuItems as $item): ?>
+                <div>
+                    <a href="<?php echo $item['link']; ?>">
+                        <i class="<?php echo $item['icon']; ?>"></i>
+                        <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                            <?php echo $item['text']; ?>
+                        </span>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+            <div>
+                <select id="language-select" class="language-select">
+                    <!-- ตัวเลือกภาษา (Language options) สามารถเพิ่มได้ที่นี่ -->
+                </select>
+            </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
 <div id="navbar-menu" onmouseleave="closeAllDropdowns()">
@@ -93,7 +196,10 @@
                         class="dropbtn" 
                         onmouseenter="toggleDropdown('<?php echo $item['id']; ?>')"
                         >
-                            <?php echo $item['text']; ?>
+                            <i class="<?php echo $item['icon']; ?>"></i>
+                            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                                <?php echo $item['text']; ?>
+                            </span>
                             <span class="dropdown-icon">
                                 <i class="fas fa-caret-down"></i>
                             </span>
@@ -104,7 +210,10 @@
                     <?php echo isset($item['target']) ? 'target="' . $item['target'] . '"' : ''; ?>
                     onmouseenter="toggleDropdown()"
                     >
+                    <i class="<?php echo $item['icon']; ?>"></i>
+                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                         <?php echo $item['text']; ?>
+                    </span>
                     </a>
                 <?php endif; ?>
             <?php endforeach; ?>
@@ -116,7 +225,10 @@
             <div class="dropdown-show">
                 <?php foreach ($dropdown['items'] as $dropdownItem): ?>
                     <a class="dropdown-item" href="<?php echo $dropdownItem['link']; ?>">
-                        <?php echo $dropdownItem['text']; ?>
+                        <i class="<?php echo $dropdownItem['icon']; ?>"></i>
+                        <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
+                            <?php echo $dropdownItem['text']; ?>
+                        </span>
                     </a>
                 <?php endforeach; ?>
             </div>

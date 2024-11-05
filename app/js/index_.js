@@ -1,11 +1,28 @@
+var $navbarItemsArray = [];
+var $dropdownItemsArray = [];
+var $menuItemsArray = [];
+var $imagesItemsArray = [];
+
+// let lastScrollTop = 0;
+// const headerTop = document.querySelector('.header-top');
+
+// window.addEventListener('scroll', function() {
+//     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+//     if (scrollTop > lastScrollTop) {
+//         headerTop.style.top = "-100px"; 
+//     } else {
+//         headerTop.style.top = "0";
+//     }
+//     lastScrollTop = scrollTop;
+// });
+
 function toggleDropdown(id) {
-    closeAllDropdowns(); // Close any open dropdowns first
+    closeAllDropdowns(); 
     const dropdown = document.getElementById(id);
     
-    if (dropdown) { // Check if dropdown exists
-        dropdown.style.display = 'block'; // Show the selected dropdown
-        
-        // Check if any dropdown is open to toggle the class
+    if (dropdown) {
+        dropdown.style.display = 'block'; 
         if (dropdown.style.display === 'block') {
             $('#background-blur').addClass('tab-open');
         }
@@ -21,57 +38,92 @@ function closeAllDropdowns() {
     dropdowns.forEach(dropdown => {
         if (dropdown.style.display === 'block') {
             dropdown.style.display = 'none';
-            anyOpen = true; // Set flag if any dropdown was open
+            anyOpen = true;
         }
     });
 
-    // Only remove the class if a dropdown was actually open
     if (anyOpen) {
         $('#background-blur').removeClass('tab-open');
     }
 }
 
 
+/****nationLanguages**** */
 
+function nationLanguages() {
+    $.getJSON("../api/languages/nation.json" + '?' + new Date().getTime(), function(data) {
+        let nationalities = data.nationalities;
+        let $select = $('#language-select');
+        $select.empty();
+    
+        $.each(nationalities, function(index, entry) {
+            let option = $('<option></option>')
+                .attr('value', entry.abbreviation)
+                .attr('data-flag', entry.flag)
+                .text(entry.name);
+            
+            $select.append(option);
+        });
 
-let lastScrollTop = 0;
-const headerTop = document.querySelector('.header-top');
-// const sections = document.querySelectorAll('.box-transform'); 
+        if (nationalities.length > 0) {
+            $select.val(nationalities[0].abbreviation); 
+            updateSelectedLanguageFlag(); 
+        }
+    });
+}
 
-window.addEventListener('scroll', function() {
-    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+function updateSelectedLanguageFlag() {
+    let selectedOption = $('#language-select option:selected');
+    let flagUrl = selectedOption.data('flag');
 
-    // ซ่อน header เมื่อเลื่อนลง
-    if (scrollTop > lastScrollTop) {
-        headerTop.style.top = "-100px"; // ซ่อน header
-
-        // วนลูปผ่านทุก .section
-        // sections.forEach(section => {
-        //     const img = section.querySelector('img'); 
-        //     if (img) {
-        //         img.style.transform = 'translateY(-20px)'; 
-        //     }
-        // });
-
-    } else {
-        headerTop.style.top = "0"; // แสดง header
-
-        // วนลูปผ่านทุก .section
-        // sections.forEach(section => {
-        //     const img = section.querySelector('img'); // เลือกรูปภาพในแต่ละ section
-        //     if (img) {
-        //         img.style.transform = 'translateY(0)'; // ส่งภาพกลับไปที่ตำแหน่งเดิม
-        //     }
-        // });
+    if (flagUrl) {
+        $('#language-select').css({
+            'background-image': 'url(' + flagUrl + ')',
+            'background-repeat': 'no-repeat',
+            'background-position': 'left 8px center',
+            'background-size': '20px 15px',
+            'padding-left': '30px' 
+        });
     }
+}
 
-    lastScrollTop = scrollTop; // อัปเดต lastScrollTop
+function changeLanguage(lang) {
+    fetch(`../api/languages/${lang}.json`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.querySelectorAll("[data-translate][lang]").forEach(el => {
+                const key = el.getAttribute("data-translate");
+
+                el.textContent = data[key] || el.textContent; 
+                // Update the lang attribute to the selected language
+                el.setAttribute('lang', lang);
+
+            });
+        })
+        .catch(error => console.error('Error loading language file:', error));
+}
+
+/****nationLanguages**** */
+
+
+$(document).ready(function() {
+
+    nationLanguages();
+    const selectedLanguage = localStorage.getItem('language') || 'en';
+    changeLanguage(selectedLanguage);
+
+    $('#language-select').on('change', function() {
+        const selectedLang = $(this).val();
+        changeLanguage(selectedLang);
+        updateSelectedLanguageFlag();
+    });
+
 });
 
 
 
-
-$('#navbar-menu a').on('click', function() {
-    $('#navbar-menu a').removeClass('active');
-    $(this).addClass('active');
-});
