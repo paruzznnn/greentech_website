@@ -31,9 +31,6 @@ const buildTabSidebar = () => {
             
             sidebarItems = response;
 
-            console.log('sidebarItems', sidebarItems);
-            
-
             // Check if sidebarItems is valid
             if (!Array.isArray(sidebarItems) || sidebarItems.length === 0) {
                 $('#showTabSidebar').html('<p>No sidebar items found.</p>');

@@ -36,10 +36,10 @@ $result = [
     [
         'menu_id' => 4, 
         'parent_id' => 2, 
-        'menu_icon' => 'icon-submenu2', 
-        'menu_label' => 'Submenu 2', 
-        'menu_link' => '', 
-        'menu_order' => 2
+        'menu_icon' => '<i class="far fa-circle"></i>', 
+        'menu_label' => 'Set Navbar', 
+        'menu_link' => 'set_template/set_navbar.php', 
+        'menu_order' => 3
     ],
 ];
 
