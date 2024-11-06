@@ -32,90 +32,58 @@ include('../../../lib/base_directory.php');
         }
 
 
-.dropzone {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px;
-    flex-grow: 1; /* Take up remaining space */
-    overflow-y: auto;
-    background-color: #fafafa; /* Light background color for better contrast */
-    border: 2px dashed #ccc; /* Dashed border to indicate droppable area */
-    border-radius: 8px; /* Rounded corners */
-}
-
-.target-row {
-    display: grid;
-    gap: 10px;
-    width: 100%;
-    cursor: pointer; 
-}
-
-.target-cell {
-    border: 1px solid #ddd;
-    min-height: 50px;
-    background-color: #e0f7fa;
-    border-radius: 4px; /* Rounded corners */
-    padding: 8px; /* Padding for spacing */
-    position: relative;
-    transition: background-color 0.3s ease; /* Smooth transition for background changes */
-}
-
-.target-cell:hover {
-    background-color: #b2ebf2; /* Darker shade on hover */
-}
-
-.selected {
-    background-color: #ffcc80;
-    box-shadow: 1px 2px 4px rgba(255, 204, 128, 0.6); /* Subtle shadow for emphasis */
-    border-color: #ffa726; /* Border color to match selection highlight */
-}
-
-.draggable {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: grab;
-    border-radius: 4px; /* Rounded corners */
-    transition: background-color 0.2s ease;
-}
-
-.draggable:active {
-    background-color: #ececec;
-    cursor: grabbing; /* Change cursor on drag */
-}
-
-
-        /* .dropzone {
+        .dropzone {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding: 10px;
-            flex-grow: 1; 
+            padding: 15px;
+            flex-grow: 1; /* Take up remaining space */
             overflow-y: auto;
+            background-color: #fafafa; /* Light background color for better contrast */
+            border: 2px dashed #ccc; /* Dashed border to indicate droppable area */
+            border-radius: 8px; /* Rounded corners */
         }
+
         .target-row {
             display: grid;
             gap: 10px;
             width: 100%;
             cursor: pointer; 
         }
+
         .target-cell {
             border: 1px solid #ddd;
-            min-height: 40px;
+            min-height: 50px;
             background-color: #e0f7fa;
+            border-radius: 4px; /* Rounded corners */
+            padding: 8px; /* Padding for spacing */
             position: relative;
+            transition: background-color 0.3s ease; /* Smooth transition for background changes */
         }
+
+        .target-cell:hover {
+            background-color: #b2ebf2; /* Darker shade on hover */
+        }
+
         .selected {
             background-color: #ffcc80;
-            box-shadow: 1px 2px 4px #ffcc80;
+            box-shadow: 1px 2px 4px rgba(255, 204, 128, 0.6); /* Subtle shadow for emphasis */
+            border-color: #ffa726; /* Border color to match selection highlight */
         }
+
         .draggable {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ccc;
             background-color: #fff;
             cursor: grab;
-        } */
+            border-radius: 4px; /* Rounded corners */
+            transition: background-color 0.2s ease;
+        }
+
+        .draggable:active {
+            background-color: #ececec;
+            cursor: grabbing; /* Change cursor on drag */
+        }
 
         .input-class {
             background-color: #f0f8ff; /* สีพื้นหลัง */
@@ -168,8 +136,8 @@ include('../../../lib/base_directory.php');
 
 <?php include '../template/header.php'?>
 
-<div class="content-sticky" id="page_contact">
-    <div class="container">
+<div class="content-sticky" id="">
+    <div class="container-fluid">
         <div class="box-content">
             <div class="row">
 
@@ -177,23 +145,20 @@ include('../../../lib/base_directory.php');
 
                     <div class="controls">
                         <label>Row column configuration: 
-                            <input type="text" id="rowConfigInput" placeholder="e.g., 3,2,4">
+                            <input type="text" id="rowConfigInput" class="form-control" placeholder="e.g., 3,2,4">
                         </label>
 
-                        <button id="addRowButton">Add Row</button>
-                        <button id="deleteSelectedRowsButton">Delete Selected Rows</button>
-                        <button id="saveLayoutButton">Save Layout</button>
-                        <button id="resetLayoutButton">Reset Layout</button>
+                        <button id="addRowButton" type="button" class="btn btn-primary">Add Row</button>
+                        <button id="deleteSelectedRowsButton" type="button" class="btn btn-danger">Delete Selected Rows</button>
+                        <button id="resetLayoutButton" type="button" class="btn btn-warning">Reset Layout</button>
 
                         <label>Update Selected Row (set columns): 
-                            <input type="number" id="selectedRowConfigInput" placeholder="e.g., 2" min="1">
-                            <button id="updateSelectedRowButton">Update Selected Row</button>
+                            <input type="number" id="selectedRowConfigInput" class="form-control" placeholder="e.g., 2" min="1">
+                            <button id="updateSelectedRowButton" type="button" class="btn btn-warning">Update Selected Row</button>
                         </label>
 
-                        <div class="downloadContent"></div>
-
                         <label for="classSelector">Select CSS Class: 
-                            <select id="classSelector">
+                            <select id="classSelector" class="form-select">
                                 <option value="">None</option>
                                 <option value="input-class">Input Field</option>
                                 <option value="button-class">Button</option>
@@ -205,7 +170,7 @@ include('../../../lib/base_directory.php');
                                 <option value="color-class">Color Picker</option>
                             </select>
                         </label>
-                        <button id="applyClassButton">Apply Class</button>
+                        <button id="applyClassButton" type="button" class="btn btn-primary">Apply Class</button>
                     </div>
                 
                 </div>
@@ -224,7 +189,46 @@ include('../../../lib/base_directory.php');
 
                 </div>
                 <div class="col-md-6">
-                    <div id="targetZone" class="dropzone"></div>
+
+                    <div class="row">
+
+                        <div class="col-md-12 d-flex justify-content-between mb-3 flex-wrap">
+                            <div class="flex-fill mx-2">
+                                <label for="mainDirectory">Main Directory:</label>
+                                <select id="mainDirectory" class="form-select">
+                                    <option value=""></option>
+                                    <option value="set_template">set template</option>
+                                </select>
+                            </div>
+
+                            <div class="flex-fill mx-2">
+                                <label for="subDirectory">Sub Directory:</label>
+                                <select id="subDirectory" class="form-select">
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <div class="flex-fill mx-2">
+                                <label for="fileSystem">File:</label>
+                                <input type="text" id="fileSystem" class="form-control" placeholder="file name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div id="targetZone" class="dropzone"></div>
+                        </div>
+
+                        <div class="col-md-12 mt-3">
+                            <div style="float: inline-end;">
+                                <button id="saveLayoutButton" type="button" class="btn btn-success ml-auto">
+                                    Save Layout
+                                </button>
+                            </div>
+                        </div>
+
+
+                    </div>
                 </div>
 
             </div>
@@ -232,11 +236,6 @@ include('../../../lib/base_directory.php');
         </div>
     </div>
 </div>
-
-
-
-
-
 
 
 <script>
@@ -251,6 +250,13 @@ include('../../../lib/base_directory.php');
     const updateSelectedRowButton = document.getElementById('updateSelectedRowButton');
     const classSelector = document.getElementById('classSelector');
     const applyClassButton = document.getElementById('applyClassButton');
+
+    const mainDirectorySelector = document.getElementById('mainDirectory');
+    const subDirectorySelector = document.getElementById('subDirectory');
+
+    const fileSystemInput = document.getElementById('fileSystem');
+
+    
 
     function createCustomGrid(rowConfig) {
         targetZone.innerHTML = '';
@@ -300,7 +306,6 @@ include('../../../lib/base_directory.php');
             case 'input':
                 element = document.createElement('input');
                 element.type = 'text';
-                element.placeholder = 'Input Field';
                 break;
             case 'button':
                 element = document.createElement('button');
@@ -322,21 +327,11 @@ include('../../../lib/base_directory.php');
             case 'checkbox':
                 element = document.createElement('input');
                 element.type = 'checkbox';
-                element.id = 'checkbox' + Date.now();
-                const label = document.createElement('label');
-                label.setAttribute('for', element.id);
-                label.textContent = 'Checkbox';
-                element.appendChild(label);
                 break;
             case 'radio':
                 element = document.createElement('input');
                 element.type = 'radio';
                 element.name = 'radioGroup'; 
-                element.id = 'radio' + Date.now();
-                const radioLabel = document.createElement('label');
-                radioLabel.setAttribute('for', element.id);
-                radioLabel.textContent = 'Radio Button';
-                element.appendChild(radioLabel);
                 break;
             case 'file':
                 element = document.createElement('input');
@@ -431,74 +426,97 @@ include('../../../lib/base_directory.php');
 
     resetLayoutButton.addEventListener('click', () => {
         targetZone.innerHTML = '';
-        
-        const contentContainer = document.querySelector('.downloadContent');
-        contentContainer.innerHTML = '';
     });
 
     function buildHtml(layout){
 
-        let htmlLayout = `
-            <html>
-            <head>
-                <style>
-                    .input-class {
-                        background-color: #f0f8ff;
-                        border: 1px solid #ccc; 
-                        padding: 10px; 
-                        margin: 5px;
-                    }
+        let cssHtml = `
+            <style>
+                .input-class {
+                    background-color: #f0f8ff;
+                    border: 1px solid #ccc; 
+                    padding: 10px; 
+                    margin: 5px;
+                }
 
-                    .button-class {
-                        background-color: #4CAF50;
-                        color: white;
-                        border: none;
-                        padding: 10px 15px;
-                        cursor: pointer;
-                    }
+                .button-class {
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    cursor: pointer;
+                }
 
-                    .select-class {
-                        background-color: #ffffff;
-                        border: 1px solid #ccc;
-                        padding: 5px;
-                        margin: 5px;
-                    }
+                .select-class {
+                    background-color: #ffffff;
+                    border: 1px solid #ccc;
+                    padding: 5px;
+                    margin: 5px;
+                }
 
-                    .textarea-class {
-                        background-color: #f9f9f9;
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                    }
+                .textarea-class {
+                    background-color: #f9f9f9;
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                }
 
-                    .checkbox-class,
-                    .radio-class {
-                        margin-right: 5px;
-                    }
+                .checkbox-class,
+                .radio-class {
+                    margin-right: 5px;
+                }
 
-                    .file-class {
-                        background-color: #ffffff;
-                        border: 1px solid #ccc;
-                        padding: 5px;
-                    }
+                .file-class {
+                    background-color: #ffffff;
+                    border: 1px solid #ccc;
+                    padding: 5px;
+                }
 
-                    .color-class {
-                        padding: 5px;
-                        border: 1px solid #ccc;
-                    }
-                </style>
-            </head>
-            <body>
+                .color-class {
+                    padding: 5px;
+                    border: 1px solid #ccc;
+                }
+            </style>
         `;
+
+        let htmlLayout = `
+            <!DOCTYPE html>
+            <html lang="th">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title></title>
+                    ${cssHtml}
+                </head>
+                <body>
+        `;
+
+        htmlLayout += `
+        <div class="content-sticky" id="">
+            <div class="container-fluid">
+                <div class="box-content">
+                    <div class="row">
+        \n`;
+
+        htmlLayout += '<div>\n';
 
         layout.forEach(item => {
             htmlLayout += `<div style="display: grid; grid-template-columns: ${item.columns}; gap: 10px;">\n`;
             
             item.cells.forEach(cell => {
-                htmlLayout += `  <div>${cell}</div>\n`; 
+                htmlLayout += `  <div style="margin: 10px;">${cell}</div>\n`; 
             });
 
             htmlLayout += '</div>\n';
         });
+
+        htmlLayout += '</div>\n';
+
+        htmlLayout += `
+                    </div>
+                </div>
+            </div>
+        </div>
+        \n`;
 
         htmlLayout += `
             </body>
@@ -509,11 +527,38 @@ include('../../../lib/base_directory.php');
 
     }
 
-    function buildCss(){
-    }
+    // saveLayoutButton.addEventListener('click', () => {
+    //     const rows = targetZone.querySelectorAll('.target-row');
+    //     const layout = Array.from(rows).map(row => {
+    //         return {
+    //             columns: row.style.gridTemplateColumns,
+    //             cells: Array.from(row.children).map(cell => cell.innerHTML)
+    //         };
+    //     });
 
-    function buildJavaScript(){
-    }
+    //     const contentContainer = document.querySelector('.downloadContent');
+
+    //     let htmlContent = buildHtml(layout);
+
+    //     const downloadButton = document.createElement('button');
+    //     downloadButton.innerText = 'Download HTML';
+    //     downloadButton.type = 'button'; 
+
+    //     downloadButton.addEventListener('click', () => {
+    //         const blob = new Blob([htmlContent], { type: 'text/html' });
+    //         const url = URL.createObjectURL(blob);
+            
+    //         const a = document.createElement('a');
+    //         a.href = url;
+    //         a.download = 'layout.html'; 
+    //         document.body.appendChild(a);
+    //         a.click();
+    //         document.body.removeChild(a); 
+    //         URL.revokeObjectURL(url);
+    //     });
+
+    //     contentContainer.appendChild(downloadButton);
+    // });
 
     saveLayoutButton.addEventListener('click', () => {
         const rows = targetZone.querySelectorAll('.target-row');
@@ -524,29 +569,38 @@ include('../../../lib/base_directory.php');
             };
         });
 
-        const contentContainer = document.querySelector('.downloadContent');
-
         let htmlContent = buildHtml(layout);
 
-        const downloadButton = document.createElement('button');
-        downloadButton.innerText = 'Download HTML';
-        downloadButton.type = 'button'; 
+        
 
-        downloadButton.addEventListener('click', () => {
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'layout.html'; 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a); 
-            URL.revokeObjectURL(url);
+        let mainFolder = mainDirectorySelector.value;
+        let subFolder = subDirectorySelector.value;
+        let fileName = fileSystemInput.value;
+
+
+        $.ajax({
+            url: 'actions/save_layout.php',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                { 
+                    htmlContent,
+                    mainFolder, 
+                    subFolder,
+                    fileName
+                }
+            ),
+            success: function(data) {
+                console.log('Data:', data);  // แสดงข้อมูลที่ได้รับจากเซิร์ฟเวอร์
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);  // แสดงข้อผิดพลาดหากมี
+            }
         });
 
-        contentContainer.appendChild(downloadButton);
+
     });
+
 
 
 </script>
