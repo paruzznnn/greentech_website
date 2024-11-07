@@ -21,7 +21,7 @@ $result = [
         'menu_id' => 2, 
         'parent_id' => 0, 
         'menu_icon' => '<i class="fas fa-user-cog"></i>', 
-        'menu_label' => 'Setting ', 
+        'menu_label' => 'Developer ', 
         'menu_link' => '', 
         'menu_order' => 2
     ],
@@ -30,16 +30,24 @@ $result = [
         'parent_id' => 2, 
         'menu_icon' => '<i class="fas fa-th-large"></i>', 
         'menu_label' => 'Set HTML', 
-        'menu_link' => 'set_template/set_download.php', 
+        'menu_link' => 'set_template/set_layout.php', 
         'menu_order' => 1
     ],
     [
         'menu_id' => 4, 
-        'parent_id' => 2, 
-        'menu_icon' => '<i class="far fa-circle"></i>', 
-        'menu_label' => 'Set Navbar', 
-        'menu_link' => 'set_template/set_navbar.php', 
-        'menu_order' => 3
+        'parent_id' => 0, 
+        'menu_icon' => '<i class="fas fa-newspaper"></i>', 
+        'menu_label' => 'News ', 
+        'menu_link' => '', 
+        'menu_order' => 1
+    ],
+    [
+        'menu_id' => 5, 
+        'parent_id' => 4, 
+        'menu_icon' => '<i class="fas fa-pen-alt"></i>', 
+        'menu_label' => 'Add news', 
+        'menu_link' => 'set_news/setup_news.php', 
+        'menu_order' => 2
     ],
 ];
 

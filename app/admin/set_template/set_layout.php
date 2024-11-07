@@ -9,6 +9,7 @@ include('../../../lib/base_directory.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+    <link rel='icon' type='image/x-icon' href='../../../public/img/logo-ALLABLE-07.ico'>
 
     <?php include 'inc_head.php'?>
     <link href="../css/index_.css?v=<?php echo time();?>" rel="stylesheet">
@@ -37,11 +38,11 @@ include('../../../lib/base_directory.php');
             flex-direction: column;
             gap: 10px;
             padding: 15px;
-            flex-grow: 1; /* Take up remaining space */
+            flex-grow: 1;
             overflow-y: auto;
-            background-color: #fafafa; /* Light background color for better contrast */
-            border: 2px dashed #ccc; /* Dashed border to indicate droppable area */
-            border-radius: 8px; /* Rounded corners */
+            background-color: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
         }
 
         .target-row {
@@ -55,20 +56,20 @@ include('../../../lib/base_directory.php');
             border: 1px solid #ddd;
             min-height: 50px;
             background-color: #e0f7fa;
-            border-radius: 4px; /* Rounded corners */
-            padding: 8px; /* Padding for spacing */
+            border-radius: 4px;
+            padding: 8px; 
             position: relative;
-            transition: background-color 0.3s ease; /* Smooth transition for background changes */
+            transition: background-color 0.3s ease;
         }
 
         .target-cell:hover {
-            background-color: #b2ebf2; /* Darker shade on hover */
+            background-color: #b2ebf2;
         }
 
         .selected {
             background-color: #ffcc80;
-            box-shadow: 1px 2px 4px rgba(255, 204, 128, 0.6); /* Subtle shadow for emphasis */
-            border-color: #ffa726; /* Border color to match selection highlight */
+            box-shadow: 1px 2px 4px rgba(255, 204, 128, 0.6);
+            border-color: #ffa726;
         }
 
         .draggable {
@@ -76,57 +77,57 @@ include('../../../lib/base_directory.php');
             border: 1px solid #ccc;
             background-color: #fff;
             cursor: grab;
-            border-radius: 4px; /* Rounded corners */
+            border-radius: 4px;
             transition: background-color 0.2s ease;
         }
 
         .draggable:active {
             background-color: #ececec;
-            cursor: grabbing; /* Change cursor on drag */
+            cursor: grabbing;
         }
 
         .input-class {
-            background-color: #f0f8ff; /* สีพื้นหลัง */
-            border: 1px solid #ccc; /* ขอบ */
-            padding: 10px; /* ช่องว่างภายใน */
-            margin: 5px; /* ช่องว่างภายนอก */
+            background-color: #f0f8ff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
         }
 
         .button-class {
-            background-color: #4CAF50; /* สีพื้นหลัง */
-            color: white; /* สีข้อความ */
-            border: none; /* ไม่แสดงขอบ */
-            padding: 10px 15px; /* ช่องว่าง */
-            cursor: pointer; /* เปลี่ยนเคอร์เซอร์ */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
         }
 
         .select-class {
-            background-color: #ffffff; /* สีพื้นหลัง */
-            border: 1px solid #ccc; /* ขอบ */
-            padding: 5px; /* ช่องว่าง */
-            margin: 5px; /* ช่องว่าง */
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin: 5px;
         }
 
         .textarea-class {
-            background-color: #f9f9f9; /* สีพื้นหลัง */
-            border: 1px solid #ccc; /* ขอบ */
-            padding: 10px; /* ช่องว่าง */
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
         }
 
         .checkbox-class,
         .radio-class {
-            margin-right: 5px; /* ช่องว่างระหว่างป้ายกำกับ */
+            margin-right: 5px;
         }
 
         .file-class {
-            background-color: #ffffff; /* สีพื้นหลัง */
-            border: 1px solid #ccc; /* ขอบ */
-            padding: 5px; /* ช่องว่าง */
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 5px;
         }
 
         .color-class {
-            padding: 5px; /* ช่องว่าง */
-            border: 1px solid #ccc; /* ขอบ */
+            padding: 5px;
+            border: 1px solid #ccc;
         }
 
 
@@ -197,14 +198,14 @@ include('../../../lib/base_directory.php');
                                 <label for="mainDirectory">Main Directory:</label>
                                 <select id="mainDirectory" class="form-select">
                                     <option value=""></option>
-                                    <option value="set_template">set template</option>
+                                    <option value="set_template">Developer</option>
+                                    <option value="set_news">News</option>
                                 </select>
                             </div>
 
                             <div class="flex-fill mx-2">
                                 <label for="subDirectory">Sub Directory:</label>
                                 <select id="subDirectory" class="form-select">
-                                    <option value=""></option>
                                     <option value=""></option>
                                 </select>
                             </div>
@@ -430,54 +431,6 @@ include('../../../lib/base_directory.php');
 
     function buildHtml(layout){
 
-        let cssHtml = `
-            <style>
-                .input-class {
-                    background-color: #f0f8ff;
-                    border: 1px solid #ccc; 
-                    padding: 10px; 
-                    margin: 5px;
-                }
-
-                .button-class {
-                    background-color: #4CAF50;
-                    color: white;
-                    border: none;
-                    padding: 10px 15px;
-                    cursor: pointer;
-                }
-
-                .select-class {
-                    background-color: #ffffff;
-                    border: 1px solid #ccc;
-                    padding: 5px;
-                    margin: 5px;
-                }
-
-                .textarea-class {
-                    background-color: #f9f9f9;
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                }
-
-                .checkbox-class,
-                .radio-class {
-                    margin-right: 5px;
-                }
-
-                .file-class {
-                    background-color: #ffffff;
-                    border: 1px solid #ccc;
-                    padding: 5px;
-                }
-
-                .color-class {
-                    padding: 5px;
-                    border: 1px solid #ccc;
-                }
-            </style>
-        `;
-
         let htmlLayout = `
             <!DOCTYPE html>
             <html lang="th">
@@ -485,7 +438,6 @@ include('../../../lib/base_directory.php');
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title></title>
-                    ${cssHtml}
                 </head>
                 <body>
         `;
@@ -570,13 +522,9 @@ include('../../../lib/base_directory.php');
         });
 
         let htmlContent = buildHtml(layout);
-
-        
-
         let mainFolder = mainDirectorySelector.value;
         let subFolder = subDirectorySelector.value;
         let fileName = fileSystemInput.value;
-
 
         $.ajax({
             url: 'actions/save_layout.php',
@@ -591,17 +539,13 @@ include('../../../lib/base_directory.php');
                 }
             ),
             success: function(data) {
-                console.log('Data:', data);  // แสดงข้อมูลที่ได้รับจากเซิร์ฟเวอร์
+                console.log('Data:', data);  
             },
             error: function(xhr, status, error) {
-                console.error('Error:', error);  // แสดงข้อผิดพลาดหากมี
+                console.error('Error:', error);
             }
         });
-
-
     });
-
-
 
 </script>
 

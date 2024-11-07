@@ -2,10 +2,10 @@
 
 // Array of image sources
 $imagesItems = [
+    '../public/img/1AllableBannerSlideWebsite.png',
     '../public/img/1730258479586.jpg',
     '../public/img/1730258513335.jpg',
     '../public/img/1730258519837.jpg',
-    '../public/img/1AllableBannerSlideWebsite.png',
 ];
 
 // Initialize carousel items
