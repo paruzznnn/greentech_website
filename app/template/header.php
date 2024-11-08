@@ -36,7 +36,7 @@
             'icon' => '',
             'text' => '',
             'translate' => 'News',
-            'link' => '#'
+            'link' => 'news'.$isFile
         ],
         [
             'icon' => '',
@@ -164,7 +164,7 @@
         </div>
             
 
-        <div class="header-top-right">
+        <!-- <div class="header-top-right">
             <?php foreach ($menuItems as $item): ?>
                 <div>
                     <a href="<?php echo $item['link']; ?>">
@@ -177,10 +177,9 @@
             <?php endforeach; ?>
             <div>
                 <select id="language-select" class="language-select">
-                    <!-- ตัวเลือกภาษา (Language options) สามารถเพิ่มได้ที่นี่ -->
                 </select>
             </div>
-        </div>
+        </div> -->
 
     </div>
 </div>

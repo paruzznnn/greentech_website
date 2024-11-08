@@ -1,30 +1,24 @@
 <?php
-if($_SERVER['SERVER_NAME'] == 'dev.allhiapp.com'){
+// if($_SERVER['SERVER_NAME'] == 'dev.allhiapp.com'){
 
-    $dbHostPD = "localhost:3306";
-    $dbUserPD = "allhi_store";
-    $dbPassPD = "6Of6h#1w1";
-    $dbNamePD = "allhi_store";
+//     $dbHostPD = "localhost:3306";
+//     $dbUserPD = "allhi_store";
+//     $dbPassPD = "6Of6h#1w1";
+//     $dbNamePD = "allhi_store";
 
-    $host = $dbHostPD; 
-    $username = $dbUserPD; 
-    $password = $dbPassPD; 
-    $database = $dbNamePD;
+//     $host = $dbHostPD; 
+//     $username = $dbUserPD; 
+//     $password = $dbPassPD; 
+//     $database = $dbNamePD;
 
-}else{
+// }else{
 
-    $dbHost = "localhost";
-    $dbUser = "root";
-    $dbPass = "";
-    $dbName = "store_db";
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "allable_db";
 
-    // Database configuration
-    $host = $dbHost; 
-    $username = $dbUser; 
-    $password = ''; 
-    $database = $dbName;
-
-}
+// }
 
 
 $conn = new mysqli($host, $username, $password, $database);

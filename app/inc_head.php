@@ -6,6 +6,7 @@
 
     <link href="../inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="../inc/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../inc/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
 

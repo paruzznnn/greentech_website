@@ -1,0 +1,67 @@
+.content-news {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* สามคอลัมน์บนหน้าจอขนาดใหญ่ */
+    gap: 20px;
+    padding: 20px;
+    justify-items: center;
+}
+
+.box-news {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.box-image {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 330px;
+    max-height: 330px;
+    overflow: hidden;
+}
+
+.box-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.box-content {
+    flex: 1; /* ให้เนื้อหาด้านล่างขยายเต็มที่ */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* จัดระยะห่างให้เนื้อหากระจาย */
+}
+
+.box-content p,
+.box-content h6,
+.box-content ul {
+    margin: 0;
+}
+
+.box-news ul {
+    padding-left: 20px;
+}
+
+@media (max-width: 1024px) {
+    .content-news {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .content-news {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .content-news {
+        grid-template-columns: 1fr;
+    }
+}
