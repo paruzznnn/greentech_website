@@ -114,7 +114,7 @@ function changeLanguage(lang) {
 $(document).ready(function() {
 
     nationLanguages();
-    const selectedLanguage = localStorage.getItem('language') || 'en';
+    const selectedLanguage = localStorage.getItem('language') || 'th';
     changeLanguage(selectedLanguage);
 
     $('#language-select').on('change', function() {

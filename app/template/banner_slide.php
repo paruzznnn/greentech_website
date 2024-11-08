@@ -1,6 +1,5 @@
 <?php
 
-// Array of image sources
 $imagesItems = [
     '../public/img/1AllableBannerSlideWebsite.png',
     '../public/img/1730258479586.jpg',
@@ -8,10 +7,8 @@ $imagesItems = [
     '../public/img/1730258519837.jpg',
 ];
 
-// Initialize carousel items
 $carouselItems = '';
 foreach ($imagesItems as $index => $image) {
-    // Check if the item is the first one to set the active class
     $activeClass = ($index === 0) ? 'active' : '';
     $carouselItems .= '
         <div class="carousel-item ' . $activeClass . '">

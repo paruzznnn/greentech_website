@@ -50,18 +50,38 @@ include('../../../lib/base_directory.php');
             gap: 10px;
             width: 100%;
             cursor: pointer; 
+            min-height: 30px;
+            background-color: #e0f7fa;
         }
 
         .target-cell {
             border: 1px solid #ddd;
-            min-height: 50px;
             background-color: #e0f7fa;
             border-radius: 4px;
-            padding: 8px; 
+            padding: 8px;
             position: relative;
             transition: background-color 0.3s ease;
+            height: 60px; 
+            width: 100%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
         }
 
+        .target-cell input,
+        .target-cell button,
+        .target-cell select,
+        .target-cell textarea {
+            width: 100%;
+            height: 100%; 
+            box-sizing: border-box; 
+            overflow: hidden;
+        }
+
+        .target-cell textarea {
+            resize: none; 
+        }
         .target-cell:hover {
             background-color: #b2ebf2;
         }
@@ -86,49 +106,6 @@ include('../../../lib/base_directory.php');
             cursor: grabbing;
         }
 
-        .input-class {
-            background-color: #f0f8ff;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 5px;
-        }
-
-        .button-class {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-        }
-
-        .select-class {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            padding: 5px;
-            margin: 5px;
-        }
-
-        .textarea-class {
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-
-        .checkbox-class,
-        .radio-class {
-            margin-right: 5px;
-        }
-
-        .file-class {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-
-        .color-class {
-            padding: 5px;
-            border: 1px solid #ccc;
-        }
 
 
     </style>
@@ -257,39 +234,22 @@ include('../../../lib/base_directory.php');
 
     const fileSystemInput = document.getElementById('fileSystem');
 
-    
+    function addRow(countRows) {
+        for (let i = 0; i < countRows; i++) {
+            const row = document.createElement('div');
+            row.classList.add('target-row');
+            row.style.gridTemplateColumns = `repeat(1, 1fr)`;
+            row.addEventListener('dragover', (e) => e.preventDefault());
+            row.addEventListener('drop', handleDrop);
 
-    function createCustomGrid(rowConfig) {
-        targetZone.innerHTML = '';
-        rowConfig.forEach(columns => addRow(columns));
-    }
-
-    function addRow(columns) {
-        const row = document.createElement('div');
-        row.classList.add('target-row');
-        row.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
-        for (let i = 0; i < columns; i++) {
-            const cell = document.createElement('div');
-            cell.classList.add('target-cell');
-            cell.setAttribute('data-cell', `${i}`);
-            cell.addEventListener('dragover', (e) => e.preventDefault());
-            cell.addEventListener('drop', handleDrop);
-
-            cell.addEventListener('click', () => {
-                cell.classList.toggle('selected');
+            row.addEventListener('click', () => {
+                row.classList.toggle('selected');
             });
 
-            row.appendChild(cell);
+            targetZone.appendChild(row);
         }
-
-        row.addEventListener('click', () => {
-            row.classList.toggle('selected');
-        });
-
-
-        targetZone.appendChild(row);
     }
+
 
     document.querySelectorAll('.draggable').forEach(item => {
         item.addEventListener('dragstart', handleDragStart);
@@ -344,7 +304,10 @@ include('../../../lib/base_directory.php');
                 break;
         }
 
-        if (e.target.classList.contains('target-cell') && !e.target.hasChildNodes()) {
+        if (
+            (e.target.classList.contains('target-cell') && !e.target.hasChildNodes()) ||
+            (e.target.classList.contains('target-row') && !e.target.hasChildNodes())
+        ) {
             element.classList.add('draggable');
 
             element.addEventListener('dblclick', () => {
@@ -357,9 +320,9 @@ include('../../../lib/base_directory.php');
     }
 
     addRowButton.addEventListener('click', () => {
-        const columns = parseInt(rowConfigInput.value);
-        if (columns > 0) {
-            addRow(columns);
+        const countRows = parseInt(rowConfigInput.value);
+        if (countRows > 0) {
+            addRow(countRows);
         }
     });
 

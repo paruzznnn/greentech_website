@@ -483,6 +483,7 @@ iframe {
     padding-top: 20px;
     box-shadow: 2px 2px 4px 0px #e8e8ea;
     overflow-y: auto;
+    z-index: 999;
 }
 
 .sidebar a {
@@ -687,4 +688,12 @@ iframe {
     max-height: 100%;            
     object-fit: contain; 
 
+}
+
+th{
+    color: #555 !important;
+}
+
+td{
+    color: #555 !important;
 }

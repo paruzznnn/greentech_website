@@ -127,7 +127,55 @@ const buildTabSidebar = () => {
     });
 };
 
+function cssResponsiveTable(tableId, headers) {
 
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    let cssContent = `
+        @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+            #${tableId}, #${tableId} thead, #${tableId} tbody, #${tableId} th, #${tableId} td, #${tableId} tr {
+                display: block;
+            }
+
+            #${tableId} thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            #${tableId} tr {
+                margin: 0 0 1rem 0;
+            }
+
+            #${tableId} td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+            }
+
+            #${tableId} td:before {
+                position: absolute;
+                top: 0;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+    `;
+
+    headers.forEach((header, index) => {
+        cssContent += `
+            #${tableId} td:nth-of-type(${index + 1}):before { content: "${header}"; font-weight: 700; }
+        `;
+    });
+
+    cssContent += ` }`;
+
+    style.innerHTML = cssContent;
+    document.head.appendChild(style);
+
+}
 
 
 

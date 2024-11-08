@@ -49,6 +49,14 @@ $result = [
         'menu_link' => 'set_news/setup_news.php', 
         'menu_order' => 2
     ],
+    [
+        'menu_id' => 6, 
+        'parent_id' => 4, 
+        'menu_icon' => '<i class="fas fa-table"></i>', 
+        'menu_label' => 'List news', 
+        'menu_link' => 'set_news/list_news.php', 
+        'menu_order' => 2
+    ],
 ];
 
 $sidebarItems = [];
