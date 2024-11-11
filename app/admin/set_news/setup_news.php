@@ -77,6 +77,15 @@ include('../../../lib/base_directory.php');
                 text-align: center; /* Center-align button on very small screens */
             }
         }
+
+        .note-editor .note-toolbar, .note-popover .popover-content {
+            margin: 0;
+            padding: 0 0 5px 5px;
+            position: sticky !important;
+            top: 0px !important;
+            z-index: 999 !important;
+        }
+
     </style>
 </head>
 

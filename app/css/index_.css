@@ -73,7 +73,7 @@ body {
     background-color: #fafafa;
     /* background-color: #ff9800; */
     white-space: nowrap;
-    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1); */
     font-size: 16px;
     z-index: 1000;
 }
@@ -291,7 +291,7 @@ body {
 
 #map-plugin {
     width: 100%;
-    max-width: 320px;
+    overflow: hidden;
 }
 
 .page-plugin {
@@ -768,6 +768,7 @@ body {
     /* height: 300px; */
     margin: 0 auto;
     overflow: hidden;
+    z-index: 999;
 }
 
 .banner-container {
@@ -776,15 +777,19 @@ body {
 }
 
 .banner-carousel-item {
+    background-color: #ffffff;
     min-width: 100%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
 }
 
 .banner-image {
     width: 100%;
     max-height: 300px;
+    max-width: 780px;
     height: auto;
-    object-fit: fill;
+    object-fit: cover;
 }
 
 .banner-control-prev,
@@ -854,6 +859,7 @@ body {
 
     #map-plugin {
         max-width: 280px;
+        overflow: hidden;
     }
 
     .box {
@@ -878,6 +884,7 @@ body {
 
     #map-plugin {
         max-width: 420px;
+        overflow: hidden;
     }
 }
 

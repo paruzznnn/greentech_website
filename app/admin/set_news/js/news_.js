@@ -2,15 +2,16 @@ $(document).ready(function () {
     $("#summernote").summernote({
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['fontname', 'fontsize']],  // เพิ่มปุ่มฟอนต์และขนาดฟอนต์
+            ['font', ['fontname', 'fontsize']], 
             ['para', ['ul', 'ol', 'paragraph']],
             ['insert', ['link', 'picture']],
-            ['view', ['fullscreen', 'codeview']]
+            ['view', ['fullscreen', 'codeview']],
+            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
         ],
         fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
-        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],  // กำหนดขนาดตัวอักษรที่เลือกได้
+        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'], 
         callbacks: {
-            // คอลแบ็กเพิ่มเติม (ถ้าจำเป็น)
+            
         }
     });
 });

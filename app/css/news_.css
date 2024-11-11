@@ -1,6 +1,6 @@
 .content-news {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* สามคอลัมน์บนหน้าจอขนาดใหญ่ */
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding: 20px;
     justify-items: center;
@@ -20,8 +20,10 @@
 .box-image {
     flex: 0 0 auto;
     width: 100%;
-    min-height: 230px;
-    max-height: 230px;
+    min-width: 300px;
+    /* max-width: 250px; */
+    min-height: 250px;
+    /* max-height: 230px; */
     overflow: hidden;
 }
 
@@ -37,11 +39,11 @@
 }
 
 .box-content {
-    flex: 1; /* ให้เนื้อหาด้านล่างขยายเต็มที่ */
+    flex: 1; 
     padding: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* จัดระยะห่างให้เนื้อหากระจาย */
+    justify-content: space-between;
 }
 
 .box-content p,
