@@ -1,7 +1,7 @@
 body { 
     margin: 0;
     font-family: "Kanit", "Roboto", sans-serif !important;
-    scroll-behavior: smooth; /* ทำให้เลื่อนหน้าอย่างนุ่มนวล */
+    scroll-behavior: smooth;
 }
   
 
@@ -10,7 +10,7 @@ body {
     background-color: #fafafafa;
     /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 5px 10px;
-    position: fixed; /* ทำให้ header อยู่ติดด้านบน */
+    position: fixed;
     top: 0;
     width: 100%;
     transition: top 0.3s;
@@ -332,41 +332,41 @@ body {
 
 
 iframe {
-    width: 100%; /* ทำให้ iframe กว้าง 100% ของพ่อแม่ */
-    max-width: 420px; /* กำหนด max-width เพื่อป้องกันไม่ให้ใหญ่เกินไป */
+    width: 100%;
+    max-width: 420px;
 }
 
 .box {
-    width: 100%; /* ทำให้ box กว้าง 100% ของพ่อแม่ */
-    max-width: 80px; /* กำหนด max-width */
-    height: auto; /* ทำให้ความสูงปรับตามเนื้อหา */
+    width: 100%;
+    max-width: 80px;
+    height: auto;
 }
 
-/* สำหรับหน้าจอที่มีความกว้างสูงสุด 700px */
+
 @media screen and (max-width: 700px) {
     iframe {
-        max-width: 420px; /* ถ้าเล็กกว่า 700px กำหนด max-width */
+        max-width: 420px;
     }
 }
 
-/* สำหรับหน้าจอที่มีความกว้างสูงสุด 400px */
+
 @media screen and (max-width: 400px) {
     iframe {
-        max-width: 280px; /* ถ้าเล็กกว่า 400px กำหนด max-width */
+        max-width: 280px;
     }
 
     .box {
-        width: 80px; /* ขนาด box ที่กำหนด */
-        height: 80px; /* ขนาด box ที่กำหนด */
+        width: 80px;
+        height: 80px;
     }
 }
 
 
 .text-content {
     display: flex;
-    align-items: center; /* จัดให้อยู่กึ่งกลางในแนวตั้ง */
+    align-items: center;
     justify-content: center;
-    height: 100%; /* ให้กล่องครอบคลุมความสูงทั้งหมด */
+    height: 100%;
     text-align: center;
     color: #555;
 }

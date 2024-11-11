@@ -1,6 +1,6 @@
 .content-pricing {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* สามคอลัมน์บนหน้าจอขนาดใหญ่ */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 20px;
   justify-items: center;
@@ -9,7 +9,7 @@
 .box-pricing {
   width: 100%;
   /* max-width: 250px; */
-  height: 550px; /* ความสูงคงที่ของกล่อง */
+  height: 550px;
   display: flex;
   flex-direction: column;
   border-radius: 8px;
@@ -26,10 +26,10 @@
   flex-direction: column;
 }
 
-/* กำหนดความสูงของแต่ละส่วน */
+
 .box-pricing > div:first-child {
-  height: 100px; /* ส่วนหัวสูง 60px */
-  flex: 0 0 auto; /* ขนาดคงที่ */
+  height: 100px; 
+  flex: 0 0 auto;
 }
 
 .box-pricing > div:nth-child(2) {
@@ -38,8 +38,8 @@
 }
 
 .box-pricing > div:last-child {
-  height: 120px; /* ส่วนท้ายสูง 80px */
-  flex: 0 0 auto; /* ขนาดคงที่ */
+  height: 120px;
+  flex: 0 0 auto;
 }
 
 .box-pricing h6 {
@@ -50,8 +50,8 @@
 
 .box-pricing img {
   width: 100%;
-  height: auto; /* ปรับให้เป็นอัตโนมัติ */
-  max-height: 100px; /* ความสูงสูงสุดของภาพ */
+  height: auto;
+  max-height: 100px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -63,19 +63,19 @@
 /* Responsive styles */
 @media (max-width: 1024px) {
   .content-pricing {
-      grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์สำหรับขนาดหน้าจอขนาดกลาง */
+      grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .content-pricing {
-      grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์สำหรับแท็บเล็ต */
+      grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .content-pricing {
-      grid-template-columns: 1fr; /* คอลัมน์เดียวสำหรับมือถือ */
+      grid-template-columns: 1fr;
   }
 }
 
@@ -145,11 +145,11 @@
 }
 
 .tab-pane {
-  display: none; /* ซ่อนเนื้อหาทั้งหมดในตอนแรก */
+  display: none;
 }
 
 .tab-pane.show {
-  display: block; /* แสดงเฉพาะเนื้อหาของแท็บที่ถูกเลือก */
+  display: block;
 }
 
 
@@ -167,5 +167,5 @@ li::before {
   font-weight: 900; 
   position: absolute; 
   left: 0; 
-  color: rgb(41, 41, 41); /* เปลี่ยนสีตามต้องการ */
+  color: rgb(41, 41, 41);
 }

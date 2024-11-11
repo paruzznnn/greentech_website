@@ -15,6 +15,7 @@
 <body>
 
     <?php include 'template/header.php'?>
+    <?php include 'template/navbar_slide.php'?>
 
     <?php
         // Array of content sections

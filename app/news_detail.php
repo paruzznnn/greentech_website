@@ -13,10 +13,12 @@ global $conn;
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
     <link href="css/news_.css?v=<?php echo time();?>" rel="stylesheet">
 
+
 </head>
 <body>
 
     <?php include 'template/header.php'?>
+    <?php include 'template/navbar_slide.php'?>
 
     <div class="content-sticky" id="">
         <div class="container">
@@ -78,14 +80,15 @@ global $conn;
                                                 echo "ไม่พบ <img> ที่มี data-filename ตรงกับค่าใน paths<br>";
                                             }
 
-                                            // แสดงเนื้อหาที่อัพเดทแล้ว
+                                            echo '<div style="width: 720px; margin-left: 20px;">';
                                             echo $content;
+                                            echo '</div>';
                                         }
                                     } else {
                                         echo "ไม่มีข้อมูล";
                                     }
 
-                                    $stmt->close(); // ปิด statement
+                                    $stmt->close(); 
                                 } else {
                                     echo "Invalid ID.";
                                 }

@@ -1,3 +1,4 @@
+
 <div class="banner-section">
     <div class="banner-container">
         <?php
@@ -27,23 +28,3 @@
         <?php endforeach; ?>
     </div>
 </div>
-
-
-<div id="navbar-news">
-    <div class="container">
-        <div class="news-ticker">
-            <span class="text-ticker">
-                <span class="blinking-icon"></span>
-                Daily News
-            </span>
-            <marquee>
-                    <div style="padding: 8px 0px 0px 0px; font-size: 18px;">
-                    Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย
-                    </div>
-            </marquee>
-        </div>
-    </div>
-</div>
-
-
-										

@@ -17,7 +17,7 @@ global $conn;
 <body>
 
     <?php include 'template/header.php'?>
-    <?php //include 'template/banner_slide.php'?>
+    <?php include 'template/navbar_slide.php'?>
 
     <div class="content-sticky" id="">
         <div class="container">

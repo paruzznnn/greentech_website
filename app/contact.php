@@ -15,6 +15,7 @@
 <body>
 
 <?php include 'template/header.php'?>
+<?php include 'template/navbar_slide.php'?>
 
 <div class="content-sticky" id="page_contact">
     <div class="container">
