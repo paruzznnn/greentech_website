@@ -1,15 +1,4 @@
 <?php
-    // if (isset($_GET['tab'])) {
-    //     $tab = $_GET['tab'];
-    //     echo "<script>
-    //         document.addEventListener('DOMContentLoaded', function() {
-    //             const section = document.getElementById('$tab');
-    //             if (section) {
-    //                 section.scrollIntoView({ behavior: 'smooth' });
-    //             }
-    //         });
-    //     </script>";
-    // }
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,7 +16,7 @@
 
     <?php include 'template/header.php'?>
 
-    <div class="content-sticky" id="page_pricing">
+    <div class="content-sticky" id="">
         <div class="container">
             <div class="box-content">
                 <div class="row">

@@ -1,15 +1,5 @@
 <?php
-    // if (isset($_GET['tab'])) {
-    //     $tab = $_GET['tab'];
-    //     echo "<script>
-    //         document.addEventListener('DOMContentLoaded', function() {
-    //             const section = document.getElementById('$tab');
-    //             if (section) {
-    //                 section.scrollIntoView({ behavior: 'smooth' });
-    //             }
-    //         });
-    //     </script>";
-    // }
+
 ?>
 <!DOCTYPE html>
 <html>

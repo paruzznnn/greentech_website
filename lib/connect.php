@@ -16,7 +16,7 @@
     $host = "localhost";
     $username = "root";
     $password = "";
-    $database = "allable_db";
+    $database = "allable";
 
 // }
 

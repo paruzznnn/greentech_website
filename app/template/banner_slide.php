@@ -1,48 +1,49 @@
-<?php
+<div class="banner-section">
+    <div class="banner-container">
+        <?php
+        $imagesItems = [
+            '../public/img/1AllableBannerSlideWebsite.png',
+            '../public/img/1730258479586.jpg',
+            '../public/img/1730258513335.jpg',
+            '../public/img/1730258519837.jpg',
+        ];
 
-$imagesItems = [
-    '../public/img/1AllableBannerSlideWebsite.png',
-    '../public/img/1730258479586.jpg',
-    '../public/img/1730258513335.jpg',
-    '../public/img/1730258519837.jpg',
-];
+        foreach ($imagesItems as $index => $image):
+        ?>
+            <div class="banner-carousel-item <?= ($index === 0) ? 'active' : '' ?>">
+                <img src="<?= $image ?>" alt="Banner Slide <?= $index + 1 ?>" class="banner-image" />
+            </div>
+        <?php endforeach; ?>
+    </div>
 
-$carouselItems = '';
-foreach ($imagesItems as $index => $image) {
-    $activeClass = ($index === 0) ? 'active' : '';
-    $carouselItems .= '
-        <div class="carousel-item ' . $activeClass . '">
-            <img src="' . $image . '" class="d-block w-100" alt="...">
-        </div>';
-}
+    <!-- Carousel Controls -->
+    <button class="banner-control-prev" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="banner-control-next" onclick="moveSlide(1)">&#10095;</button>
+    
+    <!-- Carousel Indicators -->
+    <div class="banner-indicators">
+        <?php foreach ($imagesItems as $index => $image): ?>
+            <span class="banner-pagination" onclick="goToSlide(<?= $index ?>)"></span>
+        <?php endforeach; ?>
+    </div>
+</div>
 
-?>
-<div class="header-center">
+
+<div id="navbar-news">
     <div class="container">
-        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-
-            <div class="carousel-indicators">
-                <?php foreach ($imagesItems as $index => $image): ?>
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="<?= $index ?>" 
-                        class="<?= ($index === 0) ? 'active' : '' ?>" 
-                        aria-current="<?= ($index === 0) ? 'true' : 'false' ?>" 
-                        aria-label="Slide <?= $index + 1 ?>"></button>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="carousel-inner">
-                <?= $carouselItems ?>
-            </div>
-
-            <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-
+        <div class="news-ticker">
+            <span class="text-ticker">
+                <span class="blinking-icon"></span>
+                Daily News
+            </span>
+            <marquee>
+                    <div style="padding: 8px 0px 0px 0px; font-size: 18px;">
+                    Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย
+                    </div>
+            </marquee>
         </div>
     </div>
 </div>
+
+
+										
