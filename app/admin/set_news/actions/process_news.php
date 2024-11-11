@@ -1,6 +1,5 @@
 <?php
 session_start();
-// header('Content-Type: application/json');
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
 require_once(__DIR__ . '/../../../../lib/base_directory.php');
@@ -15,81 +14,70 @@ global $conn;
 $response = array('status' => 'error', 'message' => '');
 
 function handleFileUpload($files) {
-
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
     $maxFileSize = 5 * 1024 * 1024; // 5 MB
 
     $uploadResults = [];
 
-    foreach ($files['name'] as $key => $fileName) {
-        if ($files['error'][$key] === UPLOAD_ERR_OK) {
-            $fileTmpPath = $files['tmp_name'][$key];
-            $fileSize = $files['size'][$key];
-            $fileType = $files['type'][$key];
-            $fileNameCmps = explode(".", $fileName);
-            $fileExtension = strtolower(end($fileNameCmps));
-            
-            if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                $uploadFileDir = '../../../../public/newsImge/';
-                $destFilePath = $uploadFileDir . $fileName;
+    // ตรวจสอบว่า $files['name'] เป็น array หรือไม่
+    if (isset($files['name']) && is_array($files['name'])) {
+        // ถ้า $files['name'] เป็น array, ให้ loop ผ่านแต่ละไฟล์
+        foreach ($files['name'] as $key => $fileName) {
+            if ($files['error'][$key] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $files['tmp_name'][$key];
+                $fileSize = $files['size'][$key];
+                $fileType = $files['type'][$key];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
 
-                if (!is_dir($uploadFileDir)) {
-                    mkdir($uploadFileDir, 0755, true);
-                }
+                if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+                    $uploadFileDir = '../../../../public/news_img/';
+                    $destFilePath = $uploadFileDir . $fileName;
 
-                if (move_uploaded_file($fileTmpPath, $destFilePath)) {
-                    $uploadResults[] = [
-                        'success' => true,
-                        'fileName' => $fileName,
-                        'fileSize' => $fileSize,
-                        'fileType' => $fileType,
-                        'filePath' => $destFilePath
-                    ];
+                    if (!is_dir($uploadFileDir)) {
+                        mkdir($uploadFileDir, 0755, true);
+                    }
+
+                    if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                        $uploadResults[] = [
+                            'success' => true,
+                            'fileName' => $fileName,
+                            'fileSize' => $fileSize,
+                            'fileType' => $fileType,
+                            'filePath' => $destFilePath
+                        ];
+                    } else {
+                        $uploadResults[] = [
+                            'success' => false,
+                            'fileName' => $fileName,
+                            'error' => 'Error occurred while moving the uploaded file.'
+                        ];
+                    }
                 } else {
                     $uploadResults[] = [
                         'success' => false,
                         'fileName' => $fileName,
-                        'error' => 'Error occurred while moving the uploaded file.'
+                        'error' => 'Invalid file type or file size exceeds limit.'
                     ];
                 }
             } else {
                 $uploadResults[] = [
                     'success' => false,
                     'fileName' => $fileName,
-                    'error' => 'Invalid file type or file size exceeds limit.'
+                    'error' => 'No file uploaded or there was an upload error.'
                 ];
             }
-        } else {
-            $uploadResults[] = [
-                'success' => false,
-                'fileName' => $fileName,
-                'error' => 'No file uploaded or there was an upload error.'
-            ];
         }
+    } else {
+        $uploadResults[] = [
+            'success' => false,
+            'error' => 'No files were uploaded.'
+        ];
     }
 
     return $uploadResults;
 }
 
-function insertIntoDatabase($conn, $table, $columns, $values) {
-
-    $placeholders = implode(', ', array_fill(0, count($values), '?'));
-
-    $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
-    
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare statement failed: " . $conn->error);
-    }
-
-    $types = str_repeat('s', count($values));
-    $stmt->bind_param($types, ...$values);
-
-    if (!$stmt->execute()) {
-        throw new Exception("Execute statement failed: " . $stmt->error);
-    }
-
-}
 
 
 try {
@@ -131,6 +119,10 @@ try {
     } 
     else if (isset($_POST['action']) && $_POST['action'] == 'addNews') {
 
+        // print_r($_POST);
+        // print_r($_FILES['image_files']);
+        // exit;
+
         $news_array = [
             'news_subject' => $_POST['news_subject'] ?? '',
             'news_content'  => $_POST['news_content'] ?? '',
@@ -158,23 +150,23 @@ try {
             }
 
             $last_inserted_id = $conn->insert_id;
-            // if ($_FILES['news_image']['error'] != 4) {
+            if ($_FILES['image_files']['error'] != 4) {
 
-            //     $fileInfos = handleFileUpload($_FILES['news_image']); 
-            //     foreach ($fileInfos as $fileInfo) {
-            //         if ($fileInfo['success']) {
+                $fileInfos = handleFileUpload($_FILES['image_files']); 
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
     
-            //             $picPath = $base_path .'allable/public/newsImge/'.$fileInfo['fileName'];
+                        $picPath = $base_path .'allable/public/news_img/'.$fileInfo['fileName'];
     
-            //             $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
-            //             $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-            //             insertIntoDatabase($conn, 'public_news_doc', $fileColumns, $fileValues);
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+                        insertIntoDatabase($conn, 'public_news_doc', $fileColumns, $fileValues);
     
-            //         } else {
-            //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-            //         }
-            //     }
-            // }
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
 
             $response = array('status' => 'success', 'message' => 'save');
         }
@@ -190,5 +182,21 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
+
+// $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
+    
+// $orderID = date('YmdHis'); // Unique order ID
+// $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
+// $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+// insertIntoDatabase($conn, 'ord_evidence', $fileColumns, $fileValues);
+
+// $orderColumns = ['is_status'];
+// $orderValues = ['1'];
+
+// // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+// $orderWhereClause = 'order_id = ? AND member_id = ?';
+// $orderWhereValues = [$orderID, $member_id];
+
+// updateInDatabase($conn, 'ecm_orders', $orderColumns, $orderValues, $orderWhereClause, $orderWhereValues);
 
 ?>

@@ -30,7 +30,7 @@
             'icon' => '',
             'text' => 'Allable Cloud', 
             'translate' => '',
-            'link' => 'allable_cloud'.$isFile.'?tab=page_allable_cloud'
+            'link' => 'allable_cloud'.$isFile
         ],
         [
             'icon' => '',
@@ -42,13 +42,13 @@
             'icon' => '',
             'text' => '', 
             'translate' => 'About_us',
-            'link' => 'about'.$isFile.'?tab=page_about'
+            'link' => 'about'.$isFile
         ],
         [
             'icon' => '',
             'text' => 'Contact us', 
             'translate' => 'Contact_us',
-            'link' => 'contact'.$isFile.'?tab=page_contact'
+            'link' => 'contact'.$isFile
         ],
     ];
 
@@ -120,13 +120,13 @@
                     'icon' => '',
                     'text' => 'DevRev', 
                     'translate' => '',
-                    'link' => 'origami_ai'.$isFile.'?tab=page_AI'
+                    'link' => 'origami_ai'.$isFile
                 ],
                 [
                     'icon' => '',
                     'text' => 'Pricing', 
                     'translate' => '',
-                    'link' => 'pricing'.$isFile.'?tab=page_pricing'
+                    'link' => 'pricing'.$isFile
                 ],
             ]
         ],
@@ -184,6 +184,7 @@
     </div>
 </div>
 
+
 <div id="navbar-menu" onmouseleave="closeAllDropdowns()">
     <div class="container">
         <div class="over-menu">
@@ -234,5 +235,6 @@
         </div>
     <?php endforeach; ?>
 </div>
+
 
 

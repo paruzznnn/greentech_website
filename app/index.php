@@ -1,15 +1,6 @@
 <?php
-    if (isset($_GET['tab'])) {
-        $tab = $_GET['tab'];
-        echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const section = document.getElementById('$tab');
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        </script>";
-    }
+require_once('../lib/connect.php');
+global $conn;
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +10,13 @@
     <title></title>
 
     <?php include 'inc_head.php'?>
+
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
 
     
@@ -34,6 +32,7 @@
     
 
     <script src="js/index_.js?v=<?php echo time();?>"></script>
+    <script src="js/news/news_.js?v=<?php echo time();?>"></script>
 
 </body>
 </html>

@@ -53,53 +53,9 @@ include('../../../lib/base_directory.php');
 
 
     <style>
-        .input-class {
-            background-color: #f0f8ff;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 5px;
-        }
-
-        .button-class {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-        }
-
-        .select-class {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            padding: 5px;
-            margin: 5px;
-        }
-
-        .textarea-class {
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-
-        .checkbox-class,
-        .radio-class {
-            margin-right: 5px;
-        }
-
-        .file-class {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-
-        .color-class {
-            padding: 5px;
-            border: 1px solid #ccc;
-        }
-
         .responsive-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
@@ -133,148 +89,51 @@ include('../../../lib/base_directory.php');
             <div class="box-content">
                 <div class="row">
                 <h3><i class="far fa-newspaper"></i> News</h3>
-                    <div>
+                    
                         <form id="formNews" enctype="multipart/form-data">
 
-                            <div class="responsive-grid">
-                                <div style="margin: 10px;">
-                                    <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div style="margin: 10px;">
                                         <label for="">
                                             <span>Subject</span>:
                                         </label>
                                         <input type="text" class="form-control" name="news_subject">
                                     </div>
-                                    <div style="display: none;">
-                                        <textarea class="form-control" name="news_content"></textarea>
+
+                                    <div style="margin: 10px;">
+                                        <div>
+                                            <textarea class="form-control" id="summernote" name="news_content"></textarea>
+                                        </div>
                                     </div>
+
+                                    <div style="margin: 10px; text-align: end;">
+                                        <button 
+                                        type="button" 
+                                        id="submitAddNews"
+                                        class="btn btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                            News
+                                        </button>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <div class="responsive-grid">
-                                <div style="margin: 10px;">
-                                    <div id="summernote"></div>
-                                </div>
-                            </div>
-
-                            <div class="responsive-button-container">
-                                <div style="margin: 10px; text-align: end;">
-                                    <button 
-                                    type="button" 
-                                    id="submitAddNews"
-                                    class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        News
-                                    </button>
-                                </div>
-                            </div>
                         </form>
-                    </div>
+                    
 
                 </div>
             </div>
-
-            
 
         </div>
     </div>
 
 
 
-    <script src='../js/index_.js'></script>
-    <script>
+<script src='../js/index_.js?v=<?php echo time();?>'></script>
+<script src='js/news_.js?v=<?php echo time();?>'></script>
 
-        $(document).ready(function() {
-
-            $('#summernote').summernote({
-                placeholder: '',
-                tabsize: 2,
-                height: 400,
-                callbacks: {
-                    onKeyup: function(e) {
-                        var content = $(this).summernote('code');
-                        $('textarea[name="news_content"]').val(content);
-                    }
-                }
-            });
-
-
-        });
-
-        $('#submitAddNews').on('click', function(event){
-            event.preventDefault(); 
-
-            var formNews = $('#formNews')[0];
-            var formData = new FormData(formNews);
-
-            formData.append('action', 'addNews');
-
-            $.ajax({
-                url: 'actions/process_news.php',
-                type: 'POST',
-                data: formData,
-                processData: false, 
-                contentType: false,
-                success: function(response) {
-
-                    console.log('response', response);
-                    
-
-                    if(response.status == 'success'){
-
-                    }
-
-                },
-                error: function(error) {
-                    console.log('error', error);
-                    
-                }
-            });
-        });
-
-        // var readURL = function(input) {
-        //     if (input.files && input.files[0]) {
-        //         var reader = new FileReader();
-
-        //         reader.onload = function (e) {
-        //             console.log('img', e.target.result);
-        //             let previewImage = $('#previewImage');
-        //             previewImage.attr('src', e.target.result);
-        //             previewImage.css('display', 'block');
-        //         }
-
-        //         reader.readAsDataURL(input.files[0]);
-        //     }
-        // }
-        
-        // $("#fileInput").on('change', function(){
-        //     readURL(this);
-        // });
-
-    </script>
 </body>
 
 </html>
-
-<!-- <div style="margin: 10px;">
-    <div>
-        <label for="">
-            <span>Subject</span>:
-        </label>
-        <input type="text" class="form-control" name="news_subject">
-    </div>
-    <div>
-        <label for="">
-            <span>Content</span>:
-        </label>
-        
-        <textarea class="form-control" name="news_content"></textarea>
-    </div>
-    <div>
-        <label for="">img:</label>
-        <input type="file" class="form-control" id="fileInput" name="news_image[]">
-    </div>
-</div> -->
-
-<!-- <div class="previewContainer">
-    <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
-</div> -->
