@@ -2,19 +2,21 @@
 session_start();
 header('Content-Type: application/json');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
-global $base_path_admin;
+$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+$isFile = ($isProtocol === 'http') ? '.php' : '';
+
 global $base_path;
+global $base_path_admin;
 global $public_path;
 
 
-// Demo data as an array instead of SQL query
 $result = [
     [
         'menu_id' => 1, 
         'parent_id' => 0, 
         'menu_icon' => '<i class="fas fa-tachometer-alt"></i>', 
         'menu_label' => 'Dashboard', 
-        'menu_link' => 'index.php', 
+        'menu_link' => 'dashboard'.$isFile, 
         'menu_order' => 1
     ],
     [
@@ -30,7 +32,7 @@ $result = [
         'parent_id' => 2, 
         'menu_icon' => '<i class="fas fa-th-large"></i>', 
         'menu_label' => 'Set HTML', 
-        'menu_link' => 'set_template/set_layout.php', 
+        'menu_link' => 'set_template/set_layout'.$isFile, 
         'menu_order' => 1
     ],
     [
@@ -46,7 +48,7 @@ $result = [
         'parent_id' => 4, 
         'menu_icon' => '<i class="fas fa-pen-alt"></i>', 
         'menu_label' => 'Add news', 
-        'menu_link' => 'set_news/setup_news.php', 
+        'menu_link' => 'set_news/setup_news'.$isFile, 
         'menu_order' => 2
     ],
     [
@@ -54,7 +56,7 @@ $result = [
         'parent_id' => 4, 
         'menu_icon' => '<i class="fas fa-table"></i>', 
         'menu_label' => 'List news', 
-        'menu_link' => 'set_news/list_news.php', 
+        'menu_link' => 'set_news/list_news'.$isFile, 
         'menu_order' => 2
     ],
 ];

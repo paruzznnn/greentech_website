@@ -4,8 +4,8 @@ global $base_path;
 global $public_path;
 
 echo '<script>
-    window.base_path_admin = "' . $base_path_admin . '";
     window.base_path = "' . $base_path . '";
+    window.base_path_admin = "' . $base_path_admin . '";
     window.public_path = "' . $public_path . '";
 </script>';
 
@@ -23,7 +23,7 @@ echo '<script>
             </div>
             <div>
                 <a href="#">
-                    <img class="logo" src="<?php echo $public_path ?>/img/logo-ALLABLE-06.png" alt="">
+                    <img src="#" alt="" class="logo">
                 </a>
             </div>
         </div>
@@ -40,7 +40,7 @@ echo '<script>
             </div>    
 
             <div class="profile-container">
-                <img src="<?php echo $public_path ?>/img/19056.jpg" alt="Profile Picture" class="profile-pic">
+                <img src="#" alt="" class="profile-pic">
             </div>
 
             <div class="dropdown">

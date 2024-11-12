@@ -168,7 +168,7 @@ $(document).ready(function() {
         }
     
         $.ajax({
-            url: './admin/actions/check_login.php', // Adjust path as needed
+            url: './admin/actions/check_login.php',
             type: 'POST',
             data: {
                 email: email,

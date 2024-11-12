@@ -13,9 +13,14 @@
 
 // }else{
 
-    $host = "202.129.16.77";
-    $username = "allable";
-    $password = "@LL@ble#2018";
+    // $host = "localhost";
+    // $username = "allable_admin";
+    // $password = "iydcmiofkiN1234";
+    // $database = "allable_db";
+
+    $host = "localhost";
+    $username = "root";
+    $password = "";
     $database = "allable_db";
 
 // }
