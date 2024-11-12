@@ -142,7 +142,7 @@ $(document).ready(function() {
     changeLanguage(selectedLanguage);
 
     $('#language-select').on('change', function() {
-        const selectedLang = $(this).val();
+        const selectedLang = $(this).val().toLowerCase();
         changeLanguage(selectedLang);
         updateSelectedLanguageFlag();
     });
