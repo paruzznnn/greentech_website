@@ -175,17 +175,14 @@ include('../../../lib/base_directory.php');
                     "target": 1,
                     data: null,
                     render: function ( data, type, row ) {
-                        // return data.subject_news;
-                        return data;
+                        return data.subject_news;
                     }
                 },
                 {
                     "target": 2,
                     data: null,
                     render: function ( data, type, row ) {
-                        
-                        // return data.date_create;
-                        return data;
+                        return data.date_create;
                         
                     }
                 },

@@ -95,7 +95,7 @@ try {
             // Add search filter if needed
         }
         
-        $dataQuery = "SELECT * FROM public_news 
+        $dataQuery = "SELECT * FROM dn_news 
         WHERE $whereClause 
         LIMIT $start, $length";
 
@@ -106,8 +106,8 @@ try {
         }
 
         $Index = 'news_id';
-        $totalRecords = getTotalRecords($conn, 'public_news', $Index);
-        $totalFiltered = getFilteredRecordsCount($conn, 'public_news', $whereClause, $Index);
+        $totalRecords = getTotalRecords($conn, 'dn_news', $Index);
+        $totalFiltered = getFilteredRecordsCount($conn, 'dn_news', $whereClause, $Index);
 
         $response = [
             "draw" => intval($draw),
@@ -130,7 +130,7 @@ try {
 
         if (isset($news_array)) {
             
-            $stmt = $conn->prepare("INSERT INTO public_news 
+            $stmt = $conn->prepare("INSERT INTO dn_news 
                 (subject_news, content_news, date_create) 
                 VALUES (?, ?, ?)");
 
@@ -160,7 +160,7 @@ try {
     
                         $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-                        insertIntoDatabase($conn, 'public_news_doc', $fileColumns, $fileValues);
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
     
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);

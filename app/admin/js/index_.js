@@ -1,22 +1,65 @@
+/****nationLanguages**** */
 
-$(document).ready(function() {
+function nationLanguages() {
+    $.getJSON(window.base_path + 'allable/api/languages/nation.json' + '?' + new Date().getTime(), function(data) {
+        let nationalities = data.nationalities;
+        let $select = $('#language-select');
+        $select.empty();
+    
+        $.each(nationalities, function(index, entry) {
+            let option = $('<option></option>')
+                .attr('value', entry.abbreviation)
+                .attr('data-flag', entry.flag)
+                .text(entry.name);
+            
+            $select.append(option);
+        });
 
-    buildTabSidebar();
-
-    var $sidebar = $('#showTabSidebar');
-    $sidebar.hide();
-    
-    $("#toggleIcon").on("click", function() {
-    
-        $sidebar.toggle();
-    
-        var isVisible = $sidebar.is(":visible");
-        $(this).toggleClass("fa-bars", !isVisible);
-        $(this).toggleClass("fa-times", isVisible);
+        if (nationalities.length > 0) {
+            $select.val(nationalities[0].abbreviation); 
+            updateSelectedLanguageFlag(); 
+        }
     });
+}
 
-});
 
+function updateSelectedLanguageFlag() {
+    let selectedOption = $('#language-select option:selected');
+    let flagUrl = selectedOption.data('flag');
+
+    if (flagUrl) {
+        $('#language-select').css({
+            'background-image': 'url(' + flagUrl + ')',
+            'background-repeat': 'no-repeat',
+            'background-position': 'left 8px center',
+            'background-size': '20px 15px',
+            'padding-left': '30px' 
+        });
+    }
+}
+
+function changeLanguage(lang) {
+    fetch(window.base_path + `allable/api/languages/${lang}.json`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.querySelectorAll("[data-translate][lang]").forEach(el => {
+                const key = el.getAttribute("data-translate");
+
+                el.textContent = data[key] || el.textContent; 
+                // Update the lang attribute to the selected language
+                el.setAttribute('lang', lang);
+
+            });
+        })
+        .catch(error => console.error('Error loading language file:', error));
+}
+
+/****nationLanguages**** */
 
 const buildTabSidebar = () => {
 
@@ -74,6 +117,21 @@ const buildTabSidebar = () => {
                     sidebarContent += '</div>';
                 }
             });
+
+            sidebarContent += `<div>`;
+
+            sidebarContent += `
+            <div style="padding: 10px 15px; font-size: 12px; color: #5555;">
+                <i class="fas fa-rocket"></i> APPS
+            </div>`;
+
+            sidebarContent += `
+            <a href="" class="sidebar-link" data-href="">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>log out</span>
+            </a>`;
+
+            sidebarContent += `</div>`;
 
             sidebarContent += '</div>';
 
@@ -177,9 +235,71 @@ function cssResponsiveTable(tableId, headers) {
 
 }
 
+// console.log(window.base_path_admin);
+// console.log(window.base_path);
+// console.log(window.public_path);
+
+$(document).ready(function() {
 
 
+    buildTabSidebar();
 
+    var $sidebar = $('#showTabSidebar');
+    $sidebar.hide();
+    
+    $(".toggle-button").on("click", function() {
+    
+        $sidebar.toggle();
+
+        var iconSidebar = $("#toggleIcon");
+    
+        var isVisible = $sidebar.is(":visible");
+        iconSidebar.toggleClass("fa-bars", !isVisible);
+        iconSidebar.toggleClass("fa-times", isVisible);
+    });
+
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#showTabSidebar').length && !$(event.target).closest('.toggle-button').length) {
+            $sidebar.hide();
+            $('#toggleIcon').removeClass('fa-times').addClass('fa-bars');
+        }
+    });
+
+
+    nationLanguages();
+    const selectedLanguage = localStorage.getItem('language') || 'th';
+    changeLanguage(selectedLanguage);
+
+    $('#language-select').on('change', function() {
+        const selectedLang = $(this).val();
+        changeLanguage(selectedLang);
+        updateSelectedLanguageFlag();
+    });
+
+
+    $('.dropdown-btn').on('click', function(event) {
+        event.stopPropagation();
+        $('.dropdown-content').toggle();
+    
+        const icon = $(this).find('i');
+        if ($('.dropdown-content').is(':visible')) {
+            icon.removeClass('fa-caret-up').addClass('fa-caret-down');
+        } else {
+            icon.removeClass('fa-caret-down').addClass('fa-caret-up');
+        }
+    });
+    
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('.dropdown-content').length && !$(event.target).is('.dropdown-btn')) {
+            $('.dropdown-content').hide();
+            
+            $('.dropdown-btn').find('i').removeClass('fa-caret-down').addClass('fa-caret-up');
+        }
+    });
+    
+
+
+});
 
 
 

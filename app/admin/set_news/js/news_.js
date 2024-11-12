@@ -70,11 +70,10 @@ $("#submitAddNews").on("click", function (event) {
     var newsContent = formData.get("news_content");
 
     if (newsContent) {
-        // สร้าง DOM ชั่วคราวเพื่อแปลง news_content เป็น HTML
+        
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = newsContent;
 
-        // ดึง tag <img> และแก้ไขค่า src
         var imgTags = tempDiv.getElementsByTagName("img");
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src");
@@ -85,19 +84,14 @@ $("#submitAddNews").on("click", function (event) {
                 formData.append("image_files[]", file);
             }
 
-            // ตรวจสอบว่าเป็น Base64 หรือไม่
             if (imgSrc.startsWith("data:image")) {
-                // ถ้าคือ Base64 ให้ลบ Base64 ออก
                 imgTags[i].setAttribute("src", "");
-                // หรือใช้ URL ที่ต้องการแทน
             }
         }
 
-        // อัปเดตเนื้อหาใน formData หลังจากลบ Base64
         formData.set("news_content", tempDiv.innerHTML);
     }
 
-    // ตรวจสอบค่าใน formData
     // for (var pair of formData.entries()) {
     //     console.log(pair[0] + ': ' + pair[1]);
     // }
@@ -106,10 +100,10 @@ $("#submitAddNews").on("click", function (event) {
         url: "actions/process_news.php",
         type: "POST",
         data: formData,
-        processData: false, // ป้องกัน jQuery ไม่ให้แปลงข้อมูล formData เป็น string
-        contentType: false, // ป้องกันการตั้งค่า Content-Type โดยอัตโนมัติ
+        processData: false,
+        contentType: false,
         success: function (response) {
-            console.log("response", response);
+            // console.log("response", response);
 
             // if(response.status == 'success'){
 
