@@ -3,20 +3,20 @@
 $boxesNews = [];
 
 $sql = "SELECT 
-pn.news_id, 
-pn.subject_news, 
-pn.content_news, 
-pn.date_create, 
-pn.status, 
-pn.del,
-GROUP_CONCAT(pnd.file_name) AS file_name,
-GROUP_CONCAT(pnd.api_path) AS pic_path
+dn.news_id, 
+dn.subject_news, 
+dn.content_news, 
+dn.date_create, 
+dn.status, 
+dn.del,
+GROUP_CONCAT(dnc.file_name) AS file_name,
+GROUP_CONCAT(dnc.api_path) AS pic_path
 FROM 
-public_news pn
+dn_news dn
 LEFT JOIN 
-public_news_doc pnd ON pn.news_id = pnd.news_id
+dn_news_doc dnc ON dn.news_id = dnc.news_id
 GROUP BY 
-pn.news_id";
+dn.news_id";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {

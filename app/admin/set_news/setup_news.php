@@ -45,10 +45,17 @@ include('../../../lib/base_directory.php');
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+
+
     <link href="../../../inc/summernote/summernote-lite.min.css" rel="stylesheet">
     <script src="../../../inc/summernote/summernote-lite.min.js"></script>
 
-    
+
     <link href='../css/index_.css?v=<?php echo time();?>' rel='stylesheet'>
 
 
@@ -78,13 +85,19 @@ include('../../../lib/base_directory.php');
             }
         }
 
-        .note-editor .note-toolbar, .note-popover .popover-content {
+        .note-toolbar{
+            position: sticky !important;
+            top: 78px !important;
+            z-index: 1 !important;
+        }
+
+        /* .note-editor .note-toolbar, .note-popover .popover-content {
             margin: 0;
             padding: 0 0 5px 5px;
             position: sticky !important;
             top: 0px !important;
             z-index: 999 !important;
-        }
+        } */
 
     </style>
 </head>

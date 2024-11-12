@@ -107,6 +107,33 @@ function changeLanguage(lang) {
 
 /****nationLanguages**** */
 
+function setupModal(modalId, btnId, closeClass) {
+    var $modal = $('#' + modalId);
+    var $btn = $('#' + btnId);
+    var $span = $('.' + closeClass).first(); 
+
+    if ($modal.length && $btn.length && $span.length) {
+        $btn.on('click', function() {
+            $modal.show();
+        });
+
+        $span.on('click', function() {
+            $modal.hide();
+        });
+
+        $(window).on('click', function(event) {
+            if ($(event.target).is($modal)) {
+                $modal.hide();
+            }
+        });
+    } else {
+        
+    }
+}
+
+
+
+
 
 $(document).ready(function() {
 
@@ -119,6 +146,88 @@ $(document).ready(function() {
         changeLanguage(selectedLang);
         updateSelectedLanguageFlag();
     });
+
+    setupModal("myModal-channel", "myBtn-channel", "modal-close-channel");
+
+    $('#togglePasswordPage').on('click', function() {
+        const password = $('#password');
+        const type = password.attr('type') === 'password' ? 'text' : 'password';
+        password.attr('type', type);
+        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+    });
+
+    $('#loginModal').on('submit', function(event) {
+        event.preventDefault();
+    
+        const email = $('#email').val().trim();
+        const password = $('#password').val().trim();
+    
+        if (!email || !password) {
+            alert('Please enter both email and password');
+            return;
+        }
+    
+        $.ajax({
+            url: './admin/actions/check_login.php', // Adjust path as needed
+            type: 'POST',
+            data: {
+                email: email,
+                password: password
+            },
+            dataType: 'json',
+            success: function(response) {
+
+                if (response.status === "success") {
+
+                    sessionStorage.setItem('jwt', response.jwt);
+                    
+
+                    const token = sessionStorage.getItem('jwt');
+
+                    $.ajax({
+                        url: './admin/actions/protected.php', 
+                        type: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function(response) {
+                            
+                            // if (response.status === "success") {
+                                
+                            //     switch (response.data.role) {
+                            //         case 1:
+                            //             window.location.href = './admin/index.php';
+                            //             break;
+                            //         case 2:
+                            //             window.location.href = 'index.php';
+                            //             break;
+                            //         default:
+                            //             alert('Unknown role');
+                            //             break;
+                            //     }
+
+                            // } else {
+                            //     alert(response.message);
+                            // }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Request failed:", status, error);
+                            alert("An error occurred while accessing protected resource.");
+                        }
+                    });
+    
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed:", status, error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    });
+
+
 
 });
 

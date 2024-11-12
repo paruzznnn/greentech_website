@@ -35,18 +35,18 @@ global $conn;
                                 if ($decodedId !== false) {
                                     // ควรใช้ prepared statement แทนการแทรกข้อมูลโดยตรงเพื่อความปลอดภัย
                                     $stmt = $conn->prepare("SELECT 
-                                        pn.news_id, 
-                                        pn.subject_news, 
-                                        pn.content_news, 
-                                        pn.date_create, 
-                                        pn.status, 
-                                        pn.del,
-                                        GROUP_CONCAT(pnd.file_name) AS file_name,
-                                        GROUP_CONCAT(pnd.api_path) AS pic_path
-                                        FROM public_news pn
-                                        LEFT JOIN public_news_doc pnd ON pn.news_id = pnd.news_id
-                                        WHERE pn.news_id = ?
-                                        GROUP BY pn.news_id");
+                                        dn.news_id, 
+                                        dn.subject_news, 
+                                        dn.content_news, 
+                                        dn.date_create, 
+                                        dn.status, 
+                                        dn.del,
+                                        GROUP_CONCAT(dnc.file_name) AS file_name,
+                                        GROUP_CONCAT(dnc.api_path) AS pic_path
+                                        FROM dn_news dn
+                                        LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
+                                        WHERE dn.news_id = ?
+                                        GROUP BY dn.news_id");
 
                                     // ผูกค่ากับตัวแปร
                                     $stmt->bind_param('i', $decodedId); // ใช้ 'i' สำหรับ integer
@@ -80,7 +80,7 @@ global $conn;
                                                 echo "ไม่พบ <img> ที่มี data-filename ตรงกับค่าใน paths<br>";
                                             }
 
-                                            echo '<div style="width: 720px; margin-left: 20px;">';
+                                            echo '<div style="">';
                                             echo $content;
                                             echo '</div>';
                                         }
