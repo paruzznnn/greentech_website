@@ -18,20 +18,28 @@ $port = isset($urlParts['port']) ? ':'.$urlParts['port'] : '';
 //     [path] => /tdi_store/app
 // )
 
-$fixedPath = '/allable/app/admin/';
-$newPath = '/';
+if($urlParts['scheme'] == 'http'){
+    $fixedPath = '/allable/app/admin/';
+    $newPath = '/allable/';
+}else{
+    $fixedPath = '/app/admin/';
+    $newPath = '/';
+}
 
-// สร้าง path สำหรับ public folder
-$publicPath = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . '/allable/public';
+
 
 
 $base_Path = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $newPath;
 $base_PathAdmin = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $fixedPath;
 
+$publicPath = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . '/allable/public';
 
 
-$GLOBALS["base_path_admin"] = $base_PathAdmin;
+
 $GLOBALS["base_path"] = $base_Path;
+$GLOBALS["base_path_admin"] = $base_PathAdmin;
+
+
 $GLOBALS["public_path"] = $publicPath;
 
 ?>

@@ -1,4 +1,4 @@
-<link rel="icon" type="image/x-icon" href="../public/img/logo-ALLABLE-07.ico">
+<link rel="icon" type="image/x-icon" href="../../public/img/logo-ALLABLE-07.ico">
 
     <link href="../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 

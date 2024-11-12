@@ -1,28 +1,10 @@
 <?php
-include('../../lib/permissions.php');
-include('../../lib/base_directory.php');
-// checkPermissions();
+// Determine the request protocol
+$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+// Set the file extension based on the protocol
+$isFile = ($isProtocol === 'http') ? '.php' : '';
+
+// Redirect to the specified URL with the correct file extension
+header("Location: dashboard" . $isFile);
+exit();
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-
-    <?php include 'inc_head.php'?>
-    <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
-
-</head>
-<body>
-
-    <?php include 'template/header.php'?>
-    <?php //include 'template/content.php'?>
-    <?php //include 'template/footer.php'?>
-
-
-    <script src="js/index_.js?v=<?php echo time();?>"></script>
-</body>
-</html>
-

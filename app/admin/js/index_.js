@@ -1,7 +1,7 @@
 /****nationLanguages**** */
 
 function nationLanguages() {
-    $.getJSON(window.base_path + 'allable/api/languages/nation.json' + '?' + new Date().getTime(), function(data) {
+    $.getJSON(window.base_path + 'api/languages/nation.json' + '?' + new Date().getTime(), function(data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
@@ -39,7 +39,7 @@ function updateSelectedLanguageFlag() {
 }
 
 function changeLanguage(lang) {
-    fetch(window.base_path + `allable/api/languages/${lang}.json`)
+    fetch(window.base_path + 'api/languages/'+lang+'.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -65,22 +65,19 @@ const buildTabSidebar = () => {
 
     let sidebarItems = [];
 
-    // Fetch sidebar data via AJAX
     $.ajax({
-        url: window.base_path_admin +'actions/check_sidebar.php',
+        url: 'actions/check_sidebar.php',
         type: 'POST',
         dataType: 'json',
         success: function(response) {
             
             sidebarItems = response;
 
-            // Check if sidebarItems is valid
             if (!Array.isArray(sidebarItems) || sidebarItems.length === 0) {
                 $('#showTabSidebar').html('<p>No sidebar items found.</p>');
                 return;
             }
 
-            // Generate and display the sidebar content
             let sidebarContent = '<div class="sidebar">';
 
 
@@ -137,7 +134,6 @@ const buildTabSidebar = () => {
 
             $('#showTabSidebar').html(sidebarContent);
 
-            // Event delegation for handling click events
             $('#showTabSidebar').on('click', '.sidebar-link', function(event) {
                 const itemLink = $(this).data('href');
                 const targetClass = $(this).attr('class').split(' ').find(cls => cls.startsWith('toggle-'));
@@ -183,57 +179,58 @@ const buildTabSidebar = () => {
             console.error('เกิดข้อผิดพลาด:', error);
         }
     });
+
 };
 
-function cssResponsiveTable(tableId, headers) {
+// function cssResponsiveTable(tableId, headers) {
 
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    let cssContent = `
-        @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
-            #${tableId}, #${tableId} thead, #${tableId} tbody, #${tableId} th, #${tableId} td, #${tableId} tr {
-                display: block;
-            }
+//     const style = document.createElement('style');
+//     style.type = 'text/css';
+//     let cssContent = `
+//         @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+//             #${tableId}, #${tableId} thead, #${tableId} tbody, #${tableId} th, #${tableId} td, #${tableId} tr {
+//                 display: block;
+//             }
 
-            #${tableId} thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
+//             #${tableId} thead tr {
+//                 position: absolute;
+//                 top: -9999px;
+//                 left: -9999px;
+//             }
 
-            #${tableId} tr {
-                margin: 0 0 1rem 0;
-            }
+//             #${tableId} tr {
+//                 margin: 0 0 1rem 0;
+//             }
 
-            #${tableId} td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-            }
+//             #${tableId} td {
+//                 border: none;
+//                 border-bottom: 1px solid #eee;
+//                 position: relative;
+//                 padding-left: 50%;
+//             }
 
-            #${tableId} td:before {
-                position: absolute;
-                top: 0;
-                left: 6px;
-                width: 45%;
-                padding-right: 10px;
-                white-space: nowrap;
-            }
-    `;
+//             #${tableId} td:before {
+//                 position: absolute;
+//                 top: 0;
+//                 left: 6px;
+//                 width: 45%;
+//                 padding-right: 10px;
+//                 white-space: nowrap;
+//             }
+//     `;
 
-    headers.forEach((header, index) => {
-        cssContent += `
-            #${tableId} td:nth-of-type(${index + 1}):before { content: "${header}"; font-weight: 700; }
-        `;
-    });
+//     headers.forEach((header, index) => {
+//         cssContent += `
+//             #${tableId} td:nth-of-type(${index + 1}):before { content: "${header}"; font-weight: 700; }
+//         `;
+//     });
 
-    cssContent += ` }`;
+//     cssContent += ` }`;
 
-    style.innerHTML = cssContent;
-    document.head.appendChild(style);
+//     style.innerHTML = cssContent;
+//     document.head.appendChild(style);
 
-}
+// }
 
 // console.log(window.base_path_admin);
 // console.log(window.base_path);
@@ -271,7 +268,7 @@ $(document).ready(function() {
     changeLanguage(selectedLanguage);
 
     $('#language-select').on('change', function() {
-        const selectedLang = $(this).val();
+        const selectedLang = $(this).val().toLowerCase();
         changeLanguage(selectedLang);
         updateSelectedLanguageFlag();
     });
