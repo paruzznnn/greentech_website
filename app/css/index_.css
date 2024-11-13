@@ -968,6 +968,10 @@ body {
         float: none;
     }
 
+    .header-link{
+        display: flex;
+    }
+
     .header-top-left {
         float: none;
     }
