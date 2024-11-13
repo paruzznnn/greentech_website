@@ -66,7 +66,7 @@ const buildTabSidebar = () => {
     let sidebarItems = [];
 
     $.ajax({
-        url: 'actions/check_sidebar.php',
+        url: window.base_path_admin +'actions/check_sidebar.php',
         type: 'POST',
         dataType: 'json',
         success: function(response) {
@@ -123,7 +123,7 @@ const buildTabSidebar = () => {
             </div>`;
 
             sidebarContent += `
-            <a href="" class="sidebar-link" data-href="">
+            <a href="${window.base_path_admin}logout.php" class="sidebar-link" data-href="">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>log out</span>
             </a>`;
@@ -234,7 +234,6 @@ const buildTabSidebar = () => {
 
 // console.log(window.base_path_admin);
 // console.log(window.base_path);
-// console.log(window.public_path);
 
 $(document).ready(function() {
 

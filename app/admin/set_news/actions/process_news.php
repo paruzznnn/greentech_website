@@ -1,14 +1,13 @@
 <?php
-session_start();
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
 require_once(__DIR__ . '/../../../../lib/base_directory.php');
 require_once(__DIR__ . '/../../../../lib/connect.php');
 require_once(__DIR__ . '/../../../../inc/getFunctions.php');
 
-global $base_path_admin;
 global $base_path;
-global $public_path;
+global $base_path_admin;
+
 global $conn;
 
 $response = array('status' => 'error', 'message' => '');

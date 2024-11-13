@@ -1,29 +1,22 @@
 <?php
-// if($_SERVER['SERVER_NAME'] == 'dev.allhiapp.com'){
+session_start();
+require __DIR__ . '/../vendor/autoload.php';
+use Dotenv\Dotenv;
 
-//     $dbHostPD = "localhost:3306";
-//     $dbUserPD = "allhi_store";
-//     $dbPassPD = "6Of6h#1w1";
-//     $dbNamePD = "allhi_store";
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
-//     $host = $dbHostPD; 
-//     $username = $dbUserPD; 
-//     $password = $dbPassPD; 
-//     $database = $dbNamePD;
-
-// }else{
-
-    // $host = "localhost";
-    // $username = "allable_admin";
-    // $password = "iydcmiofkiN1234";
-    // $database = "allable_db";
-
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "allable_db";
-
-// }
+if ($_SERVER['REQUEST_SCHEME'] == 'http') {
+    $host = $_ENV['DB_HOST_HTTP'];
+    $username = $_ENV['DB_USER_HTTP'];
+    $password = $_ENV['DB_PASSWORD_HTTP'];
+    $database = $_ENV['DB_NAME_HTTP'];
+} else {
+    $host = $_ENV['DB_HOST_HTTPS'];
+    $username = $_ENV['DB_USER_HTTPS'];
+    $password = $_ENV['DB_PASSWORD_HTTPS'];
+    $database = $_ENV['DB_NAME_HTTPS'];
+}
 
 
 $conn = new mysqli($host, $username, $password, $database);
@@ -33,6 +26,4 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Close the connection
-// $conn->close();
 ?>
