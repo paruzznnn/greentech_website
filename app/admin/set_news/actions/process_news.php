@@ -10,17 +10,55 @@ global $base_path_admin;
 
 global $conn;
 
-$response = array('status' => 'error', 'message' => '');
+function insertIntoDatabase($conn, $table, $columns, $values)
+{
 
-function handleFileUpload($files) {
+    $placeholders = implode(', ', array_fill(0, count($values), '?'));
+
+    $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
+
+    $stmt = $conn->prepare($query);
+
+    $types = str_repeat('s', count($values));
+    $stmt->bind_param($types, ...$values);
+
+    if ($stmt->execute()) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+function updateInDatabase($conn, $table, $columns, $values, $whereClause, $whereValues)
+{
+
+    $setPart = implode(', ', array_map(function ($col) {
+        return "$col = ?";
+    }, $columns));
+
+    $query = "UPDATE $table SET $setPart WHERE $whereClause";
+
+    $stmt = $conn->prepare($query);
+
+    // Bind parameters
+    $types = str_repeat('s', count($values)) . str_repeat('s', count($whereValues));
+    $stmt->bind_param($types, ...array_merge($values, $whereValues));
+
+    if ($stmt->execute()) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+function handleFileUpload($files)
+{
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
     $maxFileSize = 5 * 1024 * 1024; // 5 MB
 
     $uploadResults = [];
 
-    // ตรวจสอบว่า $files['name'] เป็น array หรือไม่
     if (isset($files['name']) && is_array($files['name'])) {
-        // ถ้า $files['name'] เป็น array, ให้ loop ผ่านแต่ละไฟล์
         foreach ($files['name'] as $key => $fileName) {
             if ($files['error'][$key] === UPLOAD_ERR_OK) {
                 $fileTmpPath = $files['tmp_name'][$key];
@@ -78,9 +116,62 @@ function handleFileUpload($files) {
 }
 
 
+
+$response = array('status' => 'error', 'message' => '');
+
 try {
 
-    if (isset($_POST['action']) && $_POST['action'] == 'getData_news') {
+    if (isset($_POST['action']) && $_POST['action'] == 'addNews') {
+
+        $news_array = [
+            'news_subject' => $_POST['news_subject'] ?? '',
+            'news_content'  => $_POST['news_content'] ?? '',
+        ];
+
+        if (isset($news_array)) {
+
+            $stmt = $conn->prepare("INSERT INTO dn_news 
+                (subject_news, content_news, date_create) 
+                VALUES (?, ?, ?)");
+
+            $news_subject = $news_array['news_subject'];
+
+            $news_content = mb_convert_encoding($news_array['news_content'], 'UTF-8', 'auto');
+
+            $current_date = date('Y-m-d H:i:s');
+
+            $stmt->bind_param(
+                "sss",
+                $news_subject,
+                $news_content,
+                $current_date
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Execute statement failed: " . $stmt->error);
+            }
+
+            $last_inserted_id = $conn->insert_id;
+            if ($_FILES['image_files']['error'] != 4) {
+
+                $fileInfos = handleFileUpload($_FILES['image_files']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            $response = array('status' => 'success', 'message' => 'save');
+        }
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_news') {
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
         $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
@@ -89,14 +180,20 @@ try {
         $orderIndex = isset($_POST['order'][0]['column']) ? intval($_POST['order'][0]['column']) : 0;
         $orderDir = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'asc';
 
+        $columns = ['news_id'];
+
         $whereClause = "news_id IS NOT NULL";
+
         if (!empty($searchValue)) {
-            // Add search filter if needed
+            $whereClause .= " AND (subject_news LIKE '%$searchValue%')";
         }
-        
-        $dataQuery = "SELECT * FROM dn_news 
-        WHERE $whereClause 
-        LIMIT $start, $length";
+
+        $orderBy = $columns[$orderIndex] . " " . $orderDir;
+
+        $dataQuery = "SELECT news_id, subject_news, date_create FROM dn_news 
+                    WHERE $whereClause
+                    ORDER BY $orderBy
+                    LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];
@@ -114,60 +211,6 @@ try {
             "recordsFiltered" => intval($totalFiltered),
             "data" => $data
         ];
-        
-    } 
-    else if (isset($_POST['action']) && $_POST['action'] == 'addNews') {
-
-        $news_array = [
-            'news_subject' => $_POST['news_subject'] ?? '',
-            'news_content'  => $_POST['news_content'] ?? '',
-        ];
-
-        if (isset($news_array)) {
-            
-            $stmt = $conn->prepare("INSERT INTO dn_news 
-                (subject_news, content_news, date_create) 
-                VALUES (?, ?, ?)");
-
-            $news_subject = $news_array['news_subject'];
-            // $news_content = $news_array['news_content'];
-
-            $news_content = mb_convert_encoding($news_array['news_content'], 'UTF-8', 'auto');
-
-            $current_date = date('Y-m-d H:i:s');
-
-            $stmt->bind_param(
-                "sss", 
-                $news_subject, 
-                $news_content, 
-                $current_date
-            );
-
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
-            }
-
-            $last_inserted_id = $conn->insert_id;
-            if ($_FILES['image_files']['error'] != 4) {
-
-                $fileInfos = handleFileUpload($_FILES['image_files']); 
-                foreach ($fileInfos as $fileInfo) {
-                    if ($fileInfo['success']) {
-    
-                        $picPath = $base_path .'/public/news_img/'.$fileInfo['fileName'];
-    
-                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
-                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
-    
-                    } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-                    }
-                }
-            }
-
-            $response = array('status' => 'success', 'message' => 'save');
-        }
     }
 } catch (Exception $e) {
     $response['status'] = 'error';
@@ -180,20 +223,3 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
-
-// $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
-
-// $orderID = date('YmdHis'); // Unique order ID
-// $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
-// $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-// insertIntoDatabase($conn, 'ord_evidence', $fileColumns, $fileValues);
-
-// $orderColumns = ['is_status'];
-// $orderValues = ['1'];
-
-// $orderWhereClause = 'order_id = ? AND member_id = ?';
-// $orderWhereValues = [$orderID, $member_id];
-
-// updateInDatabase($conn, 'ecm_orders', $orderColumns, $orderValues, $orderWhereClause, $orderWhereValues);
-
-?>

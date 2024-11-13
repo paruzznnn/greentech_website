@@ -112,10 +112,9 @@ include('../../../lib/base_directory.php');
 
 <script src='../js/index_.js?v=<?php echo time();?>'></script>
 <script>
-    var td_list_news;
     $(document).ready(function(){
 
-        td_list_news = new DataTable('#td_list_news', {
+        var td_list_news = new DataTable('#td_list_news', {
             "autoWidth": false,
             "language":{
                 "decimal":        "",
@@ -235,14 +234,14 @@ include('../../../lib/base_directory.php');
                 }
             },
             initComplete: function(settings, json) {
-                const headers = [
-                    "No.",
-                    "Date created",
-                    "Subject",
-                    "Date on-air",
-                    "Status",
-                    ""
-                ];
+                // const headers = [
+                //     "No.",
+                //     "Date created",
+                //     "Subject",
+                //     "Date on-air",
+                //     "Status",
+                //     ""
+                // ];
         
                 // cssResponsiveTable('td_list_news', headers);
             },

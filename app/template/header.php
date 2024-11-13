@@ -46,6 +46,20 @@
                 <select id="language-select" class="language-select">
                 </select>
             </div>
+            <div>
+                <a href="https://www.facebook.com/allablethailand/" target="_blank" style="background: #ffa719; color: #fafafa;">
+                    <i class="fab fa-facebook-square"></i>
+                </a>
+                <a href="https://www.youtube.com/@AllableThailand" target="_blank" style="background: #ffa719; color: #fafafa;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" style="background: #ffa719; color: #fafafa;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" style="background: #ffa719; color: #fafafa;">
+                    <i class="fab fa-line"></i>
+                </a>
+            </div>
         </div>
 
     </div>
@@ -64,34 +78,6 @@
                 <div class="card">
 
                     <article class="card-body">
-
-                        <!-- <div class="box-logo-container">
-
-                            <a href="<?php echo $basePath .'login.php'?>">
-                                <div class="box-logo">
-                                    <div class="box-logo-image">
-                                        <img src="../public/img/trandar_logo.png" alt="Trandar Logo">
-                                    </div>
-                                    <div data-key-lang="Trandar" lang="US" class="box-logo-text">
-                                        Trandar
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="https://www.origami.life//login.php#/">
-                                <div class="box-logo">
-                                    <div class="box-logo-image">
-                                        <img src="../public/img/ogm_logo.png" alt="Origami Logo">
-                                    </div>
-                                    <div data-key-lang="Origami" lang="US" class="box-logo-text">
-                                        Origami
-                                    </div>
-                                </div>
-                            </a>
-
-                        </div> -->
-
-                        <br>
                         <h6 style="text-align: center; color: #555;" class="mt-2">
                             <span><i class="fas fa-unlock"></i></span>
                             <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
