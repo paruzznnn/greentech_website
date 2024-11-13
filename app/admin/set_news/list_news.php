@@ -11,7 +11,7 @@ include('../../../lib/base_directory.php');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
 
-    <link rel="icon" type="image/x-icon" href="../public/img/logo-ALLABLE-07.ico">
+    <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
@@ -92,7 +92,7 @@ include('../../../lib/base_directory.php');
                                             <th>No.</th>
                                             <th>Subject</th>
                                             <th>Date created</th>
-                                            <th>Active</th>
+                                            <!-- <th>Active</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -185,31 +185,31 @@ include('../../../lib/base_directory.php');
                         return data.date_create;
                         
                     }
-                },
-                {
-                    "target": 3,
-                    data: null,
-                    render: function ( data, type, row ) {
-
-                        let toggleSwitch = `
-                        <div>
-                            <span style="margin: 0 10px;">
-                                <label class="toggleSwitch nolabel">
-                                    <input type="checkbox" id="theme-toggle"/>
-                                    <span>
-                                        <span></span>
-                                        <span></span>
-                                    </span>
-                                    <a></a>
-                                </label>
-                            </span>
-                        </div>
-                        `;
-                        
-                        return toggleSwitch;
-                        
-                    }
                 }
+                // {
+                //     "target": 3,
+                //     data: null,
+                //     render: function ( data, type, row ) {
+
+                //         let toggleSwitch = `
+                //         <div>
+                //             <span style="margin: 0 10px;">
+                //                 <label class="toggleSwitch nolabel">
+                //                     <input type="checkbox" id="theme-toggle"/>
+                //                     <span>
+                //                         <span></span>
+                //                         <span></span>
+                //                     </span>
+                //                     <a></a>
+                //                 </label>
+                //             </span>
+                //         </div>
+                //         `;
+                        
+                //         return toggleSwitch;
+                        
+                //     }
+                // }
                 
                 
             ],

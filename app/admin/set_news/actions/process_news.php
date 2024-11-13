@@ -78,8 +78,8 @@ function handleFileUpload($files) {
 }
 
 
-
 try {
+
     if (isset($_POST['action']) && $_POST['action'] == 'getData_news') {
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
@@ -118,10 +118,6 @@ try {
     } 
     else if (isset($_POST['action']) && $_POST['action'] == 'addNews') {
 
-        // print_r($_POST);
-        // print_r($_FILES['image_files']);
-        // exit;
-
         $news_array = [
             'news_subject' => $_POST['news_subject'] ?? '',
             'news_content'  => $_POST['news_content'] ?? '',
@@ -134,7 +130,10 @@ try {
                 VALUES (?, ?, ?)");
 
             $news_subject = $news_array['news_subject'];
-            $news_content = $news_array['news_content'];
+            // $news_content = $news_array['news_content'];
+
+            $news_content = mb_convert_encoding($news_array['news_content'], 'UTF-8', 'auto');
+
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
@@ -155,7 +154,7 @@ try {
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
     
-                        $picPath = $base_path .'allable/public/news_img/'.$fileInfo['fileName'];
+                        $picPath = $base_path .'/public/news_img/'.$fileInfo['fileName'];
     
                         $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
@@ -183,7 +182,7 @@ $conn->close();
 echo json_encode($response);
 
 // $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
-    
+
 // $orderID = date('YmdHis'); // Unique order ID
 // $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
 // $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
@@ -192,7 +191,6 @@ echo json_encode($response);
 // $orderColumns = ['is_status'];
 // $orderValues = ['1'];
 
-// // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
 // $orderWhereClause = 'order_id = ? AND member_id = ?';
 // $orderWhereValues = [$orderID, $member_id];
 

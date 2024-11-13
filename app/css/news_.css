@@ -18,23 +18,21 @@
 
 
 .box-image {
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: 300px;
-    /* max-width: 250px; */
+    flex: 1;  /* ให้ .box-image ขยายเต็มพื้นที่ของ .box-news */
+    width: 100%;  /* ทำให้ขยายเต็มความกว้างของ box-news */
+    height: 100%; /* ทำให้ขยายเต็มความสูงของ box-news */
     min-height: 250px;
-    /* max-height: 230px; */
     overflow: hidden;
 }
 
 .box-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover;  /* ให้ภาพขยายเต็มพื้นที่โดยไม่ทำให้บิดเบี้ยว */
     transition: transform 0.3s ease;
 }
 
-.box-image img:hover{
+.box-image img:hover {
     transform: scale(1.1);
 }
 

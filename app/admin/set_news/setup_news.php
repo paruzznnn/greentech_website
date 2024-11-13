@@ -11,7 +11,7 @@ include('../../../lib/base_directory.php');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
 
-    <link rel="icon" type="image/x-icon" href="../public/img/logo-ALLABLE-07.ico">
+    <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
@@ -52,8 +52,8 @@ include('../../../lib/base_directory.php');
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 
 
-    <link href="../../../inc/summernote/summernote-lite.min.css" rel="stylesheet">
-    <script src="../../../inc/summernote/summernote-lite.min.js"></script>
+    <!-- <link href="../../../inc/summernote/summernote-lite.min.css" rel="stylesheet">
+    <script src="../../../inc/summernote/summernote-lite.min.js"></script> -->
 
 
     <link href='../css/index_.css?v=<?php echo time();?>' rel='stylesheet'>
@@ -87,7 +87,7 @@ include('../../../lib/base_directory.php');
 
         .note-toolbar{
             position: sticky !important;
-            top: 78px !important;
+            top: 70px !important;
             z-index: 1 !important;
         }
 
