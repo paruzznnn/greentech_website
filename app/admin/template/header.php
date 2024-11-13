@@ -1,12 +1,11 @@
 <?php
-global $base_path_admin;
 global $base_path;
-global $public_path;
+global $base_path_admin;
+
 
 echo '<script>
     window.base_path = "' . $base_path . '";
     window.base_path_admin = "' . $base_path_admin . '";
-    window.public_path = "' . $public_path . '";
 </script>';
 
 ?>
@@ -56,7 +55,7 @@ echo '<script>
 <div class="dropdown-content">
 
     <a href="#">Profile</a>
-    <a href="#">Log out</a>
+    <a href="<?php echo $base_path_admin.'logout.php' ?>">Log out</a>
 
 </div>
 

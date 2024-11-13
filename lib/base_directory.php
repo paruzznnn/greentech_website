@@ -32,15 +32,9 @@ if($urlParts['scheme'] == 'http'){
 $base_Path = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $newPath;
 $base_PathAdmin = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $fixedPath;
 
-$publicPath = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . '/allable/public';
-
-
 
 $GLOBALS["base_path"] = $base_Path;
 $GLOBALS["base_path_admin"] = $base_PathAdmin;
-
-
-$GLOBALS["public_path"] = $publicPath;
 
 ?>
 

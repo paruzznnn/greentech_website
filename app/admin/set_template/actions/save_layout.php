@@ -5,7 +5,6 @@ require_once(__DIR__ . '/../../../../lib/base_directory.php');
 
 global $base_path_admin;
 global $base_path;
-global $public_path;
 
 $data = json_decode(file_get_contents('php://input'), true);
 $htmlContent = $data['htmlContent'];

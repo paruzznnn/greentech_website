@@ -7,7 +7,6 @@ $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 global $base_path;
 global $base_path_admin;
-global $public_path;
 
 
 $result = [
