@@ -13,6 +13,14 @@ global $conn;
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
     <link href="css/news_.css?v=<?php echo time();?>" rel="stylesheet">
 
+    <style>
+
+        img{
+            max-width: 600px;
+        }
+
+    </style>
+
 
 </head>
 <body>
