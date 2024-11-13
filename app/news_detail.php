@@ -33,7 +33,6 @@ global $conn;
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
-                                    // ควรใช้ prepared statement แทนการแทรกข้อมูลโดยตรงเพื่อความปลอดภัย
                                     $stmt = $conn->prepare("SELECT 
                                         dn.news_id, 
                                         dn.subject_news, 
@@ -48,8 +47,7 @@ global $conn;
                                         WHERE dn.news_id = ?
                                         GROUP BY dn.news_id");
 
-                                    // ผูกค่ากับตัวแปร
-                                    $stmt->bind_param('i', $decodedId); // ใช้ 'i' สำหรับ integer
+                                    $stmt->bind_param('i', $decodedId); 
                                     $stmt->execute();
                                     $result = $stmt->get_result();
 
@@ -60,16 +58,13 @@ global $conn;
                                             $files = explode(',', $row['file_name']);
                                             $found = false;
 
-                                            // ตรวจสอบไฟล์ใน $files
                                             foreach ($files as $index => $file) {
                                                 $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
 
                                                 if (preg_match($pattern, $content, $matches)) {
-                                                    // เพิ่ม src ใน <img>
-                                                    $new_src = $paths[$index]; // ใช้ค่าจาก $paths ที่ตรงกับไฟล์
+                                                    $new_src = $paths[$index];
                                                     $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
-                                                    
-                                                    // แสดง <img> ที่มีการอัพเดท src
+
                                                     $content = str_replace($matches[0], $new_img_tag, $content);
                                                     
                                                     $found = true;
@@ -81,7 +76,7 @@ global $conn;
                                             }
 
                                             echo '<div style="">';
-                                            echo $content;
+                                            echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
                                             echo '</div>';
                                         }
                                     } else {

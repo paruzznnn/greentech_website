@@ -1,3 +1,4 @@
+
 /****nationLanguages**** */
 
 function nationLanguages() {
@@ -232,11 +233,12 @@ const buildTabSidebar = () => {
 
 // }
 
-// console.log(window.base_path_admin);
-// console.log(window.base_path);
+
 
 $(document).ready(function() {
 
+    $('#loading-overlay').fadeIn();
+    $('#loading-overlay').fadeOut();
 
     buildTabSidebar();
 

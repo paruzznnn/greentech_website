@@ -64,53 +64,62 @@ $("#submitAddNews").on("click", function (event) {
 
     var formNews = $("#formNews")[0];
     var formData = new FormData(formNews);
-
     formData.append("action", "addNews");
-
     var newsContent = formData.get("news_content");
 
     if (newsContent) {
-        
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = newsContent;
-
         var imgTags = tempDiv.getElementsByTagName("img");
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
-
             var file = base64ToFile(imgSrc, filename);
             if (file) {
                 formData.append("image_files[]", file);
             }
-
             if (imgSrc.startsWith("data:image")) {
                 imgTags[i].setAttribute("src", "");
             }
         }
-
         formData.set("news_content", tempDiv.innerHTML);
     }
 
-    // for (var pair of formData.entries()) {
-    //     console.log(pair[0] + ': ' + pair[1]);
-    // }
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to add news.!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4CAF50",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Accept"
+    }).then((result) => {
+        
+        if (result.isConfirmed) {
 
-    $.ajax({
-        url: "actions/process_news.php",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            // console.log("response", response);
+            $('#loading-overlay').fadeIn();
 
-            // if(response.status == 'success'){
+            $.ajax({
+                url: "actions/process_news.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if(response.status == 'success'){
+                        window.location.reload();
+                    }
+                },
+                error: function (error) {
+                    console.log("error", error);
+                },
+            });
 
-            // }
-        },
-        error: function (error) {
-            console.log("error", error);
-        },
+        } else if (result.isDenied) {
+            $('#loading-overlay').fadeOut();
+        }
+
     });
+
+
 });

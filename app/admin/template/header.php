@@ -10,6 +10,10 @@ echo '<script>
 
 ?>
 
+<div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+</div>
+
 
 <div class="header-top">
     <div class="container-fluid">
