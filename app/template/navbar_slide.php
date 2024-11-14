@@ -190,9 +190,9 @@ $dropdownItems = [
                 <span class="blinking-icon"></span>
                 Daily News
             </span>
-            <marquee>
-                <div style="padding: 8px 0px 0px 0px; font-size: 18px;">
-                    Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย
+            <marquee id="newsMarquee" scrollamount="4">
+                <div id="newsMarquee-link">
+                    <a href="#">Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย</a>
                 </div>
             </marquee>
         </div>

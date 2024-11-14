@@ -2,25 +2,27 @@
     <div class="container">
         <div class="row">
 
-            <!-- <div class="col-md-12" id="">
-
-                <div class="box-content">
-                    <h4 class="line-ref">What's New</h4>
-                    <?php //include 'template/news/news_magazine.php' ?>
-                </div>
-
-            </div>
-
-            <div class="col-md-12">
-                <div class="box-section"></div>
-            </div>
-
             <div class="col-md-12" id="">
+
                 <div class="box-content">
-                    <h4 class="line-ref">Product</h4>
+
+                    <h4 class="line-ref">What's New</h4>
+                    <?php include 'template/news/news_magazine.php' ?>
+
+                    <div class="box-section"></div>
+
+                    <!-- <h4 class="line-ref">Product</h4> -->
                     <?php //include 'template/news/news_catalog.php'?>
+
+                    <!-- <div class="box-section"></div> -->
+
+                    <!-- <h4 class="line-ref">Service</h4> -->
+                    <?php //include 'template/news/news_catalog.php'?>
+
                 </div>
-            </div> -->
+
+            </div>
+
 
 
 
@@ -28,7 +30,7 @@
     <div class="box-section"></div>
 </div> -->
 
-<div class="col-md-12 section" id="">
+<!-- <div class="col-md-12 section" id="">
     <div class="box-content">
     
         <div class="row">
@@ -345,7 +347,7 @@
 
 <div class="col-md-12">
     <div class="box-section"></div>
-</div>
+</div> -->
 
 
 

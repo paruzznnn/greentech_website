@@ -1,49 +1,42 @@
 <?php
-$games = [
-  [
-    'title' => 'HR',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-597.jpg',
-    'description' => 'Feature ที่ช่วยจัดการด้านทรัพยากรบุคคล ตั้งแต่ใบสมัครงานจนถึงการเข้าทำงานในองค์กร.'
-  ],
-  [
-    'title' => 'CRM',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-736.jpg',
-    'description' => 'ส่วนจัดการข้อมูลที่เชื่อมโยงกันในระดับองค์กร เริ่มต้นข้อมูลตั้งแต่เก็บบันทึกข้อมูลบริษัท ข้อมูลผู้ติดต่อข้อมูลโครงการ ข้อมูลกิจกรรมตามโครงการ ข้อมูลสินค้า ใบเสนอราคา การบันทึกเวลาเข้าออกงานเมื่อออกปฏิบัติงานนอกสถานที่ ข้อมูลที่เชื่อมโยงแสดงบนปฏิทินช่วยให้จัดการการทำงานง่าย'
-  ],
-  [
-    'title' => 'Skoop',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-411.jpg',
-    'description' => 'บริหารการให้บริการช่วยเหลือในการทำงาน แก้ผู้ใช้ระบบ และผู้ใช้บริการ
-      และมีส่วนบริหารจัดการใช้จ่าย ลดเวลาในการจัดการเอกสาร'
-  ],
-  [
-    'title' => 'IDOC',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-725.jpg',
-    'description' => 'ส่วนจัดการไฟล์ข้อมูล ทั้งการเก็บไฟล์ข้อมูล การจัดการการเข้าถึงไฟล์ เพื่อง่ายต่อการใช้ภายในองค์กร
-    สามารถบันทึกไฟล์เข้าโครงการได้ ระบุหมวดของเอกสารเพื่อให้สะดวก ต้องการค้นหา'
-  ],
-  [
-    'title' => 'SERVICE',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-27.jpg',
-    'description' => 'บริหารการให้บริการช่วยเหลือในการทำงาน แก้ผู้ใช้ระบบ และผู้ใช้บริการ และมีส่วนบริหารจัดการใช้จ่าย ลดเวลาในการจัดการเอกสาร'
-  ],
-  [
-    'title' => 'ACADEMY',
-    'image' => 'http://localhost:3000/allable/public/news_img/20241105%20ALLABLE%20_%20DevRev-162.jpg',
-    'description' => 'เปิด Course training online ภายในองค์กร พร้อมทั้งระบบ Challenge ที่สร้างแบบทดสอบ เพื่อวัดผลหลังการ Training.'
-  ]
+
+$news = [
+    [
+        'image' => '',
+        'title' => 'Origami Platforms',
+        'description' => '',
+        'header' => ''
+    ],
+    [
+        'image' => '',
+        'title' => 'Origami AI',
+        'description' => '',
+        'header' => ''
+    ]
 ];
 ?>
 
-<div class="game-section">
-  <div class="owl-carousel custom-carousel owl-theme">
-    <?php foreach ($games as $game): ?>
-      <div class="item" style="background-image: url(<?php echo $game['image']; ?>);">
-        <div class="item-desc">
-          <h3><?php echo $game['title']; ?></h3>
-          <p><?php echo $game['description']; ?></p>
+<div class="owl-carousel">
+    <?php foreach ($news as $item): ?>
+        <div class="item">
+            <div class="custom-card">
+
+                <div class="custom-card-header">
+                    <h5><?php echo $item['header']; ?></h5>
+                </div>
+
+                <div class="custom-card-img overflow">
+                  <div class="zoom">
+                    <img class="img-fluid" src="<?php echo $item['image']; ?>" alt="News Image">
+                  </div>
+                </div>
+
+                <div class="custom-card-body">
+                    <p class="custom-card-title"><?php echo $item['title']; ?></p>
+                    <!-- <p class="custom-card-text"><?php echo $item['description']; ?></p> -->
+                </div>
+
+            </div>
         </div>
-      </div>
     <?php endforeach; ?>
-  </div>
 </div>

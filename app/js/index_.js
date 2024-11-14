@@ -159,19 +159,19 @@ $(document).ready(function() {
     $('#loginModal').on('submit', function(event) {
         event.preventDefault();
     
-        const email = $('#email').val().trim();
+        const username = $('#username').val().trim();
         const password = $('#password').val().trim();
     
-        if (!email || !password) {
+        if (!username || !password) {
             alert('Please enter both email and password');
             return;
         }
     
         $.ajax({
-            url: './admin/actions/check_login.php',
+            url: 'admin/actions/check_login.php',
             type: 'POST',
             data: {
-                email: email,
+                username: username,
                 password: password
             },
             dataType: 'json',
@@ -184,37 +184,37 @@ $(document).ready(function() {
 
                     const token = sessionStorage.getItem('jwt');
 
-                    $.ajax({
-                        url: './admin/actions/protected.php', 
-                        type: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        success: function(response) {
+                    // $.ajax({
+                    //     url: './admin/actions/protected.php', 
+                    //     type: 'GET',
+                    //     headers: {
+                    //         'Authorization': 'Bearer ' + token
+                    //     },
+                    //     success: function(response) {
                             
-                            // if (response.status === "success") {
+                    //         if (response.status === "success") {
                                 
-                            //     switch (response.data.role) {
-                            //         case 1:
-                            //             window.location.href = './admin/index.php';
-                            //             break;
-                            //         case 2:
-                            //             window.location.href = 'index.php';
-                            //             break;
-                            //         default:
-                            //             alert('Unknown role');
-                            //             break;
-                            //     }
+                    //             switch (response.data.role) {
+                    //                 case 1:
+                    //                     window.location.href = './admin/index.php';
+                    //                     break;
+                    //                 case 2:
+                    //                     window.location.href = 'index.php';
+                    //                     break;
+                    //                 default:
+                    //                     alert('Unknown role');
+                    //                     break;
+                    //             }
 
-                            // } else {
-                            //     alert(response.message);
-                            // }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Request failed:", status, error);
-                            alert("An error occurred while accessing protected resource.");
-                        }
-                    });
+                    //         } else {
+                    //             alert(response.message);
+                    //         }
+                    //     },
+                    //     error: function(xhr, status, error) {
+                    //         console.error("Request failed:", status, error);
+                    //         alert("An error occurred while accessing protected resource.");
+                    //     }
+                    // });
     
                 } else {
                     alert(response.message);
@@ -227,7 +227,14 @@ $(document).ready(function() {
         });
     });
 
-
+    $('#newsMarquee').hover(
+        function() {
+            this.stop();
+        },
+        function() {
+            this.start();
+        }
+    );
 
 });
 

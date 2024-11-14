@@ -77,7 +77,12 @@
 
                 <div class="card">
 
-                    <article class="card-body">
+                    <section class="card-body">
+
+                    <div style="text-align: center;">
+                        <img class="" style="width: 70%;" src="../public/img/logo-ALLABLE-06.png" alt="">
+                    </div>
+
                         <h6 style="text-align: center; color: #555;" class="mt-2">
                             <span><i class="fas fa-unlock"></i></span>
                             <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
@@ -88,7 +93,7 @@
                         <form id="loginModal" action="" method="post">
                                 
                             <div class="form-group mt-4">
-                                <input id="email" type="text" class="emet-login input" placeholder="Email or login">
+                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your user.">
                             </div>
 
                             <div class="form-group mt-2" style="position: relative;">
@@ -103,13 +108,13 @@
                             
                             <div class="row mt-4">
 
-                                <!-- <div class="col-md-12 text-end">
-                                    <a href="register.php">
+                                <div class="col-md-12 text-end">
+                                    <a href="#">
                                         <span style="font-size: 13px !important;">
                                             สมัครสมาชิก
                                         </span>
                                     </a>
-                                </div> -->
+                                </div>
                         
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
@@ -129,7 +134,7 @@
 
                         </form>
 
-                    </article>
+                    </section>
                 </div>
                     
 
