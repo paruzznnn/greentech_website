@@ -4,7 +4,7 @@ $(document).ready(function () {
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['font', ['fontname', 'fontsize']], 
             ['para', ['ul', 'ol', 'paragraph']],
-            ['insert', ['link', 'picture']],
+            ['insert', ['link', 'picture', 'video']],
             ['view', ['fullscreen', 'codeview']],
             ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
         ],

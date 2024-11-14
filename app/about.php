@@ -56,7 +56,7 @@
             // Check if there is an image to display
             if (isset($section['image'])) {
                 $content .= '<div class="col-md-6">';
-                $content .= '<img src="' . $section['image'] . '" alt="">';
+                $content .= '<img style="width: 100%;" src="' . $section['image'] . '" alt="">';
                 $content .= '</div>';
             }
             

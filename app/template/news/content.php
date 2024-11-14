@@ -1,13 +1,10 @@
 <?php
-// Pagination parameters
-$perPage = 4;  // Number of items per page
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;  // Get current page from query string
-$offset = ($page - 1) * $perPage;  // Calculate the offset for SQL query
+$perPage = 4;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $perPage;
 
-// Get search query if exists
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Prepare SQL query for counting total items based on search
 $totalQuery = "SELECT COUNT(*) as total FROM dn_news dn";
 if ($searchQuery) {
     $totalQuery .= " WHERE dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
@@ -18,7 +15,6 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
-// Prepare SQL query for fetching news items for the current page
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
@@ -37,7 +33,10 @@ if ($searchQuery) {
     $sql .= " WHERE dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
 }
 
-$sql .= " GROUP BY dn.news_id LIMIT $perPage OFFSET $offset";
+$sql .= " 
+GROUP BY dn.news_id 
+ORDER BY dn.date_create DESC
+LIMIT $perPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
@@ -45,15 +44,25 @@ $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $content = $row['content_news'];
+
+        $iframeSrc = null;
+        if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
+            // Ensure matches is not empty before accessing the value
+            $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
+        }
+
         $paths = explode(',', $row['pic_path']);
         $files = explode(',', $row['file_name']);
+
+        // Check if $iframeSrc is set and not null before accessing it
+        $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesNews[] = [
             'id' => $row['news_id'],
             'image' =>  $paths[0],
             'date_time' => $row['date_create'],
             'title' => $row['subject_news'],
-            'description' => ''
+            'iframe' => $iframe
         ];
     }
 } else {
@@ -76,16 +85,24 @@ if ($result->num_rows > 0) {
     </div>
 
 </div>
-
 <div class="content-news">
     <?php foreach ($boxesNews as $index => $box): ?>
+
         <div class="box-news">
             <div class="box-image">
                 <?php 
                     $encodedId = urlencode(base64_encode($box['id']));
                 ?>
                 <a href="news_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
-                    <img src="<?php echo $box['image']; ?>" alt="Image for <?php echo $box['title']; ?>">
+                    
+                    <?php
+                    if(empty($box['image'])){
+                        echo '<iframe frameborder="0" src="' . $box['iframe'] . '" width="100%" height="100%" class="note-video-clip"></iframe>';
+                    }else{
+                        echo '<img src="' . $box['image'] . '" alt="Image for ' . htmlspecialchars($box['title']) . '">';
+                    }
+                    ?>
+                    
                 </a>
             </div>
             <div class="box-content">
@@ -97,7 +114,7 @@ if ($result->num_rows > 0) {
     <?php endforeach; ?>
 </div>
 
-<!-- Pagination Links -->
+
 <div class="pagination">
     <?php if ($page > 1): ?>
         <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Previous</a>
