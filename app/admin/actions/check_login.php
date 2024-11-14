@@ -1,5 +1,4 @@
 <?php
-session_start();
 date_default_timezone_set('Asia/Bangkok');
 require '../../../vendor/autoload.php'; 
 use Firebase\JWT\JWT;
@@ -10,10 +9,11 @@ $dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
 $dotenv->load();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $password = trim($_POST['password']);
 
-    if (empty($email) || empty($password)) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if (empty($username) || empty($password)) {
         echo json_encode([
             "status" => "error",
             "message" => "Email and password are required"
@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    $sql = "SELECT ecm_users.*, umb_docs.file_path FROM ecm_users 
+    print_r($_POST);
+    exit;
+
+    $sql = "SELECT ecm_users.*, umb_docs.file_path FROM mb_user 
     LEFT JOIN umb_docs ON ecm_users.user_id = umb_docs.member_id
     WHERE 
     ecm_users.email = ? 

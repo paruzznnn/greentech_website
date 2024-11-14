@@ -46,6 +46,39 @@ setInterval(function() {
 
 $(document).ready(function () {
 
+    
+
+    var owl = $('.owl-carousel');
+    owl.owlCarousel({
+        loop: false,
+        nav: false,
+        margin: 10,
+        autoHeight:true,
+        responsive: {
+            0: {
+                items: 1
+            },
+            600: {
+                items: 2
+            },
+            960: {
+                items: 3
+            },
+            1200: {
+                items: 4
+            }
+        }
+    });
+
+    owl.on('mousewheel', '.owl-stage', function (e) {
+        if (e.deltaY > 0) {
+            owl.trigger('next.owl');
+        } else {
+            owl.trigger('prev.owl');
+        }
+        e.preventDefault();
+    });
+
     // var is_owlCarousel = $('.game-section').length;
 
     // if(is_owlCarousel > 0){
