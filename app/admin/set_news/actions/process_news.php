@@ -152,7 +152,8 @@ try {
             }
 
             $last_inserted_id = $conn->insert_id;
-            if ($_FILES['image_files']['error'] != 4) {
+            
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
                 $fileInfos = handleFileUpload($_FILES['image_files']);
                 foreach ($fileInfos as $fileInfo) {
@@ -171,6 +172,8 @@ try {
 
             $response = array('status' => 'success', 'message' => 'save');
         }
+
+
     } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_news') {
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
