@@ -39,6 +39,7 @@ $(document).ready(function () {
 
 
 function base64ToFile(base64, fileName) {
+
     var fileExtension = fileName.split(".").pop().toLowerCase();
 
     var mimeType;
@@ -98,6 +99,12 @@ function alertError(textAlert) {
     });
 }
 
+
+function isValidUrl(str) {
+    var urlPattern = /^(http|https):\/\/[^\s/$.?#].[^\s]*$/i;
+    return urlPattern.test(str);
+}
+
 $("#submitAddNews").on("click", function (event) {
     event.preventDefault();
 
@@ -113,13 +120,25 @@ $("#submitAddNews").on("click", function (event) {
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
-            var file = base64ToFile(imgSrc, filename);
-            if (file) {
-                formData.append("image_files[]", file);
+
+            var checkIsUrl = false;
+
+            let isUrl = isValidUrl(imgSrc);
+            if (!isUrl) {
+                var file = base64ToFile(imgSrc, filename);
+
+                if (file) {
+                    formData.append("image_files[]", file);
+                }
+
+                if (imgSrc.startsWith("data:image")) {
+                    imgTags[i].setAttribute("src", "");
+                }
+            } else {
+
+                checkIsUrl = true;
             }
-            if (imgSrc.startsWith("data:image")) {
-                imgTags[i].setAttribute("src", "");
-            }
+
         }
         formData.set("news_content", tempDiv.innerHTML);
     }
@@ -143,44 +162,86 @@ $("#submitAddNews").on("click", function (event) {
             alertError("Please fill in content information.");
             return;
         }
-
     }
 
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to add news.!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#4CAF50",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Accept"
-    }).then((result) => {
+    if (checkIsUrl) {
 
-        if (result.isConfirmed) {
+        Swal.fire({
+            title: "Image detection system from other websites?",
+            text: "Do you want to add news.!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4CAF50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Accept"
+        }).then((result) => {
 
-            $('#loading-overlay').fadeIn();
+            if (result.isConfirmed) {
 
-            $.ajax({
-                url: "actions/process_news.php",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    if (response.status == 'success') {
-                        window.location.reload();
-                    }
-                },
-                error: function (error) {
-                    console.log("error", error);
-                },
-            });
+                $('#loading-overlay').fadeIn();
 
-        } else if (result.isDenied) {
-            $('#loading-overlay').fadeOut();
-        }
+                $.ajax({
+                    url: "actions/process_news.php",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (error) {
+                        console.log("error", error);
+                    },
+                });
 
-    });
+            }else{
+                $('#loading-overlay').fadeOut();
+            }
+            
 
+        });
+
+
+    } else {
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to add news.!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4CAF50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Accept"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $('#loading-overlay').fadeIn();
+
+                $.ajax({
+                    url: "actions/process_news.php",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (error) {
+                        console.log("error", error);
+                    },
+                });
+
+            }else{
+                $('#loading-overlay').fadeOut();
+            }
+
+        });
+
+    }
 
 });
