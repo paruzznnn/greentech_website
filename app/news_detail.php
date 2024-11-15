@@ -46,8 +46,6 @@ global $conn;
                                         dn.subject_news, 
                                         dn.content_news, 
                                         dn.date_create, 
-                                        dn.status, 
-                                        dn.del,
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
                                         GROUP_CONCAT(dnc.api_path) AS pic_path
                                         FROM dn_news dn
