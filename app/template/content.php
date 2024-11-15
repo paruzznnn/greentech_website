@@ -26,11 +26,11 @@
 
 
 
-<!-- <div class="col-md-12">
+<div class="col-md-12">
     <div class="box-section"></div>
-</div> -->
+</div>
 
-<!-- <div class="col-md-12 section" id="">
+<div class="col-md-12 section" id="">
     <div class="box-content">
     
         <div class="row">
@@ -46,7 +46,7 @@
                 
             </div>
             <div class="col-md-6 box-transform">
-                <img src="../public/img/hr_dashboard.png" alt="HR Management Image">
+                <img style="width: 100%;" src="../public/img/hr_dashboard.png" alt="HR Management Image">
             </div>
             
         </div>
@@ -65,42 +65,42 @@
             <div class="content-hrm">
                         
                 <div class="box-hrm">
-                    <img src="../public/img/personnel-1.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/personnel-1.jpg" alt="">
                     <h6>PERSONNEL</h6>
                     <p>การสมัครงานออนไลน์ สามารถจัดการใบสมัครทุกใบไม่มีตกหล่น สามารถค้นหาข้อมูลผู้สมัครได้ง่าย</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/member-1.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/member-1.jpg" alt="">
                     <h6>MEMBER</h6>
                     <p>ระบบที่เก็บรวบรวมข้อมูลของสมาชิกทุกคนภายในองค์กรไว้ได้ในที่เดียว ง่ายต่อการตรวจสอบ และค้นหาข้อมูลของแต่ละบุคคล</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/time-1.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/time-1.jpg" alt="">
                     <h6>TIME</h6>
                     <p> รองรับการจัดการตารางเวลาทำงานได้หลายรูปแบบ จัดการเวลาเข้า-ออกงาน</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/1WORK.png" alt="">
+                    <img style="width: 100%;" src="../public/img/1WORK.png" alt="">
                     <h6>WORK</h6>
                     <p>ระบบลาออนไลน์ที่ผุ้ใช้สามารถทำลาบนระบบเองได้ แนบไฟล์เอกสารเพื่อช่วยในการตัดสินใจของหัวหน้า</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/goal-1.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/goal-1.jpg" alt="">
                     <h6>GOAL</h6>
                     <p>สามารถวางแผนตั้งเป้าหมายการทำงาน</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/admintools.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/admintools.jpg" alt="">
                     <h6>ADMINTOOL</h6>
                     <p>ส่วนจัดการของ admin สามารถประกาศในองค์กร ตั้งค่าจัดการส่วนของโครงสร้างบริษัทได้</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/controls.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/controls.jpg" alt="">
                     <h6>CONTROL</h6>
                     <p>ส่วนตั้งค่าการใช้งานใน Origami system ที่สามารถกำหนดสิทธิ์การเข้าใช้งาน ของแต่ละ Module ได้</p>
                 </div>
                 <div class="box-hrm">
-                    <img src="../public/img/dashboard.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/dashboard.jpg" alt="">
                     <h6>Dashboard & Report HR</h6>
                     <p>แสดงในรูปแบบกราฟข้อมูล เพื่อง่ายต่อการมอนิเตอร์ และรายงานพื้นฐานของ HR</p>
                 </div>
@@ -152,7 +152,7 @@
             </div>
 
             <div class="col-md-6 box-transform">
-                <img src="../public/img/crm_flow-01.png" alt="CRM Image">
+                <img style="width: 100%;" src="../public/img/crm_flow-01.png" alt="CRM Image">
             </div>
 
             <div class="col-md-3">
@@ -187,7 +187,7 @@
 
             <div class="col-md-5 box-transform">
                 <div style="display: flex; justify-content: center;">
-                    <img src="../public/img/skoop_social_company-02.png" style="width: 150px;" alt="">
+                    <img style="width: 100%;" src="../public/img/skoop_social_company-02.png" style="width: 150px;" alt="">
                 </div>
             </div>
             
@@ -228,7 +228,7 @@
 
             <div class="col-md-5 box-transform">
                 <div style="display: flex; justify-content: center;">
-                    <img src="../public/img/IDOC-1.jpg" alt="">
+                    <img style="width: 100%;" src="../public/img/IDOC-1.jpg" alt="">
                 </div>
             </div>
             
@@ -260,7 +260,7 @@
                 <div class="content-svr">
                             
                     <div class="box-svr">
-                        <img src="../public/img/expense.jpg" alt="">
+                        <img style="width: 100%;" src="../public/img/expense.jpg" alt="">
                         <h6>NEED</h6>
                         <p>ระบบที่จะช่วยบันทึกการยื่นขอความต้องการต่างๆ ภายในองค์กร ไม่ว่าจะเป็น การเบิกค่าใช้จ่ายหรือการสั่งซื้อต่างๆ สามารถทำได้ง่ายๆเพียงบันทึก และรอการอนุมัติผ่านระบบ</p>
                     </div>
@@ -274,7 +274,7 @@
                 <div class="content-svr">
                     
                     <div class="box-svr">
-                        <img src="../public/img/service.jpg" alt="">
+                        <img style="width: 100%;" src="../public/img/service.jpg" alt="">
                         <h6>HELPDESK & SERVICE</h6>
                         <p>การแจ้งปัญหา โดยผู้ใช้สามารถแจ้งปัญหาได้เอง โดยผู้ดูแลการแจ้งสามารถแยกแต่ละส่วนในการรับการแจ้งได้ โดยระบบสามารถแจ้งปัญหาได้จากทั้งภายในและภายนอก</p>
                     </div>
@@ -296,7 +296,7 @@
     <div class="box-content">
     <div class="row">
         <div class="col-md-6 box-transform">
-            <img src="../public/img/academy_profile.png" alt="">
+            <img style="width: 100%;" src="../public/img/academy_profile.png" alt="">
         </div>
         <div class="col-md-6">
             <div class="row">
@@ -310,31 +310,31 @@
             <div class="icon-row">
                 <div class="icon-col">
                     <div>
-                        <img src="../public/img/icon-academy-02.png" alt="">
+                        <img style="width: 100%;" src="../public/img/icon-academy-02.png" alt="">
                     </div>
                     <p>Video</p>
                 </div>
                 <div class="icon-col">
                     <div>
-                        <img src="../public/img/icon-academy-06.png" alt="">
+                        <img style="width: 100%;" src="../public/img/icon-academy-06.png" alt="">
                     </div>
                     <p>Challenge</p>
                 </div>
                 <div class="icon-col">
                     <div>
-                        <img src="../public/img/icon-academy-05.png" alt="">
+                        <img style="width: 100%;" src="../public/img/icon-academy-05.png" alt="">
                     </div>
                     <p>Attach file</p>
                 </div>
                 <div class="icon-col">
                     <div>
-                        <img src="../public/img/icon-academy-03.png" alt="">
+                        <img style="width: 100%;" src="../public/img/icon-academy-03.png" alt="">
                     </div>
                     <p>Link to URL</p>
                 </div>
                 <div class="icon-col">
                     <div>
-                        <img src="../public/img/icon-academy-04.png" alt="">
+                        <img style="width: 100%;" src="../public/img/icon-academy-04.png" alt="">
                     </div>
                     <p>Link to Youtube</p>
                 </div>
@@ -347,7 +347,7 @@
 
 <div class="col-md-12">
     <div class="box-section"></div>
-</div> -->
+</div>
 
 
 

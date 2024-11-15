@@ -80,7 +80,7 @@ global $conn;
                                             }
 
                                             if (!$found) {
-                                                echo "ไม่พบ <img> ที่มี data-filename ตรงกับค่าใน paths<br>";
+                                                echo "";
                                             }
 
                                             echo '<div style="">';

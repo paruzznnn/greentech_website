@@ -192,7 +192,7 @@ $dropdownItems = [
             </span>
             <marquee id="newsMarquee" scrollamount="4">
                 <div id="newsMarquee-link">
-                    <a href="#">Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย</a>
+                    <a href="news.php">Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย</a>
                 </div>
             </marquee>
         </div>

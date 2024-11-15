@@ -1,19 +1,40 @@
 $(document).ready(function () {
+
     $("#summernote").summernote({
+        height: 400,
+        minHeight: 200,
+        maxHeight: 500,
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['fontname', 'fontsize']], 
+            ['font', ['fontname', 'fontsize']],
             ['para', ['ul', 'ol', 'paragraph']],
             ['insert', ['link', 'picture', 'video']],
             ['view', ['fullscreen', 'codeview']],
             ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
         ],
         fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
-        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'], 
+        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
         callbacks: {
-            
+
         }
     });
+
+    var readURL = function (input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                let previewImage = $('#previewImage');
+                previewImage.attr('src', e.target.result);
+                previewImage.css('display', 'block');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#fileInput").on('change', function () {
+        readURL(this);
+    });
+
 });
 
 
@@ -59,6 +80,24 @@ function base64ToFile(base64, fileName) {
     return file;
 }
 
+function alertError(textAlert) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    Toast.fire({
+        icon: "error",
+        title: textAlert
+    });
+}
+
 $("#submitAddNews").on("click", function (event) {
     event.preventDefault();
 
@@ -85,6 +124,28 @@ $("#submitAddNews").on("click", function (event) {
         formData.set("news_content", tempDiv.innerHTML);
     }
 
+    $(".is-invalid").removeClass("is-invalid");
+    for (var tag of formData.entries()) {
+
+        if (tag[0] === 'fileInput[]' && tag[1].name === '') {
+            alertError("Please add a cover photo.");
+            return;
+        }
+        if (tag[0] === 'news_subject' && tag[1].trim() === '') {
+            $("#news_subject").addClass("is-invalid");
+            return;
+        }
+        if (tag[0] === 'news_description' && tag[1].trim() === '') {
+            $("#news_description").addClass("is-invalid");
+            return;
+        }
+        if (tag[0] === 'news_content' && tag[1].trim() === '') {
+            alertError("Please fill in content information.");
+            return;
+        }
+
+    }
+
     Swal.fire({
         title: "Are you sure?",
         text: "Do you want to add news.!",
@@ -94,7 +155,7 @@ $("#submitAddNews").on("click", function (event) {
         cancelButtonColor: "#d33",
         confirmButtonText: "Accept"
     }).then((result) => {
-        
+
         if (result.isConfirmed) {
 
             $('#loading-overlay').fadeIn();
@@ -106,7 +167,7 @@ $("#submitAddNews").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    if(response.status == 'success'){
+                    if (response.status == 'success') {
                         window.location.reload();
                     }
                 },

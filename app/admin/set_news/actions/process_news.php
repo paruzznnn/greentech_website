@@ -125,24 +125,27 @@ try {
 
         $news_array = [
             'news_subject' => $_POST['news_subject'] ?? '',
+            'news_description' => $_POST['news_description'] ?? '',
             'news_content'  => $_POST['news_content'] ?? '',
         ];
 
         if (isset($news_array)) {
 
             $stmt = $conn->prepare("INSERT INTO dn_news 
-                (subject_news, content_news, date_create) 
-                VALUES (?, ?, ?)");
+                (subject_news, description_news, content_news, date_create) 
+                VALUES (?, ?, ?, ?)");
 
             $news_subject = $news_array['news_subject'];
+            $news_description = $news_array['news_description'];
 
             $news_content = mb_convert_encoding($news_array['news_content'], 'UTF-8', 'auto');
 
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sss",
+                "ssss",
                 $news_subject,
+                $news_description,
                 $news_content,
                 $current_date
             );
@@ -152,6 +155,24 @@ try {
             }
 
             $last_inserted_id = $conn->insert_id;
+
+            if(isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] != 4){
+
+                $fileInfos = handleFileUpload($_FILES['fileInput']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+
+            }
             
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
