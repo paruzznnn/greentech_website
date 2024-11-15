@@ -12,7 +12,7 @@ $navbarItems = [
     ],
     [
         'icon' => '',
-        'text' => 'Origami Platforms',
+        'text' => 'Origami Platform',
         'translate' => '',
         'link' => '#',
         'isDropdown' => true,
@@ -59,13 +59,13 @@ $dropdownItems = [
         'items' => [
             [
                 'icon' => '',
-                'text' => 'HRM',
+                'text' => 'Human Resource Management',
                 'translate' => '',
                 'link' => '#'
             ],
             [
                 'icon' => '',
-                'text' => 'CRM',
+                'text' => 'Corporation Relationship Management',
                 'translate' => '',
                 'link' => '#'
             ],
@@ -83,7 +83,7 @@ $dropdownItems = [
             ],
             [
                 'icon' => '',
-                'text' => 'iDoc',
+                'text' => 'Document Management',
                 'translate' => '',
                 'link' => '#'
             ],

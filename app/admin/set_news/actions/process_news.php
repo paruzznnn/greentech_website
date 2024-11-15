@@ -121,6 +121,7 @@ $response = array('status' => 'error', 'message' => '');
 
 try {
 
+
     if (isset($_POST['action']) && $_POST['action'] == 'addNews') {
 
         $news_array = [
@@ -156,7 +157,7 @@ try {
 
             $last_inserted_id = $conn->insert_id;
 
-            if(isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] != 4){
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
 
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
@@ -171,9 +172,8 @@ try {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
                 }
-
             }
-            
+
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
                 $fileInfos = handleFileUpload($_FILES['image_files']);
@@ -193,6 +193,128 @@ try {
 
             $response = array('status' => 'success', 'message' => 'save');
         }
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'editNews') {
+
+
+        $news_array = [
+            'news_id' => $_POST['news_id'] ?? '',
+            'news_subject' => $_POST['news_subject'] ?? '',
+            'news_description' => $_POST['news_description'] ?? '',
+            'news_content'  => $_POST['news_content'] ?? '',
+        ];
+
+        if (!empty($news_array['news_id'])) {
+
+            $stmt = $conn->prepare("UPDATE dn_news 
+            SET subject_news = ?, 
+            description_news = ?, 
+            content_news = ?, 
+            date_create = ? 
+            WHERE news_id = ?");
+
+            $news_subject = $news_array['news_subject'];
+            $news_description = $news_array['news_description'];
+            $news_content = mb_convert_encoding($news_array['news_content'], 'UTF-8', 'auto');
+
+            $current_date = date('Y-m-d H:i:s');
+            $news_id = $news_array['news_id'];
+
+            $stmt->bind_param(
+                "ssssi",
+                $news_subject,
+                $news_description,
+                $news_content,
+                $current_date,
+                $news_id
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Execute statement failed: " . $stmt->error);
+            }
+
+            $news_id = $news_array['news_id'];
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+
+                $fileInfos = handleFileUpload($_FILES['fileInput']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+
+                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+                        $fileWhereClause = 'news_id = ?';
+                        $fileWhereValues = [$news_id];
+
+                        updateInDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
+
+                $fileInfos = handleFileUpload($_FILES['image_files']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+
+                        $fileWhereClause = 'news_id = ?';
+                        $fileWhereValues = [$news_id];
+
+                        updateInDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            $response = array('status' => 'success', 'message' => 'edit save');
+        }
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'delNews') {
+
+        $news_id = $_POST['id'] ?? '';
+        $del = '1';
+        
+        // Update the `dn_news` table
+        $stmt = $conn->prepare("UPDATE dn_news 
+            SET del = ? 
+            WHERE news_id = ?"); // Removed the extra comma here
+        
+        $stmt->bind_param(
+            "si",
+            $del,
+            $news_id
+        );
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        
+        // Update the `dn_news_doc` table
+        $stmt = $conn->prepare("UPDATE dn_news_doc 
+            SET del = ? 
+            WHERE news_id = ?"); // Removed the extra comma here
+        
+        $stmt->bind_param(
+            "si",
+            $del,
+            $news_id
+        );
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        
+        $response = array('status' => 'success', 'message' => 'Delete');
+        
 
 
     } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_news') {
@@ -206,7 +328,7 @@ try {
 
         $columns = ['news_id'];
 
-        $whereClause = "news_id IS NOT NULL";
+        $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
             $whereClause .= " AND (subject_news LIKE '%$searchValue%')";
