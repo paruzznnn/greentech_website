@@ -64,7 +64,7 @@ function base64ToFile(base64, fileName) {
         default:
             mimeType = "application/octet-stream";
     }
-
+    
     var byteString = atob(base64.split(",")[1]);
 
     var arrayBuffer = new ArrayBuffer(byteString.length);
@@ -102,7 +102,7 @@ function alertError(textAlert) {
 
 function isValidUrl(str) {
     var urlPattern = /^(http|https):\/\/[^\s/$.?#].[^\s]*$/i;
-    return urlPattern.test(str);
+    return urlPattern.test(str) && !str.includes(" ");
 }
 
 $("#submitAddNews").on("click", function (event) {
@@ -150,6 +150,148 @@ $("#submitAddNews").on("click", function (event) {
             alertError("Please add a cover photo.");
             return;
         }
+        if (tag[0] === 'news_subject' && tag[1].trim() === '') {
+            $("#news_subject").addClass("is-invalid");
+            return;
+        }
+        if (tag[0] === 'news_description' && tag[1].trim() === '') {
+            $("#news_description").addClass("is-invalid");
+            return;
+        }
+        if (tag[0] === 'news_content' && tag[1].trim() === '') {
+            alertError("Please fill in content information.");
+            return;
+        }
+    }
+
+    if (checkIsUrl) {
+
+        Swal.fire({
+            title: "Image detection system from other websites?",
+            text: "Do you want to add news.!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4CAF50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Accept"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $('#loading-overlay').fadeIn();
+
+                $.ajax({
+                    url: "actions/process_news.php",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (error) {
+                        console.log("error", error);
+                    },
+                });
+
+            }else{
+                $('#loading-overlay').fadeOut();
+            }
+            
+
+        });
+
+
+    } else {
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to add news.!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4CAF50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Accept"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $('#loading-overlay').fadeIn();
+
+                $.ajax({
+                    url: "actions/process_news.php",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (error) {
+                        console.log("error", error);
+                    },
+                });
+
+            }else{
+                $('#loading-overlay').fadeOut();
+            }
+
+        });
+
+    }
+
+});
+
+
+$("#submitEditNews").on("click", function (event) {
+    event.preventDefault();
+
+    var formNews = $("#formNews_edit")[0];
+    var formData = new FormData(formNews);
+    formData.append("action", "editNews");
+    var newsContent = formData.get("news_content");
+
+    if (newsContent) {
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = newsContent;
+        var imgTags = tempDiv.getElementsByTagName("img");
+        for (var i = 0; i < imgTags.length; i++) {
+            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+            var filename = imgTags[i].getAttribute("data-filename");
+
+            var checkIsUrl = false;
+            let isUrl = isValidUrl(imgSrc);
+            
+            if (!isUrl) {
+                var file = base64ToFile(imgSrc, filename);
+
+                if (file) {
+                    formData.append("image_files[]", file);
+                }
+
+                if (imgSrc.startsWith("data:image")) {
+                    imgTags[i].setAttribute("src", "");
+                }
+            } else {
+
+                checkIsUrl = true;
+            }
+
+        }
+        formData.set("news_content", tempDiv.innerHTML);
+    }
+
+    $(".is-invalid").removeClass("is-invalid");
+    for (var tag of formData.entries()) {
+
+        // if (tag[0] === 'fileInput[]' && tag[1].name === '') {
+        //     alertError("Please add a cover photo.");
+        //     return;
+        // }
         if (tag[0] === 'news_subject' && tag[1].trim() === '') {
             $("#news_subject").addClass("is-invalid");
             return;
