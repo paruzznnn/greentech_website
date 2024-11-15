@@ -18,19 +18,24 @@ $totalPages = ceil($totalItems / $perPage);
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
+            dn.description_news,
             dn.content_news, 
             dn.date_create, 
-            dn.status, 
-            dn.del,
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
         FROM 
             dn_news dn
         LEFT JOIN 
-            dn_news_doc dnc ON dn.news_id = dnc.news_id";
-        
+            dn_news_doc dnc ON dn.news_id = dnc.news_id
+        WHERE 
+            dn.del = '0' AND
+            dnc.del = '0' AND
+            dnc.status = '1'"; // Ensure there's a space before "WHERE"
+
 if ($searchQuery) {
-    $sql .= " WHERE dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    $sql .= "
+    AND dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
+    ";
 }
 
 $sql .= " 
@@ -40,9 +45,11 @@ LIMIT $perPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
+
 $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+
         $content = $row['content_news'];
 
         $iframeSrc = null;
@@ -62,6 +69,7 @@ if ($result->num_rows > 0) {
             'image' =>  $paths[0],
             'date_time' => $row['date_create'],
             'title' => $row['subject_news'],
+            'description' => $row['description_news'],
             'iframe' => $iframe
         ];
     }
@@ -107,7 +115,8 @@ if ($result->num_rows > 0) {
             </div>
             <div class="box-content">
                 <a href="news_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
-                    <p class="line-clamp"><?php echo htmlspecialchars($box['title']); ?></p>
+                    <h5 class="line-clamp"><?php echo htmlspecialchars($box['title']); ?></h5>
+                    <p class="line-clamp"><?php echo htmlspecialchars($box['description']); ?></p>
                 </a>
             </div>
         </div>
