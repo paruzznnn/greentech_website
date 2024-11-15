@@ -115,20 +115,34 @@ include('../../../lib/base_directory.php');
                         <form id="formNews" enctype="multipart/form-data">
 
                             <div class="row">
-                                <div class="col-md-12">
+
+                                <div class="col-md-4">
+                                    <div style="margin: 10px;">
+                                        <label for="">
+                                            <span>Cover photo</span>:
+                                        </label>
+                                        <div class="previewContainer">
+                                            <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 10px;">
+                                        <input type="file" class="form-control" id="fileInput" name="fileInput[]">
+                                    </div>
                                     <div style="margin: 10px;">
                                         <label for="">
                                             <span>Subject</span>:
                                         </label>
-                                        <input type="text" class="form-control" name="news_subject">
+                                        <input type="text" class="form-control" id="news_subject" name="news_subject">
                                     </div>
-
                                     <div style="margin: 10px;">
+                                        <label for="">
+                                            <span>Description</span>:
+                                        </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="news_content"></textarea>
+                                            <textarea class="form-control" id="news_description" name="news_description"></textarea>
                                         </div>
                                     </div>
-
                                     <div style="margin: 10px; text-align: end;">
                                         <button 
                                         type="button" 
@@ -138,8 +152,19 @@ include('../../../lib/base_directory.php');
                                             News
                                         </button>
                                     </div>
-
                                 </div>
+
+                                <div class="col-md-8">
+                                    <div style="margin: 10px;">
+                                        <label for="">
+                                            <span>Content</span>:
+                                        </label>
+                                        <div>
+                                            <textarea class="form-control" id="summernote" name="news_content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </form>
