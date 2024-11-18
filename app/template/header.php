@@ -1,20 +1,23 @@
 <?php
-    //header-top-right
-    $menuItems = [
-        // [
-        //     'icon' => 'fas fa-user-plus',
-        //     'text' => '',
-        //     'translate' => 'Sign_up',
-        //     'link' => '#'
-        // ],
-        [
-            'icon' => 'fas fa-sign-in-alt',
-            'text' => '',
-            'translate' => 'Sign_in',
-            'link' => '#',
-            'modal_id' => 'myBtn-channel'
-        ]
-    ];
+//header-top-right
+$menuItems = [
+    [
+        'id' => 0,
+        'icon' => 'fas fa-user-plus',
+        'text' => '',
+        'translate' => 'Sign_up',
+        'link' => 'register.php',
+        'modal_id' => ''
+    ],
+    [
+        'id' => 1,
+        'icon' => 'fas fa-sign-in-alt',
+        'text' => '',
+        'translate' => 'Sign_in',
+        'link' => '#',
+        'modal_id' => 'myBtn-sign-in'
+    ]
+];
 ?>
 
 
@@ -29,12 +32,12 @@
                 <img class="logo" src="../public/img/logo-ALLABLE-06.png" alt="">
             </a>
         </div>
-            
+
 
         <div class="header-top-right">
             <?php foreach ($menuItems as $item): ?>
                 <div>
-                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id']?>">
+                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
@@ -65,83 +68,73 @@
     </div>
 </div>
 
-<div id="myModal-channel" class="modal">
-    <!-- Modal content -->
+<div id="myModal-sign-in" class="modal">
     <div class="modal-content" style="width: 350px !important;">
         <div class="modal-header">
-            <span class="modal-close-channel">&times;</span>
+            <span class="modal-close-sign-in">&times;</span>
         </div>
         <div class="modal-body" style="background-color: #9e9e9e1f;">
 
-            <div class="box-login-container">
+            <div class="box-sign-in-container">
 
                 <div class="card">
-
                     <section class="card-body">
-
-                    <div style="text-align: center;">
-                        <img class="" style="width: 70%;" src="../public/img/logo-ALLABLE-06.png" alt="">
-                    </div>
+                        <div style="text-align: center;">
+                            <img class="" style="width: 70%;" src="../public/img/logo-ALLABLE-06.png" alt="">
+                        </div>
 
                         <h6 style="text-align: center; color: #555;" class="mt-2">
                             <span><i class="fas fa-unlock"></i></span>
                             <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
                         </h6>
-                        
+
                         <hr>
 
                         <form id="loginModal" action="" method="post">
-                                
+
                             <div class="form-group mt-4">
                                 <input id="username" type="text" class="emet-login input" placeholder="Please enter your user.">
                             </div>
 
                             <div class="form-group mt-2" style="position: relative;">
                                 <input id="password" type="password" class="emet-login inpu" data-type="password">
-                                <span class="" 
-                                style="position: absolute; top: 10px; right: 20px; color: #555555;" 
-                                id="togglePasswordPage">
+                                <span class="togglePasswordSignin"
+                                    style="position: absolute; top: 10px; right: 20px; color: #555555;"
+                                    id="">
                                     <i class="fas fa-eye-slash"></i>
                                 </span>
-                            </div>    
+                            </div>
 
-                            
+
                             <div class="row mt-4">
 
                                 <div class="col-md-12 text-end">
-                                    <a href="#">
+                                    <a href="register.php">
                                         <span style="font-size: 13px !important;">
                                             สมัครสมาชิก
                                         </span>
                                     </a>
                                 </div>
-                        
+
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
-                                        <button type="submit" class="" 
-                                        style="
+                                        <button type="submit" class=""
+                                            style="
                                         width: 260px;
                                         border: none;
                                         border-radius: 4px;
                                         padding: 10px;
                                         background: #ff8200;
                                         color: white;
-                                        "
-                                        > Login  </button>
+                                        "> Login </button>
                                     </div>
                                 </div>
                             </div>
-
                         </form>
-
                     </section>
                 </div>
-                    
-
-        </div>
+            </div>
 
         </div>
     </div>
 </div>
-
-
