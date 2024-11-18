@@ -143,6 +143,7 @@ if ($result->num_rows > 0) {
         $content = $row['content_news'];
         $paths = explode(',', $row['pic_path']);
         $files = explode(',', $row['file_name']);
+        $isCover = $row['status'];
 
         $isCover = $row['status'];
         $found = false;
@@ -157,11 +158,12 @@ if ($result->num_rows > 0) {
             }
         }
 
-        $previewImageSrc = !empty($paths) ? htmlspecialchars($paths[0], ENT_QUOTES) : '';
+        $previewImageSrc = !empty($paths) ? htmlspecialchars($paths[0]) : '';
+        $content = mb_convert_encoding($content, 'UTF-8', 'auto');
 
         echo "
         <form id='formNews_edit' enctype='multipart/form-data'>
-        <input type='text' class='form-control' id='news_id' name='news_id' value='" . htmlspecialchars($row['news_id'], ENT_QUOTES) . "' hidden>
+        <input type='text' class='form-control' id='news_id' name='news_id' value='" . htmlspecialchars($row['news_id']) . "' hidden>
             <div class='row'>
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
@@ -179,14 +181,14 @@ if ($result->num_rows > 0) {
                         <label>
                             <span>Subject</span>:
                         </label>
-                        <input type='text' class='form-control' id='news_subject' name='news_subject' value='" . htmlspecialchars($row['subject_news'], ENT_QUOTES) . "'>
+                        <input type='text' class='form-control' id='news_subject' name='news_subject' value='" . htmlspecialchars($row['subject_news']) . "'>
                     </div>
                     <div style='margin: 10px;'>
                         <label>
                             <span>Description</span>:
                         </label>
                         <div>
-                            <textarea class='form-control' id='news_description' name='news_description'>" . htmlspecialchars($row['description_news'], ENT_QUOTES) . "</textarea>
+                            <textarea class='form-control' id='news_description' name='news_description'>" . htmlspecialchars($row['description_news']) . "</textarea>
                         </div>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
@@ -205,7 +207,7 @@ if ($result->num_rows > 0) {
                             <span>Content</span>:
                         </label>
                         <div>
-                            <textarea class='form-control' id='summernote' name='news_content'>" . htmlspecialchars($content, ENT_QUOTES) . "</textarea>
+                            <textarea class='form-control' id='summernote' name='news_content'>" . htmlspecialchars($content) . "</textarea>
                         </div>
                     </div>
                 </div>
