@@ -806,7 +806,8 @@ body {
 
 /* The Close Button */
 .modal-close,
-.modal-close-channel {
+.modal-close-sign-in
+ {
     color: #555;
     float: right;
     font-size: 28px;
@@ -816,19 +817,14 @@ body {
 
 .modal-close:hover,
 .modal-close:focus,
-.modal-close-channel:hover,
-.modal-close-channel:focus {
+.modal-close-sign-in:hover,
+.modal-close-sign-in:focus
+{
     color: #e91e63;
     text-decoration: none;
     cursor: pointer;
 }
 
-.close-compare:hover,
-.close-compare:focus {
-    color: #e91e63;
-    text-decoration: none;
-    cursor: pointer;
-}
 
 .modal-header {
     padding: 2px 16px;

@@ -19,6 +19,20 @@ global $conn;
 
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
 
+    <style>
+        .valid {
+            color: #4CAF50;
+        }
+        
+        .invalid {
+            color: #ff3d00;
+        }
+        .box-consent{
+            border: 1px solid #d2d2d2;
+            padding: 20px;
+            border-radius: 3px;
+        }
+    </style>
     
 </head>
 <body>
