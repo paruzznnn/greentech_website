@@ -87,53 +87,90 @@ global $conn;
 
 <body>
 
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+    </div>
+
     <?php
 
-    $user_id = isset($_GET['otpID']) ? $_GET['otpID'] : '';
+    if (isset($_GET['register']) || isset($_GET['forgot'])) {
 
-    $sql = "SELECT mb_user.email 
-                FROM mb_user 
-                WHERE mb_user.user_id = ?";
-    $stmt = $conn->prepare($sql);
-    if ($stmt === false) {
-        exit();
+        $user_id = isset($_GET['otpID']) ? $_GET['otpID'] : '';
+
+        $sql = "SELECT mb_user.email 
+        FROM mb_user 
+        WHERE mb_user.user_id = ?";
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            exit();
+        }
+
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $row = $result->fetch_assoc();
+
+        $email = $row['email'];
+        $maskedEmail = substr($email, 0, 9) . str_repeat('*', strpos($email, '@') - 9) . substr($email, strpos($email, '@'));
     }
 
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $row = $result->fetch_assoc();
-
-    $email = $row['email'];
-    $maskedEmail = substr($email, 0, 9) . str_repeat('*', strpos($email, '@') - 9) . substr($email, strpos($email, '@'));
 
     ?>
 
-
-    <div class="container height-100 d-flex justify-content-center align-items-center">
-        <div class="position-relative">
-            <div class="card p-2 text-center">
-                <h6>Please enter the one time OTP <br> to verify your account</h6>
-                <div>
-                    <span>A code has been sent to</span> <br>
-                    <small id="maskedNumber"><?php echo $maskedEmail; ?></small>
-                </div>
-                <input type="hidden" id="user_id" name="user_id" value="<?php echo $user_id; ?>">
-                <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2">
-                    <input class="m-2 text-center form-control rounded" type="text" id="first" maxlength="1" />
-                    <input class="m-2 text-center form-control rounded" type="text" id="second" maxlength="1" />
-                    <input class="m-2 text-center form-control rounded" type="text" id="third" maxlength="1" />
-                    <input class="m-2 text-center form-control rounded" type="text" id="fourth" maxlength="1" />
-                    <input class="m-2 text-center form-control rounded" type="text" id="fifth" maxlength="1" />
-                    <input class="m-2 text-center form-control rounded" type="text" id="sixth" maxlength="1" />
-                </div>
-                <div class="mt-4">
-                    <button id="validateBtn" class="px-4 validate">confirm</button>
+    <?php if (isset($_GET['register'])) { ?>
+        <div class="container height-100 d-flex justify-content-center align-items-center">
+            <div class="position-relative">
+                <div class="card p-2 text-center">
+                    <h6>Please enter the one time OTP <br> to verify your account</h6>
+                    <div>
+                        <span>A code has been sent to</span> <br>
+                        <small id="maskedNumber"><?php echo $maskedEmail; ?></small>
+                    </div>
+                    <input type="hidden" id="user_id" name="user_id" value="<?php echo $user_id; ?>">
+                    <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2">
+                        <input class="m-2 text-center form-control rounded" type="text" id="first" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="second" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="third" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="fourth" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="fifth" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="sixth" maxlength="1" />
+                    </div>
+                    <div class="mt-4">
+                        <button id="confirm_emailBtn" class="px-4 validate">confirm</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    <?php } ?>
+
+
+    <?php if (isset($_GET['forgot'])) { ?>
+        <div class="container height-100 d-flex justify-content-center align-items-center">
+            <div class="position-relative">
+                <div class="card p-2 text-center">
+                    <h6>Please enter the one time OTP <br> to verify your account</h6>
+                    <div>
+                        <span>A code has been sent to</span> <br>
+                        <small id="maskedNumber"><?php echo $maskedEmail; ?></small>
+                    </div>
+                    <input type="hidden" id="user_id" name="user_id" value="<?php echo $user_id; ?>">
+                    <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2">
+                        <input class="m-2 text-center form-control rounded" type="text" id="first" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="second" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="third" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="fourth" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="fifth" maxlength="1" />
+                        <input class="m-2 text-center form-control rounded" type="text" id="sixth" maxlength="1" />
+                    </div>
+                    <div class="mt-4">
+                        <button id="confirm_resetBtn" class="px-4 validate">confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+
 
 
 
@@ -164,21 +201,148 @@ global $conn;
 
         $(document).ready(function() {
 
+            $('#loading-overlay').fadeIn();
+            $('#loading-overlay').fadeOut();
+
             OTPInput();
 
-            $('#validateBtn').on('click', function() {
+            $('#confirm_emailBtn').on('click', function() {
                 let otp = '';
                 $('#otp > input').each(function() {
                     otp += $(this).val();
                 });
                 let user_id = $('#user_id').val();
-                confirmOTP(user_id, otp)
+                confirmOTP(user_id, otp);
+            });
+
+
+            $('#confirm_resetBtn').on('click', function() {
+                let otp = '';
+                $('#otp > input').each(function() {
+                    otp += $(this).val();
+                });
+
+                let user_id = $('#user_id').val();
+                confirmReset(user_id, otp);
+
             });
 
 
         });
 
+        function confirmReset(user_id, otp) {
+
+            $('#loading-overlay').fadeIn();
+
+            $.ajax({
+                url: 'actions/otp_forgot_password.php',
+                type: 'POST',
+                data: {
+                    action: 'sendReset',
+                    userId: user_id,
+                    otpCode: otp
+                },
+                dataType: 'JSON',
+                success: function(response) {
+
+                    if (response.status == 'succeed') {
+
+                        $.ajax({
+                            url: 'actions/otp_forgot_password.php',
+                            type: 'POST',
+                            data: {
+                                action: 'generatePassword',
+                                userId: response.user_id
+                            },
+                            dataType: 'JSON',
+                            success: function(response) {
+
+                                if (response.status == 'succeed') {
+                                    $('#loading-overlay').fadeOut();
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.onmouseenter = Swal.stopTimer;
+                                            toast.onmouseleave = Swal.resumeTimer;
+                                        }
+                                    });
+
+                                    Toast.fire({
+                                        icon: "success",
+                                        title: response.message
+                                    }).then(() => {
+                                        window.location.href = 'index.php';
+                                    });
+
+                                } else {
+                                    $('#loading-overlay').fadeOut();
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.onmouseenter = Swal.stopTimer;
+                                            toast.onmouseleave = Swal.resumeTimer;
+                                        }
+                                    });
+
+                                    Toast.fire({
+                                        icon: "error",
+                                        title: response.message
+                                    }).then(() => {
+                                        // window.location.reload(); 
+                                    });
+                                }
+
+
+
+                            },
+                            error: function(error) {
+                                console.log('Error:', error);
+                            }
+                        });
+
+                    } else {
+                        $('#loading-overlay').fadeOut();
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+
+                        Toast.fire({
+                            icon: "error",
+                            title: response.message
+                        }).then(() => {
+                            // window.location.reload(); 
+                        });
+
+                    }
+
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+
+        }
+
+
         function confirmOTP(user_id, otp) {
+
+            $('#loading-overlay').fadeIn();
 
             $.ajax({
                 url: 'actions/otp_confirm_email.php',
@@ -192,7 +356,7 @@ global $conn;
                 success: function(response) {
 
                     if (response.status == 'succeed') {
-
+                        $('#loading-overlay').fadeOut();
                         const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",
@@ -213,7 +377,7 @@ global $conn;
                         });
 
                     } else {
-
+                        $('#loading-overlay').fadeOut();
                         const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",

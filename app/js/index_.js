@@ -114,6 +114,12 @@ function setupModal(modalId, btnId, closeClass) {
 
     if ($modal.length && $btn.length && $span.length) {
         $btn.on('click', function () {
+            // Close any currently open modal before showing the new one
+            $('.modal').each(function() {
+                if ($(this).is(':visible')) {
+                    $(this).hide();
+                }
+            });
             $modal.show();
         });
 
@@ -127,13 +133,16 @@ function setupModal(modalId, btnId, closeClass) {
             }
         });
     } else {
-
+        // Handle cases where modal, button, or close button doesn't exist
     }
 }
 
 
 
 $(document).ready(function () {
+
+    $('#loading-overlay').fadeIn();
+    $('#loading-overlay').fadeOut();
 
     nationLanguages();
     const selectedLanguage = localStorage.getItem('language') || 'th';
@@ -146,6 +155,7 @@ $(document).ready(function () {
     });
 
     setupModal("myModal-sign-in", "myBtn-sign-in", "modal-close-sign-in");
+    setupModal("myModal-forgot-password", "myBtn-forgot-password", "modal-close-forgot-password");
 
     $('#togglePasswordSignin').on('click', function () {
         const password = $('#password');
@@ -235,6 +245,86 @@ $(document).ready(function () {
         });
     });
 
+    $('#submitForgot').on('click', function (event) {
+
+        var formNews = $("#forgotModal")[0];
+        var formData = new FormData(formNews);
+
+        $(".is-invalid").removeClass("is-invalid");
+        for (var tag of formData.entries()) {
+
+            if (tag[0] === 'forgot_email' && tag[1].trim() === '') {
+                $("#forgot_email").addClass("is-invalid");
+                return;
+            }
+
+        }
+
+        formData.append("action", 'forgotPassword');
+        // formData.append("sendMail", isSendMailChecked);
+
+        $('#loading-overlay').fadeIn();
+        $.ajax({
+            url: 'actions/otp_forgot_password.php',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+            
+                if (response.status == 'succeed') {
+                    $('#loading-overlay').fadeOut();
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    
+                    Toast.fire({
+                        icon: "success",
+                        title: response.message
+                    }).then(() => {
+                        window.location.reload(); 
+                    });
+                }else{
+                    $('#loading-overlay').fadeOut();
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    
+                    Toast.fire({
+                        icon: "error",
+                        title: response.message
+                    }).then(() => {
+                        // window.location.reload(); 
+                    });
+
+                }
+
+            },
+            error: function (xhr, status, error) {
+                // Handle error, e.g., show an error message
+                console.error('Form submission failed:', error);
+            }
+        });
+        
+
+    });
+
     $('#newsMarquee').hover(
         function () {
             this.stop();
@@ -274,7 +364,6 @@ $(document).ready(function () {
             checkRegister = true;
         }
     });
-
 
     $('#submitSignUp').on('click', function (event) {
         // event.preventDefault();
@@ -399,6 +488,8 @@ $(document).ready(function () {
         formData.append("action", 'save_signup');
         // formData.append("sendMail", isSendMailChecked);
 
+        $('#loading-overlay').fadeIn();
+
         $.ajax({
             url: 'admin/actions/check_register.php',
             type: 'POST',
@@ -407,10 +498,8 @@ $(document).ready(function () {
             processData: false,
             success: function (response) {
 
-                console.log('response', response);
-                
-
                 if (response.status == 'succeed') {
+                    $('#loading-overlay').fadeOut();
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",
@@ -430,7 +519,7 @@ $(document).ready(function () {
                         window.location.reload(); 
                     });
                 }else{
-
+                    $('#loading-overlay').fadeOut();
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",

@@ -56,6 +56,9 @@ function mssageSubject($subject){
         case 'forgot':
             $HTMLsj = 'Reset your password';
             break;
+        case 'new_password':
+            $HTMLsj = 'New password';
+            break;
         default:
             
             break;
@@ -74,15 +77,13 @@ function messageBody($body, $id, $otp){
     $url = '';
 
     if($body == 'register'){
-
         $type_tmp = 'register';
         $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string). '&' . urlencode('register');
-    
     }else if($body == 'forgot'){
-
         $type_tmp = 'forgot';
-        // $url = $base_path . '/otp_confirm.php?id=' . urlencode($id) . '&' . urlencode($random_string). '&' . urlencode('forgot'); 
-
+        $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string). '&' . urlencode('forgot');
+    }else if($body == 'new_password'){
+        $type_tmp = 'new_password';
     }
 
     $HTMLbd = templateMail($url, $type_tmp, $otp);
@@ -189,9 +190,56 @@ function templateMail($url, $type_tmp, $otp){
                     <body>
                         <div class="email-container">
                             <p>Your verification code is</p>
-                            <h3>'.$otp.'</h3>
+                            <h1>'.$otp.'</h1>
                             <a href="'.$url.'" target="_blank">Reset Password</a>
-                            <p>Best regards,<br/>The Allablep Team</p>
+                            <p>Best regards,<br/>The Allable Team</p>
+                        </div>
+                    </body>
+                </html>';
+                return $mesMail;
+
+            break;
+        case 'new_password':
+
+            $mesMail = '<html>
+                    <head>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f9f9f9;
+                                color: #333;
+                                padding: 20px;
+                            }
+                            .email-container {
+                                background-color: #fff;
+                                border: 1px solid #ddd;
+                                padding: 20px;
+                                border-radius: 5px;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            }
+                            .email-container p {
+                                font-size: 16px;
+                                line-height: 1.5;
+                            }
+                            .email-container a {
+                                display: inline-block;
+                                margin-top: 10px;
+                                padding: 10px 20px;
+                                background-color: #007bff;
+                                color: #fff;
+                                text-decoration: none;
+                                border-radius: 5px;
+                            }
+                            .email-container a:hover {
+                                background-color: #0056b3;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="email-container">
+                            <p>Your new password</p>
+                            <h1>'.$otp.'</h1>
+                            <p>Best regards,<br/>The Allable Team</p>
                         </div>
                     </body>
                 </html>';
