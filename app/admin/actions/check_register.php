@@ -2,12 +2,19 @@
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
 require_once '../../../lib/connect.php';
+require_once '../../../lib/send_mail.php';
 
 $response = array('status' => '', 'message' => '');
 
-function sendMail(){
-    
+function generateOTP($length = 6) {
+    $digits = '0123456789';
+    $otp = '';
+    for ($i = 0; $i < $length; $i++) {
+        $otp .= $digits[rand(0, strlen($digits) - 1)];
+    }
+    return $otp;
 }
+
 
 try {
     // Check if the action is 'save_signup'
@@ -41,10 +48,13 @@ try {
 
         // Check if email already exists
         if (intval($row['total']) <= 0) {
+
+            $otp = generateOTP();
+
             // Insert new user data
             $stmt = $conn->prepare(
-                "INSERT INTO mb_user (first_name, last_name, password, email, consent, verify, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO mb_user (first_name, last_name, password, email, consent, verify, generate_otp, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             );
             if (!$stmt) {
                 throw new Exception("Prepare statement failed: " . $conn->error);
@@ -56,13 +66,14 @@ try {
 
             // Bind parameters
             $stmt->bind_param(
-                "ssssisi", 
+                "ssssiiss", 
                 $register_data['first_name'], 
                 $register_data['last_name'], 
                 $hashed_password, 
                 $register_data['email'], 
                 $register_data['consent'], 
                 $register_data['verify'], 
+                $otp,
                 $current_date
             );
 
@@ -70,6 +81,10 @@ try {
             if (!$stmt->execute()) {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
+
+            // Get the last inserted ID
+            $last_insert_id = $conn->insert_id;
+            sendEmail($register_data['email'], 'register', $last_insert_id, $otp);
 
             $response['status'] = 'succeed';
             $response['message'] = 'Signup completed successfully';
