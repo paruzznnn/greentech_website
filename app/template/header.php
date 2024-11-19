@@ -102,9 +102,9 @@ $menuItems = [
 
                             <div class="form-group mt-2" style="position: relative;">
                                 <input id="password" type="password" class="emet-login inpu" data-type="password">
-                                <span class="togglePasswordSignin"
+                                <span class=""
                                     style="position: absolute; top: 10px; right: 20px; color: #555555;"
-                                    id="">
+                                    id="togglePasswordSignin">
                                     <i class="fas fa-eye-slash"></i>
                                 </span>
                             </div>

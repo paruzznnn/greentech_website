@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             "data" => array(
                 "user_id" => $row['user_id'],
                 "user_pic" => '',
-                "role" => ''
+                "role" => $row['role_id']
             )
         );
 

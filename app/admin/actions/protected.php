@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             $secret_key = $_ENV['JWT_SECRET_KEY'];
             $decoded = JWT::decode($token, new Key($secret_key, 'HS256'));
 
+            // print_r($decoded);
+            // exit;
+
             // Check if token is expired
             if (time() > $decoded->exp) {
 
@@ -38,8 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 $iat = $decoded->iat;
                 $exp = $decoded->exp;
 
-                if ($role) {
-
                     $_SESSION['user_id'] = $user_id;
                     $_SESSION['user_pic'] = $user_pic;
                     $_SESSION['role'] = $role;
@@ -54,12 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                         ]
                     ];
 
-                } else {
-                    $response = [
-                        "status" => "error",
-                        "message" => "Access denied for this role."
-                    ];
-                }
             }
         } catch (Exception $e) {
             $response = [
