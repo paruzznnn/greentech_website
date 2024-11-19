@@ -20,6 +20,10 @@ $menuItems = [
 ];
 ?>
 
+<div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+</div>
+
 
 <div id="background-blur"></div>
 
@@ -108,10 +112,21 @@ $menuItems = [
 
                             <div class="row mt-4">
 
-                                <div class="col-md-12 text-end">
+                                <div class="col-md-12 text-end" 
+                                style="
+                                display: flex; 
+                                justify-content: space-between;
+                                align-items: center;
+                                ">
                                     <a href="register.php">
                                         <span style="font-size: 13px !important;">
                                             สมัครสมาชิก
+                                        </span>
+                                    </a>
+
+                                    <a type="button" href="#"  id="myBtn-forgot-password">
+                                        <span style="font-size: 13px !important;">
+                                            ลืมรหัสผ่าน
                                         </span>
                                     </a>
                                 </div>
@@ -131,6 +146,67 @@ $menuItems = [
                                 </div>
                             </div>
                         </form>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="myModal-forgot-password" class="modal">
+    <div class="modal-content" style="width: 350px !important;">
+        <div class="modal-header">
+            <span class="modal-close-forgot-password">&times;</span>
+        </div>
+        <div class="modal-body" style="background-color: #9e9e9e1f;">
+
+            <div class="box-forgot-password-container">
+
+                <div class="card">
+                    <section class="card-body">
+                        <div style="text-align: center;">
+                            <img class="" style="width: 70%;" src="../public/img/logo-ALLABLE-06.png" alt="">
+                        </div>
+
+                        <h6 style="text-align: center; color: #555;" class="mt-2">
+                            <span>
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <span data-key-lang="" lang="US">Forgot your password?</span>
+                        </h6>
+
+                        <hr>
+
+                        <form id="forgotModal" action="" method="post">
+
+                            <div class="form-group mt-4">
+                                <input 
+                                id="forgot_email" 
+                                name="forgot_email" type="text" 
+                                class="form-control emet-login input" 
+                                placeholder="Please enter your email.">
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <div class="d-inline-flex">
+                                        <button type="button" 
+                                        id="submitForgot"
+                                        class=""
+                                        style="
+                                        width: 260px;
+                                        border: none;
+                                        border-radius: 4px;
+                                        padding: 10px;
+                                        background: #ff8200;
+                                        color: white;
+                                        "> send email </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
                     </section>
                 </div>
             </div>
