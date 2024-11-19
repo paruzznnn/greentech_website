@@ -192,47 +192,37 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
 
-                console.log('response', response);
-
-
                 if (response.status === "success") {
-
                     sessionStorage.setItem('jwt', response.jwt);
-
-
                     const token = sessionStorage.getItem('jwt');
+                    $.ajax({
+                        url: './admin/actions/protected.php', 
+                        type: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function(response) {
 
-                    // $.ajax({
-                    //     url: './admin/actions/protected.php', 
-                    //     type: 'GET',
-                    //     headers: {
-                    //         'Authorization': 'Bearer ' + token
-                    //     },
-                    //     success: function(response) {
+                            if (response.status === "success") {
 
-                    //         if (response.status === "success") {
+                                switch (response.data.role) {
+                                    case 1:
+                                        window.location.href = 'admin/index.php';
+                                        break;
+                                    default:
+                                        window.location.href = 'index.php';
+                                        break;
+                                }
 
-                    //             switch (response.data.role) {
-                    //                 case 1:
-                    //                     window.location.href = './admin/index.php';
-                    //                     break;
-                    //                 case 2:
-                    //                     window.location.href = 'index.php';
-                    //                     break;
-                    //                 default:
-                    //                     alert('Unknown role');
-                    //                     break;
-                    //             }
-
-                    //         } else {
-                    //             alert(response.message);
-                    //         }
-                    //     },
-                    //     error: function(xhr, status, error) {
-                    //         console.error("Request failed:", status, error);
-                    //         alert("An error occurred while accessing protected resource.");
-                    //     }
-                    // });
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Request failed:", status, error);
+                            alert("An error occurred while accessing protected resource.");
+                        }
+                    });
 
                 } else {
                     alert(response.message);
