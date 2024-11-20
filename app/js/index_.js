@@ -205,7 +205,7 @@ $(document).ready(function () {
 
                             if (response.status === "success") {
 
-                                switch (response.data.role) {
+                                switch (response.data.role_id) {
                                     case 1:
                                         window.location.href = 'admin/index.php';
                                         break;

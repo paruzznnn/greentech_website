@@ -56,8 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             "exp" => time() + (60 * 60), // Expires in 1 hour
             "data" => array(
                 "user_id" => $row['user_id'],
-                "user_pic" => '',
-                "role" => $row['role_id']
+                "role_id" => $row['role_id'],
+                "comp_id" => $row['comp_id'],
+                "dep_id" => $row['dep_id']
             )
         );
 
