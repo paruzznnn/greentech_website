@@ -2,7 +2,6 @@
 global $base_path;
 global $base_path_admin;
 
-
 echo '<script>
     window.base_path = "' . $base_path . '";
     window.base_path_admin = "' . $base_path_admin . '";
