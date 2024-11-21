@@ -37,16 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
                 $user_id = $decoded->data->user_id;
                 $role_id = $decoded->data->role_id;
-                $comp_id = $decoded->data->comp_id;
-                $dep_id = $decoded->data->dep_id;
                 
                 $iat = $decoded->iat;
                 $exp = $decoded->exp;
 
                     $_SESSION['user_id'] = $user_id;
                     $_SESSION['role_id'] = $role_id;
-                    $_SESSION['comp_id'] = $comp_id;
-                    $_SESSION['dep_id'] = $dep_id;
                     $_SESSION['iat'] = $iat;
                     $_SESSION['exp'] = $exp;
                     

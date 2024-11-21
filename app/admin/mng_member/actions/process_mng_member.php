@@ -147,11 +147,6 @@ try {
                     consent,
                     verify,
                     confirm_email,
-                    comp_id,
-                    dep_id,
-                    pst_id,
-                    role_id,
-                    level,
                     date_create
                     FROM mb_user 
                     WHERE $whereClause

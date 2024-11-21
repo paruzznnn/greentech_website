@@ -2,7 +2,6 @@
 require_once('../../../lib/connect.php');
 include('../../../lib/base_directory.php');
 global $conn;
-// checkPermissions();
 ?>
 <!DOCTYPE html>
 <html lang="th">

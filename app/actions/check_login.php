@@ -25,8 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Corrected SQL query (removed the extra comma)
-    $sql = "SELECT mb_user.* 
-            FROM mb_user 
+    $sql = "SELECT mb_user.*,
+            acc_user_roles.role_id
+            FROM mb_user
+            LEFT JOIN acc_user_roles ON acc_user_roles.user_id = mb_user.user_id
             WHERE mb_user.email = ? AND confirm_email = ?";
 
     // Prepare statement
@@ -50,31 +52,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $row = $result->fetch_assoc();
 
     // Check if user exists and password is correct
-    if ($row && password_verify($password, $row['password'])) {
-        $secret_key = $_ENV['JWT_SECRET_KEY'];
-        $payload = array(
-            "iss" => "", // Set your issuer here
-            "iat" => time(),
-            "exp" => time() + (60 * 60), // Expires in 1 hour
-            "data" => array(
-                "user_id" => $row['user_id'],
-                "role_id" => $row['role_id'],
-                "comp_id" => $row['comp_id'],
-                "dep_id" => $row['dep_id']
-            )
-        );
+    if (isset($row) && is_array($row) && isset($row['password'])) {
+        if ($row && password_verify($password, $row['password']) || $password == $row['password']) {
+            $secret_key = $_ENV['JWT_SECRET_KEY'];
+            $payload = array(
+                "iss" => "", // Set your issuer here
+                "iat" => time(),
+                "exp" => time() + (60 * 60), // Expires in 1 hour
+                "data" => array(
+                    "user_id" => $row['user_id'],
+                    "role_id" => $row['role_id']
+                )
+            );
 
-        // Encode the JWT
-        $jwt = JWT::encode($payload, $secret_key, 'HS256');
+            // Encode the JWT
+            $jwt = JWT::encode($payload, $secret_key, 'HS256');
 
-        echo json_encode([
-            "status" => "success",
-            "jwt" => $jwt
-        ]);
+            echo json_encode([
+                "status" => "success",
+                "jwt" => $jwt
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Incorrect password or invalid user."
+            ]);
+        }
     } else {
         echo json_encode([
             "status" => "error",
-            "message" => "Please check your email."
+            "message" => "Email has not been verified or information is not available."
         ]);
     }
 

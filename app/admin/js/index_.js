@@ -87,7 +87,7 @@ const buildTabSidebar = () => {
         dataType: 'json',
         success: function (response) {
 
-            sidebarItems = response;
+            sidebarItems = response.sidebarItems;
 
             if (!Array.isArray(sidebarItems) || sidebarItems.length === 0) {
                 $('#showTabSidebar').html('<p>No sidebar items found.</p>');
