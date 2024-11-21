@@ -183,7 +183,7 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: 'admin/actions/check_login.php',
+            url: 'actions/check_login.php',
             type: 'POST',
             data: {
                 username: username,
@@ -196,7 +196,7 @@ $(document).ready(function () {
                     sessionStorage.setItem('jwt', response.jwt);
                     const token = sessionStorage.getItem('jwt');
                     $.ajax({
-                        url: './admin/actions/protected.php', 
+                        url: 'actions/protected.php', 
                         type: 'GET',
                         headers: {
                             'Authorization': 'Bearer ' + token
@@ -484,7 +484,7 @@ $(document).ready(function () {
         $('#loading-overlay').fadeIn();
 
         $.ajax({
-            url: 'admin/actions/check_register.php',
+            url: 'actions/check_register.php',
             type: 'POST',
             data: formData,
             contentType: false,

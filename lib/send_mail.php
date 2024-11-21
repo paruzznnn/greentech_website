@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -10,42 +11,44 @@ require  __DIR__ . '/../vendor/phpmailer/PHPMailer/src/SMTP.php';
 require_once(__DIR__ . '/../lib/base_directory.php');
 
 
-function sendEmail($to, $type_mes, $id, $otp) {
+function sendEmail($to, $type_mes, $id, $otp)
+{
 
     $mail = new PHPMailer(true);
 
     try {
         //Server settings
         // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      
-        $mail->isSMTP(); 
-        $mail->SMTPAuth   = true;  
+        $mail->isSMTP();
+        $mail->SMTPAuth   = true;
 
-        $mail->Host       = 'smtp.gmail.com';                                                   
-        $mail->Username   = 'allhiapp.info@gmail.com';                     
-        $mail->Password   = 'neynwxnyhmnchvbk';     
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->Username   = 'allhiapp.info@gmail.com';
+        $mail->Password   = 'neynwxnyhmnchvbk';
 
         // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
         // $mail->Port       = 587;    
-        
+
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;      // Enable SSL encryption
         $mail->Port       = 465;                              // TCP port to connect to
-    
+
         //Recipients
         $mail->setFrom('allhiapp.info@gmail.com', 'Allable');
         $mail->addAddress($to);
 
         //Content
-        $mail->isHTML(true);                           
+        $mail->isHTML(true);
         $mail->Subject = mssageSubject($type_mes);
         $mail->Body    = messageBody($type_mes, $id, $otp);
-        
+
         $mail->send();
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 }
 
-function mssageSubject($subject){
+function mssageSubject($subject)
+{
 
     $HTMLsj = '';
 
@@ -60,29 +63,30 @@ function mssageSubject($subject){
             $HTMLsj = 'New password';
             break;
         default:
-            
+
             break;
     }
 
     return $HTMLsj;
 }
 
-function messageBody($body, $id, $otp){
+function messageBody($body, $id, $otp)
+{
     global $base_path;
     // global $base_path_admin;
 
- // Generate a random string for the 'gen' parameter
+    // Generate a random string for the 'gen' parameter
     $random_string = generateUrl(8);
     $type_tmp = '';
     $url = '';
 
-    if($body == 'register'){
+    if ($body == 'register') {
         $type_tmp = 'register';
-        $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string). '&' . urlencode('register');
-    }else if($body == 'forgot'){
+        $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string) . '&' . urlencode('register');
+    } else if ($body == 'forgot') {
         $type_tmp = 'forgot';
-        $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string). '&' . urlencode('forgot');
-    }else if($body == 'new_password'){
+        $url = $base_path . 'app/otp_confirm.php?otpID=' . urlencode($id) . '&' . urlencode($random_string) . '&' . urlencode('forgot');
+    } else if ($body == 'new_password') {
         $type_tmp = 'new_password';
     }
 
@@ -91,7 +95,8 @@ function messageBody($body, $id, $otp){
 }
 
 
-function generateUrl($length) {
+function generateUrl($length)
+{
     $characters = '!@#$%^&*()_+1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
     $randomString = '';
@@ -102,11 +107,12 @@ function generateUrl($length) {
 }
 
 
-function templateMail($url, $type_tmp, $otp){
+function templateMail($url, $type_tmp, $otp)
+{
 
     switch ($type_tmp) {
         case 'register':
-                $mesMail = '<html>
+            $mesMail = '<html>
                     <head>
                         <style>
                             body {
@@ -143,17 +149,17 @@ function templateMail($url, $type_tmp, $otp){
                     <body>
                         <div class="email-container">
                             <p>Your verification code is</p>
-                            <h1>'.$otp.'</h1>
-                            <a href="'.$url.'" target="_blank">OTP</a>
+                            <h1>' . $otp . '</h1>
+                            <a href="' . $url . '" target="_blank">OTP</a>
                             <p>Best regards,<br/>The Allable Team</p>
                         </div>
                     </body>
                 </html>';
-                return $mesMail;
+            return $mesMail;
             break;
         case 'forgot':
 
-                $mesMail = '<html>
+            $mesMail = '<html>
                     <head>
                         <style>
                             body {
@@ -190,13 +196,13 @@ function templateMail($url, $type_tmp, $otp){
                     <body>
                         <div class="email-container">
                             <p>Your verification code is</p>
-                            <h1>'.$otp.'</h1>
-                            <a href="'.$url.'" target="_blank">Reset Password</a>
+                            <h1>' . $otp . '</h1>
+                            <a href="' . $url . '" target="_blank">Reset Password</a>
                             <p>Best regards,<br/>The Allable Team</p>
                         </div>
                     </body>
                 </html>';
-                return $mesMail;
+            return $mesMail;
 
             break;
         case 'new_password':
@@ -238,19 +244,18 @@ function templateMail($url, $type_tmp, $otp){
                     <body>
                         <div class="email-container">
                             <p>Your new password</p>
-                            <h1>'.$otp.'</h1>
+                            <h1>' . $otp . '</h1>
                             <p>Best regards,<br/>The Allable Team</p>
                         </div>
                     </body>
                 </html>';
-                return $mesMail;
+            return $mesMail;
 
             break;
         default:
             $mesMail = '';
             break;
     }
-
 }
 
 
@@ -266,4 +271,3 @@ function templateMail($url, $type_tmp, $otp){
 // $mail->addAttachment('/var/tmp/file.tar.gz');       
 // $mail->addAttachment('/tmp/image.jpg', 'new.jpg'); 
 // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-?>
