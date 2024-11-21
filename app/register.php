@@ -119,7 +119,7 @@ global $conn;
                                 <label for="">
                                     <span>Confirm password</span>:
                                 </label>
-                                <input id="signUp_confirm_password" name="signUp_confirm_password" type="password" class="form-control">
+                                <input id="signUp_confirm_password" name="signUp_confirm_password" type="password" class="form-control" disabled>
                             </div>
                         </div>
 

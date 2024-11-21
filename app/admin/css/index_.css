@@ -76,6 +76,14 @@ body {
     border: 4px solid #ff9800;
 }
 
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;  /* Allow text wrapping */
+}
+
 
 @media screen and (max-width: 500px) {
     .header-top a {
@@ -769,4 +777,24 @@ to {
 
 .hidden {
     display: none;
+}
+
+
+.tables-over {
+    overflow-x: auto;
+    white-space: nowrap;
+    /* scrollbar-width: thin; */
+}
+
+.tables-over::-webkit-scrollbar {
+    height: 6px;
+}
+
+.tables-over::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 10px;
+}
+
+.tables-over::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }

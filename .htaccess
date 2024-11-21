@@ -1,22 +1,17 @@
-# เปิดใช้งานการเขียน URL ใหม่
 RewriteEngine On
 
-# ซ่อนนามสกุล .php จาก URL
 RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^(.*)$ $1.php [L]
 
-# ซ่อนนามสกุล .html จาก URL
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
-
-    # ยกเว้น index.php จากการเขียน URL ใหม่
+    
     RewriteRule ^index\.php$ - [L]
 
-    # ส่งคำขอไปยัง index.php หากไม่ตรงกับไฟล์หรือโฟลเดอร์จริง
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ /index.php [L]

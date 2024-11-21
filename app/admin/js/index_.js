@@ -95,7 +95,6 @@ const buildTabSidebar = () => {
             }
             
             let sidebarContent = '<div class="sidebar">';
-            let appsAdded = false; // ตัวแปรสถานะ
             
             sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
                 const itemLink = item.link || '#';
@@ -103,14 +102,6 @@ const buildTabSidebar = () => {
                 const level = item.level || 0;
             
                 if (level == 1) {
-                    // เพิ่ม APPS เฉพาะครั้งแรกที่เจอ level == 1
-                    if (!appsAdded) {
-                        sidebarContent += `
-                        <div style="padding: 10px 15px; font-size: 12px; color: #5555;">
-                            <i class="fas fa-rocket"></i> APPS
-                        </div>`;
-                        appsAdded = true; // ตั้งค่าสถานะว่าเพิ่มแล้ว
-                    }
             
                     sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
                     <span style="font-size: 14px;">${item.icon}</span>
@@ -118,6 +109,7 @@ const buildTabSidebar = () => {
                     </a>`;
             
                 } else {
+
                     sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
                     <span style="font-size: 14px;">${item.icon}</span> 
                     ${item.label}

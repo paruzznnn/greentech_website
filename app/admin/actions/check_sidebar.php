@@ -1,142 +1,56 @@
 <?php
 header('Content-Type: application/json');
-require_once(__DIR__ . '/../../../lib/permissions.php');
+require_once(__DIR__ . '/../../../lib/connect.php');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
-// checkPermissions();
 
-$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-$isFile = ($isProtocol === 'http') ? '.php' : '';
+// $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+// $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 global $base_path;
 global $base_path_admin;
 
+$sql = "SELECT admt_menus.* 
+        FROM admt_menus 
+        WHERE admt_menus.del = ?";
 
-$result = [
-    [
-        'menu_id' => 1, 
-        'parent_id' => 0, 
-        'menu_icon' => '<i class="fas fa-tachometer-alt"></i>', 
-        'menu_label' => 'Dashboard', 
-        'menu_link' => 'dashboard'.$isFile, 
-        'menu_level' => '',
-        'menu_order' => 1
-    ],
-    [
-        'menu_id' => 4, 
-        'parent_id' => 0, 
-        'menu_icon' => '<i class="fas fa-newspaper"></i>', 
-        'menu_label' => 'News ', 
-        'menu_link' => '', 
-        'menu_level' => '',
-        'menu_order' => 1
-    ],
-    [
-        'menu_id' => 5, 
-        'parent_id' => 4, 
-        'menu_icon' => '<i class="fas fa-pen-alt"></i>', 
-        'menu_label' => 'write news', 
-        'menu_link' => 'set_news/setup_news'.$isFile, 
-        'menu_level' => '',
-        'menu_order' => 2
-    ],
-    [
-        'menu_id' => 6, 
-        'parent_id' => 4, 
-        'menu_icon' => '<i class="fas fa-table"></i>', 
-        'menu_label' => 'list news', 
-        'menu_link' => 'set_news/list_news'.$isFile, 
-        'menu_level' => '',
-        'menu_order' => 2
-    ],
-    [
-        'menu_id' => 7, 
-        'parent_id' => 0, 
-        'menu_icon' => '<i class="fas fa-user-cog"></i>', 
-        'menu_label' => 'Admin Tools', 
-        'menu_link' => '', 
-        'menu_level' => 1,
-        'menu_order' => 1
-    ],
-    [
-        'menu_id' => 9, 
-        'parent_id' => 7, 
-        'menu_icon' => '<i class="fas fa-circle-notch"></i>', 
-        'menu_label' => 'menu', 
-        'menu_link' => 'set_menu/setup_menu'.$isFile, 
-        'menu_level' => 1,
-        'menu_order' => 3
-    ],
-    [
-        'menu_id' => 10, 
-        'parent_id' => 7, 
-        'menu_icon' => '<i class="fas fa-circle-notch"></i>', 
-        'menu_label' => 'role', 
-        'menu_link' => '', 
-        'menu_level' => 1,
-        'menu_order' => 4
-    ],
-    [
-        'menu_id' => 11, 
-        'parent_id' => 7, 
-        'menu_icon' => '<i class="fas fa-circle-notch"></i>', 
-        'menu_label' => 'company', 
-        'menu_link' => '', 
-        'menu_level' => 1,
-        'menu_order' => 5
-    ],
-    [
-        'menu_id' => 12, 
-        'parent_id' => 0, 
-        'menu_icon' => '<i class="fas fa-cogs"></i>', 
-        'menu_label' => 'Template', 
-        'menu_link' => '', 
-        'menu_level' => 1,
-        'menu_order' => 1
-    ],
-    [
-        'menu_id' => 13, 
-        'parent_id' => 12, 
-        'menu_icon' => '<i class="fas fa-window-restore"></i>', 
-        'menu_label' => 'web Allable', 
-        'menu_link' => 'set_template/set_allable'.$isFile, 
-        'menu_level' => 1,
-        'menu_order' => 2
-    ],
-    [
-        'menu_id' => 14, 
-        'parent_id' => 12, 
-        'menu_icon' => '<i class="fas fa-th-large"></i>', 
-        'menu_label' => 'build layout', 
-        'menu_link' => 'set_template/set_layout'.$isFile, 
-        'menu_level' => 1,
-        'menu_order' => 2
-    ],
-];
+// Prepare statement
+$stmt = $conn->prepare($sql);
+if ($stmt === false) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Database error: Unable to prepare statement"
+    ]);
+    exit();
+}
+
+$del = 0;
+
+// Bind parameters and execute
+$stmt->bind_param("i", $del);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch all rows as an associative array
+$arrayMenu = $result->fetch_all(MYSQLI_ASSOC);
 
 $sidebarItems = [];
 
-foreach ($result as $row) {
-
-    if ($row['parent_id'] === 0) {
-        $menuItem = [
+foreach ($arrayMenu as $row) {
+    if ($row['parent_id'] == 0) { // Main menu items
+        $sidebarItems[] = [
             'id' => $row['menu_id'],
             'icon' => $row['menu_icon'],
             'label' => $row['menu_label'],
             'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
             'level' => $row['menu_level'],
             'order' => $row['menu_order'],
-            'subItems' => [], 
+            'subItems' => [],
         ];
-
-        $sidebarItems[] = $menuItem;
-
-    } else {
-
+    } else { // Submenu items
         foreach ($sidebarItems as &$parentItem) {
-
             if ($parentItem['id'] == $row['parent_id']) {
                 $parentItem['subItems'][] = [
-                    'id' => $row['parent_id'] . $row['menu_order'],
+                    'id' => $row['menu_id'],
                     'icon' => $row['menu_icon'],
                     'label' => $row['menu_label'],
                     'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
@@ -146,9 +60,8 @@ foreach ($result as $row) {
                 ];
                 break;
             }
-
         }
-
+        unset($parentItem); // Break reference
     }
 }
 
