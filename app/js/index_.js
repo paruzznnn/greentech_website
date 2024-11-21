@@ -352,7 +352,10 @@ $(document).ready(function () {
         // If all requirements are met, show an alert
         if (allRequirementsMet) {
             checkRegister = true;
+        }else{
+            checkRegister = false;
         }
+        $('#signUp_confirm_password').prop('disabled', !checkRegister);
     });
 
     $('#submitSignUp').on('click', function (event) {

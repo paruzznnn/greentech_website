@@ -2,14 +2,14 @@
     <div class="container">
         <div class="row">
 
-            <div class="col-md-12" id="">
+            <!-- <div class="col-md-12" id="">
 
-                <div class="box-content">
+                <div class="box-content"> -->
 
-                    <h4 class="line-ref">What's New</h4>
-                    <?php include 'template/news/news_magazine.php' ?>
+                    <!-- <h4 class="line-ref">What's New</h4> -->
+                    <?php //include 'template/news/news_magazine.php' ?>
 
-                    <div class="box-section"></div>
+                    <!-- <div class="box-section"></div> -->
 
                     <!-- <h4 class="line-ref">Product</h4> -->
                     <?php //include 'template/news/news_catalog.php'?>
@@ -19,16 +19,16 @@
                     <!-- <h4 class="line-ref">Service</h4> -->
                     <?php //include 'template/news/news_catalog.php'?>
 
-                </div>
+                <!-- </div>
 
-            </div>
-
-
+            </div> -->
 
 
-<div class="col-md-12">
+
+
+<!-- <div class="col-md-12">
     <div class="box-section"></div>
-</div>
+</div> -->
 
 <div class="col-md-12 section" id="">
     <div class="box-content">
@@ -187,7 +187,7 @@
 
             <div class="col-md-5 box-transform">
                 <div style="display: flex; justify-content: center;">
-                    <img style="width: 100%;" src="../public/img/skoop_social_company-02.png" style="width: 150px;" alt="">
+                    <img style="width: 50%;" src="../public/img/skoop_social_company-02.png" style="width: 150px;" alt="">
                 </div>
             </div>
             

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Corrected SQL query (removed the extra comma)
     $sql = "SELECT mb_user.* 
             FROM mb_user 
-            WHERE mb_user.email = ?";
+            WHERE mb_user.email = ? AND confirm_email = ?";
 
     // Prepare statement
     $stmt = $conn->prepare($sql);
@@ -39,8 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    $confirm_email = 1;
+
     // Bind parameters and execute
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("si", $username, $confirm_email);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -72,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         echo json_encode([
             "status" => "error",
-            "message" => "Invalid password"
+            "message" => "Please check your email."
         ]);
     }
 

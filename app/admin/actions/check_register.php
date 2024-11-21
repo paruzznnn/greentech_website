@@ -53,8 +53,8 @@ try {
 
             // Insert new user data
             $stmt = $conn->prepare(
-                "INSERT INTO mb_user (first_name, last_name, password, email, consent, verify, generate_otp, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO mb_user (first_name, last_name, password, email, phone_number, consent, verify, generate_otp, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             if (!$stmt) {
                 throw new Exception("Prepare statement failed: " . $conn->error);
@@ -66,11 +66,12 @@ try {
 
             // Bind parameters
             $stmt->bind_param(
-                "ssssiiss", 
+                "sssssiiss", 
                 $register_data['first_name'], 
                 $register_data['last_name'], 
                 $hashed_password, 
                 $register_data['email'], 
+                $register_data['phone'], 
                 $register_data['consent'], 
                 $register_data['verify'], 
                 $otp,
