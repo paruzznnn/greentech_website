@@ -12,7 +12,9 @@ global $base_path_admin;
 
 $arrPermiss = checkPermissions($_SESSION);
 // เก็บสิทธิที่เกี่ยวข้องในรูปแบบ array
-$allowedMenus = explode(',', $arrPermiss['menus_id']);
+$allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['menus_id'])) 
+    ? explode(',', $arrPermiss['menus_id']) 
+    : [];  // กำหนดให้เป็น array เปล่าแทนการใช้ string
 
 // Query เพื่อดึงข้อมูลเมนูทั้งหมด
 $sql = "SELECT ml_menus.* FROM ml_menus WHERE ml_menus.del = ?";
@@ -59,6 +61,7 @@ foreach ($arrayMenu as $row) {
             unset($parentItem); // Clear reference
         }
     }
+    
 }
 
 echo json_encode([

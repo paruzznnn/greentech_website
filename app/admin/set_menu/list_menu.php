@@ -72,12 +72,15 @@
 
                     <div class="">
 
-                        <table id="td_list_news" class="table table-hover" style="width:100%;">
+                        <table id="td_list_menu" class="table table-hover" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Member info</th>
-                                    <th>Date created</th>
+                                    <th>Icon</th>
+                                    <th>Menu name</th>
+                                    <th>Main</th>
+                                    <th>Path</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,7 +101,7 @@
     <script>
         $(document).ready(function() {
 
-            var td_list_news = new DataTable('#td_list_news', {
+            var td_list_menu = new DataTable('#td_list_menu', {
                 "autoWidth": false,
                 "language": {
                     "decimal": "",
@@ -124,11 +127,11 @@
                 "processing": true,
                 "serverSide": true,
                 ajax: {
-                    url: "actions/process_member.php",
+                    url: "actions/process_menu.php",
                     method: 'POST',
                     dataType: 'json',
                     data: function(d) {
-                        d.action = 'getData_news';
+                        d.action = 'getData_menu';
                         // d.filter_date = $('#filter_date').val();
                         // d.customParam2 = "value2";
                     },
@@ -139,15 +142,7 @@
                 "ordering": false,
                 "pageLength": 25,
                 "lengthMenu": [10, 25, 50, 100],
-                columnDefs: [
-                    // {
-                    //     "target": 0,
-                    //     data: null,
-                    //     render: function ( data, type, row, meta) {
-                    //         return meta.row + 1;
-                    //     }
-                    // },
-                    {
+                columnDefs: [{
                         "target": 0,
                         data: null,
                         render: function(data, type, row, meta) {
@@ -159,180 +154,71 @@
                         data: null,
                         render: function(data, type, row) {
 
-                            let htmlConfrim
-
-                            if(data.confirm_email == '1'){
-
-                                htmlConfrim =`
-                                <span style="font-size: 12px; color: #88fc00;">
-                                    <i class="fas fa-circle"></i>
-                                </span>
-                                Verified`;
-
-                            }else{
-
-                                htmlConfrim =`
-                                <span style="font-size: 12px; color: #ffbf00;">
-                                    <i class="fas fa-circle"></i>
-                                </span>
-                                Waiting for confirmation`;
-
-                            }
-
-
-
-                            let memberInfo = `
-                            <div class="row">
-
-                                <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-id-card"></i> 
-                                            <span>Name :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${data.fullname}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-envelope"></i> 
-                                            <span>Email address :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${data.email}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-building"></i>
-                                            <span>Company :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${0}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-id-card-alt"></i>
-                                            <span>Position :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${0}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-phone-volume"></i>
-                                            <span>Telephone number :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${data.phone_number}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                        
-                                            <span>Status :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${htmlConfrim}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-briefcase"></i> 
-                                            <span>Department :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${0}
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div style="font-size: 14px;">
-                                            <i class="fas fa-chess-pawn"></i> 
-                                            <span>Role :</span>
-                                        </div>
-                                        <div class="line-clamp">
-                                            ${0}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            `;
-
-                            return memberInfo;
+                            return data.menu_icon;
                         }
                     },
-                    // {
-                    //     "target": 2,
-                    //     data: null,
-                    //     render: function(data, type, row) {
-                    //         return data;
-
-                    //     }
-                    // },
                     {
                         "target": 2,
                         data: null,
                         render: function(data, type, row) {
 
-                            const datetime = data.date_create;
-                            const [date, time] = datetime.split(" ");
+                            return data.menu_label;
+                        }
+                    },
+                    {
+                        "target": 3,
+                        data: null,
+                        render: function(data, type, row) {
 
-                            let htmlDateTime = `
-                            <div>
-                                <div><i class="fas fa-calendar-alt"></i> ${date}</div>
-                                <div><i class="fas fa-clock"></i> ${time}</div>
-                            </div>
-                            `;
-
-                            return htmlDateTime;
+                            return data.parent_id;
 
                         }
-                    }
-                    // {
-                    //     "target": 4,
-                    //     data: null,
-                    //     render: function(data, type, row) {
+                    },
+                    {
+                        "target": 4,
+                        data: null,
+                        render: function(data, type, row) {
 
-                    //         let divBtn = `
-                    //     <div>`;
+                            return data.menu_link;
 
-                    //         divBtn += `
-                    //     <span style="margin: 2px;">
-                    //         <button type="button" class="btn-circle btn-edit">
-                    //         <i class="fas fa-pencil-alt"></i>
-                    //         </button>
-                    //     </span>
-                    //     `;
+                        }
+                    },
+                    {
+                        "target": 5,
+                        data: null,
+                        render: function(data, type, row) {
 
-                    //         divBtn += `
-                    //     <span style="margin: 2px;">
-                    //         <button type="button" class="btn-circle btn-del">
-                    //         <i class="fas fa-trash-alt"></i>
-                    //         </button>
-                    //     </span>
-                    //     `;
+                            let divBtn = `
+                        <div>`;
 
-                    //         divBtn += `
-                    //     </div>
-                    //     `;
+                            divBtn += `
+                        <span style="margin: 2px;">
+                            <button type="button" class="btn-circle btn-edit">
+                            <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </span>
+                        `;
 
-                    //         return divBtn;
+                            divBtn += `
+                        <span style="margin: 2px;">
+                            <button type="button" class="btn-circle btn-del">
+                            <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                        `;
 
-                    //     }
-                    // }
+                            divBtn += `
+                        </div>
+                        `;
+
+                            return divBtn;
+
+
+                        }
+                    },
 
 
                 ],
-
-
-
                 drawCallback: function(settings) {
 
                     var targetDivTable = $('div.dt-layout-row.dt-layout-table');
@@ -361,7 +247,7 @@
                     //     ""
                     // ];
 
-                    // cssResponsiveTable('td_list_news', headers);
+                    // cssResponsiveTable('td_list_menu', headers);
                 },
                 rowCallback: function(row, data, index) {
                     // var editButton = $(row).find('.btn-edit');

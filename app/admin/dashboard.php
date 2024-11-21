@@ -1,6 +1,4 @@
-<?php
-include('../../lib/base_directory.php');
-?>
+<?php include 'check_permission.php'?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
