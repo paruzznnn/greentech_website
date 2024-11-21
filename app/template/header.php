@@ -1,12 +1,16 @@
 <?php
 //header-top-right
+
+$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+$isFile = ($isProtocol === 'http') ? '.php' : '';
+
 $menuItems = [
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
         'text' => '',
         'translate' => 'Sign_up',
-        'link' => 'register.php',
+        'link' => 'register'. $isFile,
         'modal_id' => ''
     ],
     [
@@ -118,7 +122,7 @@ $menuItems = [
                                 justify-content: space-between;
                                 align-items: center;
                                 ">
-                                    <a href="register.php">
+                                    <a href="<?php echo 'register'.$isFile ?>">
                                         <span style="font-size: 13px !important;">
                                             สมัครสมาชิก
                                         </span>

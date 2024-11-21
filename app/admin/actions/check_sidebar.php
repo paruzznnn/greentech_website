@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once(__DIR__ . '/../../../lib/connect.php');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
+require_once(__DIR__ . '/../../../lib/permissions.php');
 
 // $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 // $isFile = ($isProtocol === 'http') ? '.php' : '';
@@ -9,61 +10,68 @@ require_once(__DIR__ . '/../../../lib/base_directory.php');
 global $base_path;
 global $base_path_admin;
 
-$sql = "SELECT admt_menus.* 
-        FROM admt_menus 
-        WHERE admt_menus.del = ?";
+$arrPermiss = checkPermissions($_SESSION);
+// เก็บสิทธิที่เกี่ยวข้องในรูปแบบ array
+$allowedMenus = explode(',', $arrPermiss['menus_id']);
 
-// Prepare statement
+// Query เพื่อดึงข้อมูลเมนูทั้งหมด
+$sql = "SELECT ml_menus.* FROM ml_menus WHERE ml_menus.del = ?";
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Database error: Unable to prepare statement"
-    ]);
+    echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
     exit();
 }
 
 $del = 0;
-
-// Bind parameters and execute
 $stmt->bind_param("i", $del);
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Fetch all rows as an associative array
 $arrayMenu = $result->fetch_all(MYSQLI_ASSOC);
 
+// สร้างเมนู sidebar
 $sidebarItems = [];
-
 foreach ($arrayMenu as $row) {
-    if ($row['parent_id'] == 0) { // Main menu items
-        $sidebarItems[] = [
-            'id' => $row['menu_id'],
-            'icon' => $row['menu_icon'],
-            'label' => $row['menu_label'],
-            'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
-            'level' => $row['menu_level'],
-            'order' => $row['menu_order'],
-            'subItems' => [],
-        ];
-    } else { // Submenu items
-        foreach ($sidebarItems as &$parentItem) {
-            if ($parentItem['id'] == $row['parent_id']) {
-                $parentItem['subItems'][] = [
-                    'id' => $row['menu_id'],
-                    'icon' => $row['menu_icon'],
-                    'label' => $row['menu_label'],
-                    'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
-                    'level' => $row['menu_level'],
-                    'order' => $row['menu_order'],
-                    'parentId' => $row['parent_id'],
-                ];
-                break;
+    // ตรวจสอบสิทธิ: ถ้าเมนูนี้อยู่ใน $allowedMenus ถึงจะเพิ่ม
+    if (in_array($row['menu_id'], $allowedMenus)) {
+        if ($row['parent_id'] == 0) { // เมนูหลัก
+            $sidebarItems[] = [
+                'id' => $row['menu_id'],
+                'icon' => $row['menu_icon'],
+                'label' => $row['menu_label'],
+                'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
+                'order' => $row['menu_order'],
+                'subItems' => [],
+            ];
+        } else { // เมนูย่อย
+            foreach ($sidebarItems as &$parentItem) {
+                if ($parentItem['id'] == $row['parent_id']) {
+                    $parentItem['subItems'][] = [
+                        'id' => $row['menu_id'],
+                        'icon' => $row['menu_icon'],
+                        'label' => $row['menu_label'],
+                        'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
+                        'order' => $row['menu_order'],
+                        'parentId' => $row['parent_id'],
+                    ];
+                    break;
+                }
             }
+            unset($parentItem); // Clear reference
         }
-        unset($parentItem); // Break reference
     }
 }
 
-echo json_encode($sidebarItems);
+echo json_encode([
+    'sidebarItems' => $sidebarItems
+]);
+
+// $permissions = explode(',', $arrPermiss['permissions']);
+// $permissions_id = explode(',', $arrPermiss['permiss_id']);
+// $permissionsMap = array_combine($permissions, $permissions_id);
+
+// ส่งผลลัพธ์เป็น JSON
+// echo json_encode([
+//     'sidebarItems' => $sidebarItems,
+//     'permissions' => $permissionsMap,
+// ]);
 ?>

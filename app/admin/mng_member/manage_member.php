@@ -1,7 +1,5 @@
 <?php
-include('../../../lib/permissions.php');
 include('../../../lib/base_directory.php');
-// checkPermissions();
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -82,9 +80,7 @@ include('../../../lib/base_directory.php');
                                 <tr>
                                     <th>No.</th>
                                     <th>Member info</th>
-                                    <th>Level</th>
                                     <th>Date created</th>
-                                    <!-- <th>Action</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -197,7 +193,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-id-card"></i> 
                                             <span>Name :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${data.fullname}
                                         </div>
                                     </div>
@@ -206,7 +202,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-envelope"></i> 
                                             <span>Email address :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${data.email}
                                         </div>
                                     </div>
@@ -215,7 +211,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-building"></i>
                                             <span>Company :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${0}
                                         </div>
                                     </div>
@@ -224,7 +220,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-id-card-alt"></i>
                                             <span>Position :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${0}
                                         </div>
                                     </div>
@@ -236,7 +232,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-phone-volume"></i>
                                             <span>Telephone number :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${data.phone_number}
                                         </div>
                                     </div>
@@ -245,7 +241,7 @@ include('../../../lib/base_directory.php');
                                         
                                             <span>Status :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${htmlConfrim}
                                         </div>
                                     </div>
@@ -254,7 +250,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-briefcase"></i> 
                                             <span>Department :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${0}
                                         </div>
                                     </div>
@@ -263,7 +259,7 @@ include('../../../lib/base_directory.php');
                                             <i class="fas fa-chess-pawn"></i> 
                                             <span>Role :</span>
                                         </div>
-                                        <div class="line-clamp" style="border-bottom: 1px solid #eaeaea;">
+                                        <div class="line-clamp">
                                             ${0}
                                         </div>
                                     </div>
@@ -275,16 +271,16 @@ include('../../../lib/base_directory.php');
                             return memberInfo;
                         }
                     },
+                    // {
+                    //     "target": 2,
+                    //     data: null,
+                    //     render: function(data, type, row) {
+                    //         return data;
+
+                    //     }
+                    // },
                     {
                         "target": 2,
-                        data: null,
-                        render: function(data, type, row) {
-                            return data.level;
-
-                        }
-                    },
-                    {
-                        "target": 3,
                         data: null,
                         render: function(data, type, row) {
 

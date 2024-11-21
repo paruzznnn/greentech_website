@@ -10,6 +10,10 @@ require  __DIR__ . '/../vendor/phpmailer/PHPMailer/src/SMTP.php';
 
 require_once(__DIR__ . '/../lib/base_directory.php');
 
+// error_reporting(E_ALL); 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+
 
 function sendEmail($to, $type_mes, $id, $otp)
 {
@@ -18,7 +22,7 @@ function sendEmail($to, $type_mes, $id, $otp)
 
     try {
         //Server settings
-        // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      
+        // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                 
         $mail->isSMTP();
         $mail->SMTPAuth   = true;
 

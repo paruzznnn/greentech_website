@@ -4,6 +4,10 @@ date_default_timezone_set('Asia/Bangkok');
 require_once(__DIR__ . '/../../lib/connect.php');
 require_once(__DIR__ . '/../../lib/send_mail.php');
 
+// error_reporting(E_ALL); 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+
 $response = array('status' => '', 'message' => '');
 
 function generateOTP($length = 6) {

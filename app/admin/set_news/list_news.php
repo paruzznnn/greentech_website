@@ -1,7 +1,5 @@
 <?php
-include('../../../lib/permissions.php');
 include('../../../lib/base_directory.php');
-// checkPermissions();
 ?>
 <!DOCTYPE html>
 <html lang="th">

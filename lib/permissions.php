@@ -1,24 +1,57 @@
 <?php
-session_start();
+function checkPermissions($data)
+{
+    global $conn;
 
-function checkPermissions() {
+    // Query เพื่อดึงข้อมูลสิทธิของผู้ใช้
+    $sql = "SELECT
+        mbu.user_id,
+        GROUP_CONCAT(DISTINCT mbr.role_type) AS roles,
+        GROUP_CONCAT(DISTINCT mbp.permiss_id) AS permiss_id,
+        GROUP_CONCAT(DISTINCT mbp.permiss_type) AS permissions,
+        GROUP_CONCAT(DISTINCT mlm.menu_id) AS menus_id,
+        GROUP_CONCAT(DISTINCT mlm.menu_label) AS accessible_menus
+    FROM
+        mb_user mbu
+    LEFT JOIN acc_user_roles acur ON acur.user_id = mbu.user_id
+    LEFT JOIN mb_roles mbr ON mbr.role_id = acur.role_id
+    LEFT JOIN acc_role_permissions acrp ON acrp.role_id = mbr.role_id
+    LEFT JOIN mb_permissions mbp ON mbp.permiss_id = acrp.permiss_id
+    LEFT JOIN acc_menu_permissions acmp ON acmp.rel_rp_id = acrp.rel_rp_id
+    LEFT JOIN ml_menus mlm ON mlm.menu_id = acmp.menu_id
+    WHERE 
+        mbu.user_id = ?
+    GROUP BY
+        mbu.user_id";
 
-    if (empty($_SESSION)) {
-        header("Location: logout.php");
+    // Prepare statement
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
         exit();
     }
 
-    if ($_SESSION['exp'] < time()) {
-        header("Location: logout.php");
-        exit();
-    }
+    $user_id = $data['user_id'];
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $userData = $result->fetch_assoc();
 
-    if ($_SESSION['role_id'] <= 0) {
-        header("Location: logout.php");
-        exit();
-    }
-
-
+    return $userData;
 
 }
-?>
+
+// if (empty($_SESSION)) {
+//     header("Location: logout.php");
+//     exit();
+// }
+
+// if ($_SESSION['exp'] < time()) {
+//     header("Location: logout.php");
+//     exit();
+// }
+
+// if ($_SESSION['role_id'] <= 0) {
+//     header("Location: logout.php");
+//     exit();
+// }
