@@ -1,14 +1,14 @@
 <?php
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
-require '../../../vendor/autoload.php';
+require '../../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 use Dotenv\Dotenv;
 
-require_once '../../../lib/connect.php';
+require_once(__DIR__ . '/../../lib/connect.php');
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

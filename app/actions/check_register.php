@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
-require_once '../../../lib/connect.php';
-require_once '../../../lib/send_mail.php';
+require_once(__DIR__ . '/../../lib/connect.php');
+require_once(__DIR__ . '/../../lib/send_mail.php');
 
 $response = array('status' => '', 'message' => '');
 

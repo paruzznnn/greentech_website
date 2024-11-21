@@ -2,12 +2,12 @@
 header('Access-Control-Allow-Origin: *'); // Replace * with your domain in production
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 session_start();
-require '../../../vendor/autoload.php'; 
+require '../../vendor/autoload.php'; 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Dotenv\Dotenv;
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../../../');
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
