@@ -1,6 +1,7 @@
-<?php include '../check_permission.php'?>
+<?php include '../check_permission.php' ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,6 +59,18 @@
             background-color: #ff4537;
             color: #ffffff;
         }
+
+        #iconPickerMenu{
+            position: absolute;
+            right: 0;
+            background-color: #fafafa;
+            top: 44px;
+        }
+
+        .box-icon-picker{
+            position: relative;
+        }
+
     </style>
 </head>
 
@@ -70,9 +83,14 @@
             <div class="box-content">
                 <div class="row">
 
+                    <!-- <div style="padding: 10px; margin-top: 10px;">
+                        <div class="iconPicker"></div>
+                        colspan="2"
+                    </div> -->
+
                     <div class="">
 
-                        <table id="td_list_menu" class="table table-hover" style="width:100%;">
+                        <table id="td_list_menu" class="table-styled" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -80,10 +98,37 @@
                                     <th>Menu name</th>
                                     <th>Main</th>
                                     <th>Path</th>
-                                    <th>Action</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th style="max-width: 50px;">
+                                        <i id="showIcon" class=""></i>
+                                        <input type="text" id="set_icon" name="set_icon" class="form-control" value="" hidden>
+                                    </th>
+                                    <th><input type="text" id="set_menu_name" name="set_menu_name" class="form-control" value=""></th>
+                                    <th><select id="set_menu_main" name="set_menu_main" class="form-select"></select></th>
+                                    <th><input type="text" id="set_menu_path" name="set_menu_path" class="form-control" value=""></th>
+                                    <th>
+                                    </th>
+                                    <th>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <div>
+                                                <button type="button" id="submitAddMenu" class="btn btn-primary">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="box-icon-picker">
+                                                <button type="button" id="target_iconPickerMenu" class="btn btn-primary"><i class="fas fa-table"></i></button>
+                                                <div id="iconPickerMenu" class="d-none"></div>
+                                            </div>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
+
                             </tbody>
                         </table>
 
@@ -98,232 +143,8 @@
 
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script>
-        $(document).ready(function() {
+    <script src='js/menu_.js?v=<?php echo time(); ?>'></script>
 
-            var td_list_menu = new DataTable('#td_list_menu', {
-                "autoWidth": false,
-                "language": {
-                    "decimal": "",
-                    "emptyTable": "No data available in table",
-                    "infoEmpty": "Showing 0 to 0 of 0 entries",
-                    "infoFiltered": "(filtered from MAX total entries)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "loadingRecords": "Loading...",
-                    "search": "Search:",
-                    "zeroRecords": "No matching records found",
-                    // "paginate": {
-                    //     "first":      "First",
-                    //     "last":       "Last",
-                    //     "next":       "Next",
-                    //     "previous":   "Previous"
-                    // },
-                    "aria": {
-                        "orderable": "Order by this column",
-                        "orderableReverse": "Reverse order this column"
-                    }
-                },
-                "processing": true,
-                "serverSide": true,
-                ajax: {
-                    url: "actions/process_menu.php",
-                    method: 'POST',
-                    dataType: 'json',
-                    data: function(d) {
-                        d.action = 'getData_menu';
-                        // d.filter_date = $('#filter_date').val();
-                        // d.customParam2 = "value2";
-                    },
-                    dataSrc: function(json) {
-                        return json.data;
-                    }
-                },
-                "ordering": false,
-                "pageLength": 25,
-                "lengthMenu": [10, 25, 50, 100],
-                columnDefs: [{
-                        "target": 0,
-                        data: null,
-                        render: function(data, type, row, meta) {
-                            return meta.row + 1;
-                        }
-                    },
-                    {
-                        "target": 1,
-                        data: null,
-                        render: function(data, type, row) {
-
-                            return data.menu_icon;
-                        }
-                    },
-                    {
-                        "target": 2,
-                        data: null,
-                        render: function(data, type, row) {
-
-                            return data.menu_label;
-                        }
-                    },
-                    {
-                        "target": 3,
-                        data: null,
-                        render: function(data, type, row) {
-
-                            return data.parent_id;
-
-                        }
-                    },
-                    {
-                        "target": 4,
-                        data: null,
-                        render: function(data, type, row) {
-
-                            return data.menu_link;
-
-                        }
-                    },
-                    {
-                        "target": 5,
-                        data: null,
-                        render: function(data, type, row) {
-
-                            let divBtn = `
-                        <div>`;
-
-                            divBtn += `
-                        <span style="margin: 2px;">
-                            <button type="button" class="btn-circle btn-edit">
-                            <i class="fas fa-pencil-alt"></i>
-                            </button>
-                        </span>
-                        `;
-
-                            divBtn += `
-                        <span style="margin: 2px;">
-                            <button type="button" class="btn-circle btn-del">
-                            <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </span>
-                        `;
-
-                            divBtn += `
-                        </div>
-                        `;
-
-                            return divBtn;
-
-
-                        }
-                    },
-
-
-                ],
-                drawCallback: function(settings) {
-
-                    var targetDivTable = $('div.dt-layout-row.dt-layout-table');
-                    if (targetDivTable.length) {
-                        targetDivTable.addClass('tables-over');
-                        // targetDivTable.css({
-                        //     'display': 'block',
-                        //     'width': '100%'
-                        // });
-                    }
-
-                    var targetDivRow = $('dt-container dt-layout-row dt-empty-footer');
-                    if (targetDivRow.length) {
-                        targetDivRow.css({
-                            'width': '50%'
-                        });
-                    }
-                },
-                initComplete: function(settings, json) {
-                    // const headers = [
-                    //     "No.",
-                    //     "Date created",
-                    //     "Subject",
-                    //     "Date on-air",
-                    //     "Status",
-                    //     ""
-                    // ];
-
-                    // cssResponsiveTable('td_list_menu', headers);
-                },
-                rowCallback: function(row, data, index) {
-                    // var editButton = $(row).find('.btn-edit');
-                    // var deleteButton = $(row).find('.btn-del');
-
-                    // editButton.off('click').on('click', function() {
-                    //     // reDirect('edit_news.php', data.news_id);
-                    //     reDirect('edit_news.php', {
-                    //         news_id: data.news_id
-                    //     });
-                    // });
-
-                    // deleteButton.off('click').on('click', function() {
-
-                    //     Swal.fire({
-                    //         title: "Are you sure?",
-                    //         text: "Do you want to delete the news?",
-                    //         icon: "warning",
-                    //         showCancelButton: true,
-                    //         confirmButtonColor: "#4CAF50",
-                    //         cancelButtonColor: "#d33",
-                    //         confirmButtonText: "Accept"
-                    //     }).then((result) => {
-
-                    //         if (result.isConfirmed) {
-
-                    //             $('#loading-overlay').fadeIn();
-
-                    //             $.ajax({
-                    //                 url: 'actions/process_role.php',
-                    //                 type: 'POST',
-                    //                 data: {
-                    //                     action: 'delNews',
-                    //                     id: data.news_id,
-                    //                 },
-                    //                 dataType: 'json',
-                    //                 success: function(response) {
-                    //                     if (response.status == 'success') {
-                    //                         window.location.reload();
-                    //                     }
-                    //                 },
-                    //                 error: function(xhr, status, error) {
-                    //                     console.error('Error:', error);
-                    //                 }
-                    //             });
-
-                    //         } else {
-                    //             $('#loading-overlay').fadeOut();
-                    //         }
-
-                    //     });
-
-                    // });
-
-                }
-            });
-
-        });
-
-        function reDirect(url, data) {
-            var form = $('<form>', {
-                method: 'POST',
-                action: url,
-                target: '_blank'
-            });
-            $.each(data, function(key, value) {
-                $('<input>', {
-                    type: 'hidden',
-                    name: key,
-                    value: value
-                }).appendTo(form);
-            });
-            $('body').append(form);
-            form.submit();
-        }
-    </script>
 </body>
 
 </html>

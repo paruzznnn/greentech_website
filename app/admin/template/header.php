@@ -1,13 +1,4 @@
-<?php
-global $base_path;
-global $base_path_admin;
 
-echo '<script>
-    window.base_path = "' . $base_path . '";
-    window.base_path_admin = "' . $base_path_admin . '";
-</script>';
-
-?>
 
 <div id="loading-overlay" class="hidden">
     <div class="spinner"></div>
@@ -25,7 +16,7 @@ echo '<script>
             </div>
             <div>
                 <a href="#">
-                    <img src="#" alt="" class="logo">
+                    <!-- <img src="#" alt="" class="logo"> -->
                 </a>
             </div>
         </div>
