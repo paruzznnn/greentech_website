@@ -96,7 +96,9 @@ const buildTabSidebar = () => {
             
             let sidebarContent = '<div class="sidebar">';
             
+            
             sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
+                
                 const itemLink = item.link || '#';
                 const itemToggleClass = `toggle-${item.id}`;
                 const level = item.level || 0;
