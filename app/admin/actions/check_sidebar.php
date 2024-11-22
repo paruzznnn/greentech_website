@@ -4,8 +4,8 @@ require_once(__DIR__ . '/../../../lib/connect.php');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
 require_once(__DIR__ . '/../../../lib/permissions.php');
 
-// $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-// $isFile = ($isProtocol === 'http') ? '.php' : '';
+$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+$isFile = ($isProtocol === 'http') ? '.php' : '';
 
 global $base_path;
 global $base_path_admin;
@@ -30,28 +30,27 @@ $stmt->execute();
 $result = $stmt->get_result();
 $arrayMenu = $result->fetch_all(MYSQLI_ASSOC);
 
-// สร้างเมนู sidebar
 $sidebarItems = [];
 foreach ($arrayMenu as $row) {
-    // ตรวจสอบสิทธิ: ถ้าเมนูนี้อยู่ใน $allowedMenus ถึงจะเพิ่ม
+    
     if (in_array($row['menu_id'], $allowedMenus)) {
-        if ($row['parent_id'] == 0) { // เมนูหลัก
+        if ($row['parent_id'] == 0) { //main menu
             $sidebarItems[] = [
                 'id' => $row['menu_id'],
                 'icon' => $row['menu_icon'],
                 'label' => $row['menu_label'],
-                'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
+                'link' => ($row['menu_link']) ? $base_path_admin . str_replace('.php', '', $row['menu_link']) . $isFile : '#',
                 'order' => $row['menu_order'],
                 'subItems' => [],
             ];
-        } else { // เมนูย่อย
+        } else { // sub menu
             foreach ($sidebarItems as &$parentItem) {
                 if ($parentItem['id'] == $row['parent_id']) {
                     $parentItem['subItems'][] = [
                         'id' => $row['menu_id'],
                         'icon' => $row['menu_icon'],
                         'label' => $row['menu_label'],
-                        'link' => ($row['menu_link']) ? $base_path_admin . $row['menu_link'] : '#',
+                        'link' => ($row['menu_link']) ? $base_path_admin . str_replace('.php', '', $row['menu_link']) . $isFile : '#',
                         'order' => $row['menu_order'],
                         'parentId' => $row['parent_id'],
                     ];
@@ -64,6 +63,7 @@ foreach ($arrayMenu as $row) {
     
 }
 
+
 echo json_encode([
     'sidebarItems' => $sidebarItems
 ]);
@@ -72,7 +72,6 @@ echo json_encode([
 // $permissions_id = explode(',', $arrPermiss['permiss_id']);
 // $permissionsMap = array_combine($permissions, $permissions_id);
 
-// ส่งผลลัพธ์เป็น JSON
 // echo json_encode([
 //     'sidebarItems' => $sidebarItems,
 //     'permissions' => $permissionsMap,
