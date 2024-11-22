@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    $("#submitAddMenu").prop('hidden', true);
+    $("#target_iconPickerMenu").prop('hidden', true);
+
     $('#iconPickerMenu').iconpicker({
         icons: ['fab', 'fas', 'far'],
         iconset: 'fontawesome5',
@@ -12,9 +15,22 @@ $(document).ready(function () {
         const iconClass = e.icon;
         const iconTag = `<i class="${iconClass}"></i>`;
         $('#set_icon').val(iconTag);
+        // $('#showIcon').toggleClass(iconClass);
+        $('#showIcon').removeClass().addClass(iconClass);
+
     });
 
-    $('#target_iconPickerMenu').on('click', function () {
+    $(document).on('click', function (event) {
+        if (
+            !$(event.target).closest('#iconPickerMenu').length && // ถ้าไม่ได้คลิกที่เมนู
+            !$(event.target).is('#target_iconPickerMenu')         // และไม่ได้คลิกที่ปุ่มเปิดเมนู
+        ) {
+            $('#iconPickerMenu').addClass('d-none');             // ซ่อนเมนู
+        }
+    });
+    
+    $('#target_iconPickerMenu').on('click', function (event) {
+        event.stopPropagation(); // ป้องกัน event bubble เพื่อไม่ให้ trigger document click
         $('#iconPickerMenu').toggleClass('d-none');
     });
 
@@ -89,6 +105,9 @@ $(document).ready(function () {
                 // d.customParam2 = "value2";
             },
             dataSrc: function (json) {
+                
+                // let combinedData = [...json.data, ...json.data2];
+                // return combinedData;
                 return json.data;
             }
         },
@@ -100,7 +119,8 @@ $(document).ready(function () {
             "orderable": true,
             data: null,
             render: function (data, type, row, meta) {
-                return meta.row + 1;
+                // return meta.row + 1;
+                return data.menu_id;
             }
         },
         {
@@ -108,7 +128,6 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-
                 return data.menu_icon;
             }
         },
@@ -117,7 +136,6 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-
                 return '<input type="text" id="" name="" class="form-control" value="' + data.menu_label + '">';
             }
         },
@@ -126,12 +144,11 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-
-                // data.parent_id
-                // <option value="two" disabled="disabled">Second (disabled)</option>
-
-                return `<select id="old_menu_main${data.menu_id}" class="form-select"></select>`;
-
+                if (data.parent_id > 0) {
+                    return `<select id="old_menu_main${data.menu_id}" class="form-select"></select>`;
+                } else {
+                    return '<h6>is main</h6>';
+                }
             }
         },
         {
@@ -139,9 +156,7 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-
                 return '<input type="text" id="" name="" class="form-control" value="' + data.menu_link + '">';
-
             }
         },
         {
@@ -149,9 +164,7 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-
                 return data.menu_order;
-
             }
         },
         {
@@ -160,15 +173,50 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row) {
 
+                let divBtn = '';
+                Object.entries(data.arrPermiss).forEach(([key, value]) => {
+
+                    if (value.includes(2)) {
+                        $("#submitAddMenu").prop('hidden', false);
+                        $("#target_iconPickerMenu").prop('hidden', false);
+                    }
+
+                    if (value.includes(3)) {
+
+                        divBtn += `
+                            <span style="margin: 2px;">
+                                <button type="button" class="btn-circle btn-save">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </span>
+                        `;
+                    }
                 
-
-                return '';
-
-
+                    if (value.includes(3)) {
+                        divBtn += `
+                            <span style="margin: 2px;">
+                                <button type="button" class="btn-circle btn-edit">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </span>
+                        `;
+                    }
+                
+                    if (value.includes(4)) {
+                        divBtn += `
+                            <span style="margin: 2px;">
+                                <button type="button" class="btn-circle btn-del">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </span>
+                        `;
+                    }
+                });
+                
+                    return `<div class="d-flex">${divBtn}</div>`;
+            
             }
         },
-
-
         ],
         drawCallback: function (settings) {
 
@@ -203,40 +251,117 @@ $(document).ready(function () {
         },
         rowCallback: function (row, data, index) {
 
-            $(row).find('#old_menu_main'+data.menu_id).select2({
-                // ajax: {
-                //     url: 'actions/process_setup_menu.php',
-                //     dataType: 'json',
-                //     type: 'POST',
-                //     data: function (params) {
-                //         return {
-                //             search: params.term, // คำค้นหา
-                //             page: params.page || 1,
-                //             action: 'getMainMenu'
-                //         };
-                //     },
-                //     processResults: function (data, params) {
-                //         params.page = params.page || 1;
-                //         return {
-                //             results: data.items, // ชื่อคีย์ต้องตรงกับ PHP
-                //             pagination: {
-                //                 more: (params.page * 10) < data.total_count
-                //             }
-                //         };
-                //     },
-                //     cache: true
-                // },
+            $(row).find('#old_menu_main' + data.menu_id).select2({
+                ajax: {
+                    url: 'actions/process_menu.php',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1,
+                            action: 'getMainMenu'
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 10) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                },
                 placeholder: 'Select an option',
                 width: '100%'
             });
 
-
-
         },
         createdRow: function (row, data, dataIndex) {
-            // เพิ่ม data-id ใน <tr>
+
             $(row).attr('data-id', data.menu_id);
-            $(row).attr('data-order', data.menu_order);
+            // $(row).attr('data-order', data.menu_order);
+
+
+            // $(row).find('#old_menu_main' + data.menu_id).select2({
+            //     ajax: {
+            //         url: 'actions/process_menu.php',
+            //         dataType: 'json',
+            //         type: 'POST',
+            //         data: function (params) {
+            //             return {
+            //                 search: params.term,
+            //                 page: params.page || 1,
+            //                 action: 'getMainMenu'
+            //             };
+            //         },
+            //         processResults: function (data, params) {
+            //             params.page = params.page || 1;
+            //             return {
+            //                 results: data.items,
+            //                 pagination: {
+            //                     more: (params.page * 10) < data.total_count
+            //                 }
+            //             };
+            //         },
+            //         cache: true
+            //     },
+            //     placeholder: 'Select an option',
+            //     width: '100%'
+            // }).on('select2:open', function () {
+
+            //     const selectElement = $(this);
+            //     const parentId = data.parent_id;
+
+            //     $.ajax({
+            //         url: 'actions/process_menu.php',
+            //         type: 'POST',
+            //         dataType: 'json',
+            //         data: {
+            //             action: 'getMainMenu',
+            //             search: '',
+            //             page: 1
+            //         },
+            //         success: function (response) {
+
+            //             const matchedItem = response.items.find(item => item.id === parentId);
+            //             if (matchedItem) {
+
+            //                 const option = new Option(matchedItem.text, matchedItem.id, true, true);
+            //                 selectElement.append(option).trigger('change');
+            //             }
+            //         }
+            //     });
+            // }).trigger('change');
+
+            // $(row).find('#old_menu_main' + data.menu_id).val(data.parent_id).trigger('change');
+
+
+            $(row).find('#old_menu_main' + data.menu_id).select2().each(function () {
+                const selectElement = $(this);
+                const parentId = data.parent_id;
+            
+                $.ajax({
+                    url: 'actions/process_menu.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'getMainMenu',
+                        search: '',
+                        page: 1
+                    },
+                    success: function (response) {
+                        const matchedItem = response.items.find(item => item.id === parentId);
+                        if (matchedItem) {
+                            const option = new Option(matchedItem.text, matchedItem.id, true, true);
+                            selectElement.append(option).trigger('change');
+                        }
+                    }
+                });
+            });
+        
         }
     });
 
@@ -247,25 +372,41 @@ $(document).ready(function () {
 
             $("#td_list_menu tbody tr").each(function (index) {
                 var dataId = $(this).data('id');
-                var dataOrder =  $(this).data('order');
-                // var dataId = ''; 
-                // var dataOrder = index + 1;
+                // var dataOrder = $(this).data('order');
+                var newOrder = index + 1;
+
                 if (dataId) {
                     sortedData.push({
                         id: dataId,
-                        order: dataOrder
+                        // order: dataOrder,
+                        newOrder: newOrder
                     });
                 }
+
             });
 
-            console.log("New Order:", sortedData);
+            $.ajax({
+                url: 'actions/process_menu.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'upDateSortMenu',
+                    menuArray: sortedData
+                },
+                success: function(response) {
 
-            // คุณสามารถส่งข้อมูลไปยังเซิร์ฟเวอร์ด้วย AJAX
-            /*
-            $.post("update_order.php", { order: sortedData }, function(response) {
-                console.log(response);
+                    if(response.status == 'success'){
+                        alertSuccess(response.message);
+                    }else{
+                        alertError(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('เกิดข้อผิดพลาด:', error);
+                }
             });
-            */
+            
+
         }
     }).disableSelection();
 
@@ -278,28 +419,28 @@ $(document).ready(function () {
 
 
     $('#set_menu_main').select2({
-        // ajax: {
-        //     url: 'actions/process_setup_menu.php',
-        //     dataType: 'json',
-        //     type: 'POST',
-        //     data: function (params) {
-        //         return {
-        //             search: params.term,
-        //             page: params.page || 1,
-        //             action: 'getMainMenu'
-        //         };
-        //     },
-        //     processResults: function (data, params) {
-        //         params.page = params.page || 1;
-        //         return {
-        //             results: data.items, // ชื่อคีย์ต้องตรงกับ PHP
-        //             pagination: {
-        //                 more: (params.page * 10) < data.total_count
-        //             }
-        //         };
-        //     },
-        //     cache: true
-        // },
+        ajax: {
+            url: 'actions/process_menu.php',
+            dataType: 'json',
+            type: 'POST',
+            data: function (params) {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    action: 'getMainMenu'
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: data.items, // ชื่อคีย์ต้องตรงกับ PHP
+                    pagination: {
+                        more: (params.page * 10) < data.total_count
+                    }
+                };
+            },
+            cache: true
+        },
         placeholder: 'Select an option',
         width: '100%'
     });
@@ -351,12 +492,34 @@ $(document).ready(function () {
 //     return file;
 // }
 
+function alertSuccess(textAlert) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    Toast.fire({
+        icon: "success",
+        title: textAlert
+    }).then(() => {
+        window.location.reload();
+        // $(".is-invalid").removeClass("is-invalid");
+    });
+}
+
 function alertError(textAlert) {
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
         showConfirmButton: false,
-        timer: 3000,
+        timer: 2000,
         timerProgressBar: true,
         didOpen: (toast) => {
             toast.onmouseenter = Swal.stopTimer;
@@ -382,10 +545,10 @@ $("#submitAddMenu").on("click", function (event) {
     event.preventDefault(); // ป้องกันการส่งฟอร์ม
 
     // ดึงค่าจาก input แต่ละช่อง
-    let set_icon = $('#set_icon').val().trim();
-    let set_menu_name = $('#set_menu_name').val().trim();
-    let set_menu_main = $('#set_menu_main').val().trim();
-    let set_menu_path = $('#set_menu_path').val().trim();
+    let set_icon = $('#set_icon').val();
+    let set_menu_name = $('#set_menu_name').val();
+    let set_menu_main = $('#set_menu_main').val();
+    let set_menu_path = $('#set_menu_path').val();
 
     // ลบ class is-invalid ก่อนทำการตรวจสอบ
     $(".is-invalid").removeClass("is-invalid");
@@ -412,30 +575,31 @@ $("#submitAddMenu").on("click", function (event) {
         return;
     }
 
-    // หากข้อมูลครบถ้วน ส่งข้อมูลไปยังเซิร์ฟเวอร์
     let formData = {
+        action: 'saveMenu',
         set_icon: set_icon,
         set_menu_name: set_menu_name,
         set_menu_main: set_menu_main,
         set_menu_path: set_menu_path,
     };
 
-    console.log("Form data ready to send:", formData);
 
-    // ตัวอย่างการส่งข้อมูลด้วย AJAX
-    // $.ajax({
-    //     url: '/your/api/endpoint', // URL ที่ต้องการส่งข้อมูล
-    //     type: 'POST',
-    //     data: formData,
-    //     success: function (response) {
-    //         console.log("Success:", response);
-    //         alert("Menu added successfully!");
-    //     },
-    //     error: function (error) {
-    //         console.log("Error:", error);
-    //         alertError("An error occurred. Please try again.");
-    //     }
-    // });
+    $.ajax({
+        url: 'actions/process_menu.php', 
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+            if(response.status == 'success'){
+                alertSuccess(response.message);
+            }else{
+                alertError(response.message);
+            }
+        },
+        error: function (error) {
+            console.log("Error:", error);
+            alertError("An error occurred. Please try again.");
+        }
+    });
 });
 
 
@@ -588,7 +752,7 @@ function reDirect(url, data) {
         action: url,
         target: '_blank'
     });
-    $.each(data, function(key, value) {
+    $.each(data, function (key, value) {
         $('<input>', {
             type: 'hidden',
             name: key,
@@ -651,3 +815,4 @@ function reDirect(url, data) {
 //     });
 
 // });
+

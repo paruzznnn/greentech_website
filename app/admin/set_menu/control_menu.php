@@ -95,7 +95,7 @@
 
                     <div class="">
 
-                        <table id="td_list_menu" class="table-styled" style="width:100%;">
+                        <table id="td_control_menu" class="table-styled" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -148,7 +148,7 @@
 
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/list_menu_.js?v=<?php echo time(); ?>'></script>
+    <script src='js/control_menu_.js?v=<?php echo time(); ?>'></script>
 
 </body>
 
