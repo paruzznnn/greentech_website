@@ -4,7 +4,6 @@ function checkPermissions($data)
 
     if(!empty($data)){
         global $conn;
-
         $sql = "SELECT
             mbu.user_id,
             GROUP_CONCAT(DISTINCT mbr.role_id) AS role_id,
@@ -26,7 +25,6 @@ function checkPermissions($data)
         GROUP BY
             mbu.user_id";
 
-        // Prepare statement
         $stmt = $conn->prepare($sql);
         if ($stmt === false) {
             echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
