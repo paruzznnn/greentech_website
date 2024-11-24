@@ -156,7 +156,12 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-                return '<input type="text" id="" name="" class="form-control" value="' + data.menu_link + '">';
+                if(data.parent_id > 0){
+                    return '<input type="text" id="" name="" class="form-control" value="' + data.menu_link + '">';
+                }else{
+                    return '';
+                }
+                
             }
         },
         {

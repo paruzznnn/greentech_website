@@ -99,36 +99,26 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Icon</th>
-                                    <th>Menu name</th>
-                                    <th>Main</th>
-                                    <th>Path</th>
-                                    <th>Order</th>
+                                    <th>Role</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                     <th>Actions</th>
                                 </tr>
                                 <tr>
                                     <th></th>
-                                    <th style="max-width: 50px;">
-                                        <i id="showIcon" class=""></i>
-                                        <input type="text" id="set_icon" name="set_icon" class="form-control" value="" hidden>
-                                    </th>
-                                    <th><input type="text" id="set_menu_name" name="set_menu_name" class="form-control" value=""></th>
-                                    <th><select id="set_menu_main" name="set_menu_main" class="form-select"></select></th>
-                                    <th><input type="text" id="set_menu_path" name="set_menu_path" class="form-control" value=""></th>
                                     <th>
                                     </th>
                                     <th>
-                                        <div style="display: flex; justify-content: space-between;">
-                                            <div>
-                                                <button type="button" id="submitAddMenu" class="btn btn-primary">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                            <div class="box-icon-picker">
-                                                <button type="button" id="target_iconPickerMenu" class="btn btn-primary"><i class="fas fa-table"></i></button>
-                                                <div id="iconPickerMenu" class="d-none"></div>
-                                            </div>
-                                        </div>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
                                     </th>
                                 </tr>
                             </thead>
