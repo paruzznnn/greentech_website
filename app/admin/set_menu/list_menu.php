@@ -70,10 +70,18 @@
             right: 0;
             background-color: #fafafa;
             top: 44px;
+            z-index: 99;
         }
 
         .box-icon-picker{
             position: relative;
+        }
+
+        .iconMenu {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: #fafafa;
         }
 
     </style>
