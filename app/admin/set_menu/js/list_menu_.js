@@ -120,7 +120,12 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row, meta) {
                 // return meta.row + 1;
-                return data.menu_id;
+                let divMenuId = `
+                ${data.menu_id}
+                <input type="text" id="" class="old_set_menu_id form-control hidden" value="${data.menu_id}">
+                `;
+
+                return divMenuId;
             }
         },
         {
@@ -128,7 +133,13 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-                return data.menu_icon;
+
+                let divIcon = `
+                ${data.menu_icon}
+                <input type="text" id="" class="old_set_icon form-control hidden" value="${data.spc_icon}">
+                `;
+
+                return divIcon;
             }
         },
         {
@@ -136,7 +147,7 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-                return '<input type="text" id="" name="" class="form-control" value="' + data.menu_label + '">';
+                return '<input type="text" id="" class="old_set_menu_name form-control" value="' + data.menu_label + '">';
             }
         },
         {
@@ -145,7 +156,7 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row) {
                 if (data.parent_id > 0) {
-                    return `<select id="old_menu_main${data.menu_id}" class="form-select"></select>`;
+                    return `<select id="old_menu_main${data.menu_id}" class="old_set_menu_main form-select"></select>`;
                 } else {
                     return '<h6>is main</h6>';
                 }
@@ -157,7 +168,7 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row) {
                 if(data.parent_id > 0){
-                    return '<input type="text" id="" name="" class="form-control" value="' + data.menu_link + '">';
+                    return '<input type="text" id="" class="old_set_menu_path form-control" value="' + data.menu_link + '">';
                 }else{
                     return '';
                 }
@@ -185,19 +196,17 @@ $(document).ready(function () {
                         $("#submitAddMenu").prop('hidden', false);
                         $("#target_iconPickerMenu").prop('hidden', false);
                     }
-
+                
                     if (value.includes(3)) {
 
                         divBtn += `
                             <span style="margin: 2px;">
-                                <button type="button" class="btn-circle btn-save">
+                                <button type="button" class="btn-circle btn-save hidden">
                                     <i class="fas fa-save"></i>
                                 </button>
                             </span>
                         `;
-                    }
-                
-                    if (value.includes(3)) {
+
                         divBtn += `
                             <span style="margin: 2px;">
                                 <button type="button" class="btn-circle btn-edit">
@@ -281,6 +290,48 @@ $(document).ready(function () {
                 },
                 placeholder: 'Select an option',
                 width: '100%'
+            });
+
+            var editButton = $(row).find('.btn-edit');
+            var deleteButton = $(row).find('.btn-del');
+            var saveButton = $(row).find('.btn-save');
+
+            var inputMenuId = $(row).find('input.old_set_menu_id');
+            var inputIcon = $(row).find('input.old_set_icon');
+            var inputMenuName = $(row).find('input.old_set_menu_name');
+            var inputMenuPath = $(row).find('input.old_set_menu_path');
+
+            var selectMenuMain = $(row).find('select.old_set_menu_main');
+
+
+            saveButton.off('click').on('click', function() {
+
+                var menuData = {
+                    action: 'saveUpdateMenu',
+                    menu_id: inputMenuId.val() ?? '',
+                    icon: inputIcon.val() ?? '',
+                    menu_name: inputMenuName.val() ?? '',
+                    menu_path: inputMenuPath.val() ?? '',
+                    menu_main: selectMenuMain.val() ?? ''
+                };
+
+                changeStatusMenu(menuData, 'Do you want to change the information?');
+
+            });
+
+
+            editButton.off('click').on('click', function() {
+                saveButton.toggleClass("hidden");
+            });
+
+            deleteButton.off('click').on('click', function() {
+                
+                var menuData = {
+                    action: 'delMenu',
+                    menu_id: inputMenuId.val() ?? ''
+                };
+
+                changeStatusMenu(menuData, 'Do you want to delete the data?');
             });
 
         },
@@ -607,148 +658,44 @@ $("#submitAddMenu").on("click", function (event) {
     });
 });
 
+function changeStatusMenu(obj, smstext) {
 
+    Swal.fire({
+        title: "Are you sure?",
+        text: smstext,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4CAF50",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Accept"
+    }).then((result) => {
 
-$("#submitEditNews").on("click", function (event) {
-    event.preventDefault();
+        if (result.isConfirmed) {
 
-    var formNews = $("#formNews_edit")[0];
-    var formData = new FormData(formNews);
-    formData.append("action", "editNews");
-    var newsContent = formData.get("news_content");
+            $('#loading-overlay').fadeIn();
 
-    if (newsContent) {
-        var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = newsContent;
-        var imgTags = tempDiv.getElementsByTagName("img");
-        for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
-            var filename = imgTags[i].getAttribute("data-filename");
-
-            var checkIsUrl = false;
-            let isUrl = isValidUrl(imgSrc);
-
-            if (!isUrl) {
-                var file = base64ToFile(imgSrc, filename);
-
-                if (file) {
-                    formData.append("image_files[]", file);
+            $.ajax({
+                url: 'actions/process_menu.php',
+                type: 'POST',
+                data: obj,
+                dataType: 'json',
+                success: function(response) {
+                    // if (response.status == 'success') {
+                    //     window.location.reload();
+                    // }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
                 }
+            });
 
-                if (imgSrc.startsWith("data:image")) {
-                    imgTags[i].setAttribute("src", "");
-                }
-            } else {
-
-                checkIsUrl = true;
-            }
-
+        } else {
+            $('#loading-overlay').fadeOut();
         }
-        formData.set("news_content", tempDiv.innerHTML);
-    }
 
-    $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
+    });
 
-        // if (tag[0] === 'fileInput[]' && tag[1].name === '') {
-        //     alertError("Please add a cover photo.");
-        //     return;
-        // }
-        if (tag[0] === 'news_subject' && tag[1].trim() === '') {
-            $("#news_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'news_description' && tag[1].trim() === '') {
-            $("#news_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'news_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
-    }
-
-    if (checkIsUrl) {
-
-        Swal.fire({
-            title: "Image detection system from other websites?",
-            text: "Do you want to add news.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_news.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-
-        });
-
-
-    } else {
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to add news.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_news.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-        });
-
-    }
-
-});
+}
 
 
 function reDirect(url, data) {
@@ -768,56 +715,4 @@ function reDirect(url, data) {
     form.submit();
 }
 
-
-// var editButton = $(row).find('.btn-edit');
-// var deleteButton = $(row).find('.btn-del');
-
-// editButton.off('click').on('click', function() {
-//     // reDirect('edit_news.php', data.news_id);
-//     reDirect('edit_news.php', {
-//         news_id: data.news_id
-//     });
-// });
-
-// deleteButton.off('click').on('click', function() {
-
-//     Swal.fire({
-//         title: "Are you sure?",
-//         text: "Do you want to delete the news?",
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#4CAF50",
-//         cancelButtonColor: "#d33",
-//         confirmButtonText: "Accept"
-//     }).then((result) => {
-
-//         if (result.isConfirmed) {
-
-//             $('#loading-overlay').fadeIn();
-
-//             $.ajax({
-//                 url: 'actions/process_role.php',
-//                 type: 'POST',
-//                 data: {
-//                     action: 'delNews',
-//                     id: data.news_id,
-//                 },
-//                 dataType: 'json',
-//                 success: function(response) {
-//                     if (response.status == 'success') {
-//                         window.location.reload();
-//                     }
-//                 },
-//                 error: function(xhr, status, error) {
-//                     console.error('Error:', error);
-//                 }
-//             });
-
-//         } else {
-//             $('#loading-overlay').fadeOut();
-//         }
-
-//     });
-
-// });
 

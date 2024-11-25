@@ -98,7 +98,7 @@
                     <div>
                         <div class="responsive-grid">
                             <div style="margin: 10px;">
-
+                            <h4 class="line-ref mb-3">List news</h4>
                                 <table id="td_list_news" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>

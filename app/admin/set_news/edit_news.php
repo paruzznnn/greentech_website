@@ -108,7 +108,10 @@
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
-                    <h3><i class="far fa-newspaper"></i> Edit News</h3>
+                    <h4 class="line-ref mb-3">
+                        <i class="far fa-newspaper"></i>  
+                        Edit News
+                    </h4>
 
 <?php
 $decodedId = $_POST['news_id'];

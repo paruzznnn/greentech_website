@@ -860,7 +860,9 @@ td {
     padding-left: 10px;
 }
 
-
+.table-icons{
+    border: 1px solid #dee2e6;
+}
 
 /* .table-custom {
     width: 100%;

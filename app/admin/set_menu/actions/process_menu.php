@@ -130,6 +130,7 @@ function handleFileUpload($files)
 
 $response = array('status' => 'error', 'message' => '');
 
+
 try {
 
     if (isset($_POST['action']) && $_POST['action'] == 'getData_menu') {
@@ -157,7 +158,8 @@ try {
                     menu_label,
                     menu_link,
                     menu_order,
-                    del
+                    del,
+                    '' as spc_icon
                     FROM ml_menus 
                     WHERE $whereClause
                     ORDER BY $orderBy
@@ -167,6 +169,7 @@ try {
         $data = [];
         while ($row = $dataResult->fetch_assoc()) {
             $row['arrPermiss'] = $permissionsMap;
+            $row['spc_icon'] = htmlspecialchars($row["menu_icon"]);
             $data[] = $row;
         }
 
@@ -275,7 +278,75 @@ try {
         $last_inserted_id = $conn->insert_id;
 
         $response = array('status' => 'success', 'message' => 'Data saved successfully.');
+    } else if (isset($_POST['action']) && $_POST['action'] == 'saveUpdateMenu') {
+
+        // [action] => saveUpdateMenu
+        // [menu_id] => 5
+        // [icon] => <i class="fas fa-pen-alt"></i>
+        // [menu_name] => write news
+        // [menu_path] => set_news/setup_news.php
+        // [menu_main] => 4
+
+        print_r($_POST);
+        exit;
+
+
+        $stmt = $conn->prepare("UPDATE ml_menus 
+        SET menu_order = ?
+        WHERE menu_id = ?");
+
+        if (!$stmt) {
+            throw new Exception("Prepare statement failed: " . $conn->error);
+        }
+
+        foreach ($menuArray as $news_array) {
+
+            $menu_id = $news_array['id'];
+            $menu_order = $news_array['newOrder'];
+
+            $stmt->bind_param(
+                "ii",
+                $menu_order,
+                $menu_id
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Execute statement failed: " . $stmt->error);
+            }
+        }
+
+        $response = array('status' => 'success', 'message' => 'successfully updated the rearrangement.');
+
+
+
+    } else if (isset($_POST['action']) && $_POST['action'] == 'delMenu') {
+
+        $menu_id = $_POST['menu_id'];
+        $del = 1;
+
+        $stmt = $conn->prepare("UPDATE ml_menus 
+        SET del = ?
+        WHERE menu_id = ?");
+
+        if (!$stmt) {
+            throw new Exception("Prepare statement failed: " . $conn->error);
+        }
+
+        $stmt->bind_param(
+            "ii",
+            $del,
+            $menu_id
+        );
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        
+
+        $response = array('status' => 'success', 'message' => 'successfully updated the rearrangement.');
     }
+
+
 } catch (Exception $e) {
     $response['status'] = 'error';
     $response['message'] = $e->getMessage();

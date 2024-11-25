@@ -14,19 +14,15 @@ $(document).ready(function () {
         const roleId = $(this).data("role");
         const isChecked = $(this).is(':checked');
     
-        // ค้นหา menu ที่มี role_id และ menu_id ตรงกัน
         const menuIndex = checkedMenus.findIndex(menu => menu.menu_id === menuId && menu.role_id === roleId);
     
         if (isChecked) {
-            // ถ้า checkbox ถูกเลือก (checked) เพิ่มรายการใหม่หากไม่มีอยู่ใน array
             if (menuIndex === -1) {
                 checkedMenus.push({ role_id: roleId, menu_id: menuId, isChecked: 0 });
             } else {
-                // ถ้ามีอยู่แล้วให้ปรับ isChecked เป็น true
                 checkedMenus[menuIndex].isChecked = 0;
             }
         } else {
-            // ถ้า checkbox ถูกยกเลิก (unchecked) ปรับ isChecked เป็น false
             if (menuIndex !== -1) {
                 checkedMenus[menuIndex].isChecked = 1;
             }
@@ -38,19 +34,15 @@ $(document).ready(function () {
         const roleId = $(this).data("role");
         const isChecked = $(this).is(':checked');
     
-        // ค้นหา permission ที่มี role_id และ permiss_id ตรงกัน
         const permIndex = checkedPermissions.findIndex(perm => perm.permiss_id === permId && perm.role_id === roleId);
     
         if (isChecked) {
-            // ถ้า checkbox ถูกเลือก (checked) เพิ่มรายการใหม่หากไม่มีอยู่ใน array
             if (permIndex === -1) {
                 checkedPermissions.push({ role_id: roleId, permiss_id: permId, isChecked: 0 });
             } else {
-                // ถ้ามีอยู่แล้วให้ปรับ isChecked เป็น true
                 checkedPermissions[permIndex].isChecked = 0;
             }
         } else {
-            // ถ้า checkbox ถูกยกเลิก (unchecked) ปรับ isChecked เป็น false
             if (permIndex !== -1) {
                 checkedPermissions[permIndex].isChecked = 1;
             }
@@ -62,9 +54,7 @@ $(document).ready(function () {
 
 
     $('#saveRoleControl').on('click', function () {
-
         saveRolePermiss(checkedMenus, checkedPermissions);
-
     });
 
 
@@ -100,10 +90,10 @@ async function fetchDataAndBuildTable() {
 
         const existingPermissions = await fetchRolePermissions();
         if (existingPermissions.status === 'success') {
-            // เพิ่ม key isChecked สำหรับแต่ละ permission ใน existingPermissions.data
+            
             checkedPermissions = existingPermissions.data.map(permission => ({
                 ...permission,
-                isChecked: 0 // หรือ false ขึ้นอยู่กับว่าคุณต้องการให้เป็นค่าเริ่มต้นอะไร
+                isChecked: 0 
             }));
         } else {
             console.error('Error fetching permissions:', existingPermissions.message);
@@ -112,17 +102,15 @@ async function fetchDataAndBuildTable() {
 
         const existingMenus = await fetchMenuPermissions();
         if (existingMenus.status === 'success') {
-            // เพิ่ม key isChecked สำหรับแต่ละ menu ใน existingMenus.data
+            
             checkedMenus = existingMenus.data.map(menu => ({
                 ...menu,
-                isChecked: 0 // หรือ false ขึ้นอยู่กับว่าคุณต้องการให้เป็นค่าเริ่มต้นอะไร
+                isChecked: 0
             }));
         } else {
             console.error('Error fetching permissions:', existingMenus.message);
             return;
         }
-
-
 
         buildRolePermissionTable('#tb_control_permiss', rolesArr, permissionsArr, existingPermissions.data);
         buildRoleMenuTable('#tb_control_menu', menuArr, rolesArr, existingMenus.data);
@@ -255,12 +243,58 @@ function saveRolePermiss(checkedMenus, checkedPermissions) {
             permissions: checkedPermissions
         },
         success: function (response) {
-            console.log('Response from server:', response);
-            // alert('Data saved successfully!');
+            if(response.status == 'success'){
+                alertSuccess('You have successfully changed roles.');
+            }else{
+                alertError('You changed roles, but it didn`t work');
+            }
         },
         error: function (error) {
             console.error('Error:', error);
             // alert('Failed to save data.');
         }
+    });
+}
+
+function alertSuccess(textAlert) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    Toast.fire({
+        icon: "success",
+        title: textAlert
+    }).then(() => {
+        window.location.reload();
+        // $(".is-invalid").removeClass("is-invalid");
+    });
+}
+
+function alertError(textAlert) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    Toast.fire({
+        icon: "error",
+        title: textAlert
+    }).then(() => {
+        // $(".is-invalid").removeClass("is-invalid");
     });
 }
