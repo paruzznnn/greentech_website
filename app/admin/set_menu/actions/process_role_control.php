@@ -155,7 +155,7 @@ try {
 
         $response = array(
             'status' => 'success',
-            'message' => 'Successfully retrieved menus.',
+            'message' => '',
             'data' => $menus
         );
     } else if (isset($_POST['action']) && $_POST['action'] == 'getRole') {
@@ -181,7 +181,7 @@ try {
 
         $response = array(
             'status' => 'success',
-            'message' => 'Successfully retrieved roles.',
+            'message' => '',
             'data' => $roles
         );
     } else if (isset($_POST['action']) && $_POST['action'] == 'getPermissions') {
@@ -207,7 +207,7 @@ try {
 
         $response = array(
             'status' => 'success',
-            'message' => 'Successfully retrieved permiss.',
+            'message' => '',
             'data' => $permiss
         );
     } else if (isset($_POST['action']) && $_POST['action'] == 'getRolePermiss') {
@@ -270,18 +270,13 @@ try {
         if (!empty($menus)) {
             $processedMenuIds = [];
 
-            // Loop through the menus array
             foreach ($menus as $menu) {
 
-                // Check if menu_id has already been processed to avoid duplication
                 if (in_array($menu['menu_id'], $processedMenuIds)) {
                     continue;
                 }
 
-                // Add menu_id to the processed list
                 $processedMenuIds[] = $menu['menu_id'];
-
-                // Process menu data (existing logic for menus)
                 $stmt = $conn->prepare("SELECT COUNT(id) as count FROM acc_menu_permissions WHERE role_id = ? AND menu_id = ?");
 
                 if (!$stmt) {
@@ -295,7 +290,6 @@ try {
                 $row = $result->fetch_assoc();
 
                 if ($row['count'] > 0) {
-                    // Update logic for menus
                     $delValue = $menu['isChecked'] ? 1 : 0;
                     $stmt = $conn->prepare("UPDATE acc_menu_permissions SET del = ? WHERE role_id = ? AND menu_id = ?");
                     $stmt->bind_param("iii", $delValue, $menu['role_id'], $menu['menu_id']);
@@ -305,7 +299,6 @@ try {
                         throw new Exception("Execute statement failed: " . $stmt->error);
                     }
                 } else {
-                    // Insert logic for menus
                     $delValue = $menu['isChecked'] ? 1 : 0;
                     $stmt = $conn->prepare("INSERT INTO acc_menu_permissions (role_id, menu_id, del) VALUES (?, ?, ?)");
                     $stmt->bind_param("iii", $menu['role_id'], $menu['menu_id'], $delValue);
@@ -323,15 +316,12 @@ try {
             
             foreach ($permissions as $permission) {
                 
-                // Check if permiss_id has already been processed to avoid duplication
                 if (in_array($permission['permiss_id'], $processedPermissionIds)) {
                     continue; 
                 }
 
-                // Add permiss_id to the processed list for permissions
                 $processedPermissionIds[] = $permission['permiss_id'];
 
-                // Process permission data
                 $stmt = $conn->prepare("SELECT COUNT(id) as count FROM acc_role_permissions WHERE role_id = ? AND permiss_id = ?");
 
                 if (!$stmt) {
@@ -345,7 +335,6 @@ try {
                 $row = $result->fetch_assoc();
 
                 if ($row['count'] > 0) {
-                    // Update logic for permissions
                     $permissionValue = $permission['isChecked'] ? 1 : 0;
                     $stmt = $conn->prepare("UPDATE acc_role_permissions SET del = ? WHERE role_id = ? AND permiss_id = ?");
                     $stmt->bind_param("iii", $permissionValue, $permission['role_id'], $permission['permiss_id']);
@@ -355,7 +344,6 @@ try {
                         throw new Exception("Execute statement failed: " . $stmt->error);
                     }
                 } else {
-                    // Insert logic for permissions
                     $permissionValue = $permission['isChecked'] ? 1 : 0;
                     $stmt = $conn->prepare("INSERT INTO acc_role_permissions (role_id, permiss_id, del) VALUES (?, ?, ?)");
                     $stmt->bind_param("iii", $permission['role_id'], $permission['permiss_id'], $permissionValue);

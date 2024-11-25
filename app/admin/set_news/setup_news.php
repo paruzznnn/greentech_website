@@ -106,7 +106,10 @@
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
-                <h3><i class="far fa-newspaper"></i> News</h3>
+                <h4 class="line-ref mb-3">
+                    <i class="far fa-newspaper"></i>  
+                    News
+                </h4>
                     
                         <form id="formNews" enctype="multipart/form-data">
 

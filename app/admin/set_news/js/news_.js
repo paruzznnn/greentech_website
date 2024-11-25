@@ -117,7 +117,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
 
                     let divBtn = `
-                <div>`;
+                <div class="d-flex">`;
 
                     divBtn += `
                 <span style="margin: 2px;">
