@@ -88,47 +88,43 @@
             <div class="box-content">
                 <div class="row">
 
-                    <!-- <div style="padding: 10px; margin-top: 10px;">
-                        <div class="iconPicker"></div>
-                        colspan="2"
-                    </div> -->
-
-                    <div class="">
-
-                        <table id="td_control_menu" class="table-styled" style="width:100%;">
+                    <div>
+                        <h4 class="line-ref mb-2">Role and Permissions</h4>
+                        <table id="tb_control_permiss" class="table table-bordered" style="width:100%;">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Role</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Actions</th>
-                                </tr>
-                                <tr>
-                                    <th></th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
+                                    <th style="min-width: 280px;">Role</th>
+                                    <th>View</th>
+                                    <th>Create</th>
+                                    <th>Update</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-
                             </tbody>
                         </table>
-
-
                     </div>
+                    
+                    <div class="mt-4">
+                        <h4 class="line-ref mb-2">Role and Menu</h4>
+                        <table id="tb_control_menu" class="table table-bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 280px;">Menu</th>
+                                    <th>Admin</th>
+                                    <th>Editor</th>
+                                    <th>Viewer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="text-align: end;">
+                        <button type="button" id="saveRoleControl" class="btn btn-primary">Save</button>
+                    </div>
+                
 
                 </div>
             </div>
@@ -138,7 +134,7 @@
 
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/control_menu_.js?v=<?php echo time(); ?>'></script>
+    <script src='js/role_control_.js?v=<?php echo time(); ?>'></script>
 
 </body>
 

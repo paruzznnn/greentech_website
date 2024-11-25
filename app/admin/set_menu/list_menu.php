@@ -95,7 +95,7 @@
 
                     <div class="">
 
-                        <table id="td_list_menu" class="table-styled" style="width:100%;">
+                        <table id="tb_list_menu" class="table table-bordered" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>No.</th>
