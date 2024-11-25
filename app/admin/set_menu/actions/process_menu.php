@@ -280,43 +280,37 @@ try {
         $response = array('status' => 'success', 'message' => 'Data saved successfully.');
     } else if (isset($_POST['action']) && $_POST['action'] == 'saveUpdateMenu') {
 
-        // [action] => saveUpdateMenu
-        // [menu_id] => 5
-        // [icon] => <i class="fas fa-pen-alt"></i>
-        // [menu_name] => write news
-        // [menu_path] => set_news/setup_news.php
-        // [menu_main] => 4
-
-        print_r($_POST);
-        exit;
-
+        $menu_id = $_POST['menu_id'];
+        $menu_icon = $_POST['icon'];
+        $menu_name = $_POST['menu_name'];
+        $menu_path = $_POST['menu_path'];
+        $menu_main = $_POST['menu_main'];
 
         $stmt = $conn->prepare("UPDATE ml_menus 
-        SET menu_order = ?
+        SET parent_id = ?, 
+            menu_icon = ?, 
+            menu_label = ?, 
+            menu_link = ? 
         WHERE menu_id = ?");
-
+    
         if (!$stmt) {
             throw new Exception("Prepare statement failed: " . $conn->error);
         }
-
-        foreach ($menuArray as $news_array) {
-
-            $menu_id = $news_array['id'];
-            $menu_order = $news_array['newOrder'];
-
-            $stmt->bind_param(
-                "ii",
-                $menu_order,
-                $menu_id
-            );
-
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
-            }
+    
+        $stmt->bind_param(
+            "isssi", // i: integer, s: string
+            $menu_main,
+            $menu_icon,
+            $menu_name,
+            $menu_path,
+            $menu_id
+        );
+    
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
         }
 
-        $response = array('status' => 'success', 'message' => 'successfully updated the rearrangement.');
-
+        $response = array('status' => 'success', 'message' => '');
 
 
     } else if (isset($_POST['action']) && $_POST['action'] == 'delMenu') {
@@ -343,7 +337,7 @@ try {
         }
         
 
-        $response = array('status' => 'success', 'message' => 'successfully updated the rearrangement.');
+        $response = array('status' => 'success', 'message' => '');
     }
 
 

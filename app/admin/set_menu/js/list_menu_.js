@@ -22,15 +22,15 @@ $(document).ready(function () {
 
     $(document).on('click', function (event) {
         if (
-            !$(event.target).closest('#iconPickerMenu').length && // ถ้าไม่ได้คลิกที่เมนู
-            !$(event.target).is('#target_iconPickerMenu')         // และไม่ได้คลิกที่ปุ่มเปิดเมนู
+            !$(event.target).closest('#iconPickerMenu').length && 
+            !$(event.target).is('#target_iconPickerMenu')         
         ) {
-            $('#iconPickerMenu').addClass('d-none');             // ซ่อนเมนู
+            $('#iconPickerMenu').addClass('d-none');            
         }
     });
     
     $('#target_iconPickerMenu').on('click', function (event) {
-        event.stopPropagation(); // ป้องกัน event bubble เพื่อไม่ให้ trigger document click
+        event.stopPropagation(); 
         $('#iconPickerMenu').toggleClass('d-none');
     });
 
@@ -135,7 +135,7 @@ $(document).ready(function () {
             render: function (data, type, row) {
 
                 let divIcon = `
-                ${data.menu_icon}
+                <span class="showOldIcon">${data.menu_icon}</span>
                 <input type="text" id="" class="old_set_icon form-control hidden" value="${data.spc_icon}">
                 `;
 
@@ -147,7 +147,7 @@ $(document).ready(function () {
             "orderable": false,
             data: null,
             render: function (data, type, row) {
-                return '<input type="text" id="" class="old_set_menu_name form-control" value="' + data.menu_label + '">';
+                return '<input type="text" id="" class="old_set_menu_name form-control" value="' + data.menu_label + '" disabled>';
             }
         },
         {
@@ -156,7 +156,7 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row) {
                 if (data.parent_id > 0) {
-                    return `<select id="old_menu_main${data.menu_id}" class="old_set_menu_main form-select"></select>`;
+                    return `<select id="old_menu_main${data.menu_id}" class="old_set_menu_main form-select" disabled></select>`;
                 } else {
                     return '<h6>is main</h6>';
                 }
@@ -168,7 +168,7 @@ $(document).ready(function () {
             data: null,
             render: function (data, type, row) {
                 if(data.parent_id > 0){
-                    return '<input type="text" id="" class="old_set_menu_path form-control" value="' + data.menu_link + '">';
+                    return '<input type="text" id="" class="old_set_menu_path form-control" value="' + data.menu_link + '" disabled>';
                 }else{
                     return '';
                 }
@@ -214,6 +214,12 @@ $(document).ready(function () {
                                 </button>
                             </span>
                         `;
+
+                        divBtn += `
+                        <span class="box-icon-picker" style="margin: 2px;">
+                            <div id="" class="iconMenu d-none"></div>
+                        </span>
+                        `;
                     }
                 
                     if (value.includes(4)) {
@@ -225,6 +231,8 @@ $(document).ready(function () {
                             </span>
                         `;
                     }
+
+
                 });
                 
                     return `<div class="d-flex">${divBtn}</div>`;
@@ -252,6 +260,11 @@ $(document).ready(function () {
         },
         initComplete: function (settings, json) {
 
+        
+            // $('.btn-icon').on('iconpickerSelected', function (event) {
+            //     console.log('Icon selected: ' + event.iconpickerValue);
+            // });
+
             // const headers = [
             //     "No.",
             //     "Date created",
@@ -264,6 +277,35 @@ $(document).ready(function () {
             // cssResponsiveTable('td_list_menu', headers);
         },
         rowCallback: function (row, data, index) {
+
+            var iconButton = $(row).find('.iconMenu');
+            var showIconMn = $(row).find('.showOldIcon');
+
+            var editButton = $(row).find('.btn-edit');
+            var deleteButton = $(row).find('.btn-del');
+            var saveButton = $(row).find('.btn-save');
+
+            var inputMenuId = $(row).find('input.old_set_menu_id');
+            var inputIcon = $(row).find('input.old_set_icon');
+            var inputMenuName = $(row).find('input.old_set_menu_name');
+            var inputMenuPath = $(row).find('input.old_set_menu_path');
+
+            var selectMenuMain = $(row).find('select.old_set_menu_main');
+
+            iconButton.iconpicker({
+                icons: ['fab', 'fas', 'far'],
+                iconset: 'fontawesome5',
+                selectedClass: 'btn-link',
+                unselectedClass: 'btn-light'
+        
+            });
+
+            iconButton.on('change', function (e) {
+                const iconClass = e.icon;
+                const iconTag = `<i class="${iconClass}"></i>`;
+                inputIcon.val(iconTag);
+                showIconMn.html(iconTag); 
+            });
 
             $(row).find('#old_menu_main' + data.menu_id).select2({
                 ajax: {
@@ -292,18 +334,6 @@ $(document).ready(function () {
                 width: '100%'
             });
 
-            var editButton = $(row).find('.btn-edit');
-            var deleteButton = $(row).find('.btn-del');
-            var saveButton = $(row).find('.btn-save');
-
-            var inputMenuId = $(row).find('input.old_set_menu_id');
-            var inputIcon = $(row).find('input.old_set_icon');
-            var inputMenuName = $(row).find('input.old_set_menu_name');
-            var inputMenuPath = $(row).find('input.old_set_menu_path');
-
-            var selectMenuMain = $(row).find('select.old_set_menu_main');
-
-
             saveButton.off('click').on('click', function() {
 
                 var menuData = {
@@ -321,8 +351,21 @@ $(document).ready(function () {
 
 
             editButton.off('click').on('click', function() {
+                // First, close any previously opened edit fields and buttons
+                $(row).siblings().find('.iconMenu').addClass("d-none");  // Hide the icon buttons of other rows
+                $(row).siblings().find('.btn-save').addClass("hidden");  // Hide the save buttons of other rows
+                $(row).siblings().find('input.old_set_menu_name').prop('disabled', true);  // Disable the input fields of other rows
+                $(row).siblings().find('input.old_set_menu_path').prop('disabled', true);
+                $(row).siblings().find('select.old_set_menu_main').prop('disabled', true);
+            
+                // Now toggle the current row's edit fields and buttons
+                iconButton.toggleClass("d-none");
                 saveButton.toggleClass("hidden");
+                inputMenuName.prop('disabled', !inputMenuName.prop('disabled'));
+                inputMenuPath.prop('disabled', !inputMenuPath.prop('disabled'));
+                selectMenuMain.prop('disabled', !selectMenuMain.prop('disabled'));
             });
+            
 
             deleteButton.off('click').on('click', function() {
                 
@@ -680,9 +723,9 @@ function changeStatusMenu(obj, smstext) {
                 data: obj,
                 dataType: 'json',
                 success: function(response) {
-                    // if (response.status == 'success') {
-                    //     window.location.reload();
-                    // }
+                    if (response.status == 'success') {
+                        window.location.reload();
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
