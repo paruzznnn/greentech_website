@@ -70,7 +70,7 @@ $(document).ready(function () {
     // });
 
 
-    var td_list_menu = new DataTable('#td_list_menu', {
+    var tb_list_menu = new DataTable('#tb_list_menu', {
         "autoWidth": false,
         "language": {
             "decimal": "",
@@ -370,12 +370,12 @@ $(document).ready(function () {
         }
     });
 
-    $("#td_list_menu tbody").sortable({
+    $("#tb_list_menu tbody").sortable({
         helper: fixHelper,
         update: function (event, ui) {
             var sortedData = [];
 
-            $("#td_list_menu tbody tr").each(function (index) {
+            $("#tb_list_menu tbody tr").each(function (index) {
                 var dataId = $(this).data('id');
                 // var dataOrder = $(this).data('order');
                 var newOrder = index + 1;

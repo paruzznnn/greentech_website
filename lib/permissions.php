@@ -18,10 +18,11 @@ function checkPermissions($data)
         LEFT JOIN mb_roles mbr ON mbr.role_id = acur.role_id
         LEFT JOIN acc_role_permissions acrp ON acrp.role_id = mbr.role_id
         LEFT JOIN mb_permissions mbp ON mbp.permiss_id = acrp.permiss_id
-        LEFT JOIN acc_menu_permissions acmp ON acmp.role_id = acrp.role_id
+        LEFT JOIN acc_menu_permissions acmp ON acmp.role_id = mbr.role_id
         LEFT JOIN ml_menus mlm ON mlm.menu_id = acmp.menu_id
         WHERE 
             mbu.user_id = ?
+            AND acmp.del = ?
         GROUP BY
             mbu.user_id";
 
@@ -32,7 +33,8 @@ function checkPermissions($data)
         }
 
         $user_id = $data['user_id'];
-        $stmt->bind_param("i", $user_id);
+        $del = 0;
+        $stmt->bind_param("ii", $user_id, $del);
         $stmt->execute();
         $result = $stmt->get_result();
         $userData = $result->fetch_assoc();

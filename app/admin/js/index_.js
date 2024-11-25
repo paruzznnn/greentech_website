@@ -88,35 +88,21 @@ const buildTabSidebar = () => {
         success: function (response) {
 
             sidebarItems = response.sidebarItems;
-
-            if (!Array.isArray(sidebarItems) || sidebarItems.length === 0) {
-                $('#showTabSidebar').html('<p>No sidebar items found.</p>');
-                return;
-            }
             
             let sidebarContent = '<div class="sidebar">';
             
+            if (Array.isArray(sidebarItems) && sidebarItems.length > 0) {
             
             sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
                 
                 const itemLink = item.link || '#';
                 const itemToggleClass = `toggle-${item.id}`;
-                const level = item.level || 0;
-            
-                if (level == 1) {
-            
-                    sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
-                    <span style="font-size: 14px;">${item.icon}</span>
-                    ${item.label}
-                    </a>`;
-            
-                } else {
 
-                    sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
-                    <span style="font-size: 14px;">${item.icon}</span> 
-                    ${item.label}
-                    </a>`;
-                }
+                sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
+                <span style="font-size: 14px;">${item.icon}</span> 
+                ${item.label}
+                </a>`;
+                
             
                 if (item.subItems && item.subItems.length > 0) {
                     sidebarContent += `<div class="sub-sidebar ${itemToggleClass}" style="display:none;">`;
@@ -132,6 +118,9 @@ const buildTabSidebar = () => {
                     sidebarContent += '</div>';
                 }
             });
+
+            }
+
             
             sidebarContent += `
             <a href="${window.base_path_admin}logout.php" class="sidebar-link" data-href="">

@@ -1,23 +1,26 @@
 $(document).ready(function () {
 
-    $("#summernote").summernote({
-        height: 400,
-        minHeight: 200,
-        maxHeight: 500,
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['fontname', 'fontsize']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview']],
-            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-        ],
-        fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
-        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-        callbacks: {
+    if($("#summernote").length > 0){
 
-        }
-    });
+        $("#summernote").summernote({
+            height: 400,
+            minHeight: 200,
+            maxHeight: 500,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['fontname', 'fontsize']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview']],
+                ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+            ],
+            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
+            fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+            callbacks: {
+
+            }
+        });
+    }
 
     var readURL = function (input) {
         if (input.files && input.files[0]) {
