@@ -111,7 +111,7 @@
                     write news
                 </h4>
                     
-                        <form id="formNews" enctype="multipart/form-data">
+                        <!-- <form id="formNews" enctype="multipart/form-data">
 
                             <div class="row">
 
@@ -166,7 +166,7 @@
 
                             </div>
 
-                        </form>
+                        </form> -->
                     
 
                 </div>
@@ -178,7 +178,7 @@
 
 
 <script src='../js/index_.js?v=<?php echo time();?>'></script>
-<script src='js/news_.js?v=<?php echo time();?>'></script>
+<!-- <script src='js/news_.js?v=<?php echo time();?>'></script> -->
 
 </body>
 

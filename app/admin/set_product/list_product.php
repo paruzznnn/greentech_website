@@ -100,22 +100,24 @@
                             <div style="margin: 10px;">
 
                                 <div style="display: flex; justify-content: space-between;">
-                                    <h4 class="line-ref mb-3"> 
-                                        <i class="far fa-newspaper"></i>   
-                                        List news
+                                    <h4 class="line-ref mb-3">
+                                        <i class="fa-solid fa-cube"></i>
+                                        List product
                                     </h4>
-                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_news/setup_news.php'?>">
+                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_product/setup_product.php'?>">
                                         <i class="fa-solid fa-plus"></i>
-                                        write news
+                                        product
                                     </a>
                                 </div>
-
+                            
                                 <table id="td_list_news" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Subject</th>
-                                            <th>Date created</th>
+                                            <th>Product name</th>
+                                            <th>Category</th>
+                                            <th>Version</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -135,7 +137,7 @@
 
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/news_.js?v=<?php echo time(); ?>'></script>
+    <!-- <script src='js/news_.js?v=<?php echo time(); ?>'></script> -->
 </body>
 
 </html>
