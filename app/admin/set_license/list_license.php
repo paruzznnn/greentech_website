@@ -1,11 +1,11 @@
 <?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+
     <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -15,7 +15,6 @@
 
     <link href="../../../inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="../../../inc/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../../../inc/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -41,129 +40,102 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
-    <link href="../css/index_.css?v=<?php echo time(); ?>" rel="stylesheet">
-
+    <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
     <style>
-        /* body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            height: 100vh;
-            margin: 0;
-        } */
-
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            /* flex: 0 0 200px;  */
-            border-right: 2px solid #ddd;
-        }
-
-
-        .dropzone {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 15px;
-            flex-grow: 1;
-            overflow-y: auto;
-            background-color: #fafafa;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-        }
-
-        .target-row {
-            display: grid;
-            gap: 10px;
-            width: 100%;
+        .button-class {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
             cursor: pointer;
-            min-height: 30px;
-            background-color: #e0f7fa;
         }
 
-        .target-cell {
-            border: 1px solid #ddd;
-            background-color: #e0f7fa;
-            border-radius: 4px;
-            padding: 8px;
-            position: relative;
-            transition: background-color 0.3s ease;
-            height: 60px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 10px;
         }
 
-        .target-cell input,
-        .target-cell button,
-        .target-cell select,
-        .target-cell textarea {
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            overflow: hidden;
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+
+            .responsive-grid {
+                grid-template-columns: 1fr;
+            }
+
         }
 
-        .target-cell textarea {
-            resize: none;
+        .btn-circle {
+            border: none;
+            width: 30px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 14px;
         }
 
-        .target-cell:hover {
-            background-color: #b2ebf2;
+        .btn-edit {
+            background-color: #FFC107;
+            color: #ffffff;
         }
 
-        .selected {
-            background-color: #ffcc80;
-            box-shadow: 1px 2px 4px rgba(255, 204, 128, 0.6);
-            border-color: #ffa726;
-        }
-
-        .draggable {
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: grab;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-
-        .draggable:active {
-            background-color: #ececec;
-            cursor: grabbing;
+        .btn-del {
+            background-color: #ff4537;
+            color: #ffffff;
         }
     </style>
 </head>
 
-<body>
+<?php include '../template/header.php' ?>
 
-    <?php include '../template/header.php' ?>
+<body>
 
     <div class="content-sticky" id="">
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
 
-                    <div class="col-md-12"></div>
+                    <div>
+                        <div class="responsive-grid">
+                            <div style="margin: 10px;">
 
+                                <div style="display: flex; justify-content: space-between;">
+                                    <h4 class="line-ref mb-3">
+                                        <i class="fa-solid fa-sitemap"></i>
+                                        List license
+                                    </h4>
+                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_license/setup_license.php'?>">
+                                        <i class="fa-solid fa-plus"></i>
+                                        license
+                                    </a>
+                                </div>
+                            
+                                <table id="td_list_news" class="table table-hover" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Subject</th>
+                                            <th>Date created</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
-
             </div>
         </div>
     </div>
 
 
-    <script src="../js/index_.js?v=<?php echo time(); ?>"></script>
+
+    <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
+    <!-- <script src='js/news_.js?v=<?php echo time(); ?>'></script> -->
 </body>
 
 </html>
