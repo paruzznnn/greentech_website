@@ -272,11 +272,14 @@ try {
 
             foreach ($menus as $menu) {
 
-                if (in_array($menu['menu_id'], $processedMenuIds)) {
+                $uniqueKeyMenu = $menu['role_id'] . '_' . $menu['menu_id'];
+
+                if (in_array($uniqueKeyMenu, $processedMenuIds)) {
                     continue;
                 }
 
-                $processedMenuIds[] = $menu['menu_id'];
+                $processedMenuIds[] = $uniqueKeyMenu;
+
                 $stmt = $conn->prepare("SELECT COUNT(id) as count FROM acc_menu_permissions WHERE role_id = ? AND menu_id = ?");
 
                 if (!$stmt) {
@@ -315,12 +318,14 @@ try {
             $processedPermissionIds = [];
             
             foreach ($permissions as $permission) {
-                
-                if (in_array($permission['permiss_id'], $processedPermissionIds)) {
-                    continue; 
+
+                $uniqueKeyPermiss = $permission['role_id'] . '_' . $permission['permiss_id'];
+
+                if (in_array($uniqueKeyPermiss, $processedPermissionIds)) {
+                    continue;
                 }
 
-                $processedPermissionIds[] = $permission['permiss_id'];
+                $processedPermissionIds[] = $uniqueKeyPermiss;
 
                 $stmt = $conn->prepare("SELECT COUNT(id) as count FROM acc_role_permissions WHERE role_id = ? AND permiss_id = ?");
 

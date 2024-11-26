@@ -205,13 +205,10 @@ $(document).ready(function () {
 
                             if (response.status === "success") {
 
-                                switch (response.data.role_id) {
-                                    case 1:
-                                        window.location.href = 'admin/index.php';
-                                        break;
-                                    default:
-                                        window.location.href = 'index.php';
-                                        break;
+                                if(response.data.role_id > 0){
+                                    window.location.href = 'admin/index.php';
+                                }else{
+                                    window.location.href = 'index.php';
                                 }
 
                             } else {
