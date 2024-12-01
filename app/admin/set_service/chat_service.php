@@ -46,7 +46,9 @@
 
         .chat-container {
             display: flex;
-            height: 100vh; /* Full viewport height */
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: row;
         }
 
         .chat-list {
@@ -54,32 +56,42 @@
             padding: 20px;
             background: #f1f1f1;
             border-right: 2px solid #ccc;
-            overflow-y: auto; /* Allow scrolling if the list is too long */
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .chat-box {
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100%; /* Ensure it fills the remaining space */
+            height: 100%;
+            overflow: hidden;
         }
 
-        .message-container {
-            position: relative;
+        .message-group {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             background: #fff;
-            overflow-y: auto; /* Enable scrolling when content overflows */
+            overflow-y: auto;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .message-container {
+            display: none;
+            position: relative;
+            padding: 10px;
+            background: #fff;
             flex-grow: 1;
             margin-bottom: 20px;
-            max-height: calc(100vh - 140px); /* Make it take up most of the space, adjust for input group and other content */
+            overflow-y: auto;
         }
 
         .input-group {
             display: flex;
             align-items: center;
-            margin-top: 10px; /* Reduced space between messages and input */
+            margin-top: 10px;
             padding: 10px;
             background: #f9f9f9;
             border-top: 1px solid #ccc;
@@ -91,6 +103,7 @@
             margin-right: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            font-size: 14px;
         }
 
         .input-group button {
@@ -100,24 +113,32 @@
             background: #4CAF50;
             color: white;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .input-group button:hover {
             background: #45a049;
         }
 
-        #recipient-select {
-            margin-bottom: 10px;
-            padding: 10px;
-            width: 100%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        #online-users {
+            list-style: none;
+            padding: 0;
+        }
+
+        #online-users li {
+            padding: 5px 0;
+            cursor: pointer;
+        }
+
+        #online-users li:hover {
+            background: #f1f1f1;
         }
 
         .message {
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
+            font-size: 14px;
         }
 
         .sent {
@@ -146,22 +167,98 @@
             color: gray;
         }
 
-        #online-status {
-            margin-top: 20px;
+
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+            }
+
+            .chat-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #ccc;
+            }
+
+            .chat-box {
+                width: 100%;
+            }
+
+            .message-group {
+                max-height: 400px;
+            }
+
+            .input-group input[type="text"] {
+                font-size: 12px;
+            }
+
+            .input-group button {
+                font-size: 12px;
+            }
+
+            .message {
+                font-size: 12px;
+            }
         }
 
-        #online-users {
-            list-style: none;
-            padding: 0;
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .chat-container {
+                flex-direction: column;
+            }
+
+            .chat-list {
+                width: 50%;
+            }
+
+            .chat-box {
+                width: 50%;
+            }
+
+            .message-group {
+                max-height: 450px;
+            }
+
+            .input-group input[type="text"] {
+                font-size: 13px;
+            }
+
+            .input-group button {
+                font-size: 13px;
+            }
+
+            .message {
+                font-size: 13px;
+            }
         }
 
-        #online-users li {
-            padding: 5px 0;
-            cursor: pointer;
+        @media (min-width: 1025px) {
+            .chat-container {
+                flex-direction: row;
+            }
+
+            .chat-list {
+                width: 250px;
+            }
+
+            .chat-box {
+                width: calc(100% - 250px);
+            }
+
+            .message-group {
+                max-height: 500px;
+            }
+
+            .input-group input[type="text"] {
+                font-size: 14px;
+            }
+
+            .input-group button {
+                font-size: 14px;
+            }
+
+            .message {
+                font-size: 14px;
+            }
         }
-
-
-
     </style>
 </head>
 
@@ -175,19 +272,16 @@
                 <div class="row">
 
                     <div class="chat-container">
-                        <!-- Left Sidebar with online users -->
+
                         <div class="chat-list">
                             <ul id="online-users">
-                                <li data-user="John">John</li>
-                                <li data-user="Jane">Jane</li>
-                                <li data-user="Mike">Mike</li>
                             </ul>
                         </div>
 
-                        <!-- Chat Box -->
                         <div class="chat-box">
-                            <div id="message-container-placeholder"></div> <!-- This will be populated dynamically -->
+                            <div id="message-container-placeholder"></div>
                         </div>
+
                     </div>
 
 
