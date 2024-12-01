@@ -52,6 +52,7 @@ class ComposerStaticInitd751713988987e9331980363e24189ce
         ),
         'M' => 
         array (
+            'MyApp\\' => 6,
             'Mpdf\\PsrLogAwareTrait\\' => 22,
             'Mpdf\\PsrHttpMessageShim\\' => 24,
             'Mpdf\\' => 5,
@@ -153,6 +154,10 @@ class ComposerStaticInitd751713988987e9331980363e24189ce
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'MyApp\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Mpdf\\PsrLogAwareTrait\\' => 
         array (
