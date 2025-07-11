@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             <div class="header-link">
-                <a href="https://www.trandar.com/shop/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+                <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
                 </a>    
                 </div>
