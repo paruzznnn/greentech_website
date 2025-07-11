@@ -11,9 +11,9 @@ $sql = "SELECT
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
         FROM 
-            dn_Blog dn
+            dn_blog dn
         LEFT JOIN 
-            dn_Blog_doc dnc ON dn.Blog_id = dnc.Blog_id
+            dn_blog_doc dnc ON dn.Blog_id = dnc.Blog_id
         WHERE 
             dn.del = '0' AND
             dnc.del = '0' AND
