@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 require __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -27,7 +27,7 @@ function sendEmail($to, $type_mes, $id, $otp)
         $mail->SMTPAuth   = true;
 
         $mail->Host       = 'smtp.gmail.com';
-        $mail->Username   = 'allhiapp.info@gmail.com';
+        $mail->Username   = '';
         $mail->Password   = 'neynwxnyhmnchvbk';
 
         // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
@@ -37,7 +37,7 @@ function sendEmail($to, $type_mes, $id, $otp)
         $mail->Port       = 465;                              // TCP port to connect to
 
         //Recipients
-        $mail->setFrom('allhiapp.info@gmail.com', 'Allable');
+        $mail->setFrom('', 'Allable');
         $mail->addAddress($to);
 
         //Content
@@ -274,4 +274,4 @@ function templateMail($url, $type_tmp, $otp)
 //Attachments
 // $mail->addAttachment('/var/tmp/file.tar.gz');       
 // $mail->addAttachment('/tmp/image.jpg', 'new.jpg'); 
-// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients'; -->
