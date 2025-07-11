@@ -60,19 +60,30 @@ $dropdownItems = [
 
 .over-menu {
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap; /* ✅ บังคับขึ้นบรรทัดใหม่เมื่อเต็ม */
+    justify-content: center;
     align-items: center;
     padding: 6px 0;
     overflow: visible;
+    gap: 5px; /* เว้นระยะระหว่างเมนู */
 }
 
-.over-menu a {
-    text-decoration: none;
-    padding: 10px 15px;
-    color: #333;
-    font-weight: 500;
-    position: relative;
+.over-menu a,
+.over-menu .dropdown {
+    flex: 1 1 auto; /* ✅ ให้แต่ละอันยืดหดได้ */
+    text-align: center;
+    padding: 0px 0px;
+    min-width: 100px; /* ✅ ป้องกันเมนูแคบเกิน */
+    white-space: nowrap;
 }
+
+@media (max-width: 768px) {
+    .over-menu a,
+    .over-menu .dropdown {
+        flex: 1 1 45%; /* ✅ ให้แสดง 2 แถบเต็มแนวมือถือ */
+    }
+}
+
 
 .dropdown {
     position: relative; /* ✅ Anchor ของ absolute dropdown */

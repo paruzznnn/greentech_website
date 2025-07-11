@@ -40,8 +40,12 @@ body {
 }
 
 .header-top img.logo {
-    width: 150px;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* หรือใช้ 'cover' ตามลักษณะภาพ */
+    display: block;
 }
+
 
 .header-top-right {
     float: right;

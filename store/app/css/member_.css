@@ -1,0 +1,165 @@
+.nav-link {
+    color: #555 !important;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    background-color: #ff8c0a !important;
+    color: #fefefe !important;
+}
+
+
+
+.purchase
+{
+    position: relative;
+    background-color: #FFF;
+    /* min-height: 680px; */
+    padding: 15px;
+    /* font-family: Times New Roman; */
+}
+.purchase header
+{
+    padding: 0px 0px 0px 0px;
+    margin-bottom: 0px;
+    border-bottom: 1px solid #FF9800;
+}
+.purchase header img
+{
+    max-width: 200px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.purchase .company-details
+{
+    text-align: right;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.purchase main
+{
+    padding: 0px 0px;
+    margin-bottom: 0px;
+}
+.purchase .to-details
+{
+    text-align: left;
+}
+.purchase .to-name
+{
+    font-weight: bold;
+}
+.purchase .to-name .to-address .to-city
+{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.purchase .purchase-info
+{
+    text-align: right;
+}
+.purchase-info .info-code
+{
+    font-weight: bold;
+}
+.purchase-info .info-code .info-date
+{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.order-section {
+    margin-bottom: 5px;
+}
+
+.order-section strong {
+    display: inline-block;
+    width: 80px;
+}
+
+.order-content {
+    display: inline-block;
+    /* width: calc(100% - 80px); */
+}
+
+.track_tbl td.track_dot {
+    width: 50px;
+    position: relative;
+    padding: 0;
+    text-align: center;
+}
+.track_tbl td.track_dot:after {
+    content: "\f111"; /* FontAwesome icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    margin-left: -6px;
+    top: 11px;
+    color: #ff8c0a;
+}
+.track_tbl td.track_dot span.track_line {
+    background: #ff8c0a;
+    width: 3px;
+    min-height: 50px;
+    position: absolute;
+    height: 101%;
+}
+.track_tbl tbody tr:first-child td.track_dot span.track_line {
+    top: 30px;
+    min-height: 25px;
+}
+.track_tbl tbody tr:last-child td.track_dot span.track_line {
+    top: 0;
+    min-height: 15px;
+    height: 10%;
+}
+
+.track_tbl tbody tr:last-child td.track_dot:after {
+    content: "\f466"; /* FontAwesome icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    margin-left: -6px;
+    top: 11px;
+    color: #ff8c0a;
+}
+
+.qr-img{
+    width: 70%;
+}
+
+.select2-container {
+    width: auto !important; /* ให้ขยายตามพื้นที่ที่มี */
+    max-width: 1024px; /* กำหนดความกว้างสูงสุด */
+    /* min-width: 150px;  */
+    box-sizing: border-box; /* รวม padding และ border ในการคำนวณขนาด */
+}
+
+.select2-container--default .select2-selection--single {
+    background-color: #fff;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px;
+    width: 100%; /* ให้กว้างเต็มภายใน container */
+}
+
+.select2-container .select2-selection--single {
+    box-sizing: border-box;
+    cursor: pointer;
+    display: block;
+    height: 37px !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #444;
+    line-height: 35px !important;
+    padding-left: 8px; /* เพิ่มระยะห่างซ้ายเล็กน้อย */
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 35px !important;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 20px;
+}

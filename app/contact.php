@@ -29,10 +29,10 @@
                         <li>102 Phatthanakan 40, Suan Luang, Bangkok 10250</li>
                         <li>(+66)2 722 7007</li>
                         <li>info@trandar.com</li>
-                        <li>Monday – Friday : 08:30 AM – 05:00 PM</li>
-                        <li>Saturday: 08:30 AM – 12:00 PM</li>
+                        <li>Monday – Friday 08:30 AM – 05:00 PM</li>
+                        <li>Saturday 08:30 AM – 12:00 PM</li>
                     </ul>
-                    <a href="https://www.origami.life/dashboard.php" target="_blank">
+                    <a href="https://www.origami.life/login.php#/register?comp=2&link=company&registype=P" target="_blank">
                     <img src="../public/img/photo_2025-07-01_10-43-53.jpg" alt="Trandar Link" style="max-width: 70%; padding-top:18px">
                     </a>
                 </div>
