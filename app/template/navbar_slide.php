@@ -1,150 +1,142 @@
 <?php
+// ดึงข่าว 3 รายการล่าสุดจาก dn_news
+require_once('../lib/connect.php');
+$newsList = [];
+$sql = "SELECT news_id, subject_news FROM dn_news ORDER BY date_create DESC LIMIT 3";
+$result = $conn->query($sql);
 
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $newsList[] = $row;
+    }
+}
+?>
+
+<?php
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 $navbarItems = [
-    [
-        'icon' => '',
-        'text' => '',
-        'translate' => 'Home',
-        'link' => 'index' . $isFile
-    ],
-    [
-        'icon' => '',
-        'text' => 'Origami Platform',
-        'translate' => '',
-        'link' => '#',
-        'isDropdown' => true,
-        'id' => 'dropdown1',
-    ],
-    [
-        'icon' => '',
-        'text' => 'Origami AI',
-        'translate' => '',
-        'link' => '#',
-        'isDropdown' => true,
-        'id' => 'dropdown2',
-    ],
-    [
-        'icon' => '',
-        'text' => 'Allable Cloud',
-        'translate' => '',
-        'link' => 'allable_cloud' . $isFile
-    ],
-    [
-        'icon' => '',
-        'text' => '',
-        'translate' => 'News',
-        'link' => 'news' . $isFile
-    ],
-    [
-        'icon' => '',
-        'text' => '',
-        'translate' => 'About_us',
-        'link' => 'about' . $isFile
-    ],
-    [
-        'icon' => '',
-        'text' => 'Contact us',
-        'translate' => 'Contact_us',
-        'link' => 'contact' . $isFile
-    ],
+    ['icon' => '', 'text' => 'หน้าแรก', 'translate' => 'Home', 'link' => 'index' . $isFile],
+    ['icon' => '', 'text' => 'เกี่ยวกับเรา', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+    ['icon' => '', 'text' => 'บริการ', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+    ['icon' => '', 'text' => 'สินค้า', 'translate' => 'product', 'link' => 'shop' . $isFile],
+    ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+    ['icon' => '', 'text' => 'ผลงาน', 'translate' => 'project', 'link' => 'project' . $isFile],
+    ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+    ['icon' => '', 'text' => 'ข่าว', 'translate' => 'News', 'link' => 'news' . $isFile],
+    ['icon' => '', 'text' => 'ติดต่อเรา', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
 ];
 
-// Dropdown items array
 $dropdownItems = [
-    [
-        'id' => 'dropdown1',
-        'items' => [
-            [
-                'icon' => '',
-                'text' => 'Human Resource Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Corporation Relationship Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Project Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Expense Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Document Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Event Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Asset Management',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Helpdesk Service',
-                'translate' => '',
-                'link' => '#'
-            ],
-            [
-                'icon' => '',
-                'text' => 'Learning Management System',
-                'translate' => '',
-                'link' => '#'
-            ],
-        ]
+    'dropdown3' => [
+        ['icon' => '', 'text' => 'INSUL Software', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+        ['icon' => '', 'text' => 'Download', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+        ['icon' => '', 'text' => 'Instructions', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
     ],
-    [
-        'id' => 'dropdown2',
-        'items' => [
-            [
-                'icon' => '',
-                'text' => 'DevRev',
-                'translate' => '',
-                'link' => 'origami_ai' . $isFile
-            ],
-            [
-                'icon' => '',
-                'text' => 'Pricing',
-                'translate' => '',
-                'link' => 'pricing' . $isFile
-            ],
-        ]
+    'dropdown4' => [
+        ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+        ['icon' => '', 'text' => 'ความรู้ด้านเสียง', 'translate' => 'Acoustic knowledge', 'link' => 'idia' . $isFile],
+        ['icon' => '', 'text' => 'วีดีโอ', 'translate' => 'video', 'link' => 'Video' . $isFile],
     ],
 ];
-
 ?>
 
-<div id="navbar-menu" onmouseleave="closeAllDropdowns()">
+<!-- ✅ CSS -->
+<style>
+#navbar-menu {
+    background-color: white;
+    position: relative;
+    z-index: 999;
+    border-bottom: 1px solid #ddd;
+    overflow: visible;
+    background-color: #ff9900;
+}
+.container {
+    position: relative;
+    overflow: visible;
+}
+
+
+.over-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px 0;
+    overflow: visible;
+}
+
+.over-menu a {
+    text-decoration: none;
+    padding: 10px 15px;
+    color: #333;
+    font-weight: 500;
+    position: relative;
+}
+
+.dropdown {
+    position: relative; /* ✅ Anchor ของ absolute dropdown */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    z-index: 10000;
+    min-width: 180px;
+    max-width: 220px;
+    border-radius: 4px;
+}
+
+.dropdown-show {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+.dropbtn {
+    cursor: pointer;
+}
+.text-ticker {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #f28b1f;
+    color: #58585a;
+    /* color: white; */
+    padding: 15px 40px 20px 10px;
+    font-weight: bold;
+    z-index: 1;
+    white-space: nowrap;
+    font-size: 24px;
+    border-radius: 0px 70px 10px 0px;
+}
+
+</style>
+
+<!-- ✅ HTML + PHP Navbar -->
+<div id="navbar-menu">
     <div class="container">
         <div class="over-menu">
             <?php foreach ($navbarItems as $item): ?>
                 <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
-                    <div class="dropdown">
-                        <a
-                            href="<?php echo $item['link']; ?>"
-                            class="dropbtn"
-                            onmouseenter="toggleDropdown('<?php echo $item['id']; ?>')">
-                            <i class="<?php echo $item['icon']; ?>"></i>
+                    <div class="dropdown" onmouseleave="closeAllDropdowns()">
+                        <a href="<?php echo $item['link']; ?>"
+                           class="dropbtn"
+                           onmouseenter="toggleDropdown('<?php echo $item['id']; ?>')">
                             <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                                 <?php echo $item['text']; ?>
                             </span>
@@ -152,11 +144,23 @@ $dropdownItems = [
                                 <i class="fas fa-caret-down"></i>
                             </span>
                         </a>
+
+                        <!-- ✅ ใส่ dropdown-content ภายใน dropdown -->
+                        <div class="dropdown-content" id="<?php echo $item['id']; ?>">
+                            <div class="dropdown-show">
+                                <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
+                                    <a class="dropdown-item" href="<?php echo $dropdownItem['link']; ?>">
+                                        <i class="<?php echo $dropdownItem['icon']; ?>"></i>
+                                        <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
+                                            <?php echo $dropdownItem['text']; ?>
+                                        </span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                     </div>
                 <?php else: ?>
-                    <a href="<?php echo $item['link']; ?>"
-                        <?php echo isset($item['target']) ? 'target="' . $item['target'] . '"' : ''; ?>
-                        onmouseenter="toggleDropdown()">
+                    <a href="<?php echo $item['link']; ?>">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
@@ -166,22 +170,36 @@ $dropdownItems = [
             <?php endforeach; ?>
         </div>
     </div>
-
-    <?php foreach ($dropdownItems as $dropdown): ?>
-        <div class="dropdown-content" id="<?php echo $dropdown['id']; ?>" style="display:none;">
-            <div class="dropdown-show">
-                <?php foreach ($dropdown['items'] as $dropdownItem): ?>
-                    <a class="dropdown-item" href="<?php echo $dropdownItem['link']; ?>">
-                        <i class="<?php echo $dropdownItem['icon']; ?>"></i>
-                        <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
-                            <?php echo $dropdownItem['text']; ?>
-                        </span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    <?php endforeach; ?>
 </div>
+
+<!-- ✅ JavaScript -->
+<script>
+let currentDropdown = null;
+
+function toggleDropdown(id) {
+    // ปิดอันเก่า
+    if (currentDropdown && currentDropdown !== id) {
+        const prev = document.getElementById(currentDropdown);
+        if (prev) prev.style.display = "none";
+    }
+
+    // เปิดอันใหม่
+    const dropdown = document.getElementById(id);
+    if (dropdown) {
+        dropdown.style.display = "block";
+        currentDropdown = id;
+    }
+}
+
+function closeAllDropdowns() {
+    if (currentDropdown) {
+        const dropdown = document.getElementById(currentDropdown);
+        if (dropdown) dropdown.style.display = "none";
+        currentDropdown = null;
+    }
+}
+</script>
+
 
 <div id="navbar-news">
     <div class="container">
@@ -190,11 +208,18 @@ $dropdownItems = [
                 <span class="blinking-icon"></span>
                 Daily News
             </span>
-            <marquee id="newsMarquee" scrollamount="4">
-                <div id="newsMarquee-link">
-                    <a href="news.php">Allable จับมือ DevRev เปิดตัว AI และ SaaS 2.0 เสริมแกร่งธุรกิจครั้งแรกในไทย</a>
-                </div>
-            </marquee>
+             <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+    <div id="newsMarquee-link" style="display: inline;">
+        <?php foreach ($newsList as $news): ?>
+            <span style="padding: 0 50px;">
+                 <a href="news.php?id=<?= $news['news_id'] ?>" style="text-decoration: none; color: inherit;">
+                    <?= htmlspecialchars($news['subject_news']) ?>
+                </a>
+            </span>
+        <?php endforeach; ?>
+    </div>
+</marquee>
+
         </div>
     </div>
 </div>

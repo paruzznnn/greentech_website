@@ -6,9 +6,9 @@ global $conn;
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+   
+ 
+
 
     <?php include 'inc_head.php' ?>
     <link href="css/index_.css?v=<?php echo time(); ?>" rel="stylesheet">
@@ -77,13 +77,14 @@ global $conn;
                 <div class="row">
 
                     <div class="col-md-9">
+                        <h2 style="font-size: 28px; font-weight: bold;">News</h2>
                         <?php include 'template/news/content.php' ?>
                     </div>
 
                     <div class="col-md-3">
 
                         <div class="page-plugin mt-3">
-                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fallablethailand%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftrandaracoustic%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                         </div>
 
                     </div>

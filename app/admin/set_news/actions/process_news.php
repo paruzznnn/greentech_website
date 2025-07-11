@@ -233,49 +233,45 @@ try {
             }
 
             $news_id = $news_array['news_id'];
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            // if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
 
-                $fileInfos = handleFileUpload($_FILES['fileInput']);
-                foreach ($fileInfos as $fileInfo) {
-                    if ($fileInfo['success']) {
+            //     $fileInfos = handleFileUpload($_FILES['fileInput']);
+            //     foreach ($fileInfos as $fileInfo) {
+            //         if ($fileInfo['success']) {
 
-                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+            //             $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
 
-                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+            //             $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+            //             $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
 
-                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
-                        $fileWhereClause = 'news_id = ?';
-                        $fileWhereValues = [$news_id];
+            //             // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+            //             $fileWhereClause = 'news_id = ?';
+            //             $fileWhereValues = [$news_id];
 
-                        updateInDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-                    } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-                    }
-                }
-            }
+            //             updateInDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+            //         } else {
+            //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+            //         }
+            //     }
+            // }
 
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
-                $fileInfos = handleFileUpload($_FILES['image_files']);
-                foreach ($fileInfos as $fileInfo) {
-                    if ($fileInfo['success']) {
+    $fileInfos = handleFileUpload($_FILES['image_files']);
+    foreach ($fileInfos as $fileInfo) {
+        if ($fileInfo['success']) {
 
-                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+            $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
 
-                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
-                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+            $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+            $fileValues = [$news_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
 
-                        $fileWhereClause = 'news_id = ?';
-                        $fileWhereValues = [$news_id];
-
-                        updateInDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-                    } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-                    }
-                }
-            }
-
+            insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+        } else {
+            throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+        }
+    }
+}
             $response = array('status' => 'success', 'message' => 'edit save');
         }
     } elseif (isset($_POST['action']) && $_POST['action'] == 'delNews') {

@@ -4,9 +4,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+        
+  
 
     <?php include 'inc_head.php'?>
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
@@ -23,15 +22,19 @@
             <div class="row">
 
                 <div class="col-md-6">
-                    <h1>
-                    ALLABLE Co.,ltd.
+                    <h1  style="font-size: 32px;">
+                    TRANDAR INTERNATIONAL CO., LTD.
                     </h1>
                     <ul>
                         <li>102 Phatthanakan 40, Suan Luang, Bangkok 10250</li>
-                        <li>(+66)2 722 7002</li>
-                        <li>info@allable.co.th</li>
+                        <li>(+66)2 722 7007</li>
+                        <li>info@trandar.com</li>
                         <li>Monday – Friday : 08:30 AM – 05:00 PM</li>
+                        <li>Saturday: 08:30 AM – 12:00 PM</li>
                     </ul>
+                    <a href="https://www.origami.life/dashboard.php" target="_blank">
+                    <img src="../public/img/photo_2025-07-01_10-43-53.jpg" alt="Trandar Link" style="max-width: 70%; padding-top:18px">
+                    </a>
                 </div>
                 <div class="col-md-6">
                     <div id="map-plugin" >

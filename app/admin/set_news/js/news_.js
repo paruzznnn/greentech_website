@@ -573,7 +573,7 @@ $("#submitEditNews").on("click", function (event) {
                     contentType: false,
                     success: function (response) {
                         if (response.status == 'success') {
-                            window.location.reload();
+                            window.location.href = "list_news.php";
                         }
                     },
                     error: function (error) {
@@ -591,11 +591,13 @@ $("#submitEditNews").on("click", function (event) {
 
 });
 
+
+
 function reDirect(url, data) {
     var form = $('<form>', {
         method: 'POST',
         action: url,
-        target: '_blank'
+        target: '_self'  // เปิดในแท็บเดิม
     });
     $.each(data, function(key, value) {
         $('<input>', {

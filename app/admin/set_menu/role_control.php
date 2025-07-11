@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>role control</title>
 
-    <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
+    <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
@@ -98,6 +98,7 @@
                                     <th>Create</th>
                                     <th>Update</th>
                                     <th>Delete</th>
+                                    <th>Comment</th>
                                 </tr>
                             </thead>
                             <tbody>

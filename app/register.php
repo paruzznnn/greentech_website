@@ -1,14 +1,71 @@
+<!-- ?php
+require_once('../lib/connect.php');
+global $conn;
+ -->
 <?php
 require_once('../lib/connect.php');
 global $conn;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // รับค่าจากฟอร์ม
+    $first_name = $_POST['signUp_name'] ?? '';
+    $last_name = $_POST['signUp_surname'] ?? '';
+    $email = $_POST['signUp_email'] ?? '';
+    $phone = $_POST['signUp_phone'] ?? '';
+    $password = $_POST['signUp_password'] ?? '';
+    $consent = isset($_POST['signUp_agree']) ? 1 : 0;
+    $confirm_email = isset($_POST['signUp_send_mail']) ? 1 : 0;
+
+    // เข้ารหัส password อย่างปลอดภัย
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $verify = 1;
+    $generate_otp = rand(100000, 999999);
+
+    // เตรียม SQL สำหรับ insert ลงตาราง mb_user
+    $sql = "INSERT INTO mb_user (
+                first_name,
+                last_name,
+                password,
+                email,
+                phone_number,
+                consent,
+                verify,
+                generate_otp,
+                confirm_email,
+                date_create
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param(
+        "sssssiisi",
+        $first_name,
+        $last_name,
+        $hashedPassword,
+        $email,
+        $phone,
+        $consent,
+        $verify,
+        $generate_otp,
+        $confirm_email
+    );
+
+    if ($stmt->execute()) {
+        header("Location: index.php");
+        exit;
+    } else {
+        echo "Insert error: " . $stmt->error;
+    }
+}
 ?>
-<!DOCTYPE html>
+
+
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+
+
+
+
 
     <?php include 'inc_head.php' ?>
 
@@ -171,7 +228,7 @@ global $conn;
                         </div>
                         <div class="col-md-4" style="display: flex; align-items: center; justify-content: flex-end;">
                             <div>
-                                <button type="button" id="submitSignUp" class="btn btn-success">confirm</button>
+                                <button type="submit" class="btn btn-success">confirm</button>
                             </div>
                         </div>
 

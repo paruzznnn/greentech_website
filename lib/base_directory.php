@@ -19,8 +19,10 @@ $port = isset($urlParts['port']) ? ':'.$urlParts['port'] : '';
 // )
 
 if($urlParts['scheme'] == 'http'){
-    $fixedPath = '/allable/app/admin/';
-    $newPath = '/allable/';
+    // $fixedPath = '/allable/app/admin/';
+    // $newPath = '/allable/';
+    $fixedPath = '/trandar/app/admin/';
+    $newPath = '/trandar/';
 }else{
     $fixedPath = '/app/admin/';
     $newPath = '/';
