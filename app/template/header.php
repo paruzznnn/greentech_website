@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
         <div class="header-top-left" style="display: flex; align-items: center;">
     <a href="https://www.trandar.com">
-        <img class="logo" src="/public/img/trandar.jpg" alt="">
+        <img class="logo" src="../public/img/trandargood.jpg" alt="">
     </a>
      <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
 </div>
@@ -560,4 +560,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 </script> -->
 
 </body>
+<style>
+/* ปรับปุ่ม Sign in / Sign up ให้มีขนาดพอดี */
+.header-top-right a#myBtn-sign-in,
+.header-top-right a[href*="register"] {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 13px;
+    background: #ffffffff;
+    color: black;
+    border-radius: 4px;
+    margin-left: 6px;
+    white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
+}
+
+/* ปรับปุ่ม Trandar Store */
+.header-top-right .header-link a[href*="shop"] {
+    padding: 6px 10px;
+    font-size: 13px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* ปรับ container ให้ไม่ล้น */
+.header-top-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Responsive เฉพาะหน้าจอเล็ก */
+@media (max-width: 768px) {
+    .header-top-right a#myBtn-sign-in,
+    .header-top-right a[href*="register"],
+    .header-top-right .header-link a[href*="shop"],
+    .header-top-right .header-link a {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .header-top-right {
+        justify-content: flex-start;
+        gap: 4px;
+    }
+
+    .language-select {
+        font-size: 13px;
+        padding: 3px 6px;
+        max-width: 100px;
+    }
+}
+</style>
+
 </html>
