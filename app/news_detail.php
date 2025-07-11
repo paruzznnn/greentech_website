@@ -1,13 +1,34 @@
 <?php
 require_once('../lib/connect.php');
 global $conn;
+
+
+
+$subjectTitle = "สินค้า"; // fallback title
+
+if (isset($_GET['id'])) {
+    $decodedId = base64_decode(urldecode($_GET['id']));
+
+    if ($decodedId !== false) {
+        $stmt = $conn->prepare("SELECT subject_news FROM dn_news WHERE del = 0 AND news_id = ?");
+        $stmt->bind_param('i', $decodedId);
+        $stmt->execute();
+        $resultTitle = $stmt->get_result();
+        if ($resultTitle->num_rows > 0) {
+            $row = $resultTitle->fetch_assoc();
+            $subjectTitle = $row['subject_news'];
+        }
+        $stmt->close();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
+
+ 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title><?= htmlspecialchars($subjectTitle); ?></title>
 
     <?php include 'inc_head.php'?>
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
@@ -100,12 +121,99 @@ global $conn;
 
                     <div class="col-md-3">
                         <div class="page-plugin mt-3">
-                        <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fallablethailand%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                        <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftrandaracoustic%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                         </div>
                     </div>
 
                 </div>
+                <div style="padding-left:50px;">
+                <hr style="border-top: dashed 1px; margin: 40px 0;">
+                <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
+                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/shop/</a></p>
+                <p>📱 Line OA : @Trandaraocoustic 
+                    <a href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</a>
+                </p>
+                <p>📱 Line OA : @Trandarstore 
+                    <a href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</a>
+                </p>
+                <p>☎️ Tel : 02-722-7007</p>         
+            </div>                      
 
+
+
+
+
+
+
+
+
+
+                        <!-- แสดงฟอร์มด้านล่างนี้ -->
+<h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
+<p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
+<form id="commentForm" style="max-width: 600px;">
+    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
+        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
+    <button type="submit"
+        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+        แสดงความคิดเห็น
+    </button>
+</form>
+
+<script>
+document.getElementById("commentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const jwt = sessionStorage.getItem("jwt");
+    const comment = document.getElementById("commentText").value;
+    const pageUrl = window.location.pathname;
+
+    if (!jwt) {
+        // alert("กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น");
+        document.getElementById("myBtn-sign-in").click(); // เปิด modal login
+        return;
+    }
+
+    fetch('actions/protected.php', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + jwt
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+            // ส่งคอมเม้นไปเก็บใน database
+            fetch('actions/save_comment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwt
+                },
+                body: JSON.stringify({
+                    comment: comment,
+                    page_url: pageUrl
+                })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                    document.getElementById("commentText").value = '';
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + result.message);
+                }
+            });
+        } else {
+            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+        }
+    })
+    .catch(err => {
+        console.error("Error verifying user:", err);
+        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+    });
+});
+</script>                
             </div>
         </div>
     </div>

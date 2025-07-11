@@ -9,6 +9,7 @@ body {
 
 .header-top {
     overflow: hidden;
+    /* background-color: #777474; */
     background-color: #fafafafa;
     /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 0px 10px;
@@ -27,7 +28,7 @@ body {
     float: left;
     color: #55555569;
     text-align: center;
-    padding: 12px;
+    padding: 8px;
     text-decoration: none;
     font-size: 14px;
     line-height: 25px;
@@ -39,7 +40,7 @@ body {
 }
 
 .header-top img.logo {
-    width: 180px;
+    width: 150px;
 }
 
 .header-top-right {
@@ -47,7 +48,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 2px solid #eeeeeea3;
+    /* border-bottom: 2px solid #eeeeeea3; */
 }
 
 .header-top-left {
@@ -87,17 +88,17 @@ body {
 }
 
 #navbar-menu a:hover {
-    color: #f28b1f;
+    color: #000000;
 }
 
 .dropdown {
-    display: inline-block;
+    /* display: inline-block; */
     position: relative;
 }
 
 .dropdown-content {
     display: none;
-    position: absolute;
+    /* position: absolute; */
     /* top: 100%; 
     left: 0; */
     background-color: #f9f9f9;
@@ -143,8 +144,8 @@ body {
 
 
 .content-sticky {
-    padding: 16px;
-    background-color: #F1F1F1;
+    padding: 0px;
+    background-color: #ffffff;
 }
 
 .box-section {
@@ -155,7 +156,15 @@ body {
 .box-content {
     background-color: #ffffff;
     padding: 40px 20px 20px 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); */
+    border-radius: 8px;
+    color: #555;
+}
+
+.box-content1 {
+    background-color: #ffffff;
+    padding: 0px 20px 20px 20px;
+    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); */
     border-radius: 8px;
     color: #555;
 }
@@ -174,7 +183,7 @@ body {
 
 .footer {
     overflow: hidden;
-    background-color: #434242;
+    background-color: #777474;
     /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 15px 10px;
     position: relative;
@@ -186,7 +195,7 @@ body {
 }
 
 .footer-logo {
-    width: 50%;
+    width: 20%;
 }
 
 .cloud-services {
@@ -379,6 +388,7 @@ body {
     margin-top: 10px;
     font-size: 14px;
     color: #333;
+    /* color: #111010; */
 }
 
 
@@ -666,8 +676,8 @@ body {
 .banner-section {
     position: relative;
     width: 100%;
-    /* max-width: 800px; */
-    /* height: 300px; */
+    /* max-width: 800px;   */
+    /* height: 300px;  */
     margin: 0 auto;
     overflow: hidden;
     z-index: 999;
@@ -689,7 +699,7 @@ body {
 .banner-image {
     width: 100%;
     max-height: 300px;
-    max-width: 780px;
+    max-width: 100%;
     height: auto;
     object-fit: cover;
 }
@@ -915,6 +925,12 @@ body {
     border-left: 5px solid #f46e20;
     padding-left: 10px;
 }
+.line-ref1 {
+    border-left: 5px solid #f46e20;
+    padding-left: 10px;
+    margin-top: 50px;
+    line-height: 1.2; /* คุมความสูงข้อความ */
+}
 
 
 #loading-overlay {
@@ -949,6 +965,16 @@ to {
     display: none;
 }
 
+.btn-orange {
+    background-color: #f37021;
+    color: white;
+    border: none;
+}
+
+.btn-orange:hover {
+    background-color: #d65c1a;
+    color: white;
+}
 
 /* For medium-sized smartphones */
 @media screen and (max-width: 768px) {

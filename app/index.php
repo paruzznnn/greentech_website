@@ -2,12 +2,13 @@
 require_once('../lib/connect.php');
 global $conn;
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <!-- <title>trandar</title> -->
 
     <?php include 'inc_head.php'?>
 
@@ -36,7 +37,7 @@ global $conn;
     
 </head>
 <body>
-
+    
     <?php include 'template/header.php'?>
     <?php include 'template/banner_slide.php'?>
     <?php include 'template/navbar_slide.php'?>

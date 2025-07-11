@@ -1,5 +1,5 @@
-<link rel="icon" type="image/x-icon" href="../../public/img/logo-ALLABLE-07.ico">
-
+<!-- <link rel="icon" type="image/x-icon" href="../../public/img/q-removebg-preview1.png"> -->
+<link rel="icon" type="image/x-icon" href="../../public/img/q-removebg-preview1.png">
     <link href="../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
     <script src="../../inc/jquery/js/jquery-3.6.0.min.js"></script>

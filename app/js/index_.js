@@ -84,8 +84,10 @@ function updateSelectedLanguageFlag() {
     }
 }
 
+   
 function changeLanguage(lang) {
-    fetch(`../api/languages/${lang}.json`)
+    const version = Date.now();
+    fetch(`../api/languages/${lang}.json?v=${version}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -193,37 +195,42 @@ $(document).ready(function () {
             success: function (response) {
 
                 if (response.status === "success") {
-                    sessionStorage.setItem('jwt', response.jwt);
-                    const token = sessionStorage.getItem('jwt');
-                    $.ajax({
-                        url: 'actions/protected.php', 
-                        type: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        success: function(response) {
+    sessionStorage.setItem('jwt', response.jwt);
+    const token = sessionStorage.getItem('jwt');
+    $.ajax({
+        url: 'actions/protected.php',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+        success: function(response) {
+            if (response.status === "success") {
+                const roleId = parseInt(response.data.role_id); // แปลงให้ชัวร์
 
-                            if (response.status === "success") {
-
-                                if(response.data.role_id > 0){
-                                    window.location.href = 'admin/index.php';
-                                }else{
-                                    window.location.href = 'index.php';
-                                }
-
-                            } else {
-                                alert(response.message);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Request failed:", status, error);
-                            alert("An error occurred while accessing protected resource.");
-                        }
-                    });
-
+                if (roleId === 1) {
+                    window.location.href = 'admin/index.php';
+                } else if (roleId === 2) {
+                    window.location.href = 'editer/index.php';
+                } else if (roleId === 3) {
+                    // viewer: reload หน้าเพื่อให้ header แสดงปุ่ม logout
+                    location.reload(); 
                 } else {
-                    alert(response.message);
+                    window.location.href = 'index.php'; // หน้า default
                 }
+
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Request failed:", status, error);
+            alert("An error occurred while accessing protected resource.");
+        }
+    });
+} else {
+    alert(response.message);
+}
+
             },
             error: function (xhr, status, error) {
                 console.error("AJAX request failed:", status, error);

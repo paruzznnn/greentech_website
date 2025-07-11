@@ -1,5 +1,5 @@
 <?php
-$perPage = 4;
+$perPage = 6;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
@@ -80,7 +80,7 @@ if ($result->num_rows > 0) {
 <div style="display: flex; justify-content: space-between;">
 
     <div>
-        <p>Showing <?php echo $page; ?> to <?php echo $totalPages; ?> of <?php echo $totalItems; ?> entry</p>
+        <!-- <p>Showing <?php echo $page; ?> to <?php echo $totalPages; ?> of <?php echo $totalItems; ?> entry</p> -->
     </div>
 
     <div>
@@ -139,3 +139,72 @@ if ($result->num_rows > 0) {
         <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Next</a>
     <?php endif; ?>
 </div>
+
+
+<!-- แสดงฟอร์มด้านล่างนี้ -->
+<h3>ใส่ความคิดเห็น</h3>
+<p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
+<form id="commentForm" style="max-width: 600px;">
+    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
+        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
+    <button type="submit"
+        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+        แสดงความคิดเห็น
+    </button>
+</form>
+
+<script>
+document.getElementById("commentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const jwt = sessionStorage.getItem("jwt");
+    const comment = document.getElementById("commentText").value;
+    const pageUrl = window.location.pathname;
+
+    if (!jwt) {
+        // alert("กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น");
+        document.getElementById("myBtn-sign-in").click(); // เปิด modal login
+        return;
+    }
+
+    fetch('actions/protected.php', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + jwt
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+            // ส่งคอมเม้นไปเก็บใน database
+            fetch('actions/save_comment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwt
+                },
+                body: JSON.stringify({
+                    comment: comment,
+                    page_url: pageUrl
+                })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                    document.getElementById("commentText").value = '';
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + result.message);
+                }
+            });
+        } else {
+            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+        }
+    })
+    .catch(err => {
+        console.error("Error verifying user:", err);
+        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+    });
+});
+</script>
+
