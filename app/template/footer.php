@@ -70,8 +70,8 @@ $menuItems = [
             <p>102 Phatthanakan 40, Suan Luang, Bangkok 10250</p>
             <p>(+66)2 722 7007</p>
             <p>info@trandar.com</p>
-            <p>Monday – Friday : 08:30 AM – 05:00 PM</p>
-            <p>Saturday: 08:30 AM – 12:00 PM</p>
+            <p>Monday – Friday 08:30 AM – 05:00 PM</p>
+            <p>Saturday 08:30 AM – 12:00 PM</p>
             
             <div style="margin-top: 0px;">
     <!-- <a href="https://www.facebook.com/trandaracoustic/" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
