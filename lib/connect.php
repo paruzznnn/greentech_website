@@ -26,4 +26,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+ob_start(function ($buffer) {
+    // แทนที่ http://localhost/trandar/ ด้วยค่าว่าง
+    return str_replace('http://localhost/trandar/', '', $buffer);
+});
 ?>
