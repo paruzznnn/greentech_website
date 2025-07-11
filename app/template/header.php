@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
         <div class="header-top-left" style="display: flex; align-items: center;">
     <a href="https://www.trandar.com">
-        <img class="logo" src="../public/img/trandar-removebg-preview.png" alt="">
+        <img class="logo" src="/public/img/trandar.jpg" alt="">
     </a>
      <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
 </div>
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             <div class="header-link">
-                <a href="https://www.trandar.com/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+                <a href="https://www.trandar.com/shop/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
                 </a>    
                 </div>
