@@ -4,23 +4,11 @@ date_default_timezone_set('Asia/Bangkok');
 require_once(__DIR__ . '/../../../../lib/base_directory.php');
 require_once(__DIR__ . '/../../../../lib/connect.php');
 require_once(__DIR__ . '/../../../../inc/getFunctions.php');
-require_once(__DIR__ . '/../../../../lib/permissions.php');
 
 global $base_path;
 global $base_path_admin;
+
 global $conn;
-
-$arrPermiss = checkPermissions($_SESSION);
-$allowedPermiss_id = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['permiss_id']))
-    ? explode(',', $arrPermiss['permiss_id'])
-    : [];
-
-$allowedPermiss = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['permissions']))
-    ? explode(',', $arrPermiss['permissions'])
-    : [];
-
-
-$permissionsMap = array_combine($allowedPermiss, $allowedPermiss_id);
 
 function insertIntoDatabase($conn, $table, $columns, $values)
 {
@@ -128,69 +116,248 @@ function handleFileUpload($files)
 }
 
 
+
 $response = array('status' => 'error', 'message' => '');
 
 try {
 
-    // if (isset($_POST['action']) && $_POST['action'] == 'getSender') {
 
-    //     $stmt = $conn->prepare("SELECT * FROM mb_user WHERE user_id = ? AND del = ?");
-    //     if (!$stmt) {
-    //         throw new Exception("Prepare statement failed: " . $conn->error);
-    //     }
+    if (isset($_POST['action']) && $_POST['action'] == 'addservice_content') {
+// print_r($_POST); exit;
+        $news_array = [
+            'service_content_subject' => $_POST['service_content_subject'] ?? '',
+            'service_content_description' => $_POST['service_content_description'] ?? '',
+            'service_content_content'  => $_POST['service_content_content'] ?? '',
+        ];
 
-    //     $user_id = $_SESSION['user_id'];
-    //     $del = 0;
-    //     $stmt->bind_param("ii", $user_id, $del);
+        if (isset($news_array)) {
 
-    //     if (!$stmt->execute()) {
-    //         throw new Exception("Execute statement failed: " . $stmt->error);
-    //     }
+            $stmt = $conn->prepare("INSERT INTO service_content 
+                (subject_service_content, description_service_content, content_service_content, date_create) 
+                VALUES (?, ?, ?, ?)");
 
-    //     $result = $stmt->get_result();
-    //     $sender = array();
+            $news_subject = $news_array['service_content_subject'];
+            $news_description = $news_array['service_content_description'];
 
-    //     while ($row = $result->fetch_assoc()) {
-    //         $sender[] = $row;
-    //     }
+            $news_content = mb_convert_encoding($news_array['service_content_content'], 'UTF-8', 'auto');
 
-    //     $response = array(
-    //         'status' => 'success',
-    //         'message' => '',
-    //         'data' => $sender
-    //     );
+            $current_date = date('Y-m-d H:i:s');
 
-    // }
+            $stmt->bind_param(
+                "ssss",
+                $news_subject,
+                $news_description,
+                $news_content,
+                $current_date
+            );
 
-    // else if (isset($_POST['action']) && $_POST['action'] == 'getReceiver') {
+            if (!$stmt->execute()) {
+                throw new Exception("Execute statement failed: " . $stmt->error);
+            }
 
-    //     $stmt = $conn->prepare("SELECT * FROM mb_user WHERE del = ?");
-    //     if (!$stmt) {
-    //         throw new Exception("Prepare statement failed: " . $conn->error);
-    //     }
+            $last_inserted_id = $conn->insert_id;
 
-    //     $del = 0;
-    //     $stmt->bind_param("i", $del);
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
 
-    //     if (!$stmt->execute()) {
-    //         throw new Exception("Execute statement failed: " . $stmt->error);
-    //     }
+                $fileInfos = handleFileUpload($_FILES['fileInput']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
 
-    //     $result = $stmt->get_result();
-    //     $receiver = array();
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
 
-    //     while ($row = $result->fetch_assoc()) {
-    //         $receiver[] = $row;
-    //     }
+                        $fileColumns = ['service_content_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                        insertIntoDatabase($conn, 'service_content_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
 
-    //     $response = array(
-    //         'status' => 'success',
-    //         'message' => '',
-    //         'data' => $receiver
-    //     );
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
-    // }
+                $fileInfos = handleFileUpload($_FILES['image_files']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
 
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['service_content_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+                        insertIntoDatabase($conn, 'service_content_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            $response = array('status' => 'success', 'message' => 'save');
+        }
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'editservice_content') {
+
+
+        $news_array = [
+            'service_content_id' => $_POST['service_content_id'] ?? '',
+            'service_content_subject' => $_POST['service_content_subject'] ?? '',
+            'service_content_description' => $_POST['service_content_description'] ?? '',
+            'service_content_content'  => $_POST['service_content_content'] ?? '',
+        ];
+
+        if (!empty($news_array['service_content_id'])) {
+
+            $stmt = $conn->prepare("UPDATE service_content 
+            SET subject_service_content = ?, 
+            description_service_content = ?, 
+            content_service_content = ?, 
+            date_create = ? 
+            WHERE service_content_id = ?");
+
+            $news_subject = $news_array['service_content_subject'];
+            $news_description = $news_array['service_content_description'];
+            $news_content = mb_convert_encoding($news_array['service_content_content'], 'UTF-8', 'auto');
+
+            $current_date = date('Y-m-d H:i:s');
+            $news_id = $news_array['service_content_id'];
+
+            $stmt->bind_param(
+                "ssssi",
+                $news_subject,
+                $news_description,
+                $news_content,
+                $current_date,
+                $news_id
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Execute statement failed: " . $stmt->error);
+            }
+
+            $news_id = $news_array['service_content_id'];
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+
+                $fileInfos = handleFileUpload($_FILES['fileInput']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+
+                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+                        $fileWhereClause = 'service_content_id = ?';
+                        $fileWhereValues = [$news_id];
+
+                        updateInDatabase($conn, 'service_content_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
+
+                $fileInfos = handleFileUpload($_FILES['image_files']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+
+                        $fileWhereClause = 'service_content_id = ?';
+                        $fileWhereValues = [$news_id];
+
+                        updateInDatabase($conn, 'service_content_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            $response = array('status' => 'success', 'message' => 'edit save');
+        }
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'delservice_content') {
+
+        $news_id = $_POST['id'] ?? '';
+        $del = '1';
+        
+        // Update the `dn_news` table
+        $stmt = $conn->prepare("UPDATE service_content 
+            SET del = ? 
+            WHERE service_content_id = ?"); // Removed the extra comma here
+        
+        $stmt->bind_param(
+            "si",
+            $del,
+            $news_id
+        );
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        
+        // Update the `dn_news_doc` table
+        $stmt = $conn->prepare("UPDATE service_content_doc 
+            SET del = ? 
+            WHERE service_content_id = ?"); // Removed the extra comma here
+        
+        $stmt->bind_param(
+            "si",
+            $del,
+            $news_id
+        );
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        
+        $response = array('status' => 'success', 'message' => 'Delete');
+        
+
+
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_service_content') {
+        $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
+        $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
+        $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
+        $searchValue = isset($_POST['search']['value']) ? $conn->real_escape_string($_POST['search']['value']) : '';
+
+        $orderIndex = isset($_POST['order'][0]['column']) ? intval($_POST['order'][0]['column']) : 0;
+        $orderDir = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'asc';
+
+        $columns = ['service_content_id'];
+
+        $whereClause = "del = 0";
+
+        if (!empty($searchValue)) {
+            $whereClause .= " AND (subject_service_content LIKE '%$searchValue%')";
+        }
+
+        $orderBy = $columns[$orderIndex] . " " . $orderDir;
+
+        $dataQuery = "SELECT service_content_id, subject_service_content, date_create FROM service_content 
+                    WHERE $whereClause
+                    ORDER BY $orderBy
+                    LIMIT $start, $length";
+
+        $dataResult = $conn->query($dataQuery);
+        $data = [];
+        while ($row = $dataResult->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $Index = 'service_content_id';
+        $totalRecords = getTotalRecords($conn, 'service_content', $Index);
+        $totalFiltered = getFilteredRecordsCount($conn, 'service_content', $whereClause, $Index);
+
+        $response = [
+            "draw" => intval($draw),
+            "recordsTotal" => intval($totalRecords),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        ];
+    }
 } catch (Exception $e) {
     $response['status'] = 'error';
     $response['message'] = $e->getMessage();

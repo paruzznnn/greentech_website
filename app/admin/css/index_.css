@@ -456,7 +456,7 @@ iframe {
 } */
 
 .language-select {
-    width: 100px;
+    width: 30px;
     padding: 5px;
     font-size: 16px;
     border: none;
@@ -897,3 +897,6 @@ td {
     background-color: #f1f1f1;
     cursor: pointer;
 }  */
+
+
+

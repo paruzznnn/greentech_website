@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Edit news</title>
 
-    <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
+    <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
@@ -132,7 +132,7 @@ $stmt = $conn->prepare("
     WHERE dn.news_id = ?
     GROUP BY dn.news_id
 ");
-
+// $news_id = $_POST['news_id'];
 $stmt->bind_param('i', $decodedId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -219,8 +219,31 @@ if ($result->num_rows > 0) {
 }
 
 
+
 $stmt->close();
 ?>
+<script>
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const container = document.getElementById('previewContainer');
+    container.innerHTML = ''; // clear preview
+
+    const files = e.target.files;
+    if (files.length > 0) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = document.createElement('img');
+                img.src = evt.target.result;
+                img.style.maxWidth = '100%';
+                img.style.marginBottom = '10px';
+                container.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+});
+</script>
+
 
                 </div>
             </div>
@@ -228,7 +251,7 @@ $stmt->close();
         </div>
     </div>
 
-
+    
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/news_.js?v=<?php echo time(); ?>'></script>

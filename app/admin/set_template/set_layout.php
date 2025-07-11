@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="icon" type="image/x-icon" href="../../../public/img/logo-ALLABLE-07.ico">
+    <title>set layout</title>
+    <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
@@ -542,7 +542,7 @@
             });
         });
     </script>
-
+    
     <script src="../js/index_.js?v=<?php echo time(); ?>"></script>
 </body>
 

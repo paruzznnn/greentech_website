@@ -1,91 +1,48 @@
 <?php
-
+require_once('../lib/connect.php');
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-
-    <?php include 'inc_head.php'?>
-    <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
-    
+    <title>เกี่ยวกับเรา | Trandar</title>
+    <?php include 'inc_head.php'; ?>
+    <link href="css/index_.css?v=<?= time(); ?>" rel="stylesheet">
 </head>
 <body>
+<?php include 'template/header.php'; ?>
+<?php include 'template/navbar_slide.php'; ?>
 
-    <?php include 'template/header.php'?>
-    <?php include 'template/navbar_slide.php'?>
-
-    <?php
-        // Array of content sections
-        $contentSections = [
-            [
-                'image' => '../public/img/a-team-smiling-while-working-5716008-1536x864.jpg',
-                'text' => 'บริษัท ออลลาเบิ้ล จำกัด (Allable Co.,Ltd.) ประกอบธุรกิจการพัฒนาซอฟท์แวร์สำหรับกิจการระดับ Enterprise 
-                ตั้งแต่ปี 2557 เราคือผู้เชี่ยวชาญในการสร้างสรรค์ Workplace Collaboration Platform 
-                และ Automated Business Workflow/Process เป็นอย่างดี ในช่วงปีที่ผ่านมาไม่นานนี้ เราได้ขยายโฟกัสจาก
-                Tailored Made Solutions เดิม ที่ขยายความสามารถของ Industrial-strength ERP Systems 
-                มาสู่ Universal Collaboration Platform: Origami System 
-                ที่ตอบสนองความต้องการอย่างเข้มข้นและหลากหลายของนานาประเภทธุรกิจได้อย่างฉับไว 
-                เป็นทัพหลังเสริมแกร่งให้องค์กรใหญ่หรือเล็กได้เป็นอย่างดี'
-            ],
-            [
-                'text' => 'นอกจากนี้ เริ่มตั้งแต่ปี 2567 บริษัท ออลลาเบิ้ล ยังเสริมบริการให้คำปรึกษาด้าน Business Transformation 
-                ด้วย Cloud Infrastructure Technology มาพร้อมกันด้วยเลย ด้วยเราชำนาญในการ implement ระบบงานขนาดใหญ่ 
-                และ การทำ SaaS (software-as-a-service) deployment ของ solution เราเองเป็นทุนเดิมอยู่แล้ว เรามีความยินดีนำเสนอ
-                Cloud Services จาก Cloud Providers ชั้นนำ ให้ลูกค้าเลือกสรรได้ตรงตามความต้องการ 
-                ทั้ง Amazon Web Services, Huawei Cloud Services, Google Cloud Platform เป็นต้น'
-            ],
-            [
-                'image' => '../public/img/2149399290-1536x1025.jpg',
-                'text' => 'โดย Solutions และ Services ทั้งหมดนี้ ถูกขับเคลื่อนภายใต้วิสัยทัศน์ในการนำเทคโนโลยีที่เหมาะสมมาปรับใช้ให้ตอบโจทย์ทางธุรกิจได้จริง
-                เกิดประโยชน์สูงสุดต่อองค์กรในหลากหลายประเภทและขนาด ให้พร้อมสู้ศึกการแข่งขันทางธุรกิจได้อย่างเต็มกำลังสามารถ'
-            ],
-        ];
-
-        // Initialize content
-        $content = '<div class="content-sticky" id="page_about">';
-        $content .= '<div class="container">';
-        $content .= '<div class="box-content">';
-
-        // Loop through each section
-        foreach ($contentSections as $section) {
-            $content .= '<div class="row">';
-            
-            // Check if there is an image to display
-            if (isset($section['image'])) {
-                $content .= '<div class="col-md-6">';
-                $content .= '<img style="width: 100%;" src="' . $section['image'] . '" alt="">';
-                $content .= '</div>';
+<div class="content-sticky" id="page_about">
+    <div class="container">
+        <div class="box-content">
+            <?php
+            $result = $conn->query("SELECT * FROM about_content ORDER BY id ASC");
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="row">';
+                if ($row['type'] === 'text') {
+                    echo '<div class="col-12">' . $row['content'] . '</div>';
+                } elseif ($row['type'] === 'image') {
+                    echo '<div class="col-md-6"><img style="width:100%;" src="' . $row['image_url'] . '"></div>';
+                    echo '<div class="col-md-6">' . $row['content'] . '</div>';
+                } elseif ($row['type'] === 'quote') {
+                    echo '
+                        <div style="text-align: center; padding: 40px 20px; font-style: italic; font-size: 25px; position: relative; width: 100%;">
+                            <div style="font-size: 40px; color: #ccc; position: absolute; left: 10px; top: 0;">“</div>
+                            <p style="margin: 0 40px;">' . $row['content'] . '</p>
+                            <div style="margin-top: 20px; font-style: normal;">
+                                <strong>' . $row['author'] . '</strong><br>' . $row['position'] . '
+                            </div>
+                            
+                        </div>';
+                }
+                echo '</div><hr>';
             }
-            
-            // Text section (always display)
-            $content .= '<div class="col-md-' . (isset($section['image']) ? '6' : '12') . '">';
-            $content .= '<p>' . $section['text'] . '</p>';
-            $content .= '</div>';
-            
-            $content .= '</div>'; // Close row
+            ?>
+        </div>
+    </div>
+</div>
 
-            // Add a horizontal rule after the first section only
-            if (isset($section['image'])) {
-                $content .= '<hr>'; // Separator after the first section
-            }
-        }
-
-        $content .= '</div>'; // Close box-content
-        $content .= '</div>'; // Close container
-        $content .= '</div>'; // Close content-sticky
-
-        // Output the content
-        echo $content;
-    ?>
-
-
-    <?php include 'template/footer.php'?>
-    
-
-    <script src="js/index_.js?v=<?php echo time();?>"></script>
-
+<?php include 'template/footer.php'; ?>
+<script src="js/index_.js?v=<?= time(); ?>"></script>
 </body>
 </html>

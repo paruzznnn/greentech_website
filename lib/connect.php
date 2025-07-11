@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_SCHEME'] == 'http') {
 
 
 $conn = new mysqli($host, $username, $password, $database);
-
+$conn->set_charset("utf8mb4");
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
