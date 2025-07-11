@@ -8,7 +8,7 @@ if (isset($_GET['id'])) {
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        $stmt = $conn->prepare("SELECT subject_Blog FROM dn_Blog WHERE del = 0 AND Blog_id = ?");
+        $stmt = $conn->prepare("SELECT subject_Blog FROM dn_blog WHERE del = 0 AND Blog_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
         $resultTitle = $stmt->get_result();
@@ -67,8 +67,8 @@ if (isset($_GET['id'])) {
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
                                         GROUP_CONCAT(dnc.api_path) AS pic_path
-                                        FROM dn_Blog dn
-                                        LEFT JOIN dn_Blog_doc dnc ON dn.Blog_id = dnc.Blog_id
+                                        FROM dn_blog dn
+                                        LEFT JOIN dn_blog_doc dnc ON dn.Blog_id = dnc.Blog_id
                                         WHERE dn.Blog_id = ?
                                         GROUP BY dn.Blog_id");
 
