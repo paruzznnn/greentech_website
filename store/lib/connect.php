@@ -3,8 +3,8 @@
 if($_SERVER['REQUEST_SCHEME'] == 'https'){
 
     $host = "localhost";
-    $username = "storedb";
-    $password = "allable1988";
+    $username = "tdi2025admin";
+    $password = "iydcmiofkiN1234";
     $database = "store_db";
 
 }else if($_SERVER['REQUEST_SCHEME'] == 'http'){
