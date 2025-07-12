@@ -30,7 +30,7 @@ ob_start(function ($buffer) {
     // ลบ http://localhost/trandar/
     $buffer = str_replace('http://localhost/trandar/', '', $buffer);
     // ลบ /trandar เฉยๆ ด้วย
-    $buffer = str_replace('/trandar', '', $buffer);
+    // $buffer = str_replace('/trandar', '', $buffer);
     return $buffer;
 });
 

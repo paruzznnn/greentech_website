@@ -4,7 +4,7 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-$totalQuery = "SELECT COUNT(*) as total FROM dn_Blog dn";
+$totalQuery = "SELECT COUNT(*) as total FROM dn_blog dn";
 if ($searchQuery) {
     $totalQuery .= " WHERE dn.subject_Blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
 }
@@ -23,9 +23,9 @@ $sql = "SELECT
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
         FROM 
-            dn_Blog dn
+            dn_blog dn
         LEFT JOIN 
-            dn_Blog_doc dnc ON dn.Blog_id = dnc.Blog_id
+            dn_blog_doc dnc ON dn.Blog_id = dnc.Blog_id
         WHERE 
             dn.del = '0' AND
             dnc.del = '0' AND

@@ -30,7 +30,7 @@
             <div class="col-md-12 section">
                 <div class="box-content">
                     <h4 class="line-ref">บทความ</h4>
-                    <?php include 'template/blog/blog_home.php'; ?>
+                    <?php include 'template/Blog/Blog_home.php'; ?>
                 </div>
             </div>
 

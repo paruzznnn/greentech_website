@@ -37,8 +37,6 @@ $(document).ready(function() {
         return "Unknown Device";
     }
 
-    console.log(getDeviceType());
-
     setInLoading('#loading-overlay', 1000);
     setOutLoading('#loading-overlay', 1000);
 

@@ -132,7 +132,7 @@ try {
 
         if (isset($news_array)) {
 
-            $stmt = $conn->prepare("INSERT INTO dn_Blog 
+            $stmt = $conn->prepare("INSERT INTO dn_blog 
                 (subject_Blog, description_Blog, content_Blog, date_create) 
                 VALUES (?, ?, ?, ?)");
 
@@ -167,7 +167,7 @@ try {
 
                         $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-                        insertIntoDatabase($conn, 'dn_Blog_doc', $fileColumns, $fileValues);
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
@@ -184,7 +184,7 @@ try {
 
                         $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-                        insertIntoDatabase($conn, 'dn_Blog_doc', $fileColumns, $fileValues);
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
@@ -205,7 +205,7 @@ try {
 
         if (!empty($news_array['Blog_id'])) {
 
-            $stmt = $conn->prepare("UPDATE dn_Blog 
+            $stmt = $conn->prepare("UPDATE dn_blog 
             SET subject_Blog = ?, 
             description_Blog = ?, 
             content_Blog = ?, 
@@ -248,7 +248,7 @@ try {
                         $fileWhereClause = 'Blog_id = ?';
                         $fileWhereValues = [$news_id];
 
-                        updateInDatabase($conn, 'dn_Blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                        updateInDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
@@ -269,7 +269,7 @@ try {
                         $fileWhereClause = 'Blog_id = ?';
                         $fileWhereValues = [$news_id];
 
-                        updateInDatabase($conn, 'dn_Blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                        updateInDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
@@ -284,7 +284,7 @@ try {
         $del = '1';
         
         // Update the `dn_news` table
-        $stmt = $conn->prepare("UPDATE dn_Blog 
+        $stmt = $conn->prepare("UPDATE dn_blog 
             SET del = ? 
             WHERE Blog_id = ?"); // Removed the extra comma here
         
@@ -299,7 +299,7 @@ try {
         }
         
         // Update the `dn_news_doc` table
-        $stmt = $conn->prepare("UPDATE dn_Blog_doc 
+        $stmt = $conn->prepare("UPDATE dn_blog_doc 
             SET del = ? 
             WHERE Blog_id = ?"); // Removed the extra comma here
         
@@ -336,7 +336,7 @@ try {
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
-        $dataQuery = "SELECT Blog_id, subject_Blog, date_create FROM dn_Blog 
+        $dataQuery = "SELECT Blog_id, subject_Blog, date_create FROM dn_blog 
                     WHERE $whereClause
                     ORDER BY $orderBy
                     LIMIT $start, $length";
@@ -348,8 +348,8 @@ try {
         }
 
         $Index = 'Blog_id';
-        $totalRecords = getTotalRecords($conn, 'dn_Blog', $Index);
-        $totalFiltered = getFilteredRecordsCount($conn, 'dn_Blog', $whereClause, $Index);
+        $totalRecords = getTotalRecords($conn, 'dn_blog', $Index);
+        $totalFiltered = getFilteredRecordsCount($conn, 'dn_blog', $whereClause, $Index);
 
         $response = [
             "draw" => intval($draw),

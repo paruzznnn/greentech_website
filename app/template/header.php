@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
         <div class="header-top-left" style="display: flex; align-items: center;">
     <a href="https://www.trandar.com">
-        <img class="logo" src="../public/img/trandargood.jpg" alt="">
+        <img class="logo" src="../public/img/trandar_logo_no_bg_100x55.png" alt="">
     </a>
      <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
 </div>
