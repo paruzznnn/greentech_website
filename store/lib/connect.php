@@ -1,30 +1,21 @@
 <?php
-if($_SERVER['SERVER_NAME'] == ''){
 
-    $dbHostPD = "localhost:3306";
-    $dbUserPD = "";
-    $dbPassPD = "6Of6h#1w1";
-    $dbNamePD = "";
+if($_SERVER['REQUEST_SCHEME'] == 'https'){
 
-    $host = $dbHostPD; 
-    $username = $dbUserPD; 
-    $password = $dbPassPD; 
-    $database = $dbNamePD;
+    $host = "localhost";
+    $username = "storedb";
+    $password = "allable1988";
+    $database = "store_db";
 
-}else{
+}else if($_SERVER['REQUEST_SCHEME'] == 'http'){
 
-    $dbHost = "localhost";
-    $dbUser = "root";
-    $dbPass = "";
-    $dbName = "store_db";
-
-    // Database configuration
-    $host = $dbHost; 
-    $username = $dbUser; 
-    $password = ''; 
-    $database = $dbName;
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "store_db";
 
 }
+
 
 
 $conn = new mysqli($host, $username, $password, $database);
