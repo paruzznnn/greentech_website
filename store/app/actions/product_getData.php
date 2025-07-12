@@ -10,13 +10,14 @@ try {
     if (isset($_POST['action']) && $_POST['action'] == 'getCategory') {
 
         $stmt = $conn->prepare("SELECT
-        material_id as id,
-        pic_icon,
-        code,
-        category_name,
-        description
-        FROM ecm_product WHERE sync_status = '1'
-        GROUP BY material_id
+    material_id AS id,
+    MAX(pic_icon) AS pic_icon,
+    MAX(code) AS code,
+    MAX(category_name) AS category_name,
+    MAX(description) AS description
+FROM ecm_product
+WHERE sync_status = '1'
+GROUP BY material_id
         -- LIMIT 0, 6
         ");
         
@@ -65,7 +66,7 @@ try {
         sync_status,
         uom
         FROM ecm_product WHERE sync_status = '1'
-        GROUP BY material_id
+        -- GROUP BY material_id
         ORDER BY stock ASC
         -- LIMIT 0, 6
         ");
@@ -113,7 +114,7 @@ try {
             $where = " AND material_id = '$pro_id'"; 
         }
 
-        $stmt = $conn->prepare("SELECT
+$stmt = $conn->prepare("SELECT
         material_id as id,
         code,
         pic_icon,
@@ -234,7 +235,7 @@ try {
             ]
         ];
 
-            if ($billboard) {
+if ($billboard) {
                 $response['status'] = 'success';
                 $response['data'] = $billboard; 
             } else {
@@ -254,7 +255,7 @@ try {
     $response['message'] = $e->getMessage();
 }
 
-if (isset($stmt)) {
+if (is_object($stmt)) {
     $stmt->close();
 }
 if (isset($totalResult)) {
