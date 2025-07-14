@@ -2,7 +2,7 @@
 /****nationLanguages**** */
 
 function nationLanguages() {
-    $.getJSON('../api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
+    $.getJSON('/api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
@@ -40,7 +40,7 @@ function updateSelectedLanguageFlag() {
 }
 
 function changeLanguage(lang) {
-    fetch('../api/languages/' + lang + '.json')
+    fetch('/api/languages/' + lang + '.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

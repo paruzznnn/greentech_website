@@ -157,7 +157,7 @@ if (!isset($base_path_admin)) {
 <script>
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-open');
-  console.log(this)
+  // console.log(this)
 }
 
 // Toggle dropdown แบบทั่วไป
