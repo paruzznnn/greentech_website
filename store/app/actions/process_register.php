@@ -8,63 +8,55 @@ $response = array('status' => '', 'message' => '');
 
 try {
     if ($_POST['action'] == 'save_signup') {
-        // Retrieve and parse register_data and consent_data
+        // Parse input
         $register_data = [];
         $consent_data = [];
-        
+
         parse_str($_POST['register_data'], $register_data);
         parse_str($_POST['consent_data'], $consent_data);
 
-        // Sanitize input for security
-        $register_data = array_map('htmlspecialchars', $register_data);
-        $consent_data = array_map('htmlspecialchars', $consent_data);
-
-        // Check if username already exists
-        $stmt = $conn->prepare("SELECT COUNT(user_id) as total FROM ecm_users WHERE username = ?");
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed: " . $conn->error);
+        // Escape input manually
+        foreach ($register_data as $key => $value) {
+            $register_data[$key] = mysqli_real_escape_string($conn, trim($value));
         }
 
-        $stmt->bind_param("s", $register_data['username']);
-        
-        if (!$stmt->execute()) {
-            throw new Exception("Count query failed: " . $stmt->error);
+        foreach ($consent_data as $key => $value) {
+            $consent_data[$key] = mysqli_real_escape_string($conn, trim($value));
         }
 
-        $row = $stmt->get_result()->fetch_assoc();
+        $username = $register_data['username'];
+
+        // Check if username exists
+        $sql_check = "SELECT COUNT(user_id) AS total FROM ecm_users WHERE username = '$username'";
+        $result = mysqli_query($conn, $sql_check);
+        if (!$result) {
+            throw new Exception("Query failed: " . mysqli_error($conn));
+        }
+
+        $row = mysqli_fetch_assoc($result);
 
         if (intval($row['total']) <= 0) {
-            // Insert new user data
-            $stmt = $conn->prepare(
-                "INSERT INTO ecm_users (email, username, password, phone, role_id, create_date, is_consent, is_verify) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            );
-            if (!$stmt) {
-                throw new Exception("Prepare statement failed: " . $conn->error);
-            }
+            // Insert new user
+            $email = $register_data['email'];
+            $username = $register_data['username'];
+            $password = password_hash($register_data['password'], PASSWORD_BCRYPT);
+            $phone = $register_data['phone'];
+            $role = mysqli_real_escape_string($conn, $_POST['role']);
+            $create_date = date('Y-m-d H:i:s');
+            $is_consent = isset($consent_data['consent']) ? (int)$consent_data['consent'] : 0;
+            $is_verify = isset($consent_data['verify']) ? (int)$consent_data['verify'] : 0;
 
-            $hashed_password = password_hash($register_data['password'], PASSWORD_BCRYPT);
-            $current_date = date('Y-m-d H:i:s');
+            $sql_insert = "
+                INSERT INTO ecm_users (email, username, password, phone, role_id, create_date, is_consent, is_verify)
+                VALUES ('$email', '$username', '$password', '$phone', '$role', '$create_date', $is_consent, $is_verify)
+            ";
 
-            $stmt->bind_param(
-                "ssssssii", 
-                $register_data['email'], 
-                $register_data['username'], 
-                $hashed_password, 
-                $register_data['phone'], 
-                $_POST['role'],
-                $current_date,
-                $consent_data['consent'], 
-                $consent_data['verify']
-            );
-
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
+            if (!mysqli_query($conn, $sql_insert)) {
+                throw new Exception("Insert failed: " . mysqli_error($conn));
             }
 
             $response['status'] = 'succeed';
             $response['message'] = 'Signup completed successfully';
-
         } else {
             $response['status'] = 'error';
             $response['message'] = 'Username already exists';
@@ -75,10 +67,6 @@ try {
     $response['message'] = $e->getMessage();
 }
 
-if (isset($stmt)) {
-    $stmt->close();
-}
-$conn->close();
-
+// $conn->close();
 echo json_encode($response);
 ?>

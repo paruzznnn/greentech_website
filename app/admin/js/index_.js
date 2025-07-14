@@ -2,7 +2,7 @@
 /****nationLanguages**** */
 
 function nationLanguages() {
-    $.getJSON(window.base_path + 'api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
+    $.getJSON('/api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
@@ -40,7 +40,7 @@ function updateSelectedLanguageFlag() {
 }
 
 function changeLanguage(lang) {
-    fetch(window.base_path + 'api/languages/' + lang + '.json')
+    fetch('/api/languages/' + lang + '.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -82,7 +82,7 @@ const buildTabSidebar = () => {
     let sidebarItems = [];
 
     $.ajax({
-        url: window.base_path_admin + 'actions/check_sidebar.php',
+        url:  '../admin/actions/check_sidebar.php',
         type: 'POST',
         dataType: 'json',
         success: function (response) {
@@ -123,7 +123,7 @@ const buildTabSidebar = () => {
 
             
             sidebarContent += `
-            <a href="${window.base_path_admin}logout.php" class="sidebar-link" data-href="">
+            <a href="../logout.php" class="sidebar-link" data-href="">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>log out</span>
             </a>`;
