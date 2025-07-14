@@ -233,38 +233,23 @@ try {
             }
 
             $project_id = $project_array['project_id'];
-            // if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
 
-            //     $fileInfos = handleFileUpload($_FILES['fileInput']);
-            //     foreach ($fileInfos as $fileInfo) {
-            //         if ($fileInfo['success']) {
+    // 🧹 1. ลบข้อมูลรูป Cover เดิมก่อน (status = 1)
+    $stmtDel = $conn->prepare("DELETE FROM dn_project_doc WHERE project_id = ? AND status = 1");
+    $stmtDel->bind_param("i", $project_id);
+    $stmtDel->execute();
+    $stmtDel->close();
 
-            //             $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-
-            //             $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-            //             $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-
-            //             // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
-            //             $fileWhereClause = 'project_id = ?';
-            //             $fileWhereValues = [$project_id];
-
-            //             updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-            //         } else {
-            //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-            //         }
-            //     }
-            // }
-
-            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
-
-    $fileInfos = handleFileUpload($_FILES['image_files']);
+    // 📤 2. อัปโหลดใหม่
+    $fileInfos = handleFileUpload($_FILES['fileInput']);
     foreach ($fileInfos as $fileInfo) {
         if ($fileInfo['success']) {
 
             $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
 
-            $fileColumns = ['project_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
-            $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+            $fileColumns = ['project_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+            $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
 
             insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
         } else {
@@ -272,6 +257,25 @@ try {
         }
     }
 }
+
+
+//             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
+
+//     $fileInfos = handleFileUpload($_FILES['image_files']);
+//     foreach ($fileInfos as $fileInfo) {
+//         if ($fileInfo['success']) {
+
+//             $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+
+//             $fileColumns = ['project_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+//             $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+
+//             insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
+//         } else {
+//             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+//         }
+//     }
+// }
             $response = array('status' => 'success', 'message' => 'edit save');
         }
     } elseif (isset($_POST['action']) && $_POST['action'] == 'delproject') {
