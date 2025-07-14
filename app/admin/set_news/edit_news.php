@@ -1,4 +1,9 @@
-<?php include '../check_permission.php'?>
+<?php 
+include '../check_permission.php';
+// print_r($_POST);
+// print_r($_GET);
+// exit;
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>

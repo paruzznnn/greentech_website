@@ -38,7 +38,57 @@ body {
 .header-top a:hover {
     color: #ff9800;
 }
+/* ปรับปุ่ม Sign in / Sign up ให้มีขนาดพอดี */
+.header-top-right a#myBtn-sign-in,
+.header-top-right a[href*="register"] {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 13px;
+    background: #ffffffff;
+    color: black;
+    border-radius: 4px;
+    margin-left: 6px;
+    white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
+}
 
+/* ปรับปุ่ม Trandar Store */
+.header-top-right .header-link a[href*="shop"] {
+    padding: 6px 10px;
+    font-size: 13px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* ปรับ container ให้ไม่ล้น */
+.header-top-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Responsive เฉพาะหน้าจอเล็ก */
+@media (max-width: 768px) {
+    .header-top-right a#myBtn-sign-in,
+    .header-top-right a[href*="register"],
+    .header-top-right .header-link a[href*="shop"],
+    .header-top-right .header-link a {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .header-top-right {
+        justify-content: flex-start;
+        gap: 4px;
+    }
+
+    .language-select {
+        font-size: 13px;
+        padding: 3px 6px;
+        max-width: 100px;
+    }
+}
 .header-top img.logo {
     width: auto;
     height: auto;
