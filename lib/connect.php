@@ -1,12 +1,19 @@
 <?php
+
 @session_start();
 require __DIR__ . '/../vendor/autoload.php';
 use Dotenv\Dotenv;
 
+// โหลด .env
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-if ($_SERVER['REQUEST_SCHEME'] == 'http') {
+// ตรวจ protocol แบบปลอดภัย
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
+$protocol = $isHttps ? 'https' : 'http';
+
+// เชื่อมต่อ DB ตาม protocol
+if ($protocol === 'http') {
     $host = $_ENV['DB_HOST_HTTP'];
     $username = $_ENV['DB_USER_HTTP'];
     $password = $_ENV['DB_PASSWORD_HTTP'];
@@ -18,7 +25,6 @@ if ($_SERVER['REQUEST_SCHEME'] == 'http') {
     $database = $_ENV['DB_NAME_HTTPS'];
 }
 
-
 $conn = new mysqli($host, $username, $password, $database);
 $conn->set_charset("utf8mb4");
 
@@ -26,13 +32,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// ลบ path /trandar และลิงก์ localhost ทิ้ง
 ob_start(function ($buffer) {
-    // ลบ http://localhost/trandar/
     $buffer = str_replace('http://localhost/trandar/', '', $buffer);
-    // ลบ /trandar เฉยๆ ด้วย
-    // $buffer = str_replace('/trandar', '', $buffer);
+    $buffer = str_replace('/trandar', '', $buffer);
     return $buffer;
 });
-
 
 ?>
