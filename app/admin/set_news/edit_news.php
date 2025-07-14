@@ -1,4 +1,8 @@
 <?php 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
@@ -97,23 +101,28 @@ $decodedId = $_POST['news_id'];
                     <h4 class="line-ref mb-3">
                         <i class="far fa-newspaper"></i> Edit News
                     </h4>
-
-<?php
+                    <?php
 $stmt = $conn->prepare("
     SELECT 
-        dn.news_id, 
-        dn.subject_news, 
-        dn.description_news,
-        dn.content_news, 
-        dn.date_create, 
-        GROUP_CONCAT(dnc.file_name) AS file_name,
-        GROUP_CONCAT(dnc.api_path) AS pic_path,
-        dnc.status
-    FROM dn_news dn
-    LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
-    WHERE dn.news_id = ?
-    GROUP BY dn.news_id
+    dn.news_id, 
+    dn.subject_news, 
+    dn.description_news,
+    dn.content_news, 
+    dn.date_create, 
+    GROUP_CONCAT(dnc.file_name) AS file_name,
+    GROUP_CONCAT(dnc.api_path) AS pic_path,
+    MAX(dnc.status) AS status
+FROM dn_news dn
+LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
+WHERE dn.news_id = ?
+GROUP BY dn.news_id
+
 ");
+
+if ($stmt === false) {
+    die('❌ SQL Prepare failed: ' . $conn->error);
+}
+
 $stmt->bind_param('i', $decodedId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -184,7 +193,6 @@ $stmt->close();
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const container = document.getElementById('previewContainer');
     container.innerHTML = ''; // clear preview
-
     const files = e.target.files;
     if (files.length > 0) {
         Array.from(files).forEach(file => {
