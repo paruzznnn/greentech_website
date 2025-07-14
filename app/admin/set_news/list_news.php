@@ -106,7 +106,7 @@
                                         <i class="far fa-newspaper"></i>   
                                         List news
                                     </h4>
-                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_news/setup_news.php'?>">
+                                    <a type="button" class="btn btn-primary" href="/app/admin/set_news/setup_news.php">
                                         <i class="fa-solid fa-plus"></i>
                                         write news
                                     </a>
