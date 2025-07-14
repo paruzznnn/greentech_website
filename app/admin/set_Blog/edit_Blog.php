@@ -146,7 +146,7 @@ if ($result->num_rows > 0) {
         $content = mb_convert_encoding($content, 'UTF-8', 'auto');
 
         echo "
-        <form id='formblog_edit' enctype='multipart/form-data'>
+        <form id='formBlog_edit' enctype='multipart/form-data'>
             <input type='hidden' class='form-control' id='blog_id' name='blog_id' value='" . htmlspecialchars($row['blog_id']) . "'>
             <div class='row'>
                 <div class='col-md-4'>
@@ -168,7 +168,7 @@ if ($result->num_rows > 0) {
                         <textarea class='form-control' id='blog_description' name='blog_description'>" . htmlspecialchars($row['description_blog']) . "</textarea>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditblog' class='btn btn-success'>
+                        <button type='button' id='submitEditBlog' class='btn btn-success'>
                             <i class='fas fa-save'></i> Save blog
                         </button>
                     </div>
@@ -216,6 +216,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     </div>
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/blog_.js?v=<?php echo time(); ?>'></script>
+    <script src='js/Blog_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
