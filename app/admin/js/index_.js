@@ -83,7 +83,10 @@ const buildTabSidebar = () => {
     let currentPath = window.location.pathname;
 
     // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
-    let sidebarPath = currentPath.includes('dashboard.php')
+    let sidebarPath = (
+    currentPath.includes('dashboard.php') || 
+    currentPath.includes('profile.php')
+) 
         ? '/app/admin/actions/check_sidebar.php'
         : '../actions/check_sidebar.php';
 
