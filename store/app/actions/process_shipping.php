@@ -117,12 +117,12 @@ function addItemOrder($merged_data, $type_id, $pay_channel, $conn) {
     // Step 7: สร้าง QR code สำหรับการชำระเงิน
     $PromptPayQR = new PromptPayQR();
     $PromptPayQR->size = 8;
-    $PromptPayQR->id = '0988971593';
+    $PromptPayQR->id = '';
     $PromptPayQR->amount = $amountNumeric;
 
     $payment = ($pay_channel == 2) 
         ? '<img class="qr-img" src="' . $PromptPayQR->generate('../../api/PromptPay/TMP_FILE_QRCODE_PROMPTPAY.png') . '"/>'
-        : '<img class="qr-img" src="' . $basePath . '/tdi_store/public/img/bankPay.png"/>';
+        : '<img class="qr-img" src="../public/img/bankPay.png"/>';
 
     // Step 8: ส่งข้อมูลคำสั่งซื้อ
     echo json_encode([
