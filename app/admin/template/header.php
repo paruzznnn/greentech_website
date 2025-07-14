@@ -70,8 +70,8 @@ if (!isset($base_path_admin)) {
       <div class="profile-container dropdown-parent" onclick="toggleDropdown('globalProfileDropdown', event)">
         <img src="/public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
         <div id="globalProfileDropdown" class="dropdown-box hidden">
-          <a href="/admin/profile.php">Profile</a>
-          <a href="/admin/logout.php">Logout</a>
+          <a href="/app/admin/profile.php">Profile</a>
+          <a href="/app/admin/logout.php">Logout</a>
         </div>
       </div>
     </div>
