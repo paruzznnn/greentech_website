@@ -4,6 +4,11 @@ header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
 require_once '../../lib/connect.php';
 
+echo '<pre>';
+print_r($_POST);
+echo '</pre>';
+exit;
+
 $response = array('status' => '', 'message' => '');
 
 try {
