@@ -7,8 +7,10 @@ require_once(__DIR__ . '/../../../lib/connect.php');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
 require_once(__DIR__ . '/../../../lib/permissions.php');
 
-$isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-$isFile = ($isProtocol === 'http') ? '.php' : '';
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+    || $_SERVER['SERVER_PORT'] == 443;
+
+$isProtocol = $isHttps ? 'https' : 'http';
 
 global $base_path;
 global $base_path_admin;
