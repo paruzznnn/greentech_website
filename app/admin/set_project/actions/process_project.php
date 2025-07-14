@@ -248,7 +248,7 @@ try {
             //             $fileWhereClause = 'project_id = ?';
             //             $fileWhereValues = [$project_id];
 
-            //             updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                        updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
             //         } else {
             //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
             //         }
