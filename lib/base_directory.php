@@ -1,42 +1,31 @@
 <?php
-$protocol = $_SERVER['REQUEST_SCHEME'];
-$host = $_SERVER['HTTP_HOST'];
-$scriptDir = dirname($_SERVER['SCRIPT_NAME']);
-$basePath = sprintf('%s://%s%s', $protocol, $host, $scriptDir);
+// ตรวจ protocol แบบปลอดภัย
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+$scriptDir = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : '/';
+
+// สร้าง base path
+$basePath = sprintf('%s://%s%s', $scheme, $host, $scriptDir);
 $urlParts = parse_url($basePath);
 
-
 $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
-$port = isset($urlParts['port']) ? ':'.$urlParts['port'] : '';
-// $newPath = dirname($path, 1);
+$port = isset($urlParts['port']) ? ':' . $urlParts['port'] : '';
 
-// Array
-// (
-//     [scheme] => http
-//     [host] => localhost
-//     [port] => 3000
-//     [path] => /tdi_store/app
-// )
-
-if($urlParts['scheme'] == 'http'){
-    // $fixedPath = '/allable/app/admin/';
-    // $newPath = '/allable/';
+// ตั้งค่าตาม scheme
+if ($scheme === 'http') {
     $fixedPath = '/trandar/app/admin/';
     $newPath = '/trandar/';
-}else{
+} else {
     $fixedPath = '/app/admin/';
     $newPath = '/';
 }
 
+// กำหนด path สำหรับใช้งาน
+$base_Path = $scheme . '://' . $host . $port . $newPath;
+$base_PathAdmin = $scheme . '://' . $host . $port . $fixedPath;
 
-
-
-$base_Path = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $newPath;
-$base_PathAdmin = $urlParts['scheme'] . '://' . $urlParts['host'] . $port . $fixedPath;
-
-
-$GLOBALS["base_path"] = $base_Path;
-$GLOBALS["base_path_admin"] = $base_PathAdmin;
-
+// ตั้งค่าให้เป็น global
+$GLOBALS['base_path'] = $base_Path;
+$GLOBALS['base_path_admin'] = $base_PathAdmin;
+$GLOBALS['isFile'] = '.php';
 ?>
-
