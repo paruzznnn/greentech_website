@@ -492,7 +492,7 @@ $username = $_SESSION['fullname'] ?? 'Admin'; // หรือใส่ชื่�
     <!-- BLOG -->
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
     <div class="dashboard-card work" style="background-color:#ab47bc;">
-        <a href="set_blog/list_blog.php" style="text-decoration: none; color: inherit; display: contents;">
+        <a href="set_Blog/list_Blog.php" style="text-decoration: none; color: inherit; display: contents;">
             <div class="card-inner">
                 <div class="emoji">📝</div>
                 <div class="text-area">
