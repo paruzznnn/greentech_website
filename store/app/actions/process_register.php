@@ -67,6 +67,6 @@ try {
     $response['message'] = $e->getMessage();
 }
 
-$conn->close();
+// $conn->close();
 echo json_encode($response);
 ?>
