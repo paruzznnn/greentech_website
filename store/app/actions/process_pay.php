@@ -6,131 +6,14 @@ require_once '../../lib/connect.php';
 require_once '../../lib/base_directory.php';
 
 global $base_path;
-$response = array('status' => 'success', 'message' => '', 'steps' => array());
-
-function handleFileUpload($files) {
-    $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
-    $maxFileSize = 5 * 1024 * 1024;
-
-    $uploadResults = array();
-
-    foreach ($files['name'] as $key => $fileName) {
-        if ($files['error'][$key] === UPLOAD_ERR_OK) {
-            $fileTmpPath = $files['tmp_name'][$key];
-            $fileSize = $files['size'][$key];
-            $fileType = $files['type'][$key];
-            $fileNameCmps = explode(".", $fileName);
-            $fileExtension = strtolower(end($fileNameCmps));
-            
-            if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                $uploadFileDir = './uploaded_files/';
-                $destFilePath = $uploadFileDir . $fileName;
-
-                if (!is_dir($uploadFileDir)) {
-                    mkdir($uploadFileDir, 0755, true);
-                }
-
-                if (move_uploaded_file($fileTmpPath, $destFilePath)) {
-                    $uploadResults[] = array(
-                        'success' => true,
-                        'fileName' => $fileName,
-                        'fileSize' => $fileSize,
-                        'fileType' => $fileType,
-                        'filePath' => $destFilePath
-                    );
-                } else {
-                    $uploadResults[] = array(
-                        'success' => false,
-                        'fileName' => $fileName,
-                        'error' => 'Error occurred while moving the uploaded file.'
-                    );
-                }
-            } else {
-                $uploadResults[] = array(
-                    'success' => false,
-                    'fileName' => $fileName,
-                    'error' => 'Invalid file type or file size exceeds limit.'
-                );
-            }
-        } else {
-            $uploadResults[] = array(
-                'success' => false,
-                'fileName' => $fileName,
-                'error' => 'No file uploaded or there was an upload error.'
-            );
-        }
-    }
-
-    return $uploadResults;
-}
-
-function insertIntoDatabase($conn, $table, $columns, $values) {
-    $placeholders = implode(', ', array_fill(0, count($values), '?'));
-    $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
-    }
-
-    $types = '';
-    foreach ($values as $val) {
-        $types .= (is_int($val) ? 'i' : (is_float($val) ? 'd' : 's'));
-    }
-
-    $bindNames[] = $types;
-    for ($i = 0; $i < count($values); $i++) {
-        $bindName = 'bind' . $i;
-        $$bindName = $values[$i];
-        $bindNames[] = &$$bindName;
-    }
-
-    call_user_func_array(array($stmt, 'bind_param'), $bindNames);
-
-    if (!$stmt->execute()) {
-        throw new Exception("Execute failed: " . $stmt->error);
-    }
-
-    $stmt->close();
-}
-
-function updateInDatabase($conn, $table, $columns, $values, $whereClause, $whereValues) {
-    $setPart = implode(', ', array_map(function($col) {
-        return "$col = ?";
-    }, $columns));
-
-    $query = "UPDATE $table SET $setPart WHERE $whereClause";
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
-    }
-
-    $allValues = array_merge($values, $whereValues);
-    $types = str_repeat('s', count($allValues));
-
-    $bindNames[] = $types;
-    for ($i = 0; $i < count($allValues); $i++) {
-        $bindName = 'bind' . $i;
-        $$bindName = $allValues[$i];
-        $bindNames[] = &$$bindName;
-    }
-
-    call_user_func_array(array($stmt, 'bind_param'), $bindNames);
-
-    if (!$stmt->execute()) {
-        throw new Exception("Execute failed: " . $stmt->error);
-    }
-
-    $stmt->close();
-}
+$response = array('status' => 'error', 'message' => '');
 
 try {
+
     $member_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-    if (!$member_id) throw new Exception("User not authenticated.");
+    if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
 
-    if (isset($_POST['action']) && $_POST['action'] === 'save_evidence') {
-        $response['steps'][] = 'Processing cart and order contents';
         $orderContents = isset($_SESSION['orderArray']) ? $_SESSION['orderArray'] : array();
-
         $orderID = date('YmdHis');
         $orderArray = array();
 
@@ -148,111 +31,232 @@ try {
             );
         }
 
-        $conn->begin_transaction();
-        $response['steps'][] = 'Transaction started';
-
         foreach ($orderArray as $order) {
             $tms_id = isset($order['transport_data']['tms_id']) ? $order['transport_data']['tms_id'] : null;
             $tms_price = isset($order['transport_data']['tms_price']) ? $order['transport_data']['tms_price'] : null;
 
             foreach ($order['product_data'] as $product) {
-                $orderValues = array(
-                    $member_id, $order['order_id'], $order['order_code'],
-                    $product['pro_id'], $product['pic'], $product['price'],
-                    $product['quantity'], $product['total_price'], $product['key_item'],
-                    $product['currency'], $order['type'], $tms_id,
-                    isset($_POST['qrCodeInput']) ? $_POST['qrCodeInput'] : null
-                );
 
-                insertIntoDatabase($conn, 'ecm_orders',
-                    array('member_id', 'order_id', 'order_code', 'pro_id', 'pic', 'price', 'quantity', 'total_price', 'order_key', 'currency', 'pay_type', 'vehicle_id', 'qr_pp'),
-                    $orderValues
-                );
+                $member_id      = mysqli_real_escape_string($conn, $member_id);
+                $order_id       = mysqli_real_escape_string($conn, $order['order_id']);
+                $order_code     = mysqli_real_escape_string($conn, $order['order_code']);
+                $order_key      = mysqli_real_escape_string($conn, $product['key_item']);
+                $pro_id         = mysqli_real_escape_string($conn, $product['pro_id']);
+                $pic            = mysqli_real_escape_string($conn, $product['pic']);
+                $price          = floatval($product['price']);
+                $quantity       = intval($product['quantity']);
+                $total_price    = floatval($product['total_price']);
+                $currency       = mysqli_real_escape_string($conn, $product['currency']);
+                $pay_type       = mysqli_real_escape_string($conn, $order['type']);
+                $vehicle_id     = mysqli_real_escape_string($conn, isset($tms_id) ? $tms_id : '');
+                $is_del         = 0;
+                $is_status      = 0;
+                // $created_at     = date("Y-m-d H:i:s");
+                $qr_pp          = mysqli_real_escape_string($conn, isset($_POST['qrCodeInput']) ? $_POST['qrCodeInput'] : '');
+
+                $ins_order_sql = "
+                    INSERT INTO `ecm_orders` (
+                        `member_id`, `order_id`, `order_code`, `order_key`, `pro_id`, `pic`, 
+                        `price`, `quantity`, `total_price`, `currency`, `pay_type`, `vehicle_id`, 
+                        `is_del`, `is_status`, `qr_pp`
+                    ) VALUES (
+                        '$member_id', '$order_id', '$order_code', '$order_key', '$pro_id', '$pic',
+                        $price, $quantity, $total_price, '$currency', '$pay_type', '$vehicle_id',
+                        $is_del, $is_status, '$qr_pp'
+                    )";
+
+                mysqli_query($conn, $ins_order_sql);
             }
 
             foreach ($order['product_data'] as $item) {
-                $sqlUpdate = "UPDATE ecm_product SET stock = stock - ? WHERE material_id = ?";
-                $stmt = $conn->prepare($sqlUpdate);
-                $stmt->bind_param("is", $item['quantity'], $item['pro_id']);
-                $stmt->execute();
-                $stmt->close();
+                $quantity_item = intval($item['quantity']); 
+                $pro_id_item = mysqli_real_escape_string($conn, $item['pro_id']);
+                $up_product_sql = "UPDATE ecm_product SET stock = stock - $quantity_item WHERE material_id = '$pro_id_item'";
+                mysqli_query($conn, $up_product_sql);
             }
 
             if (!empty($order['customer_data'])) {
                 $c = $order['customer_data'];
-                insertIntoDatabase($conn, 'ord_shipping',
-                    array('member_id', 'order_id', 'prefix_id', 'first_name', 'last_name', 'county', 'province', 'district', 'subdistrict', 'post_code', 'phone_number', 'address', 'comp_name', 'tax_number', 'latitude', 'longitude', 'pay_type', 'vehicle_id', 'vehicle_price'),
-                    array($member_id, $order['order_id'], isset($c['prefix']) ? $c['prefix'] : '', $c['firstname'], $c['lastname'], $c['country'], isset($c['province']) ? $c['province'] : '', isset($c['district']) ? $c['district'] : '', isset($c['subdistrict']) ? $c['subdistrict'] : '', isset($c['post_code']) ? $c['post_code'] : '', $c['phone_number'], $c['address'], $c['comp_name'], $c['tax_number'], $c['inputLatitude'], $c['inputLongitude'], $order['type'], $tms_id, $tms_price)
-                );
+
+                $member_id     = mysqli_real_escape_string($conn, $member_id);
+                $order_id      = mysqli_real_escape_string($conn, isset($order['order_id']) ? $order['order_id'] : '');
+                $prefix_id     = mysqli_real_escape_string($conn, isset($c['prefix']) ? $c['prefix'] : '');
+                $first_name    = mysqli_real_escape_string($conn, isset($c['firstname']) ? $c['firstname'] : '');
+                $last_name     = mysqli_real_escape_string($conn, isset($c['lastname']) ? $c['lastname'] : '');
+                $county        = mysqli_real_escape_string($conn, isset($c['country']) ? $c['country'] : '');
+                $province      = mysqli_real_escape_string($conn, isset($c['province']) ? $c['province'] : '');
+                $district      = mysqli_real_escape_string($conn, isset($c['district']) ? $c['district'] : '');
+                $subdistrict   = mysqli_real_escape_string($conn, isset($c['subdistrict']) ? $c['subdistrict'] : '');
+                $post_code     = mysqli_real_escape_string($conn, isset($c['post_code']) ? $c['post_code'] : '');
+                $phone_number  = mysqli_real_escape_string($conn, isset($c['phone_number']) ? $c['phone_number'] : '');
+                $address       = mysqli_real_escape_string($conn, isset($c['address']) ? $c['address'] : '');
+                $comp_name     = mysqli_real_escape_string($conn, isset($c['comp_name']) ? $c['comp_name'] : '');
+                $tax_number    = mysqli_real_escape_string($conn, isset($c['tax_number']) ? $c['tax_number'] : '');
+                $latitude      = mysqli_real_escape_string($conn, isset($c['inputLatitude']) ? $c['inputLatitude'] : '');
+                $longitude     = mysqli_real_escape_string($conn, isset($c['inputLongitude']) ? $c['inputLongitude'] : '');
+                $pay_type      = mysqli_real_escape_string($conn, isset($order['type']) ? $order['type'] : '');
+                $vehicle_id    = mysqli_real_escape_string($conn, $tms_id);
+                $vehicle_price = mysqli_real_escape_string($conn, $tms_price);
+
+
+                $ins_shipp_sql = "INSERT INTO ord_shipping (
+                    member_id, order_id, prefix_id, first_name, last_name, county, province, district, subdistrict, post_code,
+                    phone_number, address, comp_name, tax_number, latitude, longitude, pay_type, vehicle_id, vehicle_price
+                ) VALUES (
+                    '$member_id', '$order_id', '$prefix_id', '$first_name', '$last_name', '$county', '$province', '$district', '$subdistrict', '$post_code',
+                    '$phone_number', '$address', '$comp_name', '$tax_number', '$latitude', '$longitude', '$pay_type', '$vehicle_id', '$vehicle_price'
+                )";
+                mysqli_query($conn, $ins_shipp_sql);
             }
 
             if (!empty($order['payment_data'])) {
                 $p = $order['payment_data'];
-                insertIntoDatabase($conn, 'ord_payment',
-                    array('member_id', 'order_id', 'pay_channel', 'type'),
-                    array($member_id, $order['order_id'], $p['pay_channel'], $order['type'])
-                );
+
+                $member_id   = mysqli_real_escape_string($conn, $member_id);
+                $order_id    = mysqli_real_escape_string($conn, isset($order['order_id']) ? $order['order_id'] : '');
+                $pay_channel = mysqli_real_escape_string($conn, isset($p['pay_channel']) ? $p['pay_channel'] : '');
+                $type        = mysqli_real_escape_string($conn, isset($order['type']) ? $order['type'] : '');
+
+                $ins_pay_sql = "INSERT INTO ord_payment (
+                    member_id, order_id, pay_channel, type
+                ) VALUES (
+                    '$member_id', '$order_id', '$pay_channel', '$type'
+                )";
+                mysqli_query($conn, $ins_pay_sql);
             }
         }
 
-        if (isset($_POST['att_file']) && $_POST['att_file'] === 'save_attach_file' && isset($_FILES['input-b6b'])) {
-            $response['steps'][] = 'Handling file upload';
-            foreach (handleFileUpload($_FILES['input-b6b']) as $fileInfo) {
-                if (!$fileInfo['success']) {
-                    throw new Exception('Upload failed: ' . $fileInfo['fileName']);
+        if (isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file' && isset($_FILES['input-b6b'])) {
+            $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+            $maxFileSize = 5 * 1024 * 1024;
+
+            foreach ($_FILES['input-b6b']['name'] as $key => $fileName) {
+                if ($_FILES['input-b6b']['error'][$key] === UPLOAD_ERR_OK) {
+                    $fileTmpPath = $_FILES['input-b6b']['tmp_name'][$key];
+                    $fileSize = $_FILES['input-b6b']['size'][$key];
+                    $fileType = $_FILES['input-b6b']['type'][$key];
+                    $fileNameCmps = explode(".", $fileName);
+                    $fileExtension = strtolower(end($fileNameCmps));
+
+                    if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+                        $uploadFileDir = './uploaded_files/';
+                        $destFilePath = $uploadFileDir . $fileName;
+
+                        if (!is_dir($uploadFileDir)) {
+                            mkdir($uploadFileDir, 0755, true);
+                        }
+
+                        if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                            $picPath = 'app/actions/uploaded_files/' . $fileName;
+
+                            // escape 
+                            $member_id   = mysqli_real_escape_string($conn, $member_id);
+                            $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
+                            $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
+                            $filePathEsc = mysqli_real_escape_string($conn, $destFilePath);
+                            $picPathEsc  = mysqli_real_escape_string($conn, $picPath);
+
+                            // ins ord_evidence
+                            $sqlInsert = "INSERT INTO ord_evidence (member_id, order_id, file_name, file_size, file_type, file_path, pic_path)
+                                        VALUES ($member_id, $orderID, '$fileNameEsc', $fileSize, '$fileTypeEsc', '$filePathEsc', '$picPathEsc')";
+                            mysqli_query($conn, $sqlInsert);
+
+                            // update order
+                            $sqlUpdate = "UPDATE ecm_orders SET is_status = '1' WHERE order_id = $orderID AND member_id = $member_id";
+                            mysqli_query($conn, $sqlUpdate);
+                        } else {
+                            throw new Exception("Unable to move file: $fileName");
+                        }
+                    } else {
+                        throw new Exception("The file type is invalid or exceeds the specified size: $fileName");
+                    }
+                } else {
+                    throw new Exception("There was an error while uploading the file: $fileName");
                 }
-
-                $picPath = 'app/actions/uploaded_files/' . $fileInfo['fileName'];
-                $fileColumns = array('member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path');
-                $fileValues = array($member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath);
-                insertIntoDatabase($conn, 'ord_evidence', $fileColumns, $fileValues);
-
-                updateInDatabase($conn, 'ecm_orders', array('is_status'), array('1'), 'order_id = ? AND member_id = ?', array($orderID, $member_id));
             }
         }
 
-        $conn->commit();
-        $response['steps'][] = 'Transaction committed';
         unset($_SESSION['cart'], $_SESSION['orderArray'], $_SESSION['cartOption']);
-        $response['message'] = 'Order and evidence saved successfully.';
+        $response = array('status' => 'success');
+        throw new Exception("action save evidence.");
 
-    } elseif (isset($_POST['att_file']) && $_POST['att_file'] === 'save_attach_file' && isset($_FILES['input-b'])) {
+    }else if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file' && isset($_FILES['input-b'])){
+    
+
         $orderID = $_POST['numberOrder'];
-        $response['steps'][] = 'File upload for existing order';
+        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+        $maxFileSize = 5 * 1024 * 1024;
 
-        foreach (handleFileUpload($_FILES['input-b']) as $fileInfo) {
-            if (!$fileInfo['success']) {
-                throw new Exception('Upload failed: ' . $fileInfo['fileName']);
-            }
+        foreach ($_FILES['input-b']['name'] as $key => $fileName) {
+            if ($_FILES['input-b']['error'][$key] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['input-b']['tmp_name'][$key];
+                $fileSize = $_FILES['input-b']['size'][$key];
+                $fileType = $_FILES['input-b']['type'][$key];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
 
-            $picPath = 'app/actions/uploaded_files/' . $fileInfo['fileName'];
-            $stmt = $conn->prepare("SELECT id FROM ord_evidence WHERE member_id = ? AND order_id = ?");
-            $stmt->bind_param("is", $member_id, $orderID);
-            $stmt->execute();
-            $stmt->store_result();
+                if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+                    $uploadFileDir = './uploaded_files/';
+                    $destFilePath = $uploadFileDir . $fileName;
 
-            if ($stmt->num_rows > 0) {
-                updateInDatabase($conn, 'ord_evidence',
-                    array('file_name', 'file_size', 'file_type', 'file_path', 'pic_path'),
-                    array($fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath),
-                    'order_id = ? AND member_id = ?', array($orderID, $member_id));
+                    if (!is_dir($uploadFileDir)) {
+                        mkdir($uploadFileDir, 0755, true);
+                    }
+
+                    if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                        $picPath = 'app/actions/uploaded_files/' . $fileName;
+
+                        $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
+                        $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
+                        $filePathEsc = mysqli_real_escape_string($conn, $destFilePath);
+                        $picPathEsc = mysqli_real_escape_string($conn, $picPath);
+                        $orderIDEsc = mysqli_real_escape_string($conn, $orderID);
+                        $memberIDEsc = mysqli_real_escape_string($conn, $member_id);
+
+                        $checkSQL = "SELECT id FROM ord_evidence WHERE member_id = '$memberIDEsc' AND order_id = '$orderIDEsc'";
+                        $checkResult = mysqli_query($conn, $checkSQL);
+
+                        if (mysqli_num_rows($checkResult) > 0) {
+                            $updateSQL = "UPDATE ord_evidence SET 
+                                            file_name = '$fileNameEsc',
+                                            file_size = $fileSize,
+                                            file_type = '$fileTypeEsc',
+                                            file_path = '$filePathEsc',
+                                            pic_path = '$picPathEsc'
+                                        WHERE member_id = '$memberIDEsc' AND order_id = '$orderIDEsc'";
+                            mysqli_query($conn, $updateSQL);
+                        } else {
+                        
+                            $insertSQL = "INSERT INTO ord_evidence 
+                                (member_id, order_id, file_name, file_size, file_type, file_path, pic_path)
+                                VALUES ('$memberIDEsc', '$orderIDEsc', '$fileNameEsc', $fileSize, '$fileTypeEsc', '$filePathEsc', '$picPathEsc')";
+                            mysqli_query($conn, $insertSQL);
+                        }
+
+                        $updateStatusSQL = "UPDATE ecm_orders SET is_status = '1' 
+                                            WHERE order_id = '$orderIDEsc' AND member_id = '$memberIDEsc'";
+                        mysqli_query($conn, $updateStatusSQL);
+
+                    } else {
+                        throw new Exception("Unable to move file: $fileName");
+                    }
+                } else {
+                    throw new Exception("Invalid file type or size exceeded: $fileName");
+                }
             } else {
-                insertIntoDatabase($conn, 'ord_evidence',
-                    array('member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'),
-                    array($member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath));
+                throw new Exception("There was an error while uploading the file: $fileName");
             }
-
-            updateInDatabase($conn, 'ecm_orders', array('is_status'), array('1'), 'order_id = ? AND member_id = ?', array($orderID, $member_id));
         }
 
-        $response['message'] = 'File evidence saved.';
-    } else {
+        $response = array('status' => 'success');
+        throw new Exception("action save attach file.");
+    }else{
+        $response = array('status' => 'error');
         throw new Exception("Invalid request or missing parameters.");
     }
 
 } catch (Exception $e) {
-    $response['status'] = 'error';
     $response['message'] = $e->getMessage();
+    echo json_encode($response);
 }
 
-echo json_encode($response);
