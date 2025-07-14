@@ -253,7 +253,7 @@ try {
             //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
             //         }
             //     }
-            // }
+            // }  
 
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
