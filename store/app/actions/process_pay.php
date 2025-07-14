@@ -235,7 +235,7 @@ try {
                 $fileInfos = handleFileUpload($_FILES['input-b6b']); 
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
-                        $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
+                        $picPath = 'app/actions/uploaded_files/'.$fileInfo['fileName'];
                         $orderID = date('YmdHis');
                         $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
                         $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
@@ -289,7 +289,7 @@ try {
 
                         if(empty($data[0])){
 
-                            $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
+                            $picPath = 'app/actions/uploaded_files/'.$fileInfo['fileName'];
 
                             $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
                             $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
@@ -305,7 +305,7 @@ try {
                             
                         }else{
 
-                            $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
+                            $picPath = 'app/actions/uploaded_files/'.$fileInfo['fileName'];
 
                             $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
                             $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
