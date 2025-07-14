@@ -82,7 +82,7 @@ const buildTabSidebar = () => {
     let sidebarItems = [];
 
     $.ajax({
-        url: window.base_path_admin + 'actions/check_sidebar.php',
+        url:  '../actions/check_sidebar.php',
         type: 'POST',
         dataType: 'json',
         success: function (response) {

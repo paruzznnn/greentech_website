@@ -1,4 +1,7 @@
 <?php
+// เปิดการแสดง error
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 header('Content-Type: application/json');
 require_once(__DIR__ . '/../../../lib/connect.php');
 require_once(__DIR__ . '/../../../lib/base_directory.php');
