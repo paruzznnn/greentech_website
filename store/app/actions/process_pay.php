@@ -5,16 +5,14 @@ date_default_timezone_set('Asia/Bangkok');
 require_once '../../lib/connect.php';
 require_once '../../lib/base_directory.php';
 
+
 global $base_path;
-global $checkSaveEv;
-// Initialize response
 $response = array('status' => 'success', 'message' => '', 'steps' => []);
 
-// Helper function for file upload
 function handleFileUpload($files) {
 
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
-    $maxFileSize = 5 * 1024 * 1024; // 5 MB
+    $maxFileSize = 5 * 1024 * 1024; 
 
     $uploadResults = [];
 
@@ -68,76 +66,71 @@ function handleFileUpload($files) {
     return $uploadResults;
 }
 
-// Helper function for database insertion
 function insertIntoDatabase($conn, $table, $columns, $values) {
-
     $placeholders = implode(', ', array_fill(0, count($values), '?'));
-
-    // Create the SQL query
     $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
-    
-    // Prepare the SQL statement
     $stmt = $conn->prepare($query);
     if (!$stmt) {
         throw new Exception("Prepare statement failed: " . $conn->error);
     }
 
-    // Bind parameters
-    $types = str_repeat('s', count($values)); // Assuming all values are strings
+    $types = '';
+    foreach ($values as $val) {
+        if (is_int($val)) {
+            $types .= 'i';
+        } elseif (is_float($val)) {
+            $types .= 'd';
+        } elseif (is_null($val)) {
+            $types .= 's'; 
+        } else {
+            $types .= 's';
+        }
+    }
+
     $stmt->bind_param($types, ...$values);
 
-    // Execute the statement
     if (!$stmt->execute()) {
         throw new Exception("Execute statement failed: " . $stmt->error);
     }
 
-    // Close the statement
     $stmt->close();
 }
 
+
 function updateInDatabase($conn, $table, $columns, $values, $whereClause, $whereValues) {
 
-    // Create the SET part of the query
     $setPart = implode(', ', array_map(function($col) {
         return "$col = ?";
     }, $columns));
     
-    // Create the SQL query
     $query = "UPDATE $table SET $setPart WHERE $whereClause";
-    
-    // Prepare the SQL statement
     $stmt = $conn->prepare($query);
     if (!$stmt) {
         throw new Exception("Prepare statement failed: " . $conn->error);
     }
 
-    // Bind parameters
     $types = str_repeat('s', count($values)) . str_repeat('s', count($whereValues));
     $stmt->bind_param($types, ...array_merge($values, $whereValues));
 
-    // Execute the statement
     if (!$stmt->execute()) {
         throw new Exception("Execute statement failed: " . $stmt->error);
     }
 
-    // Close the statement
     $stmt->close();
 }
 
 
 try {
-    // Check if the action is 'save_evidence'
+
     if (isset($_POST['action']) && $_POST['action'] === 'save_evidence') {
 
-        // Process cart and order contents
         $member_id = $_SESSION['user_id'];
         $response['steps'][] = 'Processing cart and order contents';
         $orderContents = isset($_SESSION['orderArray']) ? $_SESSION['orderArray'] : [];
 
-        // Initialize order array
         $orderArray = [];
         foreach ($orderContents as $orderCode => $orderDetails) {
-            $orderID = date('YmdHis'); // Unique order ID
+            $orderID = date('YmdHis'); 
             $orderArray[] = [
                 'order_id' => $orderID,
                 'order_code' => $orderCode,
@@ -151,7 +144,6 @@ try {
             ];
         }
         
-        // Begin transaction
         $response['steps'][] = 'Beginning transaction';
         $conn->begin_transaction();
         
@@ -161,7 +153,6 @@ try {
                 $tms_id = $order['transport_data']['tms_id'] ?? null;
                 $tms_price = $order['transport_data']['tms_price'] ?? null;
 
-                // Insert product data
                 foreach ($order['product_data'] as $product) {
                     $orderValues = [
                         $member_id,
@@ -195,7 +186,6 @@ try {
                     $updateStmt->close();
                 }
         
-                // Insert customer data
                 if (isset($order['customer_data'])) {
                     $customer = $order['customer_data'];
                     insertIntoDatabase($conn, 'ord_shipping', 
@@ -225,8 +215,6 @@ try {
                         ]
                     );
                 }
-        
-                // Insert payment data
                 if (isset($order['payment_data'])) {
                     $payment = $order['payment_data'];
                     insertIntoDatabase($conn, 'ord_payment', 
@@ -244,41 +232,27 @@ try {
             if (isset($_POST['att_file']) && $_POST['att_file'] === 'save_attach_file') {
                 $member_id = $_SESSION['user_id'];
                 $response['steps'][] = 'Handling file uploads';
-    
-                // Handle file uploads
                 $fileInfos = handleFileUpload($_FILES['input-b6b']); 
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
-    
                         $picPath = $base_path .'tdi_store/app/actions/uploaded_files/'.$fileInfo['fileName'];
-    
-                        $orderID = date('YmdHis'); // Unique order ID
+                        $orderID = date('YmdHis');
                         $fileColumns = ['member_id', 'order_id', 'file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
                         $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'ord_evidence', $fileColumns, $fileValues);
-
                         $orderColumns = ['is_status'];
                         $orderValues = ['1'];
-    
-                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
                         $orderWhereClause = 'order_id = ? AND member_id = ?';
                         $orderWhereValues = [$orderID, $member_id];
-    
                         updateInDatabase($conn, 'ecm_orders', $orderColumns, $orderValues, $orderWhereClause, $orderWhereValues);
-    
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
                 }
             }
 
-            // Commit transaction
             $response['steps'][] = 'Committing transaction';
             $conn->commit();
-
-            // Clear the cart and order cookies if necessary
-            // setcookie('cart', '', time() - 3600, "/");
-            // setcookie('orderArray', '', time() - 3600, "/");
 
             unset($_SESSION['cart']);
             unset($_SESSION['orderArray']);
@@ -287,16 +261,13 @@ try {
             $response['message'] = 'Operation completed successfully';
         
         } catch (Exception $e) {
-            // Rollback transaction on error
             $response['steps'][] = 'Rolling back transaction';
             $conn->rollback();
             throw $e;
         }
     }else{
 
-        // Separate file upload processing block
         if (isset($_POST['att_file']) && $_POST['att_file'] === 'save_attach_file') {
-            // Debugging line, remove or comment out in production
 
             $member_id = $_SESSION['user_id'];
             $orderID = strval($_POST['numberOrder']);
@@ -324,11 +295,9 @@ try {
                             $fileValues = [$member_id, $orderID, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                             insertIntoDatabase($conn, 'ord_evidence', $fileColumns, $fileValues);
 
-
                             $orderColumns = ['is_status'];
                             $orderValues = ['1'];
-        
-                            // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+
                             $orderWhereClause = 'order_id = ? AND member_id = ?';
                             $orderWhereValues = [$orderID, $member_id];
         
@@ -340,24 +309,16 @@ try {
 
                             $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'pic_path'];
                             $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-        
-                            // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
                             $whereClause = 'order_id = ? AND member_id = ?';
                             $whereValues = [$orderID, $member_id];
-        
+
                             updateInDatabase($conn, 'ord_evidence', $fileColumns, $fileValues, $whereClause, $whereValues);
-
-
                             $orderColumns = ['is_status'];
                             $orderValues = ['1'];
-        
-                            // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
                             $orderWhereClause = 'order_id = ? AND member_id = ?';
                             $orderWhereValues = [$orderID, $member_id];
-        
                             updateInDatabase($conn, 'ecm_orders', $orderColumns, $orderValues, $orderWhereClause, $orderWhereValues);
                             
-
                         }
 
                 } else {
@@ -373,7 +334,5 @@ try {
     $response['status'] = 'error';
     $response['message'] = $e->getMessage();
 } finally {
-    // Close the connection and return the response
-    $conn->close();
     echo json_encode($response);
 }
