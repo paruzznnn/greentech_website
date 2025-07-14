@@ -78,15 +78,17 @@ function changeLanguage(lang) {
 // `;
 
 const buildTabSidebar = () => {
-
     let sidebarItems = [];
 
-    // ตรวจดูว่า path ปัจจุบันอยู่ใน admin หรือไม่
     let currentPath = window.location.pathname;
-    let sidebarPath = currentPath.includes('/admin/') 
-        ? '../actions/check_sidebar.php' 
-        : 'admin/actions/check_sidebar.php';
 
+    // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
+    let sidebarPath = currentPath.includes('dashboard.php')
+        ? '/app/admin/actions/check_sidebar.php'
+        : '../actions/check_sidebar.php';
+
+
+    console.log("✅ Loading sidebar from:", sidebarPath);
     $.ajax({
         url: sidebarPath,
         type: 'POST',
