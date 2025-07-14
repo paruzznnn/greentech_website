@@ -47,8 +47,11 @@ try {
             $is_verify = isset($consent_data['verify']) ? (int)$consent_data['verify'] : 0;
 
             $sql_insert = "
-                INSERT INTO ecm_users (email, username, password, phone, role_id, create_date, is_consent, is_verify)
-                VALUES ($email, $username, $password, $phone, $role, $create_date, $is_consent, $is_verify)
+                INSERT INTO ecm_users (
+                    email, username, password, phone, role_id, create_date, is_consent, is_verify
+                ) VALUES (
+                    '$email', '$username', '$password', '$phone', '$role', '$create_date', $is_consent, $is_verify
+                )
             ";
 
             if (!mysqli_query($conn, $sql_insert)) {
