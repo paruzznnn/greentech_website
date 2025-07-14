@@ -78,61 +78,71 @@ function changeLanguage(lang) {
 // `;
 
 const buildTabSidebar = () => {
-
     let sidebarItems = [];
 
+    let currentPath = window.location.pathname;
+
+    // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
+    let sidebarPath = (
+    currentPath.includes('dashboard.php') || 
+    currentPath.includes('profile.php')
+) 
+        ? '/app/admin/actions/check_sidebar.php'
+        : '../actions/check_sidebar.php';
+
+
+    console.log("✅ Loading sidebar from:", sidebarPath);
     $.ajax({
-        url:  '../actions/check_sidebar.php',
+        url: sidebarPath,
         type: 'POST',
         dataType: 'json',
         success: function (response) {
-
             sidebarItems = response.sidebarItems;
-            
+
             let sidebarContent = '<div class="sidebar">';
-            
+
             if (Array.isArray(sidebarItems) && sidebarItems.length > 0) {
-            
-            sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
-                
-                const itemLink = item.link || '#';
-                const itemToggleClass = `toggle-${item.id}`;
+                sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
+                    const itemLink = item.link || '#';
+                    const itemToggleClass = `toggle-${item.id}`;
 
-                sidebarContent += `<a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
-                <span style="font-size: 14px;">${item.icon}</span> 
-                ${item.label}
-                </a>`;
-                
-            
-                if (item.subItems && item.subItems.length > 0) {
-                    sidebarContent += `<div class="sub-sidebar ${itemToggleClass}" style="display:none;">`;
-            
-                    item.subItems.sort((a, b) => a.order - b.order).forEach(subItem => {
-                        const subItemLink = subItem.link || '#';
-                        sidebarContent += `<a href="${subItemLink}" class="sub-sidebar-link" data-parent="${subItem.parentId}">
-                        <span style="font-size: 12px;">${subItem.icon}</span> 
-                        ${subItem.label}
-                        </a>`;
-                    });
-            
-                    sidebarContent += '</div>';
-                }
-            });
+                    sidebarContent += `
+                        <a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
+                            <span style="font-size: 14px;">${item.icon}</span> 
+                            ${item.label}
+                        </a>
+                    `;
 
+                    if (item.subItems && item.subItems.length > 0) {
+                        sidebarContent += `<div class="sub-sidebar ${itemToggleClass}" style="display:none;">`;
+
+                        item.subItems.sort((a, b) => a.order - b.order).forEach(subItem => {
+                            const subItemLink = subItem.link || '#';
+                            sidebarContent += `
+                                <a href="${subItemLink}" class="sub-sidebar-link" data-parent="${subItem.parentId}">
+                                    <span style="font-size: 12px;">${subItem.icon}</span> 
+                                    ${subItem.label}
+                                </a>
+                            `;
+                        });
+
+                        sidebarContent += '</div>';
+                    }
+                });
             }
 
-            
             sidebarContent += `
-            <a href="../logout.php" class="sidebar-link" data-href="">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>log out</span>
-            </a>`;
-            
-            sidebarContent += '</div>';
-            
-            $('#showTabSidebar').html(sidebarContent);
-            
+                <a href="../logout.php" class="sidebar-link" data-href="">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>log out</span>
+                </a>
+            `;
 
+            sidebarContent += '</div>';
+
+            $('#showTabSidebar').html(sidebarContent);
+
+            // จัดการ toggle แสดง/ซ่อน submenu
             $('#showTabSidebar').on('click', '.sidebar-link', function (event) {
                 const itemLink = $(this).data('href');
                 const targetClass = $(this).attr('class').split(' ').find(cls => cls.startsWith('toggle-'));
@@ -154,6 +164,7 @@ const buildTabSidebar = () => {
                 }
             });
 
+            // ระบบ theme toggle (night mode)
             const $toggleSwitch = $('#theme-toggle');
             const isNightMode = localStorage.getItem('night-mode') === 'true';
 
@@ -171,8 +182,6 @@ const buildTabSidebar = () => {
                     localStorage.setItem('night-mode', 'false');
                 }
             });
-
-
         },
         error: function (xhr, status, error) {
             console.error('เกิดข้อผิดพลาด:', error);
@@ -180,6 +189,7 @@ const buildTabSidebar = () => {
     });
 
 };
+
 
 // function cssResponsiveTable(tableId, headers) {
 
