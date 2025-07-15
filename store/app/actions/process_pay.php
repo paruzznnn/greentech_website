@@ -161,7 +161,7 @@ try {
                         if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                             $uploadFileDir = './uploaded_files/';
                             if (!is_dir($uploadFileDir)) {
-                                mkdir($uploadFileDir, 0755, true);
+                                mkdir($uploadFileDir, 775, true);
                             }
 
                             $destFilePath = $uploadFileDir . basename($fileName);
@@ -226,7 +226,7 @@ try {
                         if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                             $uploadFileDir = './uploaded_files/';
                             if (!is_dir($uploadFileDir)) {
-                                mkdir($uploadFileDir, 0755, true);
+                                mkdir($uploadFileDir, 775, true);
                             }
 
                             $destFilePath = $uploadFileDir . basename($fileName);
