@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List Acoustic knowledge</title>
+    <title>List idia</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -104,11 +104,11 @@
                                 <div style="display: flex; justify-content: space-between;">
                                     <h4 class="line-ref mb-3"> 
                                         <i class="far fa-newspaper"></i>   
-                                        List Acoustic knowledge
+                                        List idia
                                     </h4>
                                     <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_idia/setup_idia.php'?>">
                                         <i class="fa-solid fa-plus"></i>
-                                        write Acoustic knowledge
+                                        write idia
                                     </a>
                                 </div>
 
