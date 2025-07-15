@@ -140,7 +140,7 @@ if ($result->num_rows > 0) {
 </div>
 
 <!-- แสดงฟอร์มด้านล่างนี้ -->
-<h3>ใส่ความคิดเห็น</h3>
+<!-- <h3>ใส่ความคิดเห็น</h3>
 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
 <form id="commentForm" style="max-width: 600px;">
     <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
@@ -205,4 +205,4 @@ document.getElementById("commentForm").addEventListener("submit", function(e) {
     });
 });
 </script>
-
+ -->

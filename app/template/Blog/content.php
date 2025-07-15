@@ -139,7 +139,7 @@ if ($result->num_rows > 0) {
     <?php endif; ?>
 </div>
 
-<!-- แสดงฟอร์มด้านล่างนี้ -->
+<!-- แสดงฟอร์มด้านล่างนี้
 <h3>ใส่ความคิดเห็น</h3>
 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
 <form id="commentForm" style="max-width: 600px;">
@@ -205,4 +205,4 @@ document.getElementById("commentForm").addEventListener("submit", function(e) {
     });
 });
 </script>
-
+ -->
