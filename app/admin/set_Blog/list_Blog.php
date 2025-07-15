@@ -1,12 +1,14 @@
 
 
+
+
 <?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>list Blog</title>
+    <title>List Blog</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
