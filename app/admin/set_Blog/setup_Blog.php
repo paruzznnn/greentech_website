@@ -159,7 +159,7 @@
                                             <span>Content</span>:
                                         </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="Blog_content"></textarea>
+                                            <textarea class="form-control summernote" id="summernote" name="Blog_content"></textarea>
                                         </div>
                                     </div>
                                 </div>
