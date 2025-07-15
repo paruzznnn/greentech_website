@@ -101,7 +101,7 @@ try {
 
                 $ins_shipp_sql = "INSERT INTO ord_shipping (
                     member_id, order_id, prefix_id, first_name, last_name, county, province, district, subdistrict, post_code,
-                    phone_number, address, comp_name, tax_number, latitude, longitude, pay_type, vehicle_id, vehicle_price
+                    phone_number, `address`, comp_name, tax_number, latitude, longitude, pay_type, vehicle_id, vehicle_price
                 ) VALUES (
                     '$member_id', '$order_id', '$prefix_id', '$first_name', '$last_name', '$county', '$province', '$district', '$subdistrict', '$post_code',
                     '$phone_number', '$address', '$comp_name', '$tax_number', '$latitude', '$longitude', '$pay_type', '$vehicle_id', '$vehicle_price'
@@ -118,7 +118,7 @@ try {
                 $type        = mysqli_real_escape_string($conn, isset($order['type']) ? $order['type'] : '');
 
                 $ins_pay_sql = "INSERT INTO ord_payment (
-                    member_id, order_id, pay_channel, type
+                    member_id, order_id, pay_channel, `type`
                 ) VALUES (
                     '$member_id', '$order_id', '$pay_channel', '$type'
                 )";
