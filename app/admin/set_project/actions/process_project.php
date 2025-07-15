@@ -233,27 +233,27 @@ try {
             }
 
             $project_id = $project_array['project_id'];
-            // if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
 
-            //     $fileInfos = handleFileUpload($_FILES['fileInput']);
-            //     foreach ($fileInfos as $fileInfo) {
-            //         if ($fileInfo['success']) {
+                $fileInfos = handleFileUpload($_FILES['fileInput']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
 
-            //             $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
 
-            //             $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-            //             $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
 
-            //             // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
-            //             $fileWhereClause = 'project_id = ?';
-            //             $fileWhereValues = [$project_id];
+                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
+                        $fileWhereClause = 'project_id = ?';
+                        $fileWhereValues = [$project_id];
 
                         updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-            //         } else {
-            //             throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-            //         }
-            //     }
-            // }  
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }  
 
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
 
