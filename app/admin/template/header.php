@@ -38,12 +38,12 @@ if (!isset($base_path_admin)) {
 
     <!-- ขวา -->
     <div class="header-top-right dropdown-wrapper">
-      <div id="showOrigamiAiHtml"></div>
-    <script src="https://dev.origami.life/plugin_chat_ai/plugin_chat.js"></script>
-      <!-- 🔔 กระดิ่งแจ้งเตือน -->
+          <!-- <div id="showOrigamiAiHtml"></div>
+        <script src="https://dev.origami.life/plugin_chat_ai/plugin_chat.js"></script> -->
+          <!-- 🔔 กระดิ่งแจ้งเตือน -->
       <div class="header-item">
-  <i class="fas fa-bell" style="font-size: 30px;"></i>
-</div>
+        <i class="fas fa-bell" style="font-size: 30px;"></i>
+      </div>
 
       <!-- 📦 Origami Dropdown -->
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
