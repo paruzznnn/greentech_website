@@ -1,5 +1,5 @@
 <?php
-$perPage = 6;
+$perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
