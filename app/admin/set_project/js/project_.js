@@ -1,8 +1,7 @@
 $(document).ready(function () {
 
-    if($("#summernote").length > 0){
-
-        $("#summernote").summernote({
+    if ($(".summernote").length > 0) {
+        $(".summernote").summernote({
             height: 400,
             minHeight: 200,
             maxHeight: 500,
@@ -594,77 +593,100 @@ $("#submitAddproject").on("click", function (event) {
 $("#submitEditproject").on("click", function (event) {
     event.preventDefault();
 
+    // console.log("👉 Start submitEditproject handler");
+
     var formproject = $("#formproject_edit")[0];
     var formData = new FormData(formproject);
 
-    // ✅ ดึง content จาก summernote ก่อน
-    var contentFromEditor = $("#project_content").summernote('code');
-    let checkIsUrl = false;
+    formData.set("action", "editproject");
+    formData.set("project_id", $("#project_id").val());
+
+    // Get content from Summernote
+    var contentFromEditor = $("#summernote_update").summernote('code');
+    // console.log("🔍 contentFromEditor (raw):", contentFromEditor);
+
+    var checkIsUrl = false;
+    var finalContent = '';
 
     if (contentFromEditor) {
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = contentFromEditor;
+        // console.log("🧩 Created tempDiv with innerHTML set");
+
         var imgTags = tempDiv.getElementsByTagName("img");
+        // console.log("📸 Number of <img> tags found:", imgTags.length);
 
         for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src")?.replace(/ /g, "%20");
+            var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
+            // console.log(`🔎 img[${i}] src:`, imgSrc, ", filename:", filename);
 
-            if (!imgSrc) continue;
+            if (!imgSrc) {
+                console.warn(`⚠️ img[${i}] has no src, skipping.`);
+                continue;
+            }
+
+            imgSrc = imgSrc.replace(/ /g, "%20");
 
             if (!isValidUrl(imgSrc)) {
+                // console.log(`🛠️ img[${i}] src is NOT a valid URL, converting base64 to file.`);
                 var file = base64ToFile(imgSrc, filename);
                 if (file) {
                     formData.append("image_files[]", file);
+                    // console.log(`✅ Appended image_files[] with filename: ${file.name}`);
+                } else {
+                    console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
-                imgTags[i].setAttribute("src", "");
+                if (imgSrc.startsWith("data:image")) {
+                    imgTags[i].setAttribute("src", "");
+                    // console.log(`🔄 Cleared src of img[${i}] after base64 processing.`);
+                }
             } else {
                 checkIsUrl = true;
+                // console.log(`🌐 img[${i}] src is a valid URL.`);
             }
-            
         }
-         // ✅ Final Content (ใช้ string แน่นอน)
-        var finalContent = tempDiv.innerHTML;
+
+        finalContent = tempDiv.innerHTML;
         formData.set("project_content", finalContent);
-
-        console.log("🔍 Final Content Before Submit:", finalContent);
-
-        // ✅ เอา innerHTML ที่ clean แล้ว
-        contentFromEditor = tempDiv.innerHTML;
+        // console.log("📝 finalContent (cleaned):", finalContent);
+    } else {
+        console.warn("⚠️ contentFromEditor is empty");
     }
-    
 
-    // ✅ Append หลังจัดการเสร็จ
-    formData.set("action", "editproject");
-    formData.set("project_id", $("#project_id").val());
-    formData.set("project_subject", $("#project_subject").val());
-    formData.set("project_description", $("#project_description").val());
-    formData.set("project_content", contentFromEditor);
+    // Validate
+    $(".is-invalid").removeClass("is-invalid");
 
-    console.log("🔍 ส่งข้อมูลไป:", {
-        project_id: $("#project_id").val(),
-        project_subject: $("#project_subject").val(),
-        project_description: $("#project_description").val(),
-        project_content: contentFromEditor
-    });
-
-    // ✅ Validate
     if (!$("#project_subject").val().trim()) {
         $("#project_subject").addClass("is-invalid");
+        console.error("❌ Validation failed: project_subject is empty");
         return;
     }
     if (!$("#project_description").val().trim()) {
         $("#project_description").addClass("is-invalid");
+        console.error("❌ Validation failed: project_description is empty");
         return;
     }
-    if (!contentFromEditor.trim()) {
+    if (!finalContent.trim()) {
         alertError("Please fill in content information.");
+        console.error("❌ Validation failed: project_content is empty");
         return;
     }
 
+    formData.set("project_subject", $("#project_subject").val());
+    formData.set("project_description", $("#project_description").val());
+
+    // console.log("📤 Form data prepared:", {
+    //     project_id: $("#project_id").val(),
+    //     project_subject: $("#project_subject").val(),
+    //     project_description: $("#project_description").val(),
+    //     project_content: finalContent,
+    //     image_files_count: formData.getAll("image_files[]").length
+    // });
+
     Swal.fire({
         title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
-        text: "Do you want to edit project.?",
+        text: "Do you want to edit project?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#4CAF50",
@@ -673,6 +695,7 @@ $("#submitEditproject").on("click", function (event) {
     }).then((result) => {
         if (result.isConfirmed) {
             $('#loading-overlay').fadeIn();
+            console.log("🚀 Sending AJAX request...");
 
             $.ajax({
                 url: "actions/process_project.php",
@@ -681,24 +704,31 @@ $("#submitEditproject").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log("✅ success", response);
-                    if (response.status === 'success') {
-                        window.location.href = "list_project.php";
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
+                    console.log("✅ AJAX success:", response);
+                    try {
+                        var json = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (json.status === 'success') {
+                            window.location.href = "list_project.php";
+                        } else {
+                            Swal.fire('Error', json.message || 'Unknown error', 'error');
+                        }
+                    } catch (e) {
+                        console.error("❌ JSON parse error:", e);
+                        Swal.fire('Error', 'Invalid response from server', 'error');
                     }
                 },
                 error: function (xhr) {
-                    console.log("❌ error", xhr.responseText);
+                    console.error("❌ AJAX error:", xhr.responseText);
                     Swal.fire('Error', 'AJAX request failed', 'error');
+                    $('#loading-overlay').fadeOut();
                 },
             });
         } else {
+            console.log("❎ User cancelled action");
             $('#loading-overlay').fadeOut();
         }
     });
 });
-
 
 
 
