@@ -163,7 +163,7 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                 if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                     $uploadFileDir = './uploaded_files/';
                     if (!is_dir($uploadFileDir)) {
-                        mkdir($uploadFileDir, 0755, true);
+                        mkdir($uploadFileDir, 0775, true);
                     }
 
                     $destFilePath = $uploadFileDir . basename($fileName);
@@ -214,7 +214,7 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                 if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                     $uploadFileDir = './uploaded_files/';
                     if (!is_dir($uploadFileDir)) {
-                        mkdir($uploadFileDir, 0755, true);
+                        mkdir($uploadFileDir, 0775, true);
                     }
 
                     $destFilePath = $uploadFileDir . basename($fileName);
