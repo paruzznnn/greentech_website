@@ -634,7 +634,11 @@ $("#submitEditproject").on("click", function (event) {
     formData.set("project_id", $("#project_id").val());
     formData.set("project_subject", $("#project_subject").val());
     formData.set("project_description", $("#project_description").val());
-    formData.set("project_content", projectContent);
+    formData.set("project_content", projectContent.toString());
+    // หลังจากแปลง tempDiv เสร็จ
+    projectContent = tempDiv.innerHTML;
+    console.log("Final Content Before Submit:", projectContent);
+    formData.set("project_content", typeof projectContent === "string" ? projectContent : projectContent.toString());
 
     // ✅ Validation
     $(".is-invalid").removeClass("is-invalid");
