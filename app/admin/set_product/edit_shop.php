@@ -176,7 +176,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-8'>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='shop_content'>" . htmlspecialchars($content) . "</textarea>
+                        <textarea class='form-control summernote' id='summernote_update' name='shop_content'>" . htmlspecialchars($content) . "</textarea>
                     </div>
                 </div>
             </div>
@@ -219,3 +219,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     <script src='js/shop_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
+
+
+
+
