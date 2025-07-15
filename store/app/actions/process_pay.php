@@ -150,28 +150,27 @@ if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
 if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
 
     if(isset($_FILES['input-b6b']) && !empty($_FILES['input-b6b'])){
-
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
         $maxFileSize = 100 * 1024 * 1024; // 100MB
+        foreach ($_FILES['input-b6b']['name'] as $key => $fileName) {
+            if ($_FILES['input-b6b']['error'][$key] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['input-b6b']['tmp_name'][$key];
+                $fileSize = $_FILES['input-b6b']['size'][$key];
+                $fileType = $_FILES['input-b6b']['type'][$key];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
 
-        if ($member_id && $orderID) {
-            foreach ($_FILES['input-b6b']['name'] as $key => $fileName) {
-                if ($_FILES['input-b6b']['error'][$key] === UPLOAD_ERR_OK) {
-                    $fileTmpPath = $_FILES['input-b6b']['tmp_name'][$key];
-                    $fileSize = $_FILES['input-b6b']['size'][$key];
-                    $fileType = $_FILES['input-b6b']['type'][$key];
-                    $fileNameCmps = explode(".", $fileName);
-                    $fileExtension = strtolower(end($fileNameCmps));
+                if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+                    $uploadFileDir = './uploaded_files/';
+                    if (!is_dir($uploadFileDir)) {
+                        mkdir($uploadFileDir, 0755, true);
+                    }
 
-                    if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                        $uploadFileDir = './uploaded_files/';
-                        // if (!is_dir($uploadFileDir)) {
-                        //     mkdir($uploadFileDir, 775, true);
-                        // }
+                    $destFilePath = $uploadFileDir . basename($fileName);
+                    $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
 
-                        $destFilePath = $uploadFileDir . basename($fileName);
-                        $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
-
+                    
+                    if(is_uploaded_file($fileTmpPath)){
                         if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
                             $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
@@ -195,35 +194,33 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                             }
                         }
                     }
+                    
                 }
             }
-        } else {
-            echo "Invalid member or order ID.";
         }
-
-    $response['status'] = 'success';
-
+        $response['status'] = 'success';
     }else if(isset($_FILES['input-b']) && !empty($_FILES['input-b'])){
-
         $orderID = $_POST['numberOrder'];
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
-        $maxFileSize = 100 * 1024 * 1024; // 5MB
+        $maxFileSize = 100 * 1024 * 1024; // 100MB
+        foreach ($_FILES['input-b']['name'] as $key => $fileName) {
+            if ($_FILES['input-b']['error'][$key] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['input-b']['tmp_name'][$key];
+                $fileSize = $_FILES['input-b']['size'][$key];
+                $fileType = $_FILES['input-b']['type'][$key];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
 
-        if ($member_id && $orderID) {
-            foreach ($_FILES['input-b']['name'] as $key => $fileName) {
-                if ($_FILES['input-b']['error'][$key] === UPLOAD_ERR_OK) {
-                    $fileTmpPath = $_FILES['input-b']['tmp_name'][$key];
-                    $fileSize = $_FILES['input-b']['size'][$key];
-                    $fileType = $_FILES['input-b']['type'][$key];
-                    $fileNameCmps = explode(".", $fileName);
-                    $fileExtension = strtolower(end($fileNameCmps));
+                if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+                    $uploadFileDir = './uploaded_files/';
+                    if (!is_dir($uploadFileDir)) {
+                        mkdir($uploadFileDir, 0755, true);
+                    }
 
-                    if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                        $uploadFileDir = './uploaded_files/';
+                    $destFilePath = $uploadFileDir . basename($fileName);
+                    $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
 
-                        $destFilePath = $uploadFileDir . basename($fileName);
-                        $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
-
+                    if(is_uploaded_file($fileTmpPath)){
                         if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
                             $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
@@ -273,12 +270,10 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
 
                         }
                     }
+
                 }
             }
-        } else {
-            echo "Invalid member or order ID.";
         }
-
         $response['status'] = 'success';
     }
 
