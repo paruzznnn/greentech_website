@@ -667,13 +667,18 @@ $("#submitEditproject").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    if (response.status == 'success') {
-                        window.location.href = "list_project.php"; // ✅ ไปหน้า list
-                    }
-                },
-                error: function (error) {
-                    console.log("error", error);
-                },
+                console.log("response", response);  // ✅ เอาไว้ดูใน console ว่ากลับมาอะไร
+                if (response.status == 'success') {
+                    window.location.href = "list_project.php";
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            },
+            error: function (xhr) {
+                console.log("error", xhr.responseText);
+                Swal.fire('Error', 'AJAX request failed', 'error');
+},
+
             });
         } else {
             $('#loading-overlay').fadeOut();
@@ -681,6 +686,34 @@ $("#submitEditproject").on("click", function (event) {
     });
 });
 
+Swal.fire(confirmOptions).then((result) => {
+    if (result.isConfirmed) {
+        $('#loading-overlay').fadeIn();
+
+        $.ajax({
+            url: "actions/process_project.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log(response);  // ✅
+                $('#loading-overlay').fadeOut();
+                if (response.status == 'success') {
+                    window.location.href = "list_project.php";
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            },
+            error: function (xhr) {
+                $('#loading-overlay').fadeOut();
+                Swal.fire('Error', 'AJAX request failed', 'error');
+            }
+        });
+    } else {
+        $('#loading-overlay').fadeOut();
+    }
+});
 
 // function reDirect(url, data) {
 //     var form = $('<form>', {
