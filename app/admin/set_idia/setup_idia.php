@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>setup Acoustic knowledge</title>
+    <title>setup idia</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -148,7 +148,7 @@
                                         id="submitAddidia"
                                         class="btn btn-primary">
                                             <i class="fas fa-plus"></i>
-                                            Acoustic knowledge
+                                            idia
                                         </button>
                                     </div>
                                 </div>
@@ -159,7 +159,7 @@
                                             <span>Content</span>:
                                         </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="idia_content"></textarea>
+                                            <textarea class="form-control summernote" id="summernote" name="idia_content"></textarea>
                                         </div>
                                     </div>
                                 </div>
