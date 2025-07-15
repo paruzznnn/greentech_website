@@ -1,8 +1,7 @@
 $(document).ready(function () {
 
-    if($("#summernote").length > 0){
-
-        $("#summernote").summernote({
+    if ($(".summernote").length > 0) {
+        $(".summernote").summernote({
             height: 400,
             minHeight: 200,
             maxHeight: 500,
@@ -185,6 +184,7 @@ $(document).ready(function () {
 
             editButton.off('click').on('click', function () {
                 // reDirect('edit_news.php', data.news_id);
+                // reDirect('list_shop.php', {
                 reDirect('edit_shop.php', {
                     shop_id: data.shop_id
                 });
@@ -450,151 +450,304 @@ $("#submitAddshop").on("click", function (event) {
 });
 
 
+// $("#submitEditshop").on("click", function (event) {
+//     event.preventDefault();
+
+//     var formshop = $("#formshop_edit")[0];
+//     var formData = new FormData(formshop);
+//     formData.append("action", "editshop");
+//     var shopContent = formData.get("shop_content");
+
+//     if (shopContent) {
+//         var tempDiv = document.createElement("div");
+//         tempDiv.innerHTML = shopContent;
+//         var imgTags = tempDiv.getElementsByTagName("img");
+//         for (var i = 0; i < imgTags.length; i++) {
+//             var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+//             var filename = imgTags[i].getAttribute("data-filename");
+
+//             var checkIsUrl = false;
+//             let isUrl = isValidUrl(imgSrc);
+
+//             if (!isUrl) {
+//                 var file = base64ToFile(imgSrc, filename);
+
+//                 if (file) {
+//                     formData.append("image_files[]", file);
+//                 }
+
+//                 if (imgSrc.startsWith("data:image")) {
+//                     imgTags[i].setAttribute("src", "");
+//                 }
+//             } else {
+
+//                 checkIsUrl = true;
+//             }
+
+//         }
+//         formData.set("shop_content", tempDiv.innerHTML);
+//     }
+
+//     $(".is-invalid").removeClass("is-invalid");
+//     for (var tag of formData.entries()) {
+
+//         // if (tag[0] === 'fileInput[]' && tag[1].name === '') {
+//         //     alertError("Please add a cover photo.");
+//         //     return;
+//         // }
+//         if (tag[0] === 'shop_subject' && tag[1].trim() === '') {
+//             $("#shop_subject").addClass("is-invalid");
+//             return;
+//         }
+//         if (tag[0] === 'shop_description' && tag[1].trim() === '') {
+//             $("#shop_description").addClass("is-invalid");
+//             return;
+//         }
+//         if (tag[0] === 'shop_content' && tag[1].trim() === '') {
+//             alertError("Please fill in content information.");
+//             return;
+//         }
+//     }
+
+//     if (checkIsUrl) {
+
+//         Swal.fire({
+//             title: "Image detection system from other websites?",
+//             text: "Do you want to add shop.!",
+//             icon: "warning",
+//             showCancelButton: true,
+//             confirmButtonColor: "#4CAF50",
+//             cancelButtonColor: "#d33",
+//             confirmButtonText: "Accept"
+//         }).then((result) => {
+
+//             if (result.isConfirmed) {
+
+//                 $('#loading-overlay').fadeIn();
+
+//                 $.ajax({
+//                     url: "actions/process_shop.php",
+//                     type: "POST",
+//                     data: formData,
+//                     processData: false,
+//                     contentType: false,
+//                     success: function (response) {
+//                         if (response.status == 'success') {
+//                             window.location.reload();
+//                         }
+//                     },
+//                     error: function (error) {
+//                         console.log("error", error);
+//                     },
+//                 });
+
+//             } else {
+//                 $('#loading-overlay').fadeOut();
+//             }
+
+
+//         });
+
+
+//     } else {
+
+//         Swal.fire({
+//             title: "Are you sure?",
+//             text: "Do you want to add shop.!",
+//             icon: "warning",
+//             showCancelButton: true,
+//             confirmButtonColor: "#4CAF50",
+//             cancelButtonColor: "#d33",
+//             confirmButtonText: "Accept"
+//         }).then((result) => {
+
+//             if (result.isConfirmed) {
+
+//                 $('#loading-overlay').fadeIn();
+
+//                 $.ajax({
+//                     url: "actions/process_shop.php",
+//                     type: "POST",
+//                     data: formData,
+//                     processData: false,
+//                     contentType: false,
+//                     success: function (response) {
+//                         if (response.status == 'success') {
+//                             window.location.reload();
+//                         }
+//                     },
+//                     error: function (error) {
+//                         console.log("error", error);
+//                     },
+//                 });
+
+//             } else {
+//                 $('#loading-overlay').fadeOut();
+//             }
+
+//         });
+
+//     }
+// });
+
 $("#submitEditshop").on("click", function (event) {
     event.preventDefault();
 
+    // console.log("👉 Start submitEditshop handler");
+
     var formshop = $("#formshop_edit")[0];
     var formData = new FormData(formshop);
-    formData.append("action", "editshop");
-    var shopContent = formData.get("shop_content");
-    // var formNews = $("#formNews_edit")[0];
-    // var formData = new FormData(formNews);
-    // formData.append("action", "editshop");
-    // var newsContent = formData.get("shop_content");
 
-    if (shopContent) {
+    formData.set("action", "editshop");
+    formData.set("shop_id", $("#shop_id").val());
+
+    // Get content from Summernote
+    var contentFromEditor = $("#summernote_update").summernote('code');
+    // console.log("🔍 contentFromEditor (raw):", contentFromEditor);
+
+    var checkIsUrl = false;
+    var finalContent = '';
+
+    if (contentFromEditor) {
         var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = shopContent;
+        tempDiv.innerHTML = contentFromEditor;
+        // console.log("🧩 Created tempDiv with innerHTML set");
+
         var imgTags = tempDiv.getElementsByTagName("img");
+        // console.log("📸 Number of <img> tags found:", imgTags.length);
+
         for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+            var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
+            // console.log(`🔎 img[${i}] src:`, imgSrc, ", filename:", filename);
 
-            var checkIsUrl = false;
-            let isUrl = isValidUrl(imgSrc);
+            if (!imgSrc) {
+                console.warn(`⚠️ img[${i}] has no src, skipping.`);
+                continue;
+            }
 
-            if (!isUrl) {
+            imgSrc = imgSrc.replace(/ /g, "%20");
+
+            if (!isValidUrl(imgSrc)) {
+                // console.log(`🛠️ img[${i}] src is NOT a valid URL, converting base64 to file.`);
                 var file = base64ToFile(imgSrc, filename);
-
                 if (file) {
                     formData.append("image_files[]", file);
+                    // console.log(`✅ Appended image_files[] with filename: ${file.name}`);
+                } else {
+                    console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
-
                 if (imgSrc.startsWith("data:image")) {
                     imgTags[i].setAttribute("src", "");
+                    // console.log(`🔄 Cleared src of img[${i}] after base64 processing.`);
                 }
             } else {
-
                 checkIsUrl = true;
+                // console.log(`🌐 img[${i}] src is a valid URL.`);
             }
-
         }
-        formData.set("shop_content", tempDiv.innerHTML);
-    }
 
-    $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
-
-        // if (tag[0] === 'fileInput[]' && tag[1].name === '') {
-        //     alertError("Please add a cover photo.");
-        //     return;
-        // }
-        if (tag[0] === 'shop_subject' && tag[1].trim() === '') {
-            $("#shop_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_description' && tag[1].trim() === '') {
-            $("#shop_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
-    }
-
-    if (checkIsUrl) {
-
-        Swal.fire({
-            title: "Image detection system from other websites?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-
-        });
-
-
+        finalContent = tempDiv.innerHTML;
+        formData.set("shop_content", finalContent);
+        // console.log("📝 finalContent (cleaned):", finalContent);
     } else {
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.href = "list_shop.php";
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-        });
-
+        console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // Validate
+    $(".is-invalid").removeClass("is-invalid");
+
+    if (!$("#shop_subject").val().trim()) {
+        $("#shop_subject").addClass("is-invalid");
+        console.error("❌ Validation failed: shop_subject is empty");
+        return;
+    }
+    if (!$("#shop_description").val().trim()) {
+        $("#shop_description").addClass("is-invalid");
+        console.error("❌ Validation failed: shop_description is empty");
+        return;
+    }
+    if (!finalContent.trim()) {
+        alertError("Please fill in content information.");
+        console.error("❌ Validation failed: shop_content is empty");
+        return;
+    }
+
+    formData.set("shop_subject", $("#shop_subject").val());
+    formData.set("shop_description", $("#shop_description").val());
+
+    // console.log("📤 Form data prepared:", {
+    //     shop_id: $("#shop_id").val(),
+    //     shop_subject: $("#shop_subject").val(),
+    //     shop_description: $("#shop_description").val(),
+    //     shop_content: finalContent,
+    //     image_files_count: formData.getAll("image_files[]").length
+    // });
+
+    Swal.fire({
+        title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+        text: "Do you want to edit shop?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4CAF50",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Accept"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#loading-overlay').fadeIn();
+            console.log("🚀 Sending AJAX request...");
+
+            $.ajax({
+                url: "actions/process_shop.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("✅ AJAX success:", response);
+                    try {
+                        var json = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (json.status === 'success') {
+                            window.location.href = "list_shop.php";
+                        } else {
+                            Swal.fire('Error', json.message || 'Unknown error', 'error');
+                        }
+                    } catch (e) {
+                        console.error("❌ JSON parse error:", e);
+                        Swal.fire('Error', 'Invalid response from server', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    console.error("❌ AJAX error:", xhr.responseText);
+                    Swal.fire('Error', 'AJAX request failed', 'error');
+                    $('#loading-overlay').fadeOut();
+                },
+            });
+        } else {
+            console.log("❎ User cancelled action");
+            $('#loading-overlay').fadeOut();
+        }
+    });
 });
 
+
+
+// function reDirect(url, data) {
+//     var form = $('<form>', {
+//         method: 'POST',
+//         action: url,
+//         target: '_blank'
+//     });
+//     $.each(data, function(key, value) {
+//         $('<input>', {
+//             type: 'hidden',
+//             name: key,
+//             value: value
+//         }).appendTo(form);
+//     });
+//     $('body').append(form);
+//     form.submit();
+// }
 function reDirect(url, data) {
     var form = $('<form>', {
         method: 'POST',

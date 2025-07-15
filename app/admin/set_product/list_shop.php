@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List product</title>
+    <title>List shop</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -104,11 +104,11 @@
                                 <div style="display: flex; justify-content: space-between;">
                                     <h4 class="line-ref mb-3"> 
                                         <i class="far fa-newspaper"></i>   
-                                        List product
+                                        List shop
                                     </h4>
                                     <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_product/setup_shop.php'?>">
                                         <i class="fa-solid fa-plus"></i>
-                                        write product
+                                        write shop
                                     </a>
                                 </div>
 

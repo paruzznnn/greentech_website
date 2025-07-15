@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>setup product</title>
+    <title>setup shop</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -108,7 +108,7 @@
                 <div class="row">
                 <h4 class="line-ref mb-3">
                     <i class="fa-solid fa-pen-clip"></i>
-                    write product
+                    write shop
                 </h4>
                     
                         <form id="formshop" enctype="multipart/form-data">
@@ -148,7 +148,7 @@
                                         id="submitAddshop"
                                         class="btn btn-primary">
                                             <i class="fas fa-plus"></i>
-                                            product
+                                            shop
                                         </button>
                                     </div>
                                 </div>
@@ -159,7 +159,7 @@
                                             <span>Content</span>:
                                         </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="shop_content"></textarea>
+                                            <textarea class="form-control summernote" id="summernote" name="shop_content"></textarea>
                                         </div>
                                     </div>
                                 </div>
