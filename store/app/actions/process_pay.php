@@ -165,14 +165,14 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
 
                     if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                         $uploadFileDir = './uploaded_files/';
-                        if (!is_dir($uploadFileDir)) {
-                            mkdir($uploadFileDir, 775, true);
-                        }
+                        // if (!is_dir($uploadFileDir)) {
+                        //     mkdir($uploadFileDir, 775, true);
+                        // }
 
                         $destFilePath = $uploadFileDir . basename($fileName);
                         $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
 
-                        if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                        // if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
                             $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
                             $filePathEsc = mysqli_real_escape_string($conn, $destFilePath);
@@ -193,7 +193,7 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                             if (!mysqli_query($conn, $sqlUpdate)) {
                                 echo "Error updating order status: " . mysqli_error($conn);
                             }
-                        }
+                        // }
                     }
                 }
             }
@@ -220,14 +220,14 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
 
                     if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                         $uploadFileDir = './uploaded_files/';
-                        if (!is_dir($uploadFileDir)) {
-                            mkdir($uploadFileDir, 775, true);
-                        }
+                        // if (!is_dir($uploadFileDir)) {
+                        //     mkdir($uploadFileDir, 775, true);
+                        // }
 
                         $destFilePath = $uploadFileDir . basename($fileName);
                         $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
 
-                        if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                        // if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
                             $fileTypeEsc = mysqli_real_escape_string($conn, $fileType);
                             $filePathEsc = mysqli_real_escape_string($conn, $destFilePath);
@@ -274,7 +274,7 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                                 echo "Error updating order status: " . mysqli_error($conn);
                             }
 
-                        }
+                        // }
                     }
                 }
             }
