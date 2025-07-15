@@ -34,46 +34,6 @@ try {
             $tms_id = isset($order['transport_data']['tms_id']) ? $order['transport_data']['tms_id'] : null;
             $tms_price = isset($order['transport_data']['tms_price']) ? $order['transport_data']['tms_price'] : null;
 
-            foreach ($order['product_data'] as $product) {
-
-                $member_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-                $order_id       = mysqli_real_escape_string($conn, $order['order_id']);
-                $order_code     = mysqli_real_escape_string($conn, $order['order_code']);
-                $order_key      = mysqli_real_escape_string($conn, $product['key_item']);
-                $pro_id         = mysqli_real_escape_string($conn, $product['pro_id']);
-                $pic            = mysqli_real_escape_string($conn, $product['pic']);
-                $price          = floatval($product['price']);
-                $quantity       = intval($product['quantity']);
-                $total_price    = floatval($product['total_price']);
-                $currency       = mysqli_real_escape_string($conn, $product['currency']);
-                $pay_type       = mysqli_real_escape_string($conn, $order['type']);
-                $vehicle_id     = mysqli_real_escape_string($conn, isset($tms_id) ? $tms_id : null);
-                $is_del         = 0;
-                $is_status      = 0;
-                // $created_at     = date("Y-m-d H:i:s");
-                $qr_pp          = mysqli_real_escape_string($conn, isset($_POST['qrCodeInput']) ? $_POST['qrCodeInput'] : '');
-
-                $ins_order_sql = "
-                    INSERT INTO `ecm_orders` (
-                        `member_id`, `order_id`, `order_code`, `order_key`, `pro_id`, `pic`, 
-                        `price`, `quantity`, `total_price`, `currency`, `pay_type`, `vehicle_id`, 
-                        `is_del`, `is_status`, `qr_pp`
-                    ) VALUES (
-                        '$member_id', '$order_id', '$order_code', '$order_key', '$pro_id', '$pic',
-                        $price, $quantity, $total_price, '$currency', '$pay_type', '$vehicle_id',
-                        $is_del, $is_status, '$qr_pp'
-                    )";
-
-                mysqli_query($conn, $ins_order_sql);
-            }
-
-            foreach ($order['product_data'] as $item) {
-                $quantity_item = intval($item['quantity']); 
-                $pro_id_item = mysqli_real_escape_string($conn, $item['pro_id']);
-                $up_product_sql = "UPDATE ecm_product SET stock = stock - $quantity_item WHERE material_id = '$pro_id_item'";
-                mysqli_query($conn, $up_product_sql);
-            }
-
             if ($order['customer_data']) {
                 $c = $order['customer_data'];
 
@@ -113,6 +73,46 @@ try {
                 $ins_pay_sql = "INSERT INTO ord_payment (member_id, order_id, pay_channel, `type`) 
                 VALUES ('$member_id', '$order_id', '$pay_channel', '$type')";
                 mysqli_query($conn, $ins_pay_sql);
+            }
+
+            foreach ($order['product_data'] as $product) {
+
+                $member_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+                $order_id       = mysqli_real_escape_string($conn, $order['order_id']);
+                $order_code     = mysqli_real_escape_string($conn, $order['order_code']);
+                $order_key      = mysqli_real_escape_string($conn, $product['key_item']);
+                $pro_id         = mysqli_real_escape_string($conn, $product['pro_id']);
+                $pic            = mysqli_real_escape_string($conn, $product['pic']);
+                $price          = floatval($product['price']);
+                $quantity       = intval($product['quantity']);
+                $total_price    = floatval($product['total_price']);
+                $currency       = mysqli_real_escape_string($conn, $product['currency']);
+                $pay_type       = mysqli_real_escape_string($conn, $order['type']);
+                $vehicle_id     = mysqli_real_escape_string($conn, isset($tms_id) ? $tms_id : null);
+                $is_del         = 0;
+                $is_status      = 0;
+                // $created_at     = date("Y-m-d H:i:s");
+                $qr_pp          = mysqli_real_escape_string($conn, isset($_POST['qrCodeInput']) ? $_POST['qrCodeInput'] : '');
+
+                $ins_order_sql = "
+                    INSERT INTO `ecm_orders` (
+                        `member_id`, `order_id`, `order_code`, `order_key`, `pro_id`, `pic`, 
+                        `price`, `quantity`, `total_price`, `currency`, `pay_type`, `vehicle_id`, 
+                        `is_del`, `is_status`, `qr_pp`
+                    ) VALUES (
+                        '$member_id', '$order_id', '$order_code', '$order_key', '$pro_id', '$pic',
+                        $price, $quantity, $total_price, '$currency', '$pay_type', '$vehicle_id',
+                        $is_del, $is_status, '$qr_pp'
+                    )";
+
+                mysqli_query($conn, $ins_order_sql);
+            }
+
+            foreach ($order['product_data'] as $item) {
+                $quantity_item = intval($item['quantity']); 
+                $pro_id_item = mysqli_real_escape_string($conn, $item['pro_id']);
+                $up_product_sql = "UPDATE ecm_product SET stock = stock - $quantity_item WHERE material_id = '$pro_id_item'";
+                mysqli_query($conn, $up_product_sql);
             }
         }
 
