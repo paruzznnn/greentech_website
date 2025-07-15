@@ -5,9 +5,15 @@ $offset = ($page - 1) * $perPage;
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-$totalQuery = "SELECT COUNT(*) as total FROM dn_shop dn";
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and valid documents ---
+$totalQuery = "SELECT COUNT(DISTINCT dn.shop_id) as total
+               FROM dn_shop dn
+               LEFT JOIN dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
+                                           AND dnc.del = '0'
+                                           AND dnc.status = '1'
+               WHERE dn.del = '0'"; // Filter shops that are not deleted
 if ($searchQuery) {
-    $totalQuery .= " WHERE dn.subject_shop LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    $totalQuery .= " AND dn.subject_shop LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -15,22 +21,23 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
-$sql = "SELECT 
-            dn.shop_id, 
-            dn.subject_shop, 
+// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation ---
+$sql = "SELECT
+            dn.shop_id,
+            dn.subject_shop,
             dn.description_shop,
-            dn.content_shop, 
-            dn.date_create, 
-            GROUP_CONCAT(dnc.file_name) AS file_name,
-            GROUP_CONCAT(dnc.api_path) AS pic_path
-        FROM 
+            dn.content_shop,
+            dn.date_create,
+            GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
+            GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
+        FROM
             dn_shop dn
-        LEFT JOIN 
+        LEFT JOIN
             dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
-        WHERE 
-            dn.del = '0' AND
-            dnc.del = '0' AND
-            dnc.status = '1'"; // Ensure there's a space before "WHERE"
+                                AND dnc.del = '0'
+                                AND dnc.status = '1'
+        WHERE
+            dn.del = '0'"; // Only select shops where del is 0
 
 if ($searchQuery) {
     $sql .= "
@@ -38,8 +45,8 @@ if ($searchQuery) {
     ";
 }
 
-$sql .= " 
-GROUP BY dn.shop_id 
+$sql .= "
+GROUP BY dn.shop_id
 ORDER BY dn.date_create DESC
 LIMIT $perPage OFFSET $offset";
 
@@ -54,19 +61,18 @@ if ($result->num_rows > 0) {
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
-            // Ensure matches is not empty before accessing the value
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+        // Handle cases where pic_path or file_name might be NULL if no valid documents
+        $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
+        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
 
-        // Check if $iframeSrc is set and not null before accessing it
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesNews[] = [
             'id' => $row['shop_id'],
-            'image' =>  $paths[0],
+            'image' => !empty($paths) ? $paths[0] : null, // Set to null if no valid image path
             'date_time' => $row['date_create'],
             'title' => $row['subject_shop'],
             'description' => $row['description_shop'],
@@ -80,8 +86,7 @@ if ($result->num_rows > 0) {
 <div style="display: flex; justify-content: space-between;">
 
     <div>
-        <!-- <p>Showing <?php echo $page; ?> to <?php echo $totalPages; ?> of <?php echo $totalItems; ?> entry</p> -->
-    </div>
+        </div>
 
     <div>
         <form method="GET" action="">
@@ -98,19 +103,23 @@ if ($result->num_rows > 0) {
 
         <div class="box-news">
             <div class="box-image">
-                <?php 
+                <?php
                     $encodedId = urlencode(base64_encode($box['id']));
                 ?>
                 <a href="shop_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
-                    
+
                     <?php
-                    if(empty($box['image'])){
+                    // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
+                    if(!empty($box['iframe'])){
                         echo '<iframe frameborder="0" src="' . $box['iframe'] . '" width="100%" height="100%" class="note-video-clip"></iframe>';
-                    }else{
+                    } else if (!empty($box['image'])){
                         echo '<img src="' . $box['image'] . '" alt="Image for ' . htmlspecialchars($box['title']) . '">';
+                    } else {
+                        // Optionally, display a default placeholder image or leave empty
+                        echo '<img src="path/to/default/shop_placeholder.jpg" alt="No image available">';
                     }
                     ?>
-                    
+
                 </a>
             </div>
             <div class="box-content">
@@ -139,7 +148,6 @@ if ($result->num_rows > 0) {
         <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Next</a>
     <?php endif; ?>
 </div>
-
 
 <!-- แสดงฟอร์มด้านล่างนี้ -->
 <!-- <h3>ใส่ความคิดเห็น</h3>
