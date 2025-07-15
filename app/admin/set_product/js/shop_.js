@@ -242,6 +242,10 @@ $(document).ready(function () {
 
 
 function base64ToFile(base64, fileName) {
+    if (!base64 || typeof base64 !== "string" || !base64.startsWith("data:")) {
+        console.error("Invalid base64 input:", base64);
+        return null;
+    }
 
     var fileExtension = fileName.split(".").pop().toLowerCase();
 
@@ -263,25 +267,29 @@ function base64ToFile(base64, fileName) {
         case "txt":
             mimeType = "text/plain";
             break;
-
         default:
             mimeType = "application/octet-stream";
     }
 
-    var byteString = atob(base64.split(",")[1]);
+    try {
+        const base64Data = base64.split(",")[1];
+        const byteString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
 
-    var arrayBuffer = new ArrayBuffer(byteString.length);
-    var uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
 
-    for (var i = 0; i < byteString.length; i++) {
-        uint8Array[i] = byteString.charCodeAt(i);
+        const blob = new Blob([uint8Array], { type: mimeType });
+        const file = new File([blob], fileName, { type: mimeType });
+
+        return file;
+
+    } catch (e) {
+        console.error("Failed to decode base64:", e, base64);
+        return null;
     }
-
-    var blob = new Blob([uint8Array], { type: mimeType });
-
-    var file = new File([blob], fileName, { type: mimeType });
-
-    return file;
 }
 
 function alertError(textAlert) {
