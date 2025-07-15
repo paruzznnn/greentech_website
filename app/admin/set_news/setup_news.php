@@ -111,7 +111,7 @@
                     write news
                 </h4>
                     
-                        <form id="formNews" enctype="multipart/form-data">
+                        <form id="formnews" enctype="multipart/form-data">
 
                             <div class="row">
 
@@ -145,10 +145,10 @@
                                     <div style="margin: 10px; text-align: end;">
                                         <button 
                                         type="button" 
-                                        id="submitAddNews"
+                                        id="submitAddnews"
                                         class="btn btn-primary">
                                             <i class="fas fa-plus"></i>
-                                            News
+                                            news
                                         </button>
                                     </div>
                                 </div>
@@ -159,7 +159,7 @@
                                             <span>Content</span>:
                                         </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="news_content"></textarea>
+                                            <textarea class="form-control summernote" id="summernote" name="news_content"></textarea>
                                         </div>
                                     </div>
                                 </div>

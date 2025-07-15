@@ -38,9 +38,7 @@
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.4/datatables.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js">
-        
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
     <style>
@@ -106,7 +104,7 @@
                                         <i class="far fa-newspaper"></i>   
                                         List news
                                     </h4>
-                                    <a type="button" class="btn btn-primary" href="/app/admin/set_news/setup_news.php">
+                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_news/setup_news.php'?>">
                                         <i class="fa-solid fa-plus"></i>
                                         write news
                                     </a>
