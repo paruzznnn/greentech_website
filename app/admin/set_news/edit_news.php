@@ -99,7 +99,7 @@ $decodedId = $_POST['news_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit News
+                        <i class="far fa-newspaper"></i> Edit news
                     </h4>
                     <?php
 $stmt = $conn->prepare("
@@ -146,7 +146,7 @@ if ($result->num_rows > 0) {
         $content = mb_convert_encoding($content, 'UTF-8', 'auto');
 
         echo "
-        <form id='formNews_edit' enctype='multipart/form-data'>
+        <form id='formnews_edit' enctype='multipart/form-data'>
             <input type='hidden' class='form-control' id='news_id' name='news_id' value='" . htmlspecialchars($row['news_id']) . "'>
             <div class='row'>
                 <div class='col-md-4'>
@@ -168,15 +168,15 @@ if ($result->num_rows > 0) {
                         <textarea class='form-control' id='news_description' name='news_description'>" . htmlspecialchars($row['description_news']) . "</textarea>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditNews' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save News
+                        <button type='button' id='submitEditnews' class='btn btn-success'>
+                            <i class='fas fa-save'></i> Save news
                         </button>
                     </div>
                 </div>
                 <div class='col-md-8'>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='news_content'>" . htmlspecialchars($content) . "</textarea>
+                        <textarea class='form-control summernote' id='summernote_update' name='news_content'>" . htmlspecialchars($content) . "</textarea>
                     </div>
                 </div>
             </div>
@@ -219,3 +219,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     <script src='js/news_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
+
+
+
+
