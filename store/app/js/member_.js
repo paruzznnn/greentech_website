@@ -831,7 +831,6 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
 
                     dataMemberOrder.forEach(order => {
                         
-                        
                         const productIds = order.product_ids.split(',');
                         const prices = order.prices.split(',');
                         const quantities = order.quantities.split(',');
@@ -842,13 +841,10 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         let transportChannel = '';
                         let statusHtml = '';
 
-                        let totalQty = 0; // Total quantity
-                        let totalAmount = 0; // Total amount
-                        let tmsPrice = order.vehicle_price;
+                        let totalQty = 0;
+                        let totalAmount = 0;
+                        let tmsPrice = parseInt(order.vehicle_price);
 
-                        // $vat = ($totalPrice + $tmsPrice) * 0.07; 
-                        // $totalPriceWithVat = $totalPrice + $tmsPrice + $vat;
-                    
                         switch (order.pay_channel) {
                             case 1:
                                 payChannel = `<img src="../public/img/bankPay.png" class="" style="width: 80%;">
@@ -917,15 +913,14 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                 break;
                         }
                     
-                        // Calculate totals
                         productIds.forEach((productId, index) => {
-                            totalQty += parseInt(quantities[index], 10); // Sum quantities
-                            totalAmount += parseFloat(totalPrices[index]); // Sum total prices
+                            totalQty += parseInt(quantities[index], 10);
+                            totalAmount += parseFloat(totalPrices[index]); 
                         });
                     
-                        const vat = (totalAmount + tmsPrice) * 0.07; // Calculate VAT (7%)
-                        const grandTotal = totalAmount + tmsPrice + vat; // Total including VAT
-                        
+                        let vat = (totalAmount + tmsPrice) * 0.07; 
+                        let grandTotal = totalAmount + tmsPrice + vat;
+
                         
                         $('#numberOrder').val(order.order_id);
                     
@@ -1066,8 +1061,6 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         </div>`;
                     });
                     
-
-
                     $('#showMemberPurchase').html(`
                         <div style="display: flex; justify-content: space-between;">
                             <div>Showing ${startItem} to ${endItem} of ${totalItems} PurchaseHistory</div>
