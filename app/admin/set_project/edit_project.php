@@ -1,23 +1,8 @@
-<?php 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
 
-include '../../../lib/connect.php';
-include '../../../lib/base_directory.php';
-include '../check_permission.php';
 
-// ตรวจสอบว่าได้รับค่า project_id หรือไม่
-if (!isset($_POST['project_id'])) {
-    echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
-    exit;
-}
 
-$decodedId = $_POST['project_id'];
-?>
 
-<!--  -->
-  <?php include '../check_permission.php'?>
+<?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -138,24 +123,19 @@ $decodedId = $_POST['project_id'];
 // Prepare the SQL statement
 $stmt = $conn->prepare("
     SELECT 
-    dn.project_id, 
-    dn.subject_project, 
-    dn.description_project,
-    dn.content_project, 
-    dn.date_create, 
-    GROUP_CONCAT(dnc.file_name) AS file_name,
-    GROUP_CONCAT(dnc.api_path) AS pic_path,
-    MAX(dnc.status) AS status
-FROM dn_project dn
-LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
-WHERE dn.project_id = ?
-GROUP BY dn.project_id
-
+        dn.project_id, 
+        dn.subject_project, 
+        dn.description_project,
+        dn.content_project, 
+        dn.date_create, 
+        GROUP_CONCAT(dnc.file_name) AS file_name,
+        GROUP_CONCAT(dnc.api_path) AS pic_path,
+        dnc.status
+    FROM dn_project dn
+    LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
+    WHERE dn.project_id = ?
+    GROUP BY dn.project_id
 ");
-
-if ($stmt === false) {
-    die('❌ SQL Prepare failed: ' . $conn->error);
-}
 
 $stmt->bind_param('i', $decodedId);
 $stmt->execute();
