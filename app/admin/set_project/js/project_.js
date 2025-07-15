@@ -597,21 +597,15 @@ $("#submitEditproject").on("click", function (event) {
     var formproject = $("#formproject_edit")[0];
     var formData = new FormData(formproject);
 
-    // ✅ เพิ่มค่าให้ครบทุกตัวตรงนี้
-    formData.append("action", "editproject");
-    formData.set("project_id", $("#project_id").val());
-    formData.set("project_subject", $("#project_subject").val());
-    formData.set("project_description", $("#project_description").val());
-    formData.set("project_content", $("#project_content").summernote('code'));  // ถ้าใช้ summernote
-
-    // ✅ ตรวจจับภาพใน content หลังจาก set project_content แล้ว
-    var projectContent = formData.get("project_content");
+    // ✅ ดึงค่าจาก summernote ก่อน
+    var projectContent = $("#project_content").summernote('code');
     let checkIsUrl = false;
 
     if (projectContent) {
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = projectContent;
         var imgTags = tempDiv.getElementsByTagName("img");
+
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
             var filename = imgTags[i].getAttribute("data-filename");
@@ -632,31 +626,36 @@ $("#submitEditproject").on("click", function (event) {
             }
         }
 
-        formData.set("project_content", tempDiv.innerHTML);
+        projectContent = tempDiv.innerHTML;  // ใช้ค่าใหม่ที่ถูกแก้ไข
     }
 
-    // ✅ Validation หลัง append ค่าแล้ว
+    // ✅ Append ค่า หลังจัดการ content เสร็จ
+    formData.append("action", "editproject");
+    formData.set("project_id", $("#project_id").val());
+    formData.set("project_subject", $("#project_subject").val());
+    formData.set("project_description", $("#project_description").val());
+    formData.set("project_content", projectContent);
+
+    // ✅ Validation
     $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
-        if (tag[0] === 'project_subject' && tag[1].trim() === '') {
-            $("#project_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'project_description' && tag[1].trim() === '') {
-            $("#project_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'project_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
+    if (!$("#project_subject").val().trim()) {
+        $("#project_subject").addClass("is-invalid");
+        return;
+    }
+    if (!$("#project_description").val().trim()) {
+        $("#project_description").addClass("is-invalid");
+        return;
+    }
+    if (!projectContent.trim()) {
+        alertError("Please fill in content information.");
+        return;
     }
 
     let confirmOptions = {
         title: checkIsUrl
             ? "Image detection system from other websites?"
             : "Are you sure?",
-        text: "Do you want to edit project.!",
+        text: "Do you want to edit project.?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#4CAF50",
@@ -686,7 +685,6 @@ $("#submitEditproject").on("click", function (event) {
                     console.log("error", xhr.responseText);
                     Swal.fire('Error', 'AJAX request failed', 'error');
                 },
-
             });
         } else {
             $('#loading-overlay').fadeOut();
