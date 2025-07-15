@@ -1,20 +1,5 @@
-<?php 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
-include '../../../lib/connect.php';
-include '../../../lib/base_directory.php';
-include '../check_permission.php';
-
-// ตรวจสอบว่าได้รับค่า project_id หรือไม่
-if (!isset($_POST['project_id'])) {
-    echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
-    exit;
-}
-
-$decodedId = $_POST['project_id'];
-?>
+<!--  -->
+  <?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -23,7 +8,9 @@ $decodedId = $_POST['project_id'];
     <title>Edit project</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
+
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
+
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
     <script src="../../../inc/jquery/js/jquery-ui.min.js"></script>
 
@@ -32,11 +19,16 @@ $decodedId = $_POST['project_id'];
     <script src="../../../inc/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 
     <link href="../../../inc/sweetalert2/css/sweetalert2.min.css" rel="stylesheet">
     <script src="../../../inc/sweetalert2/js/sweetalert2.all.min.js"></script>
@@ -50,13 +42,20 @@ $decodedId = $_POST['project_id'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 
+
+    <!-- <link href="../../../inc/summernote/summernote-lite.min.css" rel="stylesheet">
+    <script src="../../../inc/summernote/summernote-lite.min.js"></script> -->
+
+
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
+
 
     <style>
         .responsive-grid {
@@ -71,15 +70,18 @@ $decodedId = $_POST['project_id'];
             gap: 10px;
         }
 
+        /* Media query for smaller screens */
         @media (max-width: 768px) {
             .responsive-grid {
                 grid-template-columns: 1fr;
+                /* Switch to a single column layout */
             }
         }
 
         @media (max-width: 480px) {
             .responsive-button-container div {
                 text-align: center;
+                /* Center-align button on very small screens */
             }
         }
 
@@ -88,40 +90,49 @@ $decodedId = $_POST['project_id'];
             top: 70px !important;
             z-index: 1 !important;
         }
+
+        /* .note-editor .note-toolbar, .note-popover .popover-content {
+            margin: 0;
+            padding: 0 0 5px 5px;
+            position: sticky !important;
+            top: 0px !important;
+            z-index: 999 !important;
+        } */
     </style>
 </head>
 
 <?php include '../template/header.php' ?>
 
 <body>
+
     <div class="content-sticky" id="">
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit project
+                        <i class="far fa-newspaper"></i>  
+                        Edit project
                     </h4>
-                    <?php
+
+<?php
+$decodedId = $_POST['project_id'];
+
+// Prepare the SQL statement
 $stmt = $conn->prepare("
     SELECT 
-    dn.project_id, 
-    dn.subject_project, 
-    dn.description_project,
-    dn.content_project, 
-    dn.date_create, 
-    GROUP_CONCAT(dnc.file_name) AS file_name,
-    GROUP_CONCAT(dnc.api_path) AS pic_path,
-    MAX(dnc.status) AS status
-FROM dn_project dn
-LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
-WHERE dn.project_id = ?
-GROUP BY dn.project_id
-
+        dn.project_id, 
+        dn.subject_project, 
+        dn.description_project,
+        dn.content_project, 
+        dn.date_create, 
+        GROUP_CONCAT(dnc.file_name) AS file_name,
+        GROUP_CONCAT(dnc.api_path) AS pic_path,
+        dnc.status
+    FROM dn_project dn
+    LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
+    WHERE dn.project_id = ?
+    GROUP BY dn.project_id
 ");
-
-if ($stmt === false) {
-    die('❌ SQL Prepare failed: ' . $conn->error);
-}
 
 $stmt->bind_param('i', $decodedId);
 $stmt->execute();
@@ -132,6 +143,10 @@ if ($result->num_rows > 0) {
         $content = $row['content_project'];
         $paths = explode(',', $row['pic_path']);
         $files = explode(',', $row['file_name']);
+        $isCover = $row['status'];
+
+        $isCover = $row['status'];
+        $found = false;
 
         foreach ($files as $index => $file) {
             $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
@@ -139,20 +154,23 @@ if ($result->num_rows > 0) {
                 $new_src = $paths[$index];
                 $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
                 $content = str_replace($matches[0], $new_img_tag, $content);
+                $found = true;
             }
         }
 
-        $previewImageSrc = !empty($paths[0]) ? htmlspecialchars($paths[0]) : '';
+        $previewImageSrc = !empty($paths) ? htmlspecialchars($paths[0]) : '';
         $content = mb_convert_encoding($content, 'UTF-8', 'auto');
 
         echo "
         <form id='formproject_edit' enctype='multipart/form-data'>
-            <input type='hidden' class='form-control' id='project_id' name='project_id' value='" . htmlspecialchars($row['project_id']) . "'>
+        <input type='text' class='form-control' id='project_id' name='project_id' value='" . htmlspecialchars($row['project_id']) . "' hidden>
             <div class='row'>
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
-                        <label><span>Cover photo</span>:</label>
-                        <div id='previewContainer' class='previewContainer'>
+                        <label>
+                            <span>Cover photo</span>:
+                        </label>
+                        <div class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>
                     </div>
@@ -160,23 +178,37 @@ if ($result->num_rows > 0) {
                         <input type='file' class='form-control' id='fileInput' name='fileInput[]'>
                     </div>
                     <div style='margin: 10px;'>
-                        <label><span>Subject</span>:</label>
+                        <label>
+                            <span>Subject</span>:
+                        </label>
                         <input type='text' class='form-control' id='project_subject' name='project_subject' value='" . htmlspecialchars($row['subject_project']) . "'>
                     </div>
                     <div style='margin: 10px;'>
-                        <label><span>Description</span>:</label>
-                        <textarea class='form-control' id='project_description' name='project_description'>" . htmlspecialchars($row['description_project']) . "</textarea>
+                        <label>
+                            <span>Description</span>:
+                        </label>
+                        <div>
+                            <textarea class='form-control' id='project_description' name='project_description'>" . htmlspecialchars($row['description_project']) . "</textarea>
+                        </div>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditproject' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save project
+                        <button 
+                        type='button' 
+                        id='submitEditproject'
+                        class='btn btn-success'>
+                            <i class='fas fa-save'></i>
+                            Save project
                         </button>
                     </div>
                 </div>
                 <div class='col-md-8'>
                     <div style='margin: 10px;'>
-                        <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='project_content'>" . htmlspecialchars($content) . "</textarea>
+                        <label>
+                            <span>Content</span>:
+                        </label>
+                        <div>
+                            <textarea class='form-control' id='summernote' name='project_content'>" . htmlspecialchars(string: $content) . "</textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,38 +216,27 @@ if ($result->num_rows > 0) {
         ";
     }
 } else {
-    echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
+    echo "ไม่มีข้อมูล"; // No data found message
 }
+
+
 $stmt->close();
 ?>
 
-<script>
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const container = document.getElementById('previewContainer');
-    container.innerHTML = ''; // clear preview
-    const files = e.target.files;
-    if (files.length > 0) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const img = document.createElement('img');
-                img.src = evt.target.result;
-                img.style.maxWidth = '100%';
-                img.style.marginBottom = '10px';
-                container.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-});
-</script>
-
                 </div>
             </div>
+
         </div>
     </div>
 
+<!-- ฦ edit_project.php -->
+
+
+
+
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/project_.js?v=<?php echo time(); ?>'></script>
+
 </body>
+
 </html>
