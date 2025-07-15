@@ -152,6 +152,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
                         <label><span>Cover photo</span>:</label>
+                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                         <div id='previewContainer' class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>

@@ -118,7 +118,8 @@
                                 <div class="col-md-4">
                                     <div style="margin: 10px;">
                                         <label for="">
-                                            <span>Cover photo</span>:
+                                            <span>Cover photo</span>: 
+                                            <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                                         </label>
                                         <div class="previewContainer">
                                             <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
