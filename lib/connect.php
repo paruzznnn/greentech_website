@@ -32,11 +32,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ลบ path /trandar และลิงก์ localhost ทิ้ง
-ob_start(function ($buffer) {
-    $buffer = str_replace('http://localhost/trandar/', '', $buffer);
-    // $buffer = str_replace('/trandar', '', $buffer);
-    return $buffer;
-});
-
+if ($isHttps) {
+    // ลบ path /trandar และลิงก์ localhost ทิ้ง
+    ob_start(function ($buffer) {
+        $buffer = str_replace('http://localhost/trandar/', '', $buffer);
+        // $buffer = str_replace('/trandar', '', $buffer);()
+        return $buffer;
+    });
+}
 ?>

@@ -176,7 +176,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-8'>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='project_content'>" . htmlspecialchars($content) . "</textarea>
+                        <textarea class='form-control summernote' id='summernote_update' name='project_content'>" . htmlspecialchars($content) . "</textarea>
                     </div>
                 </div>
             </div>
