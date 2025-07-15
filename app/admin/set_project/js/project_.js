@@ -597,51 +597,58 @@ $("#submitEditproject").on("click", function (event) {
     var formproject = $("#formproject_edit")[0];
     var formData = new FormData(formproject);
 
-    // ✅ ดึงค่าจาก summernote ก่อน
-    var projectContent = $("#project_content").summernote('code');
+    // ✅ ดึง content จาก summernote ก่อน
+    var contentFromEditor = $("#project_content").summernote('code');
     let checkIsUrl = false;
 
-    if (projectContent) {
+    if (contentFromEditor) {
         var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = projectContent;
+        tempDiv.innerHTML = contentFromEditor;
         var imgTags = tempDiv.getElementsByTagName("img");
 
         for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+            var imgSrc = imgTags[i].getAttribute("src")?.replace(/ /g, "%20");
             var filename = imgTags[i].getAttribute("data-filename");
 
-            let isUrl = isValidUrl(imgSrc);
+            if (!imgSrc) continue;
 
-            if (!isUrl) {
+            if (!isValidUrl(imgSrc)) {
                 var file = base64ToFile(imgSrc, filename);
                 if (file) {
                     formData.append("image_files[]", file);
                 }
-
-                if (imgSrc.startsWith("data:image")) {
-                    imgTags[i].setAttribute("src", "");
-                }
+                imgTags[i].setAttribute("src", "");
             } else {
                 checkIsUrl = true;
             }
+            
         }
+         // ✅ Final Content (ใช้ string แน่นอน)
+        var finalContent = tempDiv.innerHTML;
+        formData.set("project_content", finalContent);
 
-        projectContent = tempDiv.innerHTML;  // ใช้ค่าใหม่ที่ถูกแก้ไข
+        console.log("🔍 Final Content Before Submit:", finalContent);
+
+        // ✅ เอา innerHTML ที่ clean แล้ว
+        contentFromEditor = tempDiv.innerHTML;
     }
+    
 
-    // ✅ Append ค่า หลังจัดการ content เสร็จ
-    formData.append("action", "editproject");
+    // ✅ Append หลังจัดการเสร็จ
+    formData.set("action", "editproject");
     formData.set("project_id", $("#project_id").val());
     formData.set("project_subject", $("#project_subject").val());
     formData.set("project_description", $("#project_description").val());
-    formData.set("project_content", projectContent.toString());
-    // หลังจากแปลง tempDiv เสร็จ
-    projectContent = tempDiv.innerHTML;
-    console.log("Final Content Before Submit:", projectContent);
-    formData.set("project_content", typeof projectContent === "string" ? projectContent : projectContent.toString());
+    formData.set("project_content", contentFromEditor);
 
-    // ✅ Validation
-    $(".is-invalid").removeClass("is-invalid");
+    console.log("🔍 ส่งข้อมูลไป:", {
+        project_id: $("#project_id").val(),
+        project_subject: $("#project_subject").val(),
+        project_description: $("#project_description").val(),
+        project_content: contentFromEditor
+    });
+
+    // ✅ Validate
     if (!$("#project_subject").val().trim()) {
         $("#project_subject").addClass("is-invalid");
         return;
@@ -650,24 +657,20 @@ $("#submitEditproject").on("click", function (event) {
         $("#project_description").addClass("is-invalid");
         return;
     }
-    if (!projectContent.trim()) {
+    if (!contentFromEditor.trim()) {
         alertError("Please fill in content information.");
         return;
     }
 
-    let confirmOptions = {
-        title: checkIsUrl
-            ? "Image detection system from other websites?"
-            : "Are you sure?",
+    Swal.fire({
+        title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
         text: "Do you want to edit project.?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#4CAF50",
         cancelButtonColor: "#d33",
         confirmButtonText: "Accept"
-    };
-
-    Swal.fire(confirmOptions).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
             $('#loading-overlay').fadeIn();
 
@@ -678,15 +681,15 @@ $("#submitEditproject").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log("response", response);
-                    if (response.status == 'success') {
+                    console.log("✅ success", response);
+                    if (response.status === 'success') {
                         window.location.href = "list_project.php";
                     } else {
                         Swal.fire('Error', response.message, 'error');
                     }
                 },
                 error: function (xhr) {
-                    console.log("error", xhr.responseText);
+                    console.log("❌ error", xhr.responseText);
                     Swal.fire('Error', 'AJAX request failed', 'error');
                 },
             });
@@ -695,6 +698,8 @@ $("#submitEditproject").on("click", function (event) {
         }
     });
 });
+
+
 
 
 // function reDirect(url, data) {
