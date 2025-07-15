@@ -596,8 +596,15 @@ $("#submitEditproject").on("click", function (event) {
 
     var formproject = $("#formproject_edit")[0];
     var formData = new FormData(formproject);
-    formData.append("action", "editproject"); // ใช้ action นี้เพื่อให้ฝั่ง PHP รู้ว่าเป็นแก้ไข
 
+    // ✅ เพิ่มค่าให้ครบทุกตัวตรงนี้
+    formData.append("action", "editproject");
+    formData.set("project_id", $("#project_id").val());
+    formData.set("project_subject", $("#project_subject").val());
+    formData.set("project_description", $("#project_description").val());
+    formData.set("project_content", $("#project_content").summernote('code'));  // ถ้าใช้ summernote
+
+    // ✅ ตรวจจับภาพใน content หลังจาก set project_content แล้ว
     var projectContent = formData.get("project_content");
     let checkIsUrl = false;
 
@@ -628,6 +635,7 @@ $("#submitEditproject").on("click", function (event) {
         formData.set("project_content", tempDiv.innerHTML);
     }
 
+    // ✅ Validation หลัง append ค่าแล้ว
     $(".is-invalid").removeClass("is-invalid");
     for (var tag of formData.entries()) {
         if (tag[0] === 'project_subject' && tag[1].trim() === '') {
@@ -667,17 +675,17 @@ $("#submitEditproject").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                console.log("response", response);  // ✅ เอาไว้ดูใน console ว่ากลับมาอะไร
-                if (response.status == 'success') {
-                    window.location.href = "list_project.php";
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                }
-            },
-            error: function (xhr) {
-                console.log("error", xhr.responseText);
-                Swal.fire('Error', 'AJAX request failed', 'error');
-},
+                    console.log("response", response);
+                    if (response.status == 'success') {
+                        window.location.href = "list_project.php";
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function (xhr) {
+                    console.log("error", xhr.responseText);
+                    Swal.fire('Error', 'AJAX request failed', 'error');
+                },
 
             });
         } else {
@@ -686,34 +694,6 @@ $("#submitEditproject").on("click", function (event) {
     });
 });
 
-Swal.fire(confirmOptions).then((result) => {
-    if (result.isConfirmed) {
-        $('#loading-overlay').fadeIn();
-
-        $.ajax({
-            url: "actions/process_project.php",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                console.log(response);  // ✅
-                $('#loading-overlay').fadeOut();
-                if (response.status == 'success') {
-                    window.location.href = "list_project.php";
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                }
-            },
-            error: function (xhr) {
-                $('#loading-overlay').fadeOut();
-                Swal.fire('Error', 'AJAX request failed', 'error');
-            }
-        });
-    } else {
-        $('#loading-overlay').fadeOut();
-    }
-});
 
 // function reDirect(url, data) {
 //     var form = $('<form>', {
