@@ -150,7 +150,7 @@ try {
             }
         }
 
-        if (isset($_POST['att_file']) && $_POST['att_file'] === 'save_attach_file' && isset($_FILES['input-b6b'])) {
+        if (isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file' && isset($_FILES['input-b6b'])) {
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
             $maxFileSize = 5 * 1024 * 1024; // 5MB
 
