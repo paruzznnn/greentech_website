@@ -817,16 +817,11 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
         dataType: 'json',
         success: function(response) {
 
-            // console.log('response', response);
-            // return;
-            
-
             if (Array.isArray(response.data)) {
-                let dataMemberOrder = response.data;
+                const dataMemberOrder = response.data;
                 const totalItems = response.totalRecords;
                 const totalPages = response.totalPages;
 
-                // Calculate showing range
                 const startItem = (page - 1) * limit + 1;
                 const endItem = Math.min(page * limit, totalItems);
 
@@ -834,251 +829,187 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                     let divShowOrderBuy = '';
 
                     dataMemberOrder.forEach(order => {
-                        
-                        const productIds = order.product_ids.split(',');
-                        const prices = order.prices.split(',');
-                        const quantities = order.quantities.split(',');
-                        const totalPrices = order.total_prices.split(',');
-                        const keyOrder = order.order_keys.split(',');
-                    
+                        const productIds = order.product_ids?.split(',') || [];
+                        const prices = order.prices?.split(',') || [];
+                        const quantities = order.quantities?.split(',') || [];
+                        const totalPrices = order.total_prices?.split(',') || [];
+                        const keyOrder = order.order_keys?.split(',') || [];
+
                         let payChannel = '';
                         let transportChannel = '';
                         let statusHtml = '';
 
                         let totalQty = 0;
                         let totalAmount = 0;
-                        let tmsPrice = parseInt(order.vehicle_price);
+                        const tmsPrice = parseFloat(order.vehicle_price) || 0;
 
-                        switch (order.pay_channel) {
+                        // Payment Channel
+                        switch (parseInt(order.pay_channel)) {
                             case 1:
-                                payChannel = `<img src="../public/img/bankPay.png" class="" style="width: 80%;">
-                                                <label>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</label>
-                                                <div>
-                                                    ธ.กรุงศรีอยุธยา 320-1-13702-8
-                                                </div>`;
+                                payChannel = `
+                                    <img src="../public/img/bankPay.png" style="width: 80%;">
+                                    <label>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</label>
+                                    <div>ธ.กรุงศรีอยุธยา 320-1-13702-8</div>`;
                                 break;
                             case 2:
                                 payChannel = `
-                                            <img src="../public/img/prompt-pay-logo.png" class="" style="width: 70%;"></img>
-                                            ${order.qr_pp}
-                                            `;
-                                break;
-                            default:
-                                break;
-                        }
-                    
-                        switch (order.type) {
-                            case 1:
-                                transportChannel = `<i class="fas fa-truck"></i> 
-                                                    ตามที่อยู่ที่กำหนด
-                                                    `;
-                                break;
-                            case 2:
-                                transportChannel = `<i class="fas fa-people-carry"></i>
-                                                    รับหน้าร้าน
-                                                    `;
-                                break;
-                            default:
+                                    <img src="../public/img/prompt-pay-logo.png" style="width: 70%;">
+                                    ${order.qr_pp || ''}
+                                `;
                                 break;
                         }
 
-                        switch (order.is_status) {
-                            case 0:
-                                statusHtml = `
-                                            รอส่งหลักฐานการชำระเงิน
-                                            <div>
-                                            <button id="btn-PO-Order" type="button" class="btn btn-link">
-                                                <i class="fas fa-upload"></i>
-                                            </button>
-                                            </div>
-                                            `;
-                                break;
+                        // Transport Type
+                        switch (parseInt(order.type)) {
                             case 1:
-                                statusHtml = `
-                                ส่งหลักฐานแล้วรอตรวจสอบ
-                                <div>
-                                </div>
-                                `;
+                                transportChannel = `<i class="fas fa-truck"></i> ตามที่อยู่ที่กำหนด`;
                                 break;
                             case 2:
-                                statusHtml = ``;
+                                transportChannel = `<i class="fas fa-people-carry"></i> รับหน้าร้าน`;
+                                break;
+                        }
+
+                        // Order Status
+                        switch (parseInt(order.is_status)) {
+                            case 0:
+                                statusHtml = `
+                                    รอส่งหลักฐานการชำระเงิน
+                                    <div>
+                                        <button type="button" class="btn btn-link btn-PO-Order" data-order="${order.order_id}">
+                                            <i class="fas fa-upload"></i>
+                                        </button>
+                                    </div>`;
+                                break;
+                            case 1:
+                                statusHtml = `ส่งหลักฐานแล้วรอตรวจสอบ`;
                                 break;
                             case 3:
                                 statusHtml = `
-                                        รอส่งหลักฐานการชำระเงินอีกครั้ง
-                                        <div>
-                                        <button id="btn-PO-Order" type="button" class="btn btn-link">
+                                    รอส่งหลักฐานการชำระเงินอีกครั้ง
+                                    <div>
+                                        <button type="button" class="btn btn-link btn-PO-Order" data-order="${order.order_id}">
                                             <i class="fas fa-upload"></i>
                                         </button>
-                                        </div>
-                                        `;
+                                    </div>`;
                                 break;
                             default:
-                                break;
+                                statusHtml = '';
                         }
-                    
-                        productIds.forEach((productId, index) => {
-                            totalQty += parseInt(quantities[index], 10);
-                            totalAmount += parseFloat(totalPrices[index]); 
+
+                        // Calculate totals
+                        productIds.forEach((_, index) => {
+                            totalQty += parseInt(quantities[index]) || 0;
+                            totalAmount += parseFloat(totalPrices[index]) || 0;
                         });
-                    
-                        let vat = (totalAmount + tmsPrice) * 0.07; 
-                        let grandTotal = totalAmount + tmsPrice + vat;
 
-                        
-                        $('#numberOrder').val(order.order_id);
-                    
+                        const vat = (totalAmount + tmsPrice) * 0.07;
+                        const grandTotal = totalAmount + tmsPrice + vat;
+
+                        // Generate order block
                         divShowOrderBuy += `
-                        <div class="box-pay-detail" id="orderBuy_${order.order_id}">
-                            <div style="text-align: end; display: flex; justify-content: flex-end; align-items: center;">
-                                <div>
-
-                                    <button type="button" class="print-btn print-circle print-orderBuy" data-key="${order.ids}">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-                                    
-                                    <button type="button" class="remove-btn remove-circle remove-orderBuy" data-key="${order.order_id}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-
+                            <div class="box-pay-detail" id="orderBuy_${order.order_id}">
+                                <div class="text-end d-flex justify-content-end align-items-center">
+                                    <div>
+                                        <button type="button" class="print-btn print-circle print-orderBuy" data-key="${order.ids}">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button type="button" class="remove-btn remove-circle remove-orderBuy" data-key="${order.order_id}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <form id="formOrderBuy_${order.order_id}" class="formOrderBuy_data">
-                                <div>
+                                <form id="formOrderBuy_${order.order_id}" class="formOrderBuy_data">
                                     <div class="purchase overflow-auto">
                                         <header>
                                             <div class="row">
-                                                <div class="col-sm-3 col-xs-3">
+                                                <div class="col-sm-3">
                                                     <img src="../public/img/trandar_logo.png" class="img-responsive">
                                                 </div>
-                                                <div class="col-sm-9 col-xs-9 company-details">
+                                                <div class="col-sm-9 company-details">
                                                     <div>Trandar International Co., Ltd.</div>
-                                                    <div>102 Soi Pattanakarn 40,</div>
-                                                    <div>Pattanakarn Rd,</div>
+                                                    <div>102 Soi Pattanakarn 40, Pattanakarn Rd,</div>
                                                     <div>Suanluang, Bangkok 10250, Thailand</div>
                                                 </div>
                                             </div>
                                         </header>
-                    
+
                                         <main>
-                                            <div class="row" style="margin: 5px 0px;">
-                                                <div class="col-sm-6 col-xs-6">
-                                                    <div class="order-section">
-                                                        <strong>ผู้รับ:</strong><br>
-                                                        <span class="order-content">${order.fullname || 'N/A'}</span>
-                                                    </div>
-                                                    <div class="order-section">
-                                                        <strong>ที่อยู่:</strong><br>
-                                                        <span class="order-content">${order.shipping || 'N/A'}</span>
-                                                    </div>
-                                                    <div class="order-section">
-                                                        <strong>เบอร์โทร:</strong><br>
-                                                        <span class="order-content">${order.phone || 'N/A'}</span>
-                                                    </div>
+                                            <div class="row my-2">
+                                                <div class="col-sm-6">
+                                                    <strong>ผู้รับ:</strong> ${order.fullname || 'N/A'}<br>
+                                                    <strong>ที่อยู่:</strong> ${order.shipping || 'N/A'}<br>
+                                                    <strong>เบอร์โทร:</strong> ${order.phone || 'N/A'}
                                                 </div>
-                                                <div class="col-sm-6 col-xs-6">
-                                                    <div class="order-section">
-                                                        <strong>วันที่:</strong><br> 
-                                                        <span class="order-content">${order.date_created}</span>
-                                                    </div>
-                                                    <div class="order-section">
-                                                        <strong>เลขที่สั่งซื้อ:</strong><br>
-                                                        <span class="order-content">${order.order_codes}</span>
-                                                    </div>
+                                                <div class="col-sm-6">
+                                                    <strong>วันที่:</strong> ${order.date_created}<br>
+                                                    <strong>เลขที่สั่งซื้อ:</strong> ${order.order_codes}
                                                 </div>
                                             </div>
-                                            
-                                            <div class="row">
-                                                <div class="col-sm-12 col-xs-12 table-responsive">
-                                                    <table class="table table-bordered" width="100%">
-                                                        <thead>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>สินค้า</th>
+                                                            <th>ราคา</th>
+                                                            <th>ปริมาณ</th>
+                                                            <th>ราคารวม</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${productIds.map((_, index) => `
                                                             <tr>
-                                                                <th class="text-center">#</th>
-                                                                <th class="text-center">สินค้า</th>
-                                                                <th class="text-center">ราคา</th>
-                                                                <th class="text-center">ปริมาณ</th>
-                                                                <th class="text-center">ราคารวม</th>
+                                                                <td>${index + 1}</td>
+                                                                <td>${keyOrder[index]}</td>
+                                                                <td>${formatNumberWithComma(prices[index])}</td>
+                                                                <td>${quantities[index]}</td>
+                                                                <td>${formatNumberWithComma(totalPrices[index])}</td>
                                                             </tr>
-                                                        </thead>
-                                                        <tbody>`;
-                    
-                                                        productIds.forEach((productId, index) => {
-                                                            divShowOrderBuy += `
-                                                            <tr>
-                                                                <td class="text-end">${index + 1}</td>
-                                                                <td class="text-end">${keyOrder[index]}</td>
-                                                                <td class="text-end">${formatNumberWithComma(prices[index])}</td>
-                                                                <td class="text-end">${quantities[index]}</td>
-                                                                <td class="text-end">${formatNumberWithComma(totalPrices[index])}</td>
-                                                            </tr>`;
-                                                        });
-                                                    
-                                                        divShowOrderBuy += `
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <th rowspan="8" colspan="2" style="width: 250px;">
-                                                                    <div class="text-start">${payChannel}</div>
-                                                                    <br>
-                                                                    <div class="text-start">${transportChannel}</div>
-                                                                    <div class="text-start">กรุณาชำระเงินภายใน 7 วัน</div>
-                                                                </th>
-                                                                <th class="text-end" colspan="2">จำนวนรายการ</th>
-                                                                <th class="text-end">${productIds.length}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">จำนวนรายการสินค้า</th>
-                                                                <th class="text-end">${totalQty}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">รวมเป็นเงิน</th>
-                                                                <th class="text-end">${formatNumberWithComma(totalAmount.toFixed(2))}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">ส่วนลด</th>
-                                                                <th class="text-end">${0}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">ค่าจัดส่ง</th>
-                                                                <th class="text-end">${tmsPrice}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">ภาษีมูลค่าเพิ่ม(7%)</th>
-                                                                <th class="text-end">${formatNumberWithComma(vat.toFixed(2))}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2">จำนวนเงินทั้งสิ้น</th>
-                                                                <th class="text-end">${formatNumberWithComma(grandTotal.toFixed(2))}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="text-end" colspan="2"></th>
-                                                                <th class="text-end">สถานะ ${statusHtml}</th>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-                                                </div>
+                                                        `).join('')}
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th rowspan="8" colspan="2" style="width: 250px;" class="text-start">
+                                                                ${payChannel}<br>
+                                                                ${transportChannel}<br>
+                                                                กรุณาชำระเงินภายใน 7 วัน
+                                                            </th>
+                                                            <th colspan="2">จำนวนรายการ</th>
+                                                            <th>${productIds.length}</th>
+                                                        </tr>
+                                                        <tr><th colspan="2">จำนวนสินค้า</th><th>${totalQty}</th></tr>
+                                                        <tr><th colspan="2">รวมเป็นเงิน</th><th>${formatNumberWithComma(totalAmount.toFixed(2))}</th></tr>
+                                                        <tr><th colspan="2">ส่วนลด</th><th>0</th></tr>
+                                                        <tr><th colspan="2">ค่าจัดส่ง</th><th>${formatNumberWithComma(tmsPrice.toFixed(2))}</th></tr>
+                                                        <tr><th colspan="2">ภาษีมูลค่าเพิ่ม(7%)</th><th>${formatNumberWithComma(vat.toFixed(2))}</th></tr>
+                                                        <tr><th colspan="2">จำนวนเงินทั้งสิ้น</th><th>${formatNumberWithComma(grandTotal.toFixed(2))}</th></tr>
+                                                        <tr><th colspan="2"></th><th>สถานะ ${statusHtml}</th></tr>
+                                                    </tfoot>
+                                                </table>
                                             </div>
                                         </main>
                                     </div>
-                                </div>
-                            </form>
-                        </div>`;
+                                </form>
+                            </div>
+                        `;
                     });
-                    
+
+                    // Inject HTML to page
                     $('#showMemberPurchase').html(`
-                        <div style="display: flex; justify-content: space-between;">
+                        <div class="d-flex justify-content-between mb-2">
                             <div>Showing ${startItem} to ${endItem} of ${totalItems} PurchaseHistory</div>
                             <div id="paginationControls_order"></div>
                         </div>
                         ${divShowOrderBuy}
                     `);
 
-                    $("#btn-PO-Order").click(function() {
-                        $("#myBtn-purchase").click();
+                    // Set up event handlers
+                    $('.btn-PO-Order').click(function () {
+                        $('#myBtn-purchase').click();
                     });
 
                     dataMemberOrder.forEach(orderBuy => {
-                        // setFormFieldsReadOnly(orderBuy.order_id);
                         setupEventHandlers(orderBuy.order_id, 'order_buy');
                     });
 
@@ -1086,10 +1017,10 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                 } else {
                     $('#showMemberPurchase').html('<p>No PurchaseHistory found.</p>');
                 }
-
             } else {
                 console.error('Response is not an array:', response);
             }
+
         },
         error: function() {
             console.error('Error fetching data.');
