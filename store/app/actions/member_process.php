@@ -153,7 +153,6 @@ if(isset($_POST['action']) && $_POST['action'] == 'add_shipment'){
 
     $address_id = (int) $_POST['dataID'];
     $statusActive = (int) ($_POST['dataValue'] ?? 0);
-    $status_del = 1;
 
     $dataType = $_POST['dataType'] ?? '';
 
@@ -178,9 +177,11 @@ if(isset($_POST['action']) && $_POST['action'] == 'add_shipment'){
             break;
 
         case 'remove':
+            $status_del = 1;
+            $is_default = 0;
             $sql = "
                 UPDATE ecm_address 
-                SET is_status = '$status_del'
+                SET is_status = '$status_del', is_default = '$is_default'
                 WHERE address_id = '$address_id' AND member_id = '" . $conn->real_escape_string($member_id) . "'
             ";
             $result = mysqli_query($conn, $sql);
