@@ -115,10 +115,12 @@
                                 <table id="td_list_shop" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Subject</th>
-                                            <th>Date created</th>
-                                            <th>Action</th>
+                                            <th>#</th>
+                                            <th>กลุ่มแม่</th>
+                                            <th>กลุ่มย่อย</th>
+                                            <th>ชื่อสินค้า</th>
+                                            <th>วันที่สร้าง</th>
+                                            <th>การจัดการ</th>
                                         </tr>
                                     </thead>
                                     <tbody>
