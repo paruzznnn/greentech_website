@@ -304,7 +304,7 @@ $(document).ready(function() {
 }
 
 .main-category-block .block-image-top {
-    width: 100%;
+    width: 500px;
     height: 200px;
     overflow: hidden;
     display: flex;
