@@ -99,6 +99,18 @@ if(isset($_POST['action']) && $_POST['action'] == 'get_shipment'){
 
     $result = mysqli_query($conn, $sql);
     $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    
+    $product_ids = isset($data[0]['product_ids']) ? $data[0]['product_ids'] : '';
+
+    $product_ids_array = explode(',', $product_ids);
+    $product_ids_escaped = array_map(function($id) use ($conn) {
+        return "'" . mysqli_real_escape_string($conn, trim($id)) . "'";
+    }, $product_ids_array);
+    $product_ids_sql = implode(',', $product_ids_escaped);
+
+    $sql_item = "SELECT * FROM `ecm_product` WHERE material_id IN ($product_ids_sql)";
+    $rs_item = mysqli_query($conn, $sql_item);
+    $data_item = mysqli_fetch_all($rs_item, MYSQLI_ASSOC);
 
     // Query Count all the numbers
     $count_sql = "
@@ -114,6 +126,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'get_shipment'){
 
     $response = array(
         'status' => 'success',
+        'data_item' => $data_item, 
         'data' => $data, 
         'currentPage' => $page,
         'totalPages' => $totalPages,
