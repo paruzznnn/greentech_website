@@ -243,9 +243,9 @@ $(document).ready(function() {
         var $blockContent = $(this).next('.block-content-accordion');
         var $toggleArrow = $(this).find('.toggle-arrow i');
 
-        // ปิด accordion อื่นๆ ใน Main Category blocks ก่อนเปิดอันใหม่
-        $('.block-content-accordion').not($blockContent).slideUp();
-        $('.main-category-block .toggle-arrow i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        // Close only other accordions within the same grid row if desired,
+        // but for "not pushing", we just let it expand naturally within its grid cell.
+        // The key is the CSS.
 
         $blockContent.slideToggle(function() {
             if ($blockContent.is(':visible')) {
@@ -261,10 +261,9 @@ $(document).ready(function() {
         var $productList = $(this).next('.product-list-accordion');
         var $toggleArrowSub = $(this).find('.toggle-arrow-sub i');
 
-        // ปิด accordion อื่นๆ ใน Sub Category items ก่อนเปิดอันใหม่
+        // Close only other sub-category accordions within the same main category block
         $(this).closest('.sub-category-list').find('.product-list-accordion').not($productList).slideUp();
         $(this).closest('.sub-category-list').find('.toggle-arrow-sub i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
-
 
         $productList.slideToggle(function() {
             if ($productList.is(':visible')) {
@@ -284,6 +283,7 @@ $(document).ready(function() {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* ปรับขนาดบล็อกให้ใหญ่ขึ้นเล็กน้อย */
     gap: 25px; /* เพิ่มช่องว่างระหว่างบล็อก */
     margin-top: 20px;
+    align-items: start; /* เพิ่ม: ทำให้รายการใน grid เริ่มต้นที่ด้านบน ไม่ยืดตามกัน */
 }
 
 /* Styles for Main Category Blocks */
@@ -295,8 +295,8 @@ $(document).ready(function() {
     background-color: #fff;
     cursor: pointer; /* แสดงว่าคลิกได้ */
     transition: box-shadow 0.2s, transform 0.2s;
-    display: flex; /* ใช้ flexbox สำหรับการจัดวางรูปและข้อความ */
-    flex-direction: column; /* จัดเรียงในแนวตั้ง: รูปอยู่บน ข้อความอยู่ล่าง */
+    /* Removed: display: flex; flex-direction: column; */
+    /* This allows each block to manage its own height independently within the grid cell */
 }
 
 .main-category-block:hover {
@@ -304,7 +304,7 @@ $(document).ready(function() {
     transform: translateY(-3px);
 }
 
-.main-category-block .block-image-top { /* เปลี่ยนชื่อ class เพื่อให้แยกแยะได้ง่ายขึ้น */
+.main-category-block .block-image-top {
     width: 100%;
     height: 200px; /* กำหนดความสูงของรูปภาพให้ใหญ่ขึ้น */
     overflow: hidden;
@@ -320,14 +320,14 @@ $(document).ready(function() {
     object-fit: cover;
 }
 
-.main-category-block .block-header-bottom { /* เปลี่ยนชื่อ class สำหรับส่วน header ที่อยู่ด้านล่างรูป */
+.main-category-block .block-header-bottom {
     display: flex;
     align-items: center;
     padding: 15px;
     background-color: #f7f7f7;
-    border-top: 1px solid #eee; /* เปลี่ยนจาก border-bottom เป็น border-top */
+    border-top: 1px solid #eee;
     position: relative;
-    flex-grow: 1; /* ให้ใช้พื้นที่ที่เหลือ */
+    /* Removed: flex-grow: 1; as it's no longer a flex item in this context */
 }
 
 .main-category-block .block-title-info {
@@ -468,7 +468,7 @@ $(document).ready(function() {
 .box-content p {
     font-size: 0.9em;
     color: #777;
-    height: 60px; /* กำหนดความสูงเพื่อให้ข้อความไม่เกิน */
+    height: 20px; /* กำหนดความสูงเพื่อให้ข้อความไม่เกิน */
     overflow: hidden;
 }
 
