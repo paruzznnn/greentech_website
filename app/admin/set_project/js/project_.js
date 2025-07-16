@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    if ($(".summernote").length > 0) {
+        if ($(".summernote").length > 0) {
         $(".summernote").summernote({
             height: 400,
             minHeight: 200,
@@ -9,17 +9,18 @@ $(document).ready(function () {
                 ['style', ['bold', 'italic', 'underline', 'clear']],
                 ['font', ['fontname', 'fontsize']],
                 ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video']],
+                ['insert', ['link', 'picture', 'video', 'table']], // เพิ่ม 'table' เข้าไปในกลุ่ม 'insert'
                 ['view', ['fullscreen', 'codeview']],
                 ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
             ],
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
+            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
             fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
             callbacks: {
-
+                // ... (ส่วน callbacks เดิมของคุณ)
             }
         });
     }
+
 
     var readURL = function (input) {
         if (input.files && input.files[0]) {
