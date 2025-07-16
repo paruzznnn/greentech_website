@@ -5,11 +5,6 @@ date_default_timezone_set('Asia/Bangkok');
 require_once '../../lib/connect.php';
 require_once '../../lib/base_directory.php';
 
-echo '<pre>';
-print_r($_SERVER);
-echo '</pre>';
-exit;
-
 global $base_path;
 $response = array('status' => 'error', 'message' => '');
 
@@ -17,6 +12,9 @@ $member_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $orderContents = isset($_SESSION['orderArray']) ? $_SESSION['orderArray'] : array();
 $orderID = date('YmdHis');
 $orderArray = array();
+
+$check_process = false;
+$check_file = false;
 
 if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
     foreach ($orderContents as $orderCode => $orderDetails) {
@@ -72,6 +70,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
             if (!mysqli_query($conn, $ins_shipp_sql)) {
                 echo "Error inserting shipping: " . mysqli_error($conn);
             }
+            $check_process = true;
         }
         if (!empty($order['payment_data'])) {
             $p = $order['payment_data'];
@@ -85,6 +84,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
             if (!mysqli_query($conn, $ins_pay_sql)) {
                 echo "Error inserting payment: " . mysqli_error($conn);
             }
+            $check_process = true;
         }
         foreach ($order['product_data'] as $product) {
             $order_code     = mysqli_real_escape_string($conn, $order['order_code']);
@@ -114,6 +114,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
             if (!mysqli_query($conn, $ins_order_sql)) {
                 echo "Error inserting order: " . mysqli_error($conn);
             }
+            $check_process = true;
         }
         foreach ($order['product_data'] as $item) {
             $quantity_item = intval($item['quantity']);
@@ -126,6 +127,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'save_evidence'){
             if (!mysqli_query($conn, $up_product_sql)) {
                 echo "Error updating stock: " . mysqli_error($conn);
             }
+            $check_process = true;
         }
     }
 }
@@ -147,7 +149,8 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                         mkdir($uploadFileDir, 0775, true);
                     }
                     $destFilePath = $uploadFileDir . basename($fileName);
-                    $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
+                    // https://www.trandar.com/store/app/actions/uploaded_files/KrungSri_Logo.png
+                    $picPath = $_SERVER['HTTP_ORIGIN'] . '/store/app/actions/uploaded_files/' . basename($fileName);
                     if(is_uploaded_file($fileTmpPath)){
                         if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
@@ -168,11 +171,13 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                             if (!mysqli_query($conn, $sqlUpdate)) {
                                 echo "Error updating order status: " . mysqli_error($conn);
                             }
+                            $check_file = true;
                         }
                     }
                 }
             }
         }
+        
     }else if(isset($_FILES['input-b']) && !empty($_FILES['input-b'])){
         $orderID = $_POST['numberOrder'];
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
@@ -190,7 +195,7 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                         mkdir($uploadFileDir, 0775, true);
                     }
                     $destFilePath = $uploadFileDir . basename($fileName);
-                    $picPath = $_SERVER['DOCUMENT_ROOT'] . '/store/app/actions/uploaded_files/' . basename($fileName);
+                    $picPath = $_SERVER['HTTP_ORIGIN'] . '/store/app/actions/uploaded_files/' . basename($fileName);
                     if(is_uploaded_file($fileTmpPath)){
                         if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                             $fileNameEsc = mysqli_real_escape_string($conn, $fileName);
@@ -218,22 +223,10 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                                             WHERE order_id = '$orderID' AND member_id = '$member_id'";
                             mysqli_query($conn, $updateStatusSQL);
 
-                            // // Insert evidence
-                            // $sqlInsert = "INSERT INTO ord_evidence (member_id, order_id, file_name, file_size, file_type, file_path, pic_path) 
-                            // VALUES ('$member_id', '$orderID', '$fileNameEsc', '$fileSize', '$fileTypeEsc', '$filePathEsc', '$picPathEsc')";
-                            // if (!mysqli_query($conn, $sqlInsert)) {
-                            //     echo "Error inserting file record: " . mysqli_error($conn);
-                            // }
-
-                            // // Update order status
-                            // $sqlUpdate = "UPDATE ecm_orders
-                            // SET is_status = '1'
-                            // WHERE order_id = '$orderID' AND member_id = '$member_id'
-                            // ";
-
                             if (!mysqli_query($conn, $sqlUpdate)) {
                                 echo "Error updating order status: " . mysqli_error($conn);
                             }
+                            $check_file = true;
                         }
                     }
                 }
@@ -242,6 +235,25 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
     }
 }
 
-// $response['status'] = 'success';
+if ($check_process || $check_file) {
+    $response['status'] = 'success';
+}else{
+    $response['status'] = 'error';
+}
+
 unset($_SESSION['cart'], $_SESSION['orderArray'], $_SESSION['cartOption']);
 echo json_encode($response);
+
+
+// Insert evidence
+// $sqlInsert = "INSERT INTO ord_evidence (member_id, order_id, file_name, file_size, file_type, file_path, pic_path) 
+// VALUES ('$member_id', '$orderID', '$fileNameEsc', '$fileSize', '$fileTypeEsc', '$filePathEsc', '$picPathEsc')";
+// if (!mysqli_query($conn, $sqlInsert)) {
+//     echo "Error inserting file record: " . mysqli_error($conn);
+// }
+
+// // Update order status
+// $sqlUpdate = "UPDATE ecm_orders
+// SET is_status = '1'
+// WHERE order_id = '$orderID' AND member_id = '$member_id'
+// ";
