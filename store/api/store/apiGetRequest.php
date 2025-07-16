@@ -40,7 +40,7 @@ function handleChangeSync($apiGetData) {
 
     $matID = $apiGetData['matId'] ?? null;
     $type = $apiGetData['type'] ?? null;
-    $syncSt = ($type === 'sync') ? 0 : (($type === 'notSync') ? 1 : null);
+    $syncSt = ($type === 'sync') ? 1 : (($type === 'notSync') ? 0 : null);
 
     if (!$matID || !$type || $syncSt === null) {
         $response = [
