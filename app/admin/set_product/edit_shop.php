@@ -1,11 +1,8 @@
 <?php 
-ini_set('display_errors', 1); // เปิดใช้งานการแสดงข้อผิดพลาด
-ini_set('display_startup_errors', 1); // เปิดใช้งานการแสดงข้อผิดพลาดตอนเริ่มต้น
-error_reporting(E_ALL); // รายงานข้อผิดพลาดทั้งหมด
-
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
+
 
 // ตรวจสอบว่าได้รับค่า shop_id หรือไม่
 if (!isset($_POST['shop_id'])) {
