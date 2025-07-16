@@ -1004,7 +1004,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                         <thead>
                                                             <tr>
                                                                 <th class="text-center">#</th>
-                                                                <th class="text-center">สินค้า</th>
+                                                                <th class="text-start" style="width: 35%;">สินค้า</th>
                                                                 <th class="text-center">ราคา</th>
                                                                 <th class="text-center">ปริมาณ</th>
                                                                 <th class="text-center">ราคารวม</th>
@@ -1016,7 +1016,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                             divShowOrderBuy += `
                                                             <tr>
                                                                 <td class="text-end">${index + 1}</td>
-                                                                <td class="text-end">${mapped_items[index]?.description}</td>
+                                                                <td class="text-start" style="width: 35%;">${mapped_items[index]?.description}</td>
                                                                 <td class="text-end">${formatNumberWithComma(prices[index])}</td>
                                                                 <td class="text-end">${quantities[index]}</td>
                                                                 <td class="text-end">${formatNumberWithComma(totalPrices[index])}</td>
