@@ -844,7 +844,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
 
                         let totalQty = 0; // Total quantity
                         let totalAmount = 0; // Total amount
-                        let tmsPrice = order.vehicle_price;
+                        let tmsPrice = parseInt(order.vehicle_price);
 
                         // $vat = ($totalPrice + $tmsPrice) * 0.07; 
                         // $totalPriceWithVat = $totalPrice + $tmsPrice + $vat;
