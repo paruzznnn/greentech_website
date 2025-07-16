@@ -288,30 +288,29 @@ $(document).ready(function() {
 
 /* Styles for Main Category Blocks */
 .main-category-block {
-    border: 1px solid #eee;
+    border: 1px solid #ddd; /* เปลี่ยนสีเส้นขอบให้เข้มขึ้นเล็กน้อย */
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    background-color: #fff;
-    cursor: pointer; /* แสดงว่าคลิกได้ */
-    transition: box-shadow 0.2s, transform 0.2s;
-    /* Removed: display: flex; flex-direction: column; */
-    /* This allows each block to manage its own height independently within the grid cell */
+    /* ปรับ box-shadow ให้มีเงาสวยงามขึ้น */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* เพิ่มเงาที่เข้มขึ้นและขยายออกเล็กน้อย */
+    background-color: #fcfcfc; /* เปลี่ยนพื้นหลังเป็นสีขาวนวล */
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; /* ปรับ transition ให้สมูทขึ้น */
 }
 
 .main-category-block:hover {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* เงาเข้มขึ้นเมื่อ hover */
+    transform: translateY(-5px); /* ยกขึ้นเล็กน้อยเมื่อ hover */
 }
 
 .main-category-block .block-image-top {
     width: 100%;
-    height: 200px; /* กำหนดความสูงของรูปภาพให้ใหญ่ขึ้น */
+    height: 200px;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #e0e0e0;
+    background-color: #e6e6e6; /* ปรับสีพื้นหลังของรูปภาพ */
 }
 
 .main-category-block .block-image-top img {
@@ -324,14 +323,13 @@ $(document).ready(function() {
     display: flex;
     align-items: center;
     padding: 15px;
-    background-color: #f7f7f7;
-    border-top: 1px solid #eee;
+    background-color: #f0f0f0; /* ปรับสีพื้นหลังของส่วน header */
+    border-top: 1px solid #e0e0e0; /* ปรับสีเส้นขอบด้านบน */
     position: relative;
-    /* Removed: flex-grow: 1; as it's no longer a flex item in this context */
 }
 
 .main-category-block .block-title-info {
-    flex-grow: 1; /* ให้ใช้พื้นที่ที่เหลือ */
+    flex-grow: 1;
 }
 
 .main-category-block .block-title-info h3 {
@@ -343,7 +341,7 @@ $(document).ready(function() {
 
 .main-category-block .product-count {
     font-size: 0.9em;
-    color: #888;
+    color: #777; /* ปรับสีตัวเลขจำนวนสินค้า */
     margin: 0;
 }
 
@@ -352,14 +350,14 @@ $(document).ready(function() {
     font-size: 1.2em;
     color: #555;
     margin-left: 10px;
-    transition: transform 0.3s;
+    transition: transform 0.3s ease;
 }
 
 
 /* Accordion Content for Main Category */
 .block-content-accordion {
     padding: 15px;
-    background-color: #ffffff;
+    background-color: #ffffff; /* เปลี่ยนพื้นหลังเป็นสีขาว */
 }
 
 .sub-category-list {
@@ -369,13 +367,13 @@ $(document).ready(function() {
 }
 
 .sub-category-item {
-    margin-bottom: 5px;
-    border-bottom: 1px dashed #eee; /* เส้นแบ่งระหว่าง Sub Category */
-    padding-bottom: 5px;
+    margin-bottom: 8px; /* เพิ่มระยะห่างระหว่าง sub-category */
+    border-bottom: 1px solid #f0f0f0; /* เปลี่ยนเส้นแบ่งเป็นสีอ่อนกว่า */
+    padding-bottom: 8px;
 }
 
 .sub-category-item:last-child {
-    border-bottom: none; /* ไม่ต้องมีเส้นแบ่งที่รายการสุดท้าย */
+    border-bottom: none;
     margin-bottom: 0;
     padding-bottom: 0;
 }
@@ -387,12 +385,12 @@ $(document).ready(function() {
     padding: 8px 0;
     cursor: pointer;
     font-weight: bold;
-    color: #555;
+    color: #444; /* ปรับสีข้อความ header */
     transition: color 0.2s;
 }
 
 .sub-category-item .sub-category-header:hover {
-    color: #ffa719; /* สีเมื่อ hover */
+    color: #007bff; /* สีเมื่อ hover (น้ำเงินมาตรฐาน) */
 }
 
 .sub-category-item .sub-category-header h4 {
@@ -403,48 +401,58 @@ $(document).ready(function() {
 /* Accordion Content for Sub Category (Product List) */
 .product-list-accordion {
     list-style: none;
-    padding-left: 20px; /* เยื้องเข้ามา */
+    padding-left: 25px; /* เยื้องเข้ามาอีกหน่อย */
     margin: 5px 0 0 0;
+    background-color: #fdfdfd; /* พื้นหลังสำหรับรายการสินค้า */
+    border-radius: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .product-list-accordion li {
-    padding: 5px 0;
+    padding: 6px 0; /* เพิ่ม padding */
     font-size: 0.95em;
+    border-bottom: 1px dotted #e0e0e0; /* เส้นประ */
+}
+
+.product-list-accordion li:last-child {
+    border-bottom: none;
 }
 
 .product-list-accordion li a {
     text-decoration: none;
-    color: #666;
+    color: #555;
     display: block;
 }
 
 .product-list-accordion li a:hover {
-    color: #ffa719; /* สีเมื่อ hover */
+    color: #0056b3; /* สีเมื่อ hover (น้ำเงินเข้มขึ้น) */
     text-decoration: underline;
 }
 
 /* For Search Results (flat product list) */
 .box-news {
-    border: 1px solid #eee;
+    border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
-    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* เงาเหมือน main-category-block */
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+    background-color: #fcfcfc; /* พื้นหลังเหมือน main-category-block */
 }
 
 .box-news:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     transform: translateY(-5px);
 }
 
 .box-image {
     width: 100%;
-    height: 200px; /* ขนาดรูปภาพสำหรับผลการค้นหา */
+    height: 200px;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
+    background-color: #e6e6e6;
 }
 
 .box-image img, .box-image iframe {
@@ -455,20 +463,22 @@ $(document).ready(function() {
 
 .box-content {
     padding: 15px;
+    background-color: #ffffff; /* พื้นหลังของส่วนเนื้อหา */
 }
 
 .box-content h5 {
     font-size: 1.1em;
     font-weight: bold;
     margin-bottom: 5px;
-    height: 40px; /* กำหนดความสูงเพื่อให้ข้อความไม่เกิน */
+    height: 40px;
     overflow: hidden;
+    color: #333; /* สีข้อความหัวข้อ */
 }
 
 .box-content p {
     font-size: 0.9em;
-    color: #777;
-    height: 20px; /* กำหนดความสูงเพื่อให้ข้อความไม่เกิน */
+    color: #666; /* สีข้อความรายละเอียด */
+    height: 20px;
     overflow: hidden;
 }
 
@@ -480,7 +490,7 @@ $(document).ready(function() {
 
 .line-clamp {
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* จำกัดให้แสดงแค่ 2 บรรทัด */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
