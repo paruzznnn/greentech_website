@@ -817,6 +817,10 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
         dataType: 'json',
         success: function(response) {
 
+            console.log('response', response);
+            return;
+            
+
             if (Array.isArray(response.data)) {
                 let dataMemberOrder = response.data;
                 const totalItems = response.totalRecords;
