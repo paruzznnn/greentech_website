@@ -40,7 +40,7 @@ function handleChangeSync($apiGetData) {
 
     $matID = $apiGetData['matId'] ?? null;
     $type = $apiGetData['type'] ?? null;
-    $syncSt = ($type === 'sync') ? 1 : (($type === 'notSync') ? 0 : null);
+    $syncSt = ($type === 'sync') ? 0 : (($type === 'notSync') ? 1 : null);
 
     if (!$matID || !$type || $syncSt === null) {
         $response = [
@@ -141,8 +141,9 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
         module, 
         stock,
         sync_status,
+        comp_id,
         uom
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
     $stmt->bind_param('sssssssssssssss',
         $matID,
@@ -159,6 +160,7 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
         $apiGetData['module'],
         $apiGetData['material_stock'],
         $syncSt,
+        $apiGetData['comp_id'],
         $apiGetData['uom']
     );
 
