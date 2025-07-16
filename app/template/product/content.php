@@ -200,10 +200,10 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $mainGroupData): ?>
                 <div class="main-category-block" data-main-group-id="<?php echo htmlspecialchars($mainGroupData['id']); ?>">
-                    <div class="block-header">
-                        <div class="block-image">
-                            <img src="<?php echo htmlspecialchars($mainGroupData['image'] ?: 'path/to/default/category_placeholder.jpg'); ?>" alt="<?php echo htmlspecialchars($mainGroupData['name']); ?>">
-                        </div>
+                    <div class="block-image-top">
+                        <img src="<?php echo htmlspecialchars($mainGroupData['image'] ?: 'path/to/default/category_placeholder.jpg'); ?>" alt="<?php echo htmlspecialchars($mainGroupData['name']); ?>">
+                    </div>
+                    <div class="block-header-bottom">
                         <div class="block-title-info">
                             <h3><?php echo htmlspecialchars($mainGroupData['name']); ?></h3>
                             <p class="product-count"><?php echo $mainGroupData['total_products']; ?> products</p>
@@ -239,7 +239,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 <script>
 $(document).ready(function() {
     // Toggle for Main Category blocks
-    $('.main-category-block .block-header').on('click', function() {
+    $('.main-category-block .block-header-bottom').on('click', function() {
         var $blockContent = $(this).next('.block-content-accordion');
         var $toggleArrow = $(this).find('.toggle-arrow i');
 
@@ -295,6 +295,8 @@ $(document).ready(function() {
     background-color: #fff;
     cursor: pointer; /* แสดงว่าคลิกได้ */
     transition: box-shadow 0.2s, transform 0.2s;
+    display: flex; /* ใช้ flexbox สำหรับการจัดวางรูปและข้อความ */
+    flex-direction: column; /* จัดเรียงในแนวตั้ง: รูปอยู่บน ข้อความอยู่ล่าง */
 }
 
 .main-category-block:hover {
@@ -302,32 +304,30 @@ $(document).ready(function() {
     transform: translateY(-3px);
 }
 
-.main-category-block .block-header {
+.main-category-block .block-image-top { /* เปลี่ยนชื่อ class เพื่อให้แยกแยะได้ง่ายขึ้น */
+    width: 100%;
+    height: 200px; /* กำหนดความสูงของรูปภาพให้ใหญ่ขึ้น */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e0e0e0;
+}
+
+.main-category-block .block-image-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.main-category-block .block-header-bottom { /* เปลี่ยนชื่อ class สำหรับส่วน header ที่อยู่ด้านล่างรูป */
     display: flex;
     align-items: center;
     padding: 15px;
     background-color: #f7f7f7;
-    border-bottom: 1px solid #eee;
-    position: relative; /* สำหรับ toggle-arrow */
-}
-
-.main-category-block .block-image {
-    width: 80px; /* ขนาดรูปภาพ thumbnail ใน header */
-    height: 80px;
-    flex-shrink: 0; /* ไม่ให้ย่อขนาด */
-    overflow: hidden;
-    border-radius: 4px;
-    margin-right: 15px;
-    background-color: #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.main-category-block .block-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    border-top: 1px solid #eee; /* เปลี่ยนจาก border-bottom เป็น border-top */
+    position: relative;
+    flex-grow: 1; /* ให้ใช้พื้นที่ที่เหลือ */
 }
 
 .main-category-block .block-title-info {
@@ -424,9 +424,7 @@ $(document).ready(function() {
 }
 
 /* For Search Results (flat product list) */
-/* ใช้ .content-news class เดิมของคุณ (หรือปรับใหม่ถ้าต้องการ) */
 .box-news {
-    /* ใช้สไตล์เดิม */
     border: 1px solid #eee;
     border-radius: 8px;
     overflow: hidden;
@@ -441,7 +439,7 @@ $(document).ready(function() {
 
 .box-image {
     width: 100%;
-    height: 200px;
+    height: 200px; /* ขนาดรูปภาพสำหรับผลการค้นหา */
     overflow: hidden;
     display: flex;
     justify-content: center;
