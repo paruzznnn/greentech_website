@@ -104,6 +104,11 @@ if(isset($_POST['action']) && $_POST['action'] == 'get_shipment'){
         LIMIT $offset, $limit
     ";
 
+    echo '<pre>';
+    print_r($sql);
+    echo '</pre>';
+    exit;
+
     $result = mysqli_query($conn, $sql);
     $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
