@@ -145,7 +145,7 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
         uom
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
-    $stmt->bind_param('sssssssssssssss',
+    $stmt->bind_param('ssssssssssssssss',
         $matID,
         $apiGetData['code'],
         $apiGetData['pic_icon'],
