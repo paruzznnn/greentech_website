@@ -364,35 +364,35 @@ if(isset($_POST['action']) && $_POST['action'] == 'add_shipment'){
 
 }else if(isset($_POST['action']) && $_POST['action'] == 'saveReview'){
 
-    
-//         $member_id = $_POST['member'] ?? '';
-//         $comment_text = $_POST['comment'] ?? null;
-//         $rating_val = $_POST['rating'] ?? '';
-//         $pro_id = $_POST['prod_id'] ?? '';
-    
-//         $stmt = $conn->prepare("INSERT INTO ecm_review 
-//         (
-//         pro_id, member_id, description, rating
-//         ) 
-//         VALUES (?, ?, ?, ?)");
-        
-//         if (!$stmt) {
-//             throw new Exception("Prepare statement failed: " . $conn->error);
-//         }
 
-//         $stmt->bind_param(
-//             "iisi", 
-//             $pro_id, 
-//             $member_id,
-//             $comment_text,
-//             $rating_val
-//         );
+    // $member_id = $_POST['member'] ?? '';
+    // $comment_text = $_POST['comment'] ?? null;
+    // $rating_val = $_POST['rating'] ?? '';
+    // $pro_id = $_POST['prod_id'] ?? '';
 
-//         if (!$stmt->execute()) {
-//             throw new Exception("Execute statement failed: " . $stmt->error);
-//         }
+    // $stmt = $conn->prepare("INSERT INTO ecm_review 
+    // (
+    // pro_id, member_id, description, rating
+    // ) 
+    // VALUES (?, ?, ?, ?)");
 
-//         $response = array('status' => 'success', 'message' => 'save');
+    // if (!$stmt) {
+    //     throw new Exception("Prepare statement failed: " . $conn->error);
+    // }
+
+    // $stmt->bind_param(
+    //     "iisi", 
+    //     $pro_id, 
+    //     $member_id,
+    //     $comment_text,
+    //     $rating_val
+    // );
+
+    // if (!$stmt->execute()) {
+    //     throw new Exception("Execute statement failed: " . $stmt->error);
+    // }
+
+    // $response = array('status' => 'success', 'message' => 'save');
 
 }else{
     echo json_encode($response);
