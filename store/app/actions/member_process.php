@@ -4,16 +4,14 @@ header('Content-Type: application/json');
 date_default_timezone_set('Asia/Bangkok');
 require_once '../../lib/connect.php';
 
-$response = array('status' => 'error', 'message' => '');
-
-function handleFileUpload($file, $dbConnection, $member_id, $file_id = null) {
+function handleFileUpload($file, $conn, $member_id, $file_id = null) {
     $uploadDir = 'uploads/';
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    $maxFileSize = 2 * 1024 * 1024; // 2 MB
+    $maxFileSize = 100 * 1024 * 1024; // 100 MB
 
     if (!is_dir($uploadDir)) {
         if (!mkdir($uploadDir, 0755, true)) {
-            throw new Exception("Failed to create upload directory.");
+            return ['status' => 'error', 'message' => 'Failed to create upload directory.'];
         }
     }
 
@@ -24,474 +22,381 @@ function handleFileUpload($file, $dbConnection, $member_id, $file_id = null) {
         $fileSize = $file['size'];
 
         if (!in_array($fileType, $allowedTypes)) {
-            throw new Exception("Unsupported file type. Allowed types are: " . implode(', ', $allowedTypes));
+            return ['status' => 'error', 'message' => 'Unsupported file type. Allowed types are: ' . implode(', ', $allowedTypes)];
         }
 
         if ($fileSize > $maxFileSize) {
-            throw new Exception("File size exceeds the maximum limit of " . ($maxFileSize / 1024 / 1024) . " MB.");
+            return ['status' => 'error', 'message' => 'File size exceeds the maximum limit of ' . ($maxFileSize / 1024 / 1024) . ' MB.'];
         }
 
-        $filePath = $uploadDir . $fileName;
+        $filePath = $uploadDir . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '', $fileName);
 
         if (move_uploaded_file($fileTmpName, $filePath)) {
+            $fileNameEsc   = $conn->real_escape_string($fileName);
+            $filePathEsc   = $conn->real_escape_string($filePath);
+            $fileTypeEsc   = $conn->real_escape_string($fileType);
+            $fileSize      = (int) $fileSize;
+            $upload_date   = date('Y-m-d H:i:s');
+            $member_id     = (int) $member_id;
+
             if ($file_id) {
-                // Update existing file
-                $stmt = $dbConnection->prepare("UPDATE umb_docs 
-                    SET file_name = ?, file_path = ?, file_size = ?, file_type = ?, upload_date = ? 
-                    WHERE id = ? AND member_id = ?");
+                $file_id = (int) $file_id;
 
-                if (!$stmt) {
-                    throw new Exception("Prepare statement failed: " . $dbConnection->error);
+                $sql = "
+                    UPDATE umb_docs SET
+                        file_name = '$fileNameEsc',
+                        file_path = '$filePathEsc',
+                        file_size = $fileSize,
+                        file_type = '$fileTypeEsc',
+                        upload_date = '$upload_date'
+                    WHERE id = $file_id AND member_id = $member_id
+                ";
+                $result = mysqli_query($conn, $sql);
+
+                if (!$result) {
+                    return ['status' => 'error', 'message' => 'Failed to update file metadata.', 'error' => mysqli_error($conn)];
                 }
-
-                $upload_date = date('Y-m-d H:i:s');
-
-                $stmt->bind_param(
-                    "ssissii", 
-                    $fileName, 
-                    $filePath, 
-                    $fileSize, 
-                    $fileType, 
-                    $upload_date, 
-                    $file_id, 
-                    $member_id
-                );
-
-                if (!$stmt->execute()) {
-                    throw new Exception("Error updating file metadata: " . $stmt->error);
-                }
-
             } else {
-                // Insert new file
-                $stmt = $dbConnection->prepare("INSERT INTO umb_docs 
-                    (member_id, file_name, file_path, file_size, file_type, is_del, is_status) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $is_del = 0;
+                $is_status = 1;
 
-                if (!$stmt) {
-                    throw new Exception("Prepare statement failed: " . $dbConnection->error);
+                $sql = "
+                    INSERT INTO umb_docs (
+                        member_id, file_name, file_path, file_size, file_type, is_del, is_status
+                    ) VALUES (
+                        $member_id, '$fileNameEsc', '$filePathEsc', $fileSize, '$fileTypeEsc', $is_del, $is_status
+                    )
+                ";
+                $result = mysqli_query($conn, $sql);
+
+                if (!$result) {
+                    return ['status' => 'error', 'message' => 'Failed to insert file metadata.', 'error' => mysqli_error($conn)];
                 }
-
-                $is_del = 0; 
-                $is_status = 1; 
-                // $upload_date = date('Y-m-d H:i:s');
-
-                $stmt->bind_param(
-                    "issisii", 
-                    $member_id, 
-                    $fileName, 
-                    $filePath, 
-                    $fileSize, 
-                    $fileType, 
-                    $is_del, 
-                    $is_status
-                );
-
-                if (!$stmt->execute()) {
-                    throw new Exception("Error saving file metadata: " . $stmt->error);
-                }
-
-                $stmt->close();
             }
 
+            return ['status' => 'success', 'message' => 'File uploaded successfully.'];
         } else {
-            throw new Exception("Failed to move uploaded file.");
+            return ['status' => 'error', 'message' => 'Failed to move uploaded file.'];
         }
+
     } else {
-        throw new Exception("File upload error: " . $file['error']);
+        return ['status' => 'error', 'message' => 'File upload error. Code: ' . $file['error']];
     }
-
 }
 
+$response = array('status' => 'error', 'message' => '');
+$member_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-try {
+if(isset($_POST['action']) && $_POST['action'] == 'add_shipment'){
 
-    if(isset($_POST['action']) && $_POST['action'] == 'add_shipment') {
-
-        if (isset($_POST['shipping'])) {
-            $shipping_data = [];
-            parse_str($_POST['shipping'], $shipping_data);
-            // $orderArray['shipping'] = array_map('htmlspecialchars', $shipping_data);
-        }
-
-        if (isset($shipping_data)) {
-            $shipping = $shipping_data;
-            $stmt = $conn->prepare("INSERT INTO ecm_address 
-            (
-            member_id, prefix, firstname, lastname, phone_number,
-            detail, country, province_id, district_id, sub_district_id, 
-            postcode_id, comp_name, tax_number, create_date, latitude, longitude
-            ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            if (!$stmt) {
-                throw new Exception("Prepare statement failed: " . $conn->error);
-            }
-
-            $member_id = $_SESSION['user_id'] ?? '';
-            $prefix = $shipping['prefix'] ?? '';
-            $firstname = $shipping['first_name'] ?? null;
-            $lastname = $shipping['last_name'] ?? null;
-            $phone_number = $shipping['phone_number'] ?? null;
-            $address_detail = $shipping['address'] ?? null;
-
-            $country = $shipping['country'] ?? null;
-            $province = $shipping['province'] ?? '';
-            $district = $shipping['district'] ?? '';
-            $subdistrict = $shipping['subdistrict'] ?? '';
-            $postcode = $shipping['post_code'] ?? '';
-            
-            $comp_name = $shipping['comp_name'] ?? null;
-            $tax_number = $shipping['tax_number'] ?? null;
-
-            $current_date = date('Y-m-d H:i:s');
-            
-            $latitude = strval($shipping['inputLatitude']) ?? null;
-            $longitude = strval($shipping['inputLongitude']) ?? null;
-            
-            $stmt->bind_param(
-                "iisssssiiiisssss", 
-                $member_id, 
-                $prefix,
-                $firstname, 
-                $lastname,
-                $phone_number,
-                $address_detail, 
-                $country, 
-                $province, 
-                $district, 
-                $subdistrict,
-                $postcode,
-                $comp_name,
-                $tax_number,
-                $current_date,
-                $latitude,
-                $longitude
-            );
-
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
-            }
-
-            $response = array('status' => 'success', 'message' => 'add_shipment');
-
-        }
-        
+    if (isset($_POST['shipping'])) {
+        $shipping_data = [];
+        parse_str($_POST['shipping'], $shipping_data);
     }
 
-    else if(isset($_POST['action']) && $_POST['action'] == 're_shipment'){
+    if (!empty($shipping_data)) {
 
-        $member_id = $_SESSION['user_id'];
-        $status_del = 1;
-        $address_id = $_POST['dataID'];
-        $statusActive = $_POST['dataValue'];
+        $shipping = $shipping_data;
 
-        switch ($_POST['dataType']) {
+        // Escape string data
+        $prefix         = $conn->real_escape_string($shipping['prefix'] ?? '');
+        $firstname      = $conn->real_escape_string($shipping['first_name'] ?? '');
+        $lastname       = $conn->real_escape_string($shipping['last_name'] ?? '');
+        $phone_number   = $conn->real_escape_string($shipping['phone_number'] ?? '');
+        $address_detail = $conn->real_escape_string($shipping['address'] ?? '');
+        $comp_name      = $conn->real_escape_string($shipping['comp_name'] ?? '');
+        $tax_number     = $conn->real_escape_string($shipping['tax_number'] ?? '');
+        $latitude       = $conn->real_escape_string(strval($shipping['inputLatitude'] ?? ''));
+        $longitude      = $conn->real_escape_string(strval($shipping['inputLongitude'] ?? ''));
 
-            case 'active':
+        // Integer casting for numeric fields
+        $country     = (int)($shipping['country'] ?? 0);
+        $province    = (int)($shipping['province'] ?? 0);
+        $district    = (int)($shipping['district'] ?? 0);
+        $subdistrict = (int)($shipping['subdistrict'] ?? 0);
+        $postcode    = (int)($shipping['post_code'] ?? 0);
 
-                    $sql_up = "UPDATE ecm_address SET is_default = '0' WHERE member_id = '".$member_id."'";
-                    $rs_up = mysqli_query($conn, $sql_up);
+        $current_date = date('Y-m-d H:i:s');
 
-                    $stmt = $conn->prepare("UPDATE ecm_address 
-                    SET is_default = ?
-                    WHERE address_id = ? AND member_id = ?");
-                    if (!$stmt) {
-                        throw new Exception("Prepare statement failed: " . $conn->error);
-                    }
+        // SQL insert (not using prepared statement)
+        $sql = "
+            INSERT INTO ecm_address (
+                member_id, prefix, firstname, lastname, phone_number,
+                detail, country, province_id, district_id, sub_district_id, 
+                postcode_id, comp_name, tax_number, create_date, latitude, longitude
+            ) VALUES (
+                '$member_id', '$prefix', '$firstname', '$lastname', '$phone_number',
+                '$address_detail', $country, $province, $district, $subdistrict,
+                $postcode, '$comp_name', '$tax_number', '$current_date', '$latitude', '$longitude'
+            )
+        ";
 
-                    $stmt->bind_param(
-                    "iii", 
-                    $statusActive, 
-                    $address_id,
-                    $member_id
-                    );
+        $result = mysqli_query($conn, $sql);
 
-                    if (!$stmt->execute()) {
-                        throw new Exception("Execute statement failed: " . $stmt->error);
-                    }
-
-                    $response = array('status' => 'success', 'message' => 'active');
-                
-                break;
-            case 'remove':
-
-                    $stmt = $conn->prepare("UPDATE ecm_address 
-                    SET is_status = ?
-                    WHERE address_id = ? AND member_id = ?");
-                    if (!$stmt) {
-                        throw new Exception("Prepare statement failed: " . $conn->error);
-                    }
-
-                    $stmt->bind_param(
-                    "iii", 
-                    $status_del, 
-                    $address_id,
-                    $member_id
-                    );
-
-                    if (!$stmt->execute()) {
-                        throw new Exception("Execute statement failed: " . $stmt->error);
-                    }
-
-                    $response = array('status' => 'success', 'message' => 'remove');
-
-                break;
-            case 'save':
-
-                    $stmt = $conn->prepare("UPDATE ecm_address 
-                    SET prefix = ?, 
-                        firstname = ?, 
-                        lastname = ?, 
-                        phone_number = ?, 
-                        detail = ?, 
-                        country = ?, 
-                        province_id = ?, 
-                        district_id = ?, 
-                        sub_district_id = ?, 
-                        postcode_id = ?, 
-                        comp_name = ?, 
-                        tax_number = ?, 
-                        update_date = ?,
-                        latitude = ?,
-                        longitude = ?
-                    WHERE address_id = ? AND member_id = ?");
-
-                    if (!$stmt) {
-                    throw new Exception("Prepare statement failed: " . $conn->error);
-                    }
-
-                    // Get the current date and time
-                    $current_date = date('Y-m-d H:i:s');
-
-                    // Extract values from $_POST with default values if not set
-                    $prefix = $_POST['dataValue'][0]['prefix'] ?? null;
-                    $firstname = $_POST['dataValue'][1]['firstname'] ?? null;
-                    $lastname = $_POST['dataValue'][2]['lastname'] ?? null;
-                    $country = $_POST['dataValue'][3]['country'] ?? null;
-                    $province = $_POST['dataValue'][4]['province'] ?? null;
-                    $district = $_POST['dataValue'][5]['district'] ?? null;
-                    $subdistrict = $_POST['dataValue'][6]['subdistrict'] ?? null;
-                    $post_code = $_POST['dataValue'][7]['post_code'] ?? null;
-                    $phone_number = $_POST['dataValue'][8]['phone_number'] ?? null;
-                    $address = $_POST['dataValue'][9]['address'] ?? null;
-                    $comp_name = $_POST['dataValue'][10]['comp_name'] ?? null;
-                    $tax_number = $_POST['dataValue'][11]['tax_number'] ?? null;
-                    $inputLatitude = $_POST['dataValue'][12]['inputLatitude'] ?? null;
-                    $inputLongitude = $_POST['dataValue'][13]['inputLongitude'] ?? null;
-
-                    // Bind parameters and execute the statement
-                    $stmt->bind_param(
-                    "isssssiiiisssssii", 
-                    $prefix,
-                    $firstname,
-                    $lastname,
-                    $phone_number,
-                    $address,
-                    $country,
-                    $province,
-                    $district,
-                    $subdistrict,
-                    $post_code,
-                    $comp_name,
-                    $tax_number,
-                    $current_date,
-                    $inputLatitude,
-                    $inputLongitude,
-                    $address_id,
-                    $member_id
-                    );
-
-                    if (!$stmt->execute()) {
-                    throw new Exception("Execute statement failed: " . $stmt->error);
-                    }
-
-                    $response = array('status' => 'success', 'message' => 'save');
-            
-                break;
-            default:
-                break;
+        if ($result) {
+            $response = [
+                'status' => 'success',
+                'message' => 'add_shipment'
+            ];
+        } else {
+            $response = [
+                'status' => 'error',
+                'message' => 'insert_failed',
+                'error' => mysqli_error($conn)
+            ];
         }
 
+        echo json_encode($response);
     }
 
-    else if(isset($_POST['action']) && $_POST['action'] == 'save_member'){
+}else if(isset($_POST['action']) && $_POST['action'] == 're_shipment'){
 
-        $member = [
-            'first_name' => $_POST['first_name'] ?? '',
-            'last_name'  => $_POST['last_name'] ?? '',
-            'email'      => $_POST['email'] ?? '',
-            'phone'      => $_POST['phone'] ?? '',
-        ];
+    $address_id = (int) $_POST['dataID'];
+    $statusActive = (int) ($_POST['dataValue'] ?? 0);
+    $status_del = 1;
 
-        if($_FILES['profile_image']['error'] != 4){
+    $dataType = $_POST['dataType'] ?? '';
 
-            $member_id = $_SESSION['user_id'];
+    switch ($dataType) {
 
-            $stmt = $conn->prepare("SELECT id, member_id FROM umb_docs WHERE member_id = ?");
-            $stmt->bind_param("i", $member_id);
-            
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
-            }
+        case 'active':
+            // Reset all is_default to 0
+            $sql_up = "UPDATE ecm_address SET is_default = '0' WHERE member_id = '" . $conn->real_escape_string($member_id) . "'";
+            mysqli_query($conn, $sql_up);
 
-            $result = $stmt->get_result();
-            $data = $result->fetch_all(MYSQLI_ASSOC);
+            // Set selected address as default
+            $sql = "
+                UPDATE ecm_address 
+                SET is_default = '$statusActive'
+                WHERE address_id = '$address_id' AND member_id = '" . $conn->real_escape_string($member_id) . "'
+            ";
+            $result = mysqli_query($conn, $sql);
 
-            $file_id = ($data) ? $data[0]['id'] : '';
+            $response = $result
+                ? ['status' => 'success', 'message' => 'active']
+                : ['status' => 'error', 'message' => 'update_failed', 'error' => mysqli_error($conn)];
+            break;
 
-            handleFileUpload($_FILES['profile_image'], $conn, $_SESSION['user_id'], $file_id);
+        case 'remove':
+            $sql = "
+                UPDATE ecm_address 
+                SET is_status = '$status_del'
+                WHERE address_id = '$address_id' AND member_id = '" . $conn->real_escape_string($member_id) . "'
+            ";
+            $result = mysqli_query($conn, $sql);
 
-        }
+            $response = $result
+                ? ['status' => 'success', 'message' => 'remove']
+                : ['status' => 'error', 'message' => 'remove_failed', 'error' => mysqli_error($conn)];
+            break;
 
-        if (isset($member)) {
-            
-            // Prepare the UPDATE statement
-            $stmt = $conn->prepare("UPDATE ecm_users SET
-                firstname = ?, 
-                lastname = ?, 
-                email = ?, 
-                phone = ?, 
-                update_date = ?
-                WHERE user_id = ?");
-        
-            if (!$stmt) {
-                throw new Exception("Prepare statement failed: " . $conn->error);
-            }
-        
-            $member_id = $_SESSION['user_id'];
-            $firstname = $member['first_name'];
-            $lastname = $member['last_name'];
-            $member_email = $member['email'];
-            $member_phone = $member['phone'];
-            $current_date = date('Y-m-d H:i:s');
-            
-            // Bind the parameters
-            $stmt->bind_param(
-                "sssssi", 
-                $firstname, 
-                $lastname, 
-                $member_email, 
-                $member_phone, 
-                $current_date, 
-                $member_id
-            );
-        
-            // Execute the statement
-            if (!$stmt->execute()) {
-                throw new Exception("Execute statement failed: " . $stmt->error);
-            }
+        case 'save':
+            $data = $_POST['dataValue'];
 
-            $response = array('status' => 'success', 'message' => 'save');
-        }
+            // Escape all input values
+            $prefix         = $conn->real_escape_string($data[0]['prefix'] ?? '');
+            $firstname      = $conn->real_escape_string($data[1]['firstname'] ?? '');
+            $lastname       = $conn->real_escape_string($data[2]['lastname'] ?? '');
+            $country        = (int)($data[3]['country'] ?? 0);
+            $province       = (int)($data[4]['province'] ?? 0);
+            $district       = (int)($data[5]['district'] ?? 0);
+            $subdistrict    = (int)($data[6]['subdistrict'] ?? 0);
+            $post_code      = (int)($data[7]['post_code'] ?? 0);
+            $phone_number   = $conn->real_escape_string($data[8]['phone_number'] ?? '');
+            $address        = $conn->real_escape_string($data[9]['address'] ?? '');
+            $comp_name      = $conn->real_escape_string($data[10]['comp_name'] ?? '');
+            $tax_number     = $conn->real_escape_string($data[11]['tax_number'] ?? '');
+            $inputLatitude  = $conn->real_escape_string($data[12]['inputLatitude'] ?? '');
+            $inputLongitude = $conn->real_escape_string($data[13]['inputLongitude'] ?? '');
+            $current_date   = date('Y-m-d H:i:s');
 
+            $sql = "
+                UPDATE ecm_address SET 
+                    prefix = '$prefix',
+                    firstname = '$firstname',
+                    lastname = '$lastname',
+                    phone_number = '$phone_number',
+                    detail = '$address',
+                    country = $country,
+                    province_id = $province,
+                    district_id = $district,
+                    sub_district_id = $subdistrict,
+                    postcode_id = $post_code,
+                    comp_name = '$comp_name',
+                    tax_number = '$tax_number',
+                    update_date = '$current_date',
+                    latitude = '$inputLatitude',
+                    longitude = '$inputLongitude'
+                WHERE address_id = '$address_id' AND member_id = '" . $conn->real_escape_string($member_id) . "'
+            ";
+
+            $result = mysqli_query($conn, $sql);
+
+            $response = $result
+                ? ['status' => 'success', 'message' => 'save']
+                : ['status' => 'error', 'message' => 'save_failed', 'error' => mysqli_error($conn)];
+            break;
+
+        default:
+            $response = ['status' => 'error', 'message' => 'invalid_action'];
+            break;
     }
 
-    else if (isset($_POST['action']) && $_POST['action'] == 're_orderBuy') {
+    echo json_encode($response);
 
-        $member_id = $_SESSION['user_id'];
-        $order_id = $_POST['dataID'];
-        $status_del = 1;
-    
-        // Prepare statement to update order status
-        $stmt = $conn->prepare("UPDATE ecm_orders SET is_del = ? WHERE order_id = ? AND member_id = ?");
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed: " . $conn->error);
-        }
-    
-        // Bind parameters and execute the update
-        $stmt->bind_param("iii", $status_del, $order_id, $member_id);
-        if (!$stmt->execute()) {
-            throw new Exception("Execute statement failed: " . $stmt->error);
-        }
-    
-        // Prepare statement to select products from the updated order
-        $stmt = $conn->prepare("SELECT pro_id, quantity FROM ecm_orders WHERE order_id = ?");
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed: " . $conn->error);
-        }
-    
-        // Bind the order_id and execute the selection
-        $stmt->bind_param("i", $order_id);
-        if (!$stmt->execute()) {
-            throw new Exception("Execute statement failed: " . $stmt->error);
-        }
-    
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-    
-        // Loop through each item and update the product stock
-        foreach ($data as $item) {
-            // Prepare statement for stock update
-            $sqlUpdate = "UPDATE ecm_product SET stock = stock + ? WHERE material_id = ?";
-            $updateStmt = $conn->prepare($sqlUpdate);
-            if (!$updateStmt) {
-                throw new Exception("Prepare update statement failed: " . $conn->error);
-            }
-    
-            // Bind parameters for stock update
-            $updateStmt->bind_param("is", $item['quantity'], $item['pro_id']);
-            if (!$updateStmt->execute()) {
-                throw new Exception("Execute update statement failed: " . $updateStmt->error);
-            }
-            
-            // Close the update statement
-            $updateStmt->close();
-        }
-    
-        // Create a successful response
-        $response = array(
-            'status' => 'success',
-            'message' => 'Stock updated successfully'
-        );
-    
-    }
-    
 
-    else if(isset($_POST['action']) && $_POST['action'] == 'saveReview'){
+}else if(isset($_POST['action']) && $_POST['action'] == 'save_member'){
 
-        $member_id = $_POST['member'] ?? '';
-        $comment_text = $_POST['comment'] ?? null;
-        $rating_val = $_POST['rating'] ?? '';
-        $pro_id = $_POST['prod_id'] ?? '';
-    
-        $stmt = $conn->prepare("INSERT INTO ecm_review 
-        (
-        pro_id, member_id, description, rating
-        ) 
-        VALUES (?, ?, ?, ?)");
-        
-        if (!$stmt) {
-            throw new Exception("Prepare statement failed: " . $conn->error);
-        }
+    $member = [
+        'first_name' => $_POST['first_name'] ?? '',
+        'last_name'  => $_POST['last_name'] ?? '',
+        'email'      => $_POST['email'] ?? '',
+        'phone'      => $_POST['phone'] ?? '',
+    ];
 
-        $stmt->bind_param(
-            "iisi", 
-            $pro_id, 
-            $member_id,
-            $comment_text,
-            $rating_val
-        );
+    if ($_FILES['profile_image']['error'] != 4) {
+        $sql_check = "SELECT id, member_id FROM umb_docs WHERE member_id = '$member_id'";
+        $result = mysqli_query($conn, $sql_check);
+        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-        if (!$stmt->execute()) {
-            throw new Exception("Execute statement failed: " . $stmt->error);
-        }
+        $file_id = ($data && isset($data[0]['id'])) ? $data[0]['id'] : '';
 
-        $response = array('status' => 'success', 'message' => 'save');
-
+        handleFileUpload($_FILES['profile_image'], $conn, $member_id, $file_id);
     }
 
-} catch (Exception $e) {
-    $response['status'] = 'error';
-    $response['message'] = $e->getMessage();
+    if (!empty($member)) {
+        // Escape 
+        $firstname      = $conn->real_escape_string($member['first_name']);
+        $lastname       = $conn->real_escape_string($member['last_name']);
+        $member_email   = $conn->real_escape_string($member['email']);
+        $member_phone   = $conn->real_escape_string($member['phone']);
+        $current_date   = date('Y-m-d H:i:s');
+
+        //update member
+        $sql_update = "
+            UPDATE ecm_users SET 
+                firstname = '$firstname', 
+                lastname = '$lastname', 
+                email = '$member_email', 
+                phone = '$member_phone', 
+                update_date = '$current_date'
+            WHERE user_id = '$member_id'
+        ";
+
+        $result = mysqli_query($conn, $sql_update);
+
+        $response = $result
+            ? ['status' => 'success', 'message' => 'save']
+            : ['status' => 'error', 'message' => 'update_failed', 'error' => mysqli_error($conn)];
+    }
+
+    echo json_encode($response);
+
+}else if(isset($_POST['action']) && $_POST['action'] == 're_orderBuy'){
+
+
+    $order_id  = (int) ($_POST['dataID'] ?? 0);
+    $status_del = 1;
+
+    // 1. อัปเดตสถานะคำสั่งซื้อให้ถูกลบ
+    $sqlUpdateOrder = "
+        UPDATE ecm_orders 
+        SET is_del = $status_del 
+        WHERE order_id = $order_id AND member_id = $member_id
+    ";
+    $resUpdate = mysqli_query($conn, $sqlUpdateOrder);
+
+    if (!$resUpdate) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to update order.',
+            'error' => mysqli_error($conn)
+        ]);
+        exit;
+    }
+
+    // 2. ดึงข้อมูลสินค้าที่อยู่ในคำสั่งซื้อนี้
+    $sqlSelect = "
+        SELECT pro_id, quantity 
+        FROM ecm_orders 
+        WHERE order_id = $order_id
+    ";
+    $result = mysqli_query($conn, $sqlSelect);
+
+    if (!$result) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to fetch order items.',
+            'error' => mysqli_error($conn)
+        ]);
+        exit;
+    }
+
+    $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    // 3. อัปเดต stock สินค้าแต่ละตัว
+    foreach ($items as $item) {
+        $pro_id = $conn->real_escape_string($item['pro_id']);
+        $quantity = (int) $item['quantity'];
+
+        $sqlUpdateStock = "
+            UPDATE ecm_product 
+            SET stock = stock + $quantity 
+            WHERE material_id = '$pro_id'
+        ";
+        $resStock = mysqli_query($conn, $sqlUpdateStock);
+
+        if (!$resStock) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Failed to update stock for product: ' . $pro_id,
+                'error' => mysqli_error($conn)
+            ]);
+            exit;
+        }
+    }
+
+    // 4. สำเร็จ
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Stock updated successfully.'
+    ]);
+
+}else if(isset($_POST['action']) && $_POST['action'] == 'saveReview'){
+
+
+    // $member_id = $_POST['member'] ?? '';
+    // $comment_text = $_POST['comment'] ?? null;
+    // $rating_val = $_POST['rating'] ?? '';
+    // $pro_id = $_POST['prod_id'] ?? '';
+
+    // $stmt = $conn->prepare("INSERT INTO ecm_review 
+    // (
+    // pro_id, member_id, description, rating
+    // ) 
+    // VALUES (?, ?, ?, ?)");
+
+    // if (!$stmt) {
+    //     throw new Exception("Prepare statement failed: " . $conn->error);
+    // }
+
+    // $stmt->bind_param(
+    //     "iisi", 
+    //     $pro_id, 
+    //     $member_id,
+    //     $comment_text,
+    //     $rating_val
+    // );
+
+    // if (!$stmt->execute()) {
+    //     throw new Exception("Execute statement failed: " . $stmt->error);
+    // }
+
+    // $response = array('status' => 'success', 'message' => 'save');
+
+}else{
+    echo json_encode($response);
 }
-
-if (isset($stmt)) {
-    $stmt->close();
-}
-$conn->close();
-
-echo json_encode($response);
-
 
 ?>
 
