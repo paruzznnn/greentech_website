@@ -923,7 +923,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         }
 
                         const mapped_items = keyOrder.map(key =>
-                            order.data_item.find(item => item.material_id === key)
+                            response.data_item.find(item => item.material_id === key)
                         );
 
                         // Calculate totals
