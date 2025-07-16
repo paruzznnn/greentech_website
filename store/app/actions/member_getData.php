@@ -63,41 +63,37 @@ if(isset($_POST['action']) && $_POST['action'] == 'get_shipment'){
     $limit = max(1, $limit);
     $is_del = 0;
 
-    $sql = "SELECT
-            od.id,
-            od.order_id,
-            od.is_status,
-            od.created_at,
-            od.order_key,
-            od.order_code,
-            od.pro_id AS product_id,
-            od.price,
-            od.quantity,
-            od.total_price,
-            CONCAT(sp.first_name, ' ', sp.last_name) AS fullname,
-            sp.address,
-            sp.phone_number AS phone,
-            CONCAT(sp.address, ' ', sp.province, ' ', sp.district, ' ', sp.subdistrict, ' ', sp.post_code) AS shipping,
-            pm.pay_channel,
-            od.pay_type,
-            od.qr_pp,
-            od.vehicle_id,
-            sp.vehicle_price
-        FROM
-            ecm_orders od
-        LEFT JOIN ord_payment pm ON od.order_id = pm.order_id
-        LEFT JOIN ord_shipping sp ON od.order_id = sp.order_id
-        WHERE
-            od.member_id = $member_id
-            AND od.is_del = $is_del
-        GROUP BY 
-            od.id, od.order_id, od.is_status, od.created_at, od.order_key, od.order_code,
-            od.pro_id, od.price, od.quantity, od.total_price,
-            sp.first_name, sp.last_name, sp.address, sp.phone_number,
-            sp.province, sp.district, sp.subdistrict, sp.post_code,
-            pm.pay_channel, od.pay_type, od.qr_pp, od.vehicle_id, sp.vehicle_price
-        ORDER BY od.id DESC
-        LIMIT $offset, $limit
+        $sql = "SELECT
+        od.order_id,
+        MAX(od.is_status) AS is_status,
+        GROUP_CONCAT(DISTINCT od.id) AS ids,
+        GROUP_CONCAT(DISTINCT od.created_at) AS date_created,
+        GROUP_CONCAT(DISTINCT od.order_key) AS order_keys,
+        GROUP_CONCAT(DISTINCT od.order_code) AS order_codes,
+        GROUP_CONCAT(od.pro_id) AS product_ids,
+        GROUP_CONCAT(od.price) AS prices,
+        GROUP_CONCAT(od.quantity) AS quantities,
+        GROUP_CONCAT(od.total_price) AS total_prices,
+        CONCAT(MAX(sp.first_name), ' ', MAX(sp.last_name)) AS fullname,
+        MAX(sp.address) AS address,
+        MAX(sp.phone_number) AS phone,
+        CONCAT(MAX(sp.address), ' ', MAX(sp.province), ' ', MAX(sp.district), ' ', MAX(sp.subdistrict), ' ', MAX(sp.post_code)) AS shipping,
+        MAX(pm.pay_channel) AS pay_channel,
+        MAX(od.pay_type) AS pay_type,
+        MAX(od.qr_pp) AS qr_pp,
+        MAX(od.vehicle_id) AS vehicle_id,
+        MAX(sp.vehicle_price) AS vehicle_price
+    FROM
+        ecm_orders od
+    LEFT JOIN ord_payment pm ON od.order_id = pm.order_id
+    LEFT JOIN ord_shipping sp ON od.order_id = sp.order_id
+    WHERE
+        od.member_id = $member_id 
+        AND od.is_del = $is_del
+    GROUP BY
+        od.order_id
+    ORDER BY MAX(od.id) DESC
+    LIMIT $offset, $limit
     ";
 
 
