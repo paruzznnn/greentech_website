@@ -187,95 +187,88 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
 
 function handleGetOrders($apiGetData) {
     global $conn;
-    $is_del = 0;
 
-    
-    $sql = "
-        SELECT
-			od.order_id,
-			od.is_status as order_status,
-			GROUP_CONCAT(DISTINCT od.id) AS ids,
-			GROUP_CONCAT(DISTINCT od.created_at) AS date_created,
-			GROUP_CONCAT(DISTINCT od.order_key) AS order_keys,
-			GROUP_CONCAT(DISTINCT od.order_code) AS order_codes,
-			GROUP_CONCAT(od.pro_id) AS product_ids,
-			GROUP_CONCAT(od.price) AS prices,
-			GROUP_CONCAT(od.quantity) AS quantities,
-			GROUP_CONCAT(od.total_price) AS total_prices,
-			CONCAT(sp.first_name, ' ', sp.last_name) AS fullname,
-            GROUP_CONCAT(DISTINCT  od.currency) AS currency,
-            sp.id as shipping_id,
+    $sql = "SELECT
+            od.order_id,
+            od.is_status AS order_status,
+            GROUP_CONCAT(DISTINCT od.id) AS ids,
+            GROUP_CONCAT(DISTINCT od.created_at) AS date_created,
+            GROUP_CONCAT(DISTINCT od.order_key) AS order_keys,
+            GROUP_CONCAT(DISTINCT od.order_code) AS order_codes,
+            GROUP_CONCAT(od.pro_id) AS product_ids,
+            GROUP_CONCAT(od.price) AS prices,
+            GROUP_CONCAT(od.quantity) AS quantities,
+            GROUP_CONCAT(od.total_price) AS total_prices,
+            CONCAT(sp.first_name, ' ', sp.last_name) AS fullname,
+            GROUP_CONCAT(DISTINCT od.currency) AS currency,
+            sp.id AS shipping_id,
             sp.phone_number,
             sp.prefix_id,
-			sp.address,
-			sp.county,
-			sp.province,
-			sp.district,
-			sp.subdistrict,
-			sp.post_code,
+            sp.address,
+            sp.county,
+            sp.province,
+            sp.district,
+            sp.subdistrict,
+            sp.post_code,
             sp.vehicle_id,
             sp.vehicle_price,
-			pm.pay_channel,
-			od.pay_type,
+            pm.pay_channel,
+            od.pay_type,
             evd.pic_path,
             evd.upload_date,
-            GROUP_CONCAT(od.pic) as picArr,
-            GROUP_CONCAT(DISTINCT pd.code) as codeArr,
+            GROUP_CONCAT(od.pic) AS picArr,
+            GROUP_CONCAT(DISTINCT pd.code) AS codeArr,
             GROUP_CONCAT(DISTINCT pd.description) AS description
-		FROM
-			ecm_orders od
-		LEFT JOIN ord_payment pm ON
-			od.order_id = pm.order_id
-		LEFT JOIN ord_shipping sp ON
-			od.order_id = sp.order_id
-        LEFT JOIN ord_evidence evd ON 
-            od.order_id = evd.order_id
-        LEFT JOIN ecm_product pd ON 
-            od.pro_id = pd.material_id
-		WHERE
-			od.is_del = ?
-		GROUP BY
-			od.order_id,
-			od.created_at,
-			od.order_code,
-			sp.address,
-			pm.pay_channel,
-			od.pay_type,
-			od.qr_pp
-		ORDER BY
-			od.id
-		DESC
-    ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $is_del);
+        FROM
+            ecm_orders od
+        LEFT JOIN ord_payment pm ON od.order_id = pm.order_id
+        LEFT JOIN ord_shipping sp ON od.order_id = sp.order_id
+        LEFT JOIN ord_evidence evd ON od.order_id = evd.order_id
+        LEFT JOIN ecm_product pd ON od.pro_id = pd.material_id
+        WHERE
+            od.is_del = 0
+        GROUP BY
+            od.order_id,
+            od.is_status,
+            sp.id,
+            sp.phone_number,
+            sp.prefix_id,
+            sp.address,
+            sp.county,
+            sp.province,
+            sp.district,
+            sp.subdistrict,
+            sp.post_code,
+            sp.vehicle_id,
+            sp.vehicle_price,
+            pm.pay_channel,
+            od.pay_type,
+            evd.pic_path,
+            evd.upload_date
+        ORDER BY
+        od.order_id DESC
+        ";
 
-    // Execute and fetch results
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
+    $result = $conn->query($sql);
+
+    if ($result) {
         $data = [];
-
-        // Loop through each row and add it to the data array
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
         }
 
-        // Encode and output JSON with the retrieved data
         echo json_encode([
             'status' => 'success',
             'message' => 'Data retrieved successfully.',
             'data' => $data
         ]);
     } else {
-        // Handle errors if query fails
         echo json_encode([
             'status' => 'error',
-            'message' => 'Failed to retrieve data.',
+            'message' => 'Failed to retrieve data: ' . $conn->error,
             'data' => []
         ]);
     }
-
-    // $stmt_pic->close();
-    $stmt->close();
     
 }
 
