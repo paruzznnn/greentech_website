@@ -365,9 +365,25 @@ const setupEventHandlers = (id, type) => {
     }else if(type == 'order_buy'){
 
         $('.remove-orderBuy').on('click', function(e) {
+
             e.preventDefault();
             const dataID = $(this).data('key');
-            reDataOrder(null, dataID, 'remove');
+
+            Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to delete the data?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4caf50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ok",
+            cancelButtonText: "cancel" 
+            }).then((result) => {
+            if (result.isConfirmed) {
+                reDataOrder(null, dataID, 'remove');
+            }
+            });
+
         });
 
         $('.print-orderBuy').on('click', function(e) {

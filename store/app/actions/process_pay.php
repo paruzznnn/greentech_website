@@ -218,13 +218,11 @@ if(isset($_POST['att_file']) && $_POST['att_file'] == 'save_attach_file'){
                                             (member_id, order_id, file_name, file_size, file_type, file_path, pic_path)
                                             VALUES ('$member_id', '$orderID', '$fileNameEsc', $fileSize, '$fileTypeEsc', '$filePathEsc', '$picPathEsc')";
                                 mysqli_query($conn, $insertSQL);
-                            }
-                            $updateStatusSQL = "UPDATE ecm_orders SET is_status = '1' 
-                                            WHERE order_id = '$orderID' AND member_id = '$member_id'";
-                            mysqli_query($conn, $updateStatusSQL);
 
-                            if (!mysqli_query($conn, $sqlUpdate)) {
-                                echo "Error updating order status: " . mysqli_error($conn);
+                                $updateStatusSQL = "UPDATE ecm_orders SET is_status = '1' 
+                                            WHERE order_id = '$orderID' AND member_id = '$member_id'";
+                                mysqli_query($conn, $updateStatusSQL);
+
                             }
                             $check_file = true;
                         }
