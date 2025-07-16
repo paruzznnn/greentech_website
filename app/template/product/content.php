@@ -433,7 +433,7 @@ $(document).ready(function() {
 /* For Search Results (flat product list) */
 .box-news {
     border: 1px solid #ddd;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* เงาเหมือน main-category-block */
     transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
