@@ -390,7 +390,7 @@ $(document).ready(function() {
 }
 
 .sub-category-item .sub-category-header:hover {
-    color: #007bff; /* สีเมื่อ hover (น้ำเงินมาตรฐาน) */
+    color: #ff9900; /* สีเมื่อ hover (น้ำเงินมาตรฐาน) */
 }
 
 .sub-category-item .sub-category-header h4 {
@@ -426,7 +426,7 @@ $(document).ready(function() {
 }
 
 .product-list-accordion li a:hover {
-    color: #0056b3; /* สีเมื่อ hover (น้ำเงินเข้มขึ้น) */
+    color: #ff9900; /* สีเมื่อ hover (น้ำเงินเข้มขึ้น) */
     text-decoration: underline;
 }
 
