@@ -830,13 +830,12 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                     let divShowOrderBuy = '';
 
                     dataMemberOrder.forEach(order => {
-                        
-                        
-                        const productIds = order.product_ids.split(',');
-                        const prices = order.prices.split(',');
-                        const quantities = order.quantities.split(',');
-                        const totalPrices = order.total_prices.split(',');
-                        const keyOrder = order.order_keys.split(',');
+
+                        const productIds = order.product_ids?.split(',') ?? [];
+                        const prices = order.prices?.split(',') ?? [];
+                        const quantities = order.quantities?.split(',') ?? [];
+                        const totalPrices = order.total_prices?.split(',') ?? [];
+                        const keyOrder = order.order_keys?.split(',') ?? [];
                     
                         let payChannel = '';
                         let transportChannel = '';
@@ -846,8 +845,6 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         let totalAmount = 0; // Total amount
                         let tmsPrice = parseInt(order.vehicle_price);
 
-                        // $vat = ($totalPrice + $tmsPrice) * 0.07; 
-                        // $totalPriceWithVat = $totalPrice + $tmsPrice + $vat;
                     
                         switch (order.pay_channel) {
                             case "1":
@@ -924,7 +921,11 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                             default:
                                 break;
                         }
-                    
+
+                        const mapped_items = keyOrder.map(key =>
+                            order.data_item.find(item => item.material_id === key)
+                        );
+
                         // Calculate totals
                         productIds.forEach((productId, index) => {
                             totalQty += parseInt(quantities[index], 10); // Sum quantities
@@ -1015,7 +1016,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                             divShowOrderBuy += `
                                                             <tr>
                                                                 <td class="text-end">${index + 1}</td>
-                                                                <td class="text-end">${keyOrder[index]}</td>
+                                                                <td class="text-end">${mapped_items[index]?.description}</td>
                                                                 <td class="text-end">${formatNumberWithComma(prices[index])}</td>
                                                                 <td class="text-end">${quantities[index]}</td>
                                                                 <td class="text-end">${formatNumberWithComma(totalPrices[index])}</td>

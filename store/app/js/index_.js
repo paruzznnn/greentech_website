@@ -1108,6 +1108,10 @@ function closeNav() {
 
 
 function formatNumberWithComma(number) {
+    if (number === undefined || number === null || isNaN(number)) {
+        return '0';
+    }
+
     const [integerPart, decimalPart] = number.toString().split('.');
     const formattedInteger = parseInt(integerPart, 10).toLocaleString();
 
@@ -1117,6 +1121,7 @@ function formatNumberWithComma(number) {
 
     return formattedInteger;
 }
+
 
 // const getDiscount = () => {
 
