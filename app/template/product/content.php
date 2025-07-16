@@ -289,7 +289,7 @@ $(document).ready(function() {
 /* Styles for Main Category Blocks */
 .main-category-block {
     border: 1px solid #ddd; /* เปลี่ยนสีเส้นขอบให้เข้มขึ้นเล็กน้อย */
-    border-radius: 8px;
+    /* border-radius: 8px; */
     overflow: hidden;
     /* ปรับ box-shadow ให้มีเงาสวยงามขึ้น */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* เพิ่มเงาที่เข้มขึ้นและขยายออกเล็กน้อย */
@@ -433,7 +433,7 @@ $(document).ready(function() {
 /* For Search Results (flat product list) */
 .box-news {
     border: 1px solid #ddd;
-    /* border-radius: 8px; */
+    border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* เงาเหมือน main-category-block */
     transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
