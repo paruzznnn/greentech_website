@@ -106,12 +106,14 @@ function handleFileUpload($files, $is_single_file = false)
             $fileExtension = strtolower(end($fileNameCmps));
 
             if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                $uploadFileDir = '../../../../public/news_img/'; // ใช้ Path นี้สำหรับจัดเก็บรูปภาพใน server
+                $uploadFileDir = '../../../../public/shop_img/'; // เปลี่ยนจาก news_img เป็น shop_img
                 
-                // สร้างชื่อไฟล์ที่ไม่ซ้ำกัน
-                $newFileName = uniqid() . '_' . preg_replace("/[^a-zA-Z0-9\.]/", "_", $fileName);
-                $destFilePath = $uploadFileDir . $newFileName;
-                $apiPath = $base_path . '/public/news_img/' . $newFileName; // ใช้ $base_path สำหรับ Path ที่จะเก็บใน DB เพื่อเรียกใช้งานบนเว็บ
+                // สร้างชื่อไฟล์ที่ไม่ซ้ำกันสำหรับบันทึกลง server
+                // โดยยังคงเก็บชื่อไฟล์เดิมไว้ใน $originalFileName เพื่อใช้บันทึกใน DB
+                $uniquePrefix = uniqid() . '_'; // เพิ่ม unique prefix
+                $serverFileName = $uniquePrefix . preg_replace("/[^a-zA-Z0-9\._-]/", "_", $fileName); // ทำให้ชื่อไฟล์สะอาดขึ้นสำหรับ server
+                $destFilePath = $uploadFileDir . $serverFileName;
+                $apiPath = $base_path . '/public/shop_img/' . $serverFileName; // Path สำหรับการแสดงผลบนเว็บ
 
                 if (!is_dir($uploadFileDir)) {
                     mkdir($uploadFileDir, 0755, true);
@@ -120,8 +122,9 @@ function handleFileUpload($files, $is_single_file = false)
                 if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                     $uploadResults[] = [
                         'success' => true,
-                        'fileName' => $newFileName, // ชื่อไฟล์ใหม่ที่บันทึก
-                        'originalFileName' => $fileName, // ชื่อไฟล์เดิม
+                        'fileName' => $fileName, // ใช้ชื่อไฟล์เดิมสำหรับบันทึกใน DB
+                        'serverFileName' => $serverFileName, // ชื่อไฟล์ที่บันทึกบน server
+                        'originalFileName' => $fileName, // ชื่อไฟล์เดิมที่อัปโหลด
                         'fileSize' => $fileSize,
                         'fileType' => $fileType,
                         'filePath' => $destFilePath,
@@ -200,8 +203,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['fileInput'], true); // true indicates single file
             if (!empty($fileInfos) && $fileInfos[0]['success']) {
                 $fileInfo = $fileInfos[0];
+                // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName'] เพื่อให้บันทึกชื่อไฟล์เดิมใน DB
                 $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                $fileValues = [$new_shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
+                $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
                 if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                     throw new Exception('Error inserting cover photo for new shop.');
                 }
@@ -219,8 +223,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
+                    // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
                     $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
-                    $fileValues = [$new_shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
+                    $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
                     if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                         error_log('Error inserting content image: ' . $fileInfo['fileName']);
                         // ไม่ต้อง throw exception เพื่อให้ request สำเร็จหากมีแค่บางรูปที่อัปโหลดไม่ได้
@@ -297,8 +302,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['fileInput'], true); // true indicates single file
             if (!empty($fileInfos) && $fileInfos[0]['success']) {
                 $fileInfo = $fileInfos[0];
+                // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
                 $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                $fileValues = [$shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
+                $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
                 if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                     throw new Exception('Error inserting new cover photo.');
                 }
@@ -314,8 +320,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
+                    // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
                     $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
-                    $fileValues = [$shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
+                    $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
                     if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                         error_log('Error inserting content image: ' . $fileInfo['fileName']);
                         // ไม่ต้อง throw exception เพื่อให้ request สำเร็จหากมีแค่บางรูปที่อัปโหลดไม่ได้
@@ -395,26 +402,26 @@ try {
 
         // Query สำหรับนับจำนวนที่ filter แล้ว
         $totalFilteredQuery = "SELECT COUNT(s.shop_id) 
-                                FROM dn_shop s
-                                LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                                LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                                WHERE $whereClause";
+                                 FROM dn_shop s
+                                 LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                                 LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                                 WHERE $whereClause";
         $totalFilteredResult = $conn->query($totalFilteredQuery);
         $totalFiltered = $totalFilteredResult->fetch_row()[0];
 
 
         $dataQuery = "SELECT 
-                            s.shop_id,
-                            s.subject_shop,
-                            s.date_create,
-                            sub.group_name AS sub_group_name,
-                            parent.group_name AS main_group_name
-                        FROM dn_shop s
-                        LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                        LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                        WHERE $whereClause
-                        ORDER BY $orderBy
-                        LIMIT $start, $length";
+                                 s.shop_id,
+                                 s.subject_shop,
+                                 s.date_create,
+                                 sub.group_name AS sub_group_name,
+                                 parent.group_name AS main_group_name
+                             FROM dn_shop s
+                             LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                             LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                             WHERE $whereClause
+                             ORDER BY $orderBy
+                             LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];
