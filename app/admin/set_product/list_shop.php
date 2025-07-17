@@ -1,5 +1,3 @@
-
-
 <?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
@@ -103,13 +101,18 @@
 
                                 <div style="display: flex; justify-content: space-between;">
                                     <h4 class="line-ref mb-3"> 
-                                        <i class="far fa-newspaper"></i>   
+                                        <i class="far fa-newspaper"></i>   
                                         List shop
                                     </h4>
-                                    <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_product/setup_shop.php'?>">
-                                        <i class="fa-solid fa-plus"></i>
-                                        write shop
-                                    </a>
+                                    <div>
+                                        <a type="button" class="btn btn-info me-2" href="<?php echo $base_path_admin.'set_product/group_management.php'?>">
+                                            <i class="fas fa-layer-group"></i> จัดการหมวดหมู่
+                                        </a>
+                                        <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_product/setup_shop.php'?>">
+                                            <i class="fa-solid fa-plus"></i>
+                                            write shop
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <table id="td_list_shop" class="table table-hover" style="width:100%;">
@@ -135,7 +138,6 @@
             </div>
         </div>
     </div>
-
 
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>

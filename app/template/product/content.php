@@ -21,6 +21,7 @@ $sqlAllProducts = "SELECT
     sub_group.parent_group_id,
     main_group.group_id AS main_group_id,
     main_group.group_name AS main_group_name,
+    main_group.image_path AS main_group_image_path, -- เพิ่มคอลัมน์ image_path ของ main_group
     (SELECT dnc.api_path FROM dn_shop_doc dnc WHERE dnc.shop_id = dn.shop_id AND dnc.del = '0' AND dnc.status = '1' ORDER BY dnc.id ASC LIMIT 1) AS first_image_path
 FROM dn_shop dn
 LEFT JOIN dn_shop_groups sub_group ON dn.group_id = sub_group.group_id
@@ -52,6 +53,7 @@ $organizedGroups = [];
 foreach ($allProductsData as $product) {
     $mainGroupId = $product['main_group_id'];
     $mainGroupName = $product['main_group_name'];
+    $mainGroupImage = $product['main_group_image_path']; // ดึงค่า image_path ของ main_group
     $subGroupId = $product['sub_group_id'];
     $subGroupName = $product['sub_group_name'];
 
@@ -61,7 +63,7 @@ foreach ($allProductsData as $product) {
         $organizedGroups[$mainGroupId] = [
             'id' => $mainGroupId,
             'name' => $mainGroupName,
-            'image' => $product['first_image_path'],
+            'image' => $mainGroupImage, // ใช้ image_path ของ main_group ที่ดึงมา
             'total_products' => 0,
             'sub_groups' => []
         ];
@@ -106,13 +108,13 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         } elseif ($selectedSubGroupId > 0 && $product['sub_group_id'] == $selectedSubGroupId) {
             $shouldAddProduct = true;
         } elseif ($selectedGroupId > 0) {
-            if ($product['main_group_id'] == $selectedGroupId || ($product['sub_group_id'] == $selectedGroupId && $product['main_group_id'] === NULL)) {
+            if ($product['main_group_id'] == $selectedGroupId || ($product['sub_group_id'] == $selectedGroupId && $product['parent_group_id'] === NULL)) {
                 $shouldAddProduct = true;
             }
         }
 
         if ($shouldAddProduct && !empty($product['group_id']) && $product['group_id'] > 0) {
-           $finalDisplayItems[] = [
+            $finalDisplayItems[] = [
                 'id' => $product['shop_id'],
                 'title' => $product['subject_shop'],
                 'description' => $product['description_shop'],
@@ -121,6 +123,35 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             ];
         }
     }
+    // เมื่อมีการค้นหาหรือกรองกลุ่ม เราจะแสดงเฉพาะสินค้าที่ตรงเงื่อนไข ไม่ใช่หมวดหมู่
+    // ดังนั้นจึงจำเป็นต้องล้าง $finalDisplayItems ที่จัดเรียงเป็นหมวดหมู่ไปแล้ว
+    // และนำเข้าเฉพาะสินค้าที่ตรงกับเงื่อนไขการค้นหา/กรอง
+    $tempDisplayItems = [];
+    foreach ($allProductsData as $product) {
+        $shouldAddProduct = false;
+        if ($searchQuery && (stripos($product['subject_shop'], $searchQuery) !== false || stripos($product['description_shop'], $searchQuery) !== false)) {
+            $shouldAddProduct = true;
+        } elseif ($selectedSubGroupId > 0 && $product['sub_group_id'] == $selectedSubGroupId) {
+            $shouldAddProduct = true;
+        } elseif ($selectedGroupId > 0) {
+            // Check if product belongs to the selected main group or if it's a direct product in a main group (parent_group_id IS NULL)
+            if (($product['main_group_id'] == $selectedGroupId) ||
+                ($product['parent_group_id'] === NULL && $product['group_id'] == $selectedGroupId)) {
+                $shouldAddProduct = true;
+            }
+        }
+
+        if ($shouldAddProduct) {
+            $tempDisplayItems[] = [
+                'id' => $product['shop_id'],
+                'title' => $product['subject_shop'],
+                'description' => $product['description_shop'],
+                'iframe' => preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $product['content_shop'], $matches) ? $matches[1] : null,
+                'image' => $product['first_image_path']
+            ];
+        }
+    }
+    $finalDisplayItems = $tempDisplayItems; // กำหนด finalDisplayItems เป็นรายการสินค้าที่กรองแล้ว
 } else {
     // If not searching, display main categories as primary blocks
     // Sort main categories by name before passing to display
@@ -155,7 +186,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         $groupName = '';
         foreach ($allProductsData as $prod) {
             if ($prod['main_group_id'] == $selectedGroupId || ($prod['sub_group_id'] == $selectedGroupId && $prod['parent_group_id'] === NULL)) {
-                $groupName = $prod['main_group_name'];
+                $groupName = $prod['main_group_name']; // ควรใช้ main_group_name เพื่อแสดงชื่อหมวดหมู่หลัก
                 break;
             }
         }
@@ -304,7 +335,7 @@ $(document).ready(function() {
 }
 
 .main-category-block .block-image-top {
-    width: 500px;
+    width: 500px; /* ควรเปลี่ยนเป็น 100% เพื่อให้ภาพเต็มความกว้างของ block */
     height: 200px;
     overflow: hidden;
     display: flex;
@@ -312,6 +343,17 @@ $(document).ready(function() {
     align-items: center;
     background-color: #e6e6e6; /* ปรับสีพื้นหลังของรูปภาพ */
 }
+/* แก้ไขความกว้างของรูปภาพให้เป็น 100% แทน 500px */
+.main-category-block .block-image-top {
+    width: 100%; /* เปลี่ยนจาก 500px เป็น 100% */
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e6e6e6;
+}
+
 
 .main-category-block .block-image-top img {
     width: 100%;
