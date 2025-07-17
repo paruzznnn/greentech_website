@@ -16,7 +16,7 @@ function insertIntoDatabase($conn, $table, $columns, $values)
     $placeholders = implode(', ', array_fill(0, count($values), '?'));
 
     $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
-
+   
     $stmt = $conn->prepare($query);
 
     $types = str_repeat('s', count($values));
@@ -133,8 +133,8 @@ try {
         if (isset($news_array)) {
 
             $stmt = $conn->prepare("INSERT INTO dn_news 
-                (subject_news, description_news, content_news, date_create) 
-                VALUES (?, ?, ?, ?)");
+                (subject_news, description_news, content_news, `status`, date_create) 
+                VALUES (?, ?, ?, 0, ?)");
 
             $news_subject = $news_array['news_subject'];
             $news_description = $news_array['news_description'];
@@ -365,3 +365,4 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
+ 
