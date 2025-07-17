@@ -577,38 +577,33 @@ function base64ToFile(base64, filename) {
 }
 
 
+// ... (ส่วนบนของโค้ด)
+
 $("#submitEditshop").on("click", function (event) {
     event.preventDefault();
 
     let subGroupVal = $('#sub_group_select').val();
     let mainGroupVal = $('#main_group_select').val();
 
-    // กำหนด group_id โดยใช้ group_id ของกลุ่มย่อย ถ้ามี ถ้าไม่มีใช้ group_id ของกลุ่มแม่
     let groupId = subGroupVal ? subGroupVal : mainGroupVal;
 
     let formData = new FormData(document.getElementById('formshop_edit'));
-    formData.append('action', 'editshop'); // *** เพิ่ม action เพื่อบอก server ว่าเป็นการแก้ไข ***
-    formData.set('group_id', groupId); // ✅ กำหนด group_id ชัดเจน
+    formData.append('action', 'editshop');
+    formData.set('group_id', groupId);
 
-    // Get content from Summernote
     var contentFromEditor = $("#summernote_update").summernote('code');
-    console.log("🔍 contentFromEditor (raw):", contentFromEditor);
-
     var checkIsUrl = false;
     var finalContent = '';
 
     if (contentFromEditor) {
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = contentFromEditor;
-        console.log("🧩 Created tempDiv with innerHTML set");
 
         var imgTags = tempDiv.getElementsByTagName("img");
-        console.log("📸 Number of <img> tags found:", imgTags.length);
 
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
-            console.log(`🔎 img[${i}] src:`, imgSrc, ", filename:", filename);
 
             if (!imgSrc) {
                 console.warn(`⚠️ img[${i}] has no src, skipping.`);
@@ -617,42 +612,48 @@ $("#submitEditshop").on("click", function (event) {
 
             imgSrc = imgSrc.replace(/ /g, "%20");
 
-            // ตรวจสอบว่ารูปภาพเป็น Base64 หรือไม่
             if (imgSrc.startsWith("data:image")) {
                 console.log(`🛠️ img[${i}] src is a Base64 image, converting to file.`);
-                var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`); // เพิ่ม filename default
+                var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
                 if (file) {
                     formData.append("image_files[]", file);
                     console.log(`✅ Appended image_files[] with filename: ${file.name}`);
-                    imgTags[i].setAttribute("src", ""); // Clear src to avoid sending base64 again
+                    // เมื่อเป็น Base64 ที่กำลังจะถูกอัปโหลดใหม่ ให้ล้าง src เพื่อไม่ให้ส่ง Base64 ไปใน content_shop
+                    // แต่ถ้า Server ประสบความสำเร็จในการอัปโหลดรูปและส่ง path กลับมา
+                    // edit_shop.php จะเป็นคนจัดการแทนที่ src อีกครั้งเมื่อโหลดหน้า
+                    imgTags[i].setAttribute("src", "");
                 } else {
                     console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
-            } else if (!isValidUrl(imgSrc)) {
-                // ถ้าไม่ใช่ Base64 และไม่ใช่ URL ที่ถูกต้อง (เช่น เป็น path แบบ local) ก็อาจจะต้องการจัดการเป็นไฟล์
-                // ในกรณีนี้ อาจจะหมายถึงรูปภาพที่เคยอัปโหลดไปแล้ว และไม่ได้มีการเปลี่ยนแปลง หรือเป็นรูปจาก Summernote ที่เป็น blob URL
-                // สำหรับรูปภาพที่มาจาก server แล้ว ควรจะมี src เป็น URL ที่ถูกต้องอยู่แล้ว
-                console.log(`🌐 img[${i}] src is a valid URL or previously uploaded, no conversion needed.`);
-                checkIsUrl = true; // ตั้งค่าเป็น true หากพบ URL (อาจจะมาจากเว็บอื่น หรือจากเซิร์ฟเวอร์เราเอง)
+            } else if (isValidUrl(imgSrc)) {
+                // ถ้าเป็น URL อยู่แล้ว (เช่น รูปที่อัปโหลดไปก่อนหน้า)
+                // ไม่ต้องทำอะไรกับ src ปล่อยให้มันเป็น URL เดิม
+                checkIsUrl = true; // อาจจะมีรูปจาก URL อื่นๆ หรือรูปที่อัปโหลดไปแล้ว
+                console.log(`🌐 img[${i}] src is a valid URL, keeping original src.`);
             } else {
-                checkIsUrl = true; // เป็น URL ปกติ
+                // กรณีที่ไม่ใช่ Base64 และไม่ใช่ URL ที่ถูกต้อง (เช่น อาจจะเป็น blob: URL หรือ path ผิดๆ)
+                // ณ จุดนี้ โค้ดนี้อาจต้องจัดการเพิ่มเติม ขึ้นอยู่กับ Summernote สร้าง src แบบใด
+                // แต่โดยทั่วไป ถ้ามาจากไฟล์ที่อัปโหลดแล้ว มันควรเป็น URL ที่ถูกต้อง
+                console.warn(`❓ img[${i}] src is neither Base64 nor a valid URL: ${imgSrc}`);
+                // ถ้าเป็น blob URL (ของ Summernote เอง) เราอาจจะต้องพยายามแปลงเป็นไฟล์ด้วย
+                // แต่มักจะหมายถึงรูปที่เพิ่งวางและยังไม่ถูกอัปโหลด
+                // สำหรับตอนนี้ ให้คง src เดิมไว้หากไม่สามารถจัดการเป็นไฟล์ได้
             }
         }
 
         finalContent = tempDiv.innerHTML;
         formData.set("shop_content", finalContent);
-        console.log("📝 finalContent (cleaned):", finalContent);
     } else {
         console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // ... (ส่วนที่เหลือของโค้ดเหมือนเดิม)
     // ตรวจสอบไฟล์ Cover photo
     const fileInput = document.getElementById('fileInput');
     if (fileInput && fileInput.files.length > 0) {
-        formData.append('fileInput', fileInput.files[0]); // Append the single cover photo file
+        formData.append('fileInput', fileInput.files[0]);
         console.log("📤 Appended fileInput (Cover photo).");
     }
-
 
     // Validate
     $(".is-invalid").removeClass("is-invalid");
@@ -677,25 +678,14 @@ $("#submitEditshop").on("click", function (event) {
     if (!groupId) {
         alertError("Please select a group.");
         console.error("❌ Validation failed: group_id is empty");
-        $('#main_group_select').addClass("is-invalid"); // เพิ่ม class invalid ให้กลุ่มแม่
-        $('#sub_group_select').addClass("is-invalid"); // เพิ่ม class invalid ให้กลุ่มย่อย
+        $('#main_group_select').addClass("is-invalid");
+        $('#sub_group_select').addClass("is-invalid");
         return;
     }
 
 
     formData.set("shop_subject", $("#shop_subject").val());
     formData.set("shop_description", $("#shop_description").val());
-
-    // Logging FormData content for debugging (can be large)
-    console.log("📤 Form data prepared:");
-    for (let [key, value] of formData.entries()) {
-        if (value instanceof File) {
-            console.log(`  ${key}: File (name: ${value.name}, type: ${value.type}, size: ${value.size} bytes)`);
-        } else {
-            console.log(`  ${key}: ${value}`);
-        }
-    }
-
 
     Swal.fire({
         title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",

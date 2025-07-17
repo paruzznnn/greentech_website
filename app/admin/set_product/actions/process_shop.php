@@ -94,6 +94,11 @@ function handleFileUpload($files, $is_single_file = false)
     } else if (isset($files['name']) && is_array($files['name'])) {
         $files_to_process = $files;
     } else {
+        // UPLOAD_ERR_NO_FILE (4) สำหรับกรณีที่ไม่มีไฟล์ถูกส่งมาเลย หรือโครงสร้างไม่ถูกต้อง
+        // เราจะไม่ส่งคืน error หาก error เป็น UPLOAD_ERR_NO_FILE เพื่อให้โค้ดส่วนอื่นจัดการเอง
+        if (isset($files['error']) && (is_array($files['error']) ? $files['error'][0] === UPLOAD_ERR_NO_FILE : $files['error'] === UPLOAD_ERR_NO_FILE)) {
+             return []; // คืนค่าว่างเปล่าถ้าไม่มีไฟล์ แต่ไม่ใช่ error
+        }
         return [['success' => false, 'error' => 'No files were uploaded or invalid file structure.']];
     }
 
@@ -107,7 +112,7 @@ function handleFileUpload($files, $is_single_file = false)
 
             if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
                 $uploadFileDir = '../../../../public/shop_img/'; // เปลี่ยนจาก news_img เป็น shop_img
-                
+
                 // สร้างชื่อไฟล์ที่ไม่ซ้ำกันสำหรับบันทึกลง server
                 // โดยยังคงเก็บชื่อไฟล์เดิมไว้ใน $originalFileName เพื่อใช้บันทึกใน DB
                 $uniquePrefix = uniqid() . '_'; // เพิ่ม unique prefix
@@ -199,11 +204,11 @@ try {
         $new_shop_id = $conn->insert_id; // Get the newly inserted shop_id
 
         // Handle Cover photo upload (fileInput)
+        // ตรวจสอบว่ามีไฟล์อัปโหลดมาหรือไม่ และไม่มี error
         if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] === UPLOAD_ERR_OK) {
             $fileInfos = handleFileUpload($_FILES['fileInput'], true); // true indicates single file
             if (!empty($fileInfos) && $fileInfos[0]['success']) {
                 $fileInfo = $fileInfos[0];
-                // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName'] เพื่อให้บันทึกชื่อไฟล์เดิมใน DB
                 $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
                 $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
                 if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
@@ -213,8 +218,10 @@ try {
                 throw new Exception('Error uploading cover photo: ' . ($fileInfos[0]['error'] ?? 'Unknown error'));
             }
         } else {
-             // ถ้าไม่มีการอัปโหลดไฟล์ ให้ throw error
-            throw new Exception("Cover photo is required.");
+            // ถ้าไม่มีการอัปโหลดไฟล์ หรือมีข้อผิดพลาดในการอัปโหลดไฟล์ (ไม่ใช่แค่ UPLOAD_ERR_NO_FILE) ให้ throw error
+            if (!isset($_FILES['fileInput']) || $_FILES['fileInput']['error'] !== UPLOAD_ERR_NO_FILE) {
+                 throw new Exception("Cover photo is required or there was an upload error.");
+            }
         }
 
 
@@ -223,7 +230,6 @@ try {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
-                    // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
                     $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
                     $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
                     if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
@@ -237,7 +243,7 @@ try {
             }
         }
         $response = array('status' => 'success', 'message' => 'Shop added successfully!', 'shop_id' => $new_shop_id);
-        
+
     } elseif ($_POST['action'] == 'editshop') {
         $group_id = $_POST['group_id'] ?? null;
         $shop_array = [
@@ -254,13 +260,13 @@ try {
         $shop_id = (int)$shop_array['shop_id']; // Cast to int for safety
 
         // Update dn_shop table
-        $stmt = $conn->prepare("UPDATE dn_shop 
-            SET subject_shop = ?, 
-            description_shop = ?, 
-            content_shop = ?, 
-            date_create = ?, 
-            group_id = ? 
-            WHERE shop_id = ?");
+        $stmt = $conn->prepare("UPDATE dn_shop
+                SET subject_shop = ?,
+                description_shop = ?,
+                content_shop = ?,
+                date_create = ?,
+                group_id = ?
+                WHERE shop_id = ?");
 
         if ($stmt === false) {
             throw new Exception("SQL Prepare failed for update shop: " . $conn->error);
@@ -268,10 +274,10 @@ try {
 
         $shop_subject = $shop_array['shop_subject'];
         $shop_description = $shop_array['shop_description'];
-        $shop_content = $shop_array['shop_content']; // ไม่ต้องแปลง encoding ถ้า frontend ส่งมาเป็น UTF-8 แล้ว
+        $shop_content = $shop_array['shop_content'];
 
         $current_date = date('Y-m-d H:i:s');
-        
+
         $stmt->bind_param(
             "ssssii",
             $shop_subject,
@@ -286,41 +292,93 @@ try {
             throw new Exception("Execute statement failed for update shop: " . $stmt->error);
         }
 
-        // Handle Cover photo upload (fileInput)
+        // --- Start Handle Cover photo upload (fileInput) ---
         if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] === UPLOAD_ERR_OK) {
-            // ลบรูป Cover photo เก่า (status = 1) ก่อน
-            $deleteOldCoverStmt = $conn->prepare("UPDATE dn_shop_doc SET status = 0 WHERE shop_id = ? AND status = 1");
-            if ($deleteOldCoverStmt === false) {
-                throw new Exception("SQL Prepare failed for deleting old cover: " . $conn->error);
+            // 1. Get the path of the old cover photo from the database
+            $oldCoverPath = null;
+            $getOldCoverStmt = $conn->prepare("SELECT file_path FROM dn_shop_doc WHERE shop_id = ? AND status = 1 AND del = 0");
+            if ($getOldCoverStmt) {
+                $getOldCoverStmt->bind_param("i", $shop_id);
+                $getOldCoverStmt->execute();
+                $oldCoverResult = $getOldCoverStmt->get_result();
+                if ($oldCoverRow = $oldCoverResult->fetch_assoc()) {
+                    $oldCoverPath = $oldCoverRow['file_path'];
+                }
+                $getOldCoverStmt->close();
+            } else {
+                error_log("SQL Prepare failed for getting old cover path: " . $conn->error);
             }
-            $deleteOldCoverStmt->bind_param("i", $shop_id);
-            if (!$deleteOldCoverStmt->execute()) {
-                throw new Exception("Execute statement failed for deleting old cover: " . $deleteOldCoverStmt->error);
-            }
-            $deleteOldCoverStmt->close();
 
+            // 2. Upload the new cover photo
             $fileInfos = handleFileUpload($_FILES['fileInput'], true); // true indicates single file
             if (!empty($fileInfos) && $fileInfos[0]['success']) {
                 $fileInfo = $fileInfos[0];
-                // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
-                $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
-                if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
-                    throw new Exception('Error inserting new cover photo.');
+
+                // 3. Update or Insert the new cover photo record
+                // Check if there's an existing cover photo record (status = 1)
+                $checkExistingCoverStmt = $conn->prepare("SELECT COUNT(*) FROM dn_shop_doc WHERE shop_id = ? AND status = 1 AND del = 0");
+                if ($checkExistingCoverStmt) {
+                    $checkExistingCoverStmt->bind_param("i", $shop_id);
+                    $checkExistingCoverStmt->execute();
+                    $existingCount = $checkExistingCoverStmt->get_result()->fetch_row()[0];
+                    $checkExistingCoverStmt->close();
+
+                    if ($existingCount > 0) {
+                        // Update existing cover photo record
+                        $updateCoverStmt = $conn->prepare("UPDATE dn_shop_doc
+                                                        SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
+                                                        WHERE shop_id = ? AND status = 1 AND del = 0");
+                        if ($updateCoverStmt === false) {
+                            throw new Exception("SQL Prepare failed for updating cover photo: " . $conn->error);
+                        }
+                        $updateCoverStmt->bind_param(
+                            "sisssi",
+                            $fileInfo['originalFileName'],
+                            $fileInfo['fileSize'],
+                            $fileInfo['fileType'],
+                            $fileInfo['filePath'],
+                            $fileInfo['apiPath'],
+                            $shop_id
+                        );
+                        if (!$updateCoverStmt->execute()) {
+                            throw new Exception('Error updating cover photo: ' . $updateCoverStmt->error);
+                        }
+                        $updateCoverStmt->close();
+                    } else {
+                        // No existing cover photo, insert a new one
+                        $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 for Cover photo
+                        if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
+                            throw new Exception('Error inserting new cover photo.');
+                        }
+                    }
+
+                    // 4. Delete the old file from the server if a new one was successfully uploaded and an old one existed
+                    if ($oldCoverPath && file_exists($oldCoverPath)) {
+                        unlink($oldCoverPath); // Delete the actual file
+                        error_log("Deleted old cover photo file: " . $oldCoverPath);
+                    }
+
+                } else {
+                     throw new Exception("SQL Prepare failed for checking existing cover: " . $conn->error);
                 }
+
             } else {
-                throw new Exception('Error uploading cover photo: ' . ($fileInfos[0]['error'] ?? 'Unknown error'));
+                throw new Exception('Error uploading new cover photo: ' . ($fileInfos[0]['error'] ?? 'Unknown error'));
             }
         }
+        // --- End Handle Cover photo upload (fileInput) ---
+
 
         // Handle content images upload (image_files)
         // ควรลบรูปภาพที่ไม่อยู่ใน content แล้ว หรือ update เฉพาะที่จำเป็น
         // ตัวอย่างนี้เป็นการเพิ่มรูปใหม่เข้าไปเท่านั้น ยังไม่ได้จัดการเรื่องลบรูปเก่าที่ไม่มีอยู่ใน content แล้ว
+        // การจัดการรูปภาพในเนื้อหา Summernote ที่ซับซ้อน (เพิ่ม, ลบ, เปลี่ยน) ควรมี logic ที่ละเอียดอ่อนมากขึ้น
+        // เช่น ตรวจสอบว่ารูปภาพใดใน DB ยังอยู่ใน content_shop หรือไม่ ถ้าไม่ก็ลบออกจาก DB และ Server
         if (isset($_FILES['image_files']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
-                    // เปลี่ยน $fileInfo['fileName'] เป็น $fileInfo['originalFileName']
                     $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
                     $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
                     if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
@@ -341,11 +399,11 @@ try {
             throw new Exception("Shop ID is missing for deletion.");
         }
         $del = '1';
-        
+
         // Update the dn_shop table
-        $stmt = $conn->prepare("UPDATE dn_shop 
-            SET del = ? 
-            WHERE shop_id = ?"); 
+        $stmt = $conn->prepare("UPDATE dn_shop
+                SET del = ?
+                WHERE shop_id = ?");
         if ($stmt === false) {
             throw new Exception("SQL Prepare failed for delete shop: " . $conn->error);
         }
@@ -357,11 +415,11 @@ try {
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed for delete shop: " . $stmt->error);
         }
-        
+
         // Update the dn_shop_doc table
-        $stmt = $conn->prepare("UPDATE dn_shop_doc 
-            SET del = ? 
-            WHERE shop_id = ?"); 
+        $stmt = $conn->prepare("UPDATE dn_shop_doc
+                SET del = ?
+                WHERE shop_id = ?");
         if ($stmt === false) {
             throw new Exception("SQL Prepare failed for delete shop doc: " . $conn->error);
         }
@@ -373,7 +431,7 @@ try {
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed for delete shop doc: " . $stmt->error);
         }
-        
+
         $response = array('status' => 'success', 'message' => 'Shop deleted successfully!');
 
     } elseif ($_POST['action'] == 'getData_shop') {
@@ -401,27 +459,27 @@ try {
         $totalRecords = $totalRecordsResult->fetch_row()[0];
 
         // Query สำหรับนับจำนวนที่ filter แล้ว
-        $totalFilteredQuery = "SELECT COUNT(s.shop_id) 
-                                 FROM dn_shop s
-                                 LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                                 LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                                 WHERE $whereClause";
+        $totalFilteredQuery = "SELECT COUNT(s.shop_id)
+                                    FROM dn_shop s
+                                    LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                                    LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                                    WHERE $whereClause";
         $totalFilteredResult = $conn->query($totalFilteredQuery);
         $totalFiltered = $totalFilteredResult->fetch_row()[0];
 
 
-        $dataQuery = "SELECT 
-                                 s.shop_id,
-                                 s.subject_shop,
-                                 s.date_create,
-                                 sub.group_name AS sub_group_name,
-                                 parent.group_name AS main_group_name
-                             FROM dn_shop s
-                             LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                             LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                             WHERE $whereClause
-                             ORDER BY $orderBy
-                             LIMIT $start, $length";
+        $dataQuery = "SELECT
+                                    s.shop_id,
+                                    s.subject_shop,
+                                    s.date_create,
+                                    sub.group_name AS sub_group_name,
+                                    parent.group_name AS main_group_name
+                                 FROM dn_shop s
+                                 LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                                 LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                                 WHERE $whereClause
+                                 ORDER BY $orderBy
+                                 LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];
