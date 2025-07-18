@@ -739,7 +739,9 @@ $("#submitEditidia").on("click", function (event) {
     });
 });
 
-
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_idia.php";
+});
 
 // function reDirect(url, data) {
 //     var form = $('<form>', {

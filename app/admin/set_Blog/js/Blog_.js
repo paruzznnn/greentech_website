@@ -739,6 +739,10 @@ $("#submitEditBlog").on("click", function (event) {
     });
 });
 
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_Blog.php";
+});
+
 
 
 // function reDirect(url, data) {

@@ -739,6 +739,9 @@ $("#submitEditnews").on("click", function (event) {
     });
 });
 
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_news.php";
+});
 
 
 // function reDirect(url, data) {

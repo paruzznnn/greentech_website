@@ -175,6 +175,11 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
                 <div class='col-md-8'>
+                 <div style='margin: 10px; text-align: end;'>
+                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                    <i class='fas fa-arrow-left'></i> Back 
+                </button>
+            </div>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
                         <textarea class='form-control summernote' id='summernote_update' name='news_content'>" . htmlspecialchars($content) . "</textarea>
