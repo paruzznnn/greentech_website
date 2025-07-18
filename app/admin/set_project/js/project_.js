@@ -739,7 +739,9 @@ $("#submitEditproject").on("click", function (event) {
     });
 });
 
-
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_project.php";
+});
 
 // function reDirect(url, data) {
 //     var form = $('<form>', {
