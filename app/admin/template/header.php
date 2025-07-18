@@ -49,14 +49,11 @@ if (!isset($base_path_admin)) {
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
         <img src="/public/img/origami_app.png" height="25" style="cursor:pointer;">
         <div id="origamiDropdownMenu" class="dropdown-box hidden">
-          <a href="https://origami.example.com">
+          <a href="https://www.origami.life">
             <img src="/public/img/2_20180425103337.ico" height="40"><br>
             <span>Origami</span>
           </a>
-          <a href="https://robusta.example.com">
-            <img src="/public/img/6_20181018145034.png" height="40"><br>
-            <span>Robusta</span>
-          </a>
+          
         </div>
       </div>
 
