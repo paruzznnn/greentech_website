@@ -1,5 +1,6 @@
 <?php
     require_once('../lib/connect.php');
+    require_once('../lib/utils.php'); // เพิ่มบรรทัดนี้เพื่อเรียกใช้ฟังก์ชัน generateRandomPassword
     header('Content-Type: application/json; charset=UTF-8');
     date_default_timezone_set('Asia/Bangkok');
     session_start();
@@ -17,7 +18,7 @@
     $lastname  = trim($data['lastname']  ?? '');
     $email     = trim($data['email']     ?? '');
     $username  = trim($data['username']  ?? '');
-    $password  = trim($data['password']  ?? '');
+    // $password  = trim($data['password']  ?? ''); // ลบบรรทัดนี้ออก
     $telephone = trim($data['telephone'] ?? '');
     $role_id   = 1;
     $email = $email ?: $username;
@@ -37,14 +38,18 @@
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         session_regenerate_id(true);
-        $_SESSION['user_email'] = $row['email'];
-        $_SESSION['user_role']  = (int) $row['role_id'];
+        $_SESSION['email'] = $row['email'];
+        $_SESSION['role_id']  = (int) $row['role_id'];
         $_SESSION['logged_in']  = true;
         header("Location: admin/dashboard.php");
         exit;
     }
+
+    // สร้างรหัสผ่านสุ่มและแฮช
+    $generated_password = generateRandomPassword(); // เรียกใช้ฟังก์ชันสร้างรหัสผ่าน
+    $hashed_password = password_hash($generated_password, PASSWORD_DEFAULT);
     $otp = rand(100000, 999999);
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
     $insert = $conn->prepare("
         INSERT INTO mb_user (
             first_name, last_name, password, email, phone_number,
@@ -61,7 +66,7 @@
         "sssssis",
         $firstname,
         $lastname,
-        $hashed_password,
+        $hashed_password, // ใช้รหัสผ่านที่แฮชแล้ว
         $email,
         $telephone,
         $otp,
@@ -73,8 +78,8 @@
         exit;
     }
     session_regenerate_id(true);
-    $_SESSION['user_email'] = $email;
-    $_SESSION['user_role']  = $role_id;
+    $_SESSION['email'] = $email;
+    $_SESSION['role_id']  = $role_id;
     $_SESSION['logged_in']  = true;
     header("Location: admin/dashboard.php");
     exit;
