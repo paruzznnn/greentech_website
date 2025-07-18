@@ -717,7 +717,7 @@ $("#submitEditBlog").on("click", function (event) {
                     try {
                         var json = (typeof response === "string") ? JSON.parse(response) : response;
                         if (json.status === 'success') {
-                            window.location.href = "list_Blog.php";
+                           location.reload(); // This line refreshes the current page
                         } else {
                             Swal.fire('Error', json.message || 'Unknown error', 'error');
                         }
