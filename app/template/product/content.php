@@ -39,7 +39,8 @@ if ($selectedSubGroupId > 0) {
     $sqlAllProducts .= " AND main_group.group_id = $selectedGroupId";
 }
 
-$sqlAllProducts .= " ORDER BY main_group.group_name ASC, sub_group.group_name ASC, dn.subject_shop ASC";
+// **แก้ไขตรงนี้: เรียงตาม shop_id ASC เป็นลำดับสุดท้าย**
+$sqlAllProducts .= " ORDER BY main_group.group_name ASC, sub_group.group_name ASC, dn.shop_id ASC";
 
 $resultAllProducts = $conn->query($sqlAllProducts);
 $allProductsData = [];
@@ -91,41 +92,14 @@ ksort($organizedGroups);
 foreach ($organizedGroups as &$group) {
     ksort($group['sub_groups']);
     foreach ($group['sub_groups'] as &$subGroup) {
-        usort($subGroup['products'], fn($a, $b) => strcmp($a['title'], $b['title']));
+        // **แก้ไขตรงนี้: เรียงสินค้าในกลุ่มย่อยตาม shop_id (id)**
+        usort($subGroup['products'], fn($a, $b) => $a['id'] <=> $b['id']);
     }
 }
 
 $finalDisplayItems = array_values($organizedGroups);
 
 if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
-    // If searching or filtering by group, collect all products that matched the query
-    foreach ($allProductsData as $product) {
-        // Ensure that the product has a group_id
-        // และอยู่ในเงื่อนไขการกรองที่เลือก
-        $shouldAddProduct = false;
-        if ($searchQuery) {
-            $shouldAddProduct = true; // ถ้าค้นหา แสดงทั้งหมดที่ตรง
-        } elseif ($selectedSubGroupId > 0 && $product['sub_group_id'] == $selectedSubGroupId) {
-            $shouldAddProduct = true;
-        } elseif ($selectedGroupId > 0) {
-            if ($product['main_group_id'] == $selectedGroupId || ($product['sub_group_id'] == $selectedGroupId && $product['parent_group_id'] === NULL)) {
-                $shouldAddProduct = true;
-            }
-        }
-
-        if ($shouldAddProduct && !empty($product['group_id']) && $product['group_id'] > 0) {
-            $finalDisplayItems[] = [
-                'id' => $product['shop_id'],
-                'title' => $product['subject_shop'],
-                'description' => $product['description_shop'],
-                'iframe' => preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $product['content_shop'], $matches) ? $matches[1] : null,
-                'image' => $product['first_image_path']
-            ];
-        }
-    }
-    // เมื่อมีการค้นหาหรือกรองกลุ่ม เราจะแสดงเฉพาะสินค้าที่ตรงเงื่อนไข ไม่ใช่หมวดหมู่
-    // ดังนั้นจึงจำเป็นต้องล้าง $finalDisplayItems ที่จัดเรียงเป็นหมวดหมู่ไปแล้ว
-    // และนำเข้าเฉพาะสินค้าที่ตรงกับเงื่อนไขการค้นหา/กรอง
     $tempDisplayItems = [];
     foreach ($allProductsData as $product) {
         $shouldAddProduct = false;
@@ -152,6 +126,10 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         }
     }
     $finalDisplayItems = $tempDisplayItems; // กำหนด finalDisplayItems เป็นรายการสินค้าที่กรองแล้ว
+
+    // **เพิ่มตรงนี้: เรียงสินค้าที่ถูกกรองหรือค้นหาตาม shop_id**
+    usort($finalDisplayItems, fn($a, $b) => $a['id'] <=> $b['id']);
+
 } else {
     // If not searching, display main categories as primary blocks
     // Sort main categories by name before passing to display
