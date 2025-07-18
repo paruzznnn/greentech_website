@@ -230,6 +230,11 @@ if ($result->num_rows > 0) {
                         <i class='fas fa-save'></i> Save shop
                     </button>
                 </div>
+                <div style='margin: 10px; text-align: end;'>
+                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                    <i class='fas fa-arrow-left'></i> Back 
+                </button>
+            </div>
             </div>
             <div class='col-md-8'>
                 <div style='margin: 10px;'>

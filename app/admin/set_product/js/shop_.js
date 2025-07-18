@@ -737,6 +737,10 @@ $("#submitEditshop").on("click", function (event) {
     });
 });
 
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_shop.php";
+});
+
 // ฟังก์ชัน alertError (ถ้ายังไม่มีใน index_.js)
 function alertError(message) {
     Swal.fire({
