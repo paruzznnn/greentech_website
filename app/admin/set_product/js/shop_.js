@@ -712,7 +712,7 @@ $("#submitEditshop").on("click", function (event) {
                         var json = (typeof response === "string") ? JSON.parse(response) : response;
                         if (json.status === 'success') {
                             Swal.fire('Success', json.message, 'success').then(() => {
-                                window.location.href = "list_shop.php";
+                                location.reload(); // This line refreshes the current page
                             });
                         } else {
                             Swal.fire('Error', json.message || 'Unknown error', 'error');
