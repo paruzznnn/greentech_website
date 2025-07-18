@@ -2,8 +2,9 @@
 // *** ตรวจสอบ PATH นี้ให้ถูกต้องที่สุด ***
 // สมมติว่า group_management.php อยู่ที่ /admin/set_product/
 // check_permission.php อยู่ที่ /admin/check_permission.php
-// connect_db.php อยู่ที่ /inc/connect_db.php
-include '../check_permission.php'; // ตรวจสอบสิทธิ์การเข้าถึง 
+// include '../../../lib/connect.php';
+// include '../../../lib/base_directory.php';
+include '../check_permission.php';
 // require_once '../../../inc/connect_db.php'; // เชื่อมต่อฐานข้อมูล
 
 // ตรวจสอบว่าเชื่อมต่อฐานข้อมูลได้หรือไม่ (ถ้า connect_db.php ไม่ได้ die() เมื่อ error)
