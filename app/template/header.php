@@ -92,97 +92,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 <div id="background-blur"></div>
 
 <div class="header-top">
-    <div class="container">
-
-        <div class="header-top-left" style="display: flex; align-items: center;">
-    <a href="https://www.trandar.com">
-        <img class="logo" src="../public/img/trandar_logo_no_bg_100x55.png" alt="">
-    </a>
-     <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
-</div>
-
-<script>
-    // สคริปต์แสดงวันที่
-    const dateEl = document.getElementById("current-date");
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const today = new Date().toLocaleDateString('en-US', options);
-    dateEl.textContent = today;
-</script>
-
-
-        <div class="header-top-right">
-            <div id="auth-buttons">
-    <?php foreach ($menuItems as $item): ?>
-        <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
-            <i class="<?php echo $item['icon']; ?>"></i>
-            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                <?php echo $item['text']; ?>
-            </span>
+    <div class="header-top-left" style="display: flex; align-items: center;">
+        <a href="https://www.trandar.com">
+            <img class="logo" src="../public/img/trandar_logo_no_bg_100x55.png" alt="">
         </a>
-    <?php endforeach; ?>
-</div>
+        <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
+    </div>
 
-<a href="#" id="logout-btn" style="display:none; background: #ff3333; color: white; padding: 8px 15px; border-radius: 4px; margin-left: 10px;">
-    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-</a>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const jwt = sessionStorage.getItem("jwt");
+    <script>
+        // สคริปต์แสดงวันที่
+        const dateEl = document.getElementById("current-date");
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date().toLocaleDateString('en-US', options);
+        dateEl.textContent = today;
+    </script>
 
-    if (jwt) {
-        fetch('actions/protected.php', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + jwt
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-                // viewer login แล้ว
-                document.getElementById("auth-buttons").style.display = "none";
-                document.getElementById("logout-btn").style.display = "inline-block";
-            }
-        })
-        .catch(error => console.error("Token verification failed:", error));
-    }
-
-    document.getElementById("logout-btn").addEventListener("click", function () {
-        sessionStorage.removeItem("jwt");
-        location.reload(); // รีเฟรชหน้าเพื่อให้กลับสู่สถานะไม่ได้ล็อกอิน
-    });
-});
-</script>
-
-
-            <div class="header-link">
-                <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
-                Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
-                </a>    
-                </div>
-            <div>
-                <select id="language-select" class="language-select">
-                </select>
-            </div>
-            <div class="header-link">
-                <a href="https://www.facebook.com/trandaracoustic/" target="_blank" style="background: #ffa719; color: #fafafa;">
-                    <i class="fab fa-facebook-square"></i>
+    <div class="header-top-right">
+        <div id="auth-buttons">
+            <?php foreach ($menuItems as $item): ?>
+                <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
+                    <i class="<?php echo $item['icon']; ?>"></i>
+                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                        <?php echo $item['text']; ?>
+                    </span>
                 </a>
-                <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank" style="background: #ffa719; color: #fafafa;">
-                    <i class="fab fa-youtube"></i>
-                </a>
-                <a href="https://www.instagram.com/trandaracoustics/" target="_blank" style="background: #ffa719; color: #fafafa;">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://lin.ee/yoSCNwF" target="_blank" style="background: #ffa719; color: #fafafa;">
-                    <i class="fab fa-line"></i>
-                </a>
-                <a href="https://www.tiktok.com/@trandaracoustics" target="_blank" style="background: #ffa719; color: #fafafa;">
-                    <i class="fab fa-tiktok"></i>
-                </a>
-            </div>
+            <?php endforeach; ?>
         </div>
 
+        <a href="#" id="logout-btn" style="display:none; background: #ff3333; color: white; padding: 8px 15px; border-radius: 4px; margin-left: 10px;">
+            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </a>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const jwt = sessionStorage.getItem("jwt");
+
+                if (jwt) {
+                    fetch('actions/protected.php', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + jwt
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+                            document.getElementById("auth-buttons").style.display = "none";
+                            document.getElementById("logout-btn").style.display = "inline-block";
+                        }
+                    })
+                    .catch(error => console.error("Token verification failed:", error));
+                }
+
+                document.getElementById("logout-btn").addEventListener("click", function () {
+                    sessionStorage.removeItem("jwt");
+                    location.reload();
+                });
+            });
+        </script>
+
+        <div class="header-link">
+            <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+                Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
+            </a>
+        </div>
+        <div>
+            <select id="language-select" class="language-select">
+            </select>
+        </div>
+        <div class="header-link">
+            <a href="https://www.facebook.com/trandaracoustic/" target="_blank" style="background: #ffa719; color: #fafafa;">
+                <i class="fab fa-facebook-square"></i>
+            </a>
+            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank" style="background: #ffa719; color: #fafafa;">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://www.instagram.com/trandaracoustics/" target="_blank" style="background: #ffa719; color: #fafafa;">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://lin.ee/yoSCNwF" target="_blank" style="background: #ffa719; color: #fafafa;">
+                <i class="fab fa-line"></i>
+            </a>
+            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank" style="background: #ffa719; color: #fafafa;">
+                <i class="fab fa-tiktok"></i>
+            </a>
+        </div>
     </div>
 </div>
 
