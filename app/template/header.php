@@ -4,7 +4,7 @@ $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : '
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 $menuItems = [
-    // 
+    //
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
@@ -67,13 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 ?>
 
 
- <!-- SEO -->
-<title><?= $meta['meta_title'] ?? 'Trandar' ?></title>
+ <title><?= $meta['meta_title'] ?? 'Trandar' ?></title>
 <meta name="description" content="<?= $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
 <meta name="keywords" content="<?= $meta['meta_keywords'] ?? 'Trandar, แผ่นฝ้า, ฝ้าดูดซับเสียง' ?>">
 <meta name="author" content="trandar.com">
 
-<!-- Open Graph (Facebook, LINE) -->
 <meta property="og:site_name" content="trandar.com">
 <meta property="og:title" content="<?= $meta['og_title'] ?? $meta['meta_title'] ?? 'Trandar' ?>">
 <meta property="og:description" content="<?= $meta['og_description'] ?? $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
@@ -107,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
         dateEl.textContent = today;
     </script>
 
+
     <div class="header-top-right">
         <div id="auth-buttons">
             <?php foreach ($menuItems as $item): ?>
@@ -136,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+                            // viewer login แล้ว
                             document.getElementById("auth-buttons").style.display = "none";
                             document.getElementById("logout-btn").style.display = "inline-block";
                         }
@@ -145,10 +145,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
                 document.getElementById("logout-btn").addEventListener("click", function () {
                     sessionStorage.removeItem("jwt");
-                    location.reload();
+                    location.reload(); // รีเฟรชหน้าเพื่อให้กลับสู่สถานะไม่ได้ล็อกอิน
                 });
             });
         </script>
+
 
         <div class="header-link">
             <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
@@ -177,12 +178,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
             </a>
         </div>
     </div>
+
 </div>
 
 <div id="myModal-sign-in" class="modal">
     <div class="modal-content" style="width: 350px !important;">
         <div class="modal-header">
-            <span class="modal-close-sign-in">&times;</span>
+            <span class="modal-close-sign-in">×</span>
         </div>
         <div class="modal-body" style="background-color: #9e9e9e1f;">
 
@@ -191,8 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
                 <div class="card">
                     <section class="card-body">
                         <div style="text-align: center;">
-                            <!-- <img class="" style="width: 70%;" src="../public/img/logo-ALLABLE-06.png" alt=""> -->
-                             <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
+                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
                         </div>
 
                         <h6 style="text-align: center; color: #555;" class="mt-2">
@@ -220,10 +221,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
                             <div class="row mt-4">
 
-                            
-                                <div class="col-md-12 text-end" 
+
+                                <div class="col-md-12 text-end"
                                 style="
-                                display: flex; 
+                                display: flex;
                                 justify-content: space-between;
                                 align-items: center;
                                 ">
@@ -244,13 +245,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
                                     <div class="d-inline-flex">
                                         <button type="submit" class=""
                                             style="
-                                        width: 260px;
-                                        border: none;
-                                        border-radius: 4px;
-                                        padding: 10px;
-                                        background: #ff8200;
-                                        color: white;
-                                        "> Login </button>
+                                            width: 260px;
+                                            border: none;
+                                            border-radius: 4px;
+                                            padding: 10px;
+                                            background: #ff8200;
+                                            color: white;
+                                            "> Login </button>
                                     </div>
                                 </div>
                             </div>
@@ -267,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 <div id="myModal-forgot-password" class="modal">
     <div class="modal-content" style="width: 350px !important;">
         <div class="modal-header">
-            <span class="modal-close-forgot-password">&times;</span>
+            <span class="modal-close-forgot-password">×</span>
         </div>
         <div class="modal-body" style="background-color: #9e9e9e1f;">
 
@@ -291,17 +292,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
                         <form id="forgotModal" action="" method="post">
 
                             <div class="form-group mt-4">
-                                <input 
-                                id="forgot_email" 
-                                name="forgot_email" type="text" 
-                                class="form-control emet-login input" 
+                                <input
+                                id="forgot_email"
+                                name="forgot_email" type="text"
+                                class="form-control emet-login input"
                                 placeholder="Please enter your email.">
                             </div>
 
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
-                                        <button type="button" 
+                                        <button type="button"
                                         id="submitForgot"
                                         class=""
                                         style="
@@ -324,10 +325,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
         </div>
     </div>
 </div>
-
-
-
-
 
 
 <?php
@@ -382,4 +379,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     }
 }
 ?>
-
