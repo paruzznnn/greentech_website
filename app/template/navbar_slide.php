@@ -1,6 +1,6 @@
 <?php
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
-require_once('../lib/connect.php');
+// require_once('../lib/connect.php');
 $newsList = [];
 $sql = "SELECT news_id, subject_news FROM dn_news ORDER BY date_create DESC LIMIT 3";
 $result = $conn->query($sql);
