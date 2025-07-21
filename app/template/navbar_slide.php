@@ -109,12 +109,13 @@ $dropdownItems = [
 
 .dropdown-item {
     padding: 10px 15px;
-    color: #333;
+    /* color: #565656ff; */
     text-decoration: none;
+    background-color: #bebcbcff;
 }
 
 .dropdown-item:hover {
-    background-color: #f0f0f0;
+    /* background-color: #302f2fff; */
 }
 
 .dropbtn {
@@ -125,8 +126,8 @@ $dropdownItems = [
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #f28b1f;
-    color: #58585a;
+    background-color: #ff9900;
+    color: #ffffff;
     /* color: white; */
     padding: 15px 40px 20px 10px;
     font-weight: bold;
