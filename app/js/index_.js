@@ -129,11 +129,11 @@ function setupModal(modalId, btnId, closeClass) {
             $modal.hide();
         });
 
-        $(window).on('click', function (event) {
-            if ($(event.target).is($modal)) {
-                $modal.hide();
-            }
-        });
+        // $(window).on('click', function (event) {
+        //     if ($(event.target).is($modal)) {
+        //         $modal.hide();
+        //     }
+        // });
     } else {
         // Handle cases where modal, button, or close button doesn't exist
     }
