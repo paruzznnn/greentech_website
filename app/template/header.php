@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
                         <form id="loginModal" action="" method="post">
 
                             <div class="form-group mt-4">
-                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your Email">
+                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your email.">
                             </div>
 
                             <div class="form-group mt-2" style="position: relative;">
