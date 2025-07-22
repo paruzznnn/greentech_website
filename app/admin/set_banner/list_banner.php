@@ -92,8 +92,8 @@ include '../check_permission.php';
                         </a>
                     </div>
                     <div style="gap :20px"><h5>
-                        <div style="padding-bottom :5px">ความสูงรูปภาพ: 300px;</div>
-                        <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
+                        <div style="padding-bottom :5px">ความสูงรูปภาพ: 360px;</div>
+                        <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1521px;</div>
                     </h5></div>
                     <table id="td_list_Banner" class="table table-hover table-striped table-bordered" style="width:100%;">
                         <thead>
