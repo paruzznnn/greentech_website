@@ -2,23 +2,23 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-$sql = "SELECT 
-            dn.shop_id, 
-            dn.subject_shop, 
+$sql = "SELECT
+            dn.shop_id,
+            dn.subject_shop,
             dn.description_shop,
-            dn.content_shop, 
-            dn.date_create, 
+            dn.content_shop,
+            dn.date_create,
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
-        FROM 
+        FROM
             dn_shop dn
-        LEFT JOIN 
+        LEFT JOIN
             dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
-        WHERE 
+        WHERE
             dn.del = '0' AND
             dnc.del = '0' AND
             dnc.status = '1'
-        GROUP BY dn.shop_id 
+        GROUP BY dn.shop_id
         ORDER BY dn.date_create DESC
         LIMIT 5";
 
@@ -52,7 +52,7 @@ if ($result->num_rows > 0) {
 <style>
 .shop-wrapper-container {
     position: relative;
-    max-width: 1280px; /* เดิม 960 → เพิ่มเป็น 1280px พอดี 4 กล่อง */
+    max-width: 1280px;
     margin: auto;
     overflow: hidden;
     padding: 0 40px;
@@ -60,7 +60,7 @@ if ($result->num_rows > 0) {
 
 .shop-scroll {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem; /* ลดขนาด gap จาก 1rem เป็น 0.5rem */
     scroll-behavior: smooth;
     overflow-x: auto;
     padding-bottom: 1rem;
@@ -103,27 +103,33 @@ if ($result->num_rows > 0) {
     padding: 10px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    /* ลด min-height ลงอีกเพื่อให้ส่วนเนื้อหากระชับขึ้น */
+    min-height: 65px; /* ปรับค่านี้ตามความเหมาะสมเพื่อให้พอดีกับ 2 บรรทัด */
+    justify-content: center; /* จัดให้อยู่ตรงกลางแนวตั้งภายใน min-height */
 }
 
 .card-title {
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 0px; /* **สำคัญ:** ลบ margin ด้านล่างออก เพื่อให้ชิดกับ description */
     color: #333;
+    white-space: nowrap; /* ตรวจสอบให้แน่ใจว่าไม่ขึ้นบรรทัดใหม่ */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
 }
 
-/* ✅ จำกัดข้อความแค่ 4 บรรทัด */
 .card-text {
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #555;
-    font-size: 0.9rem;
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 0px; /* **สำคัญ:** ลบ margin ด้านบนออก เพื่อให้ชิดกับ title */
+    margin-bottom: 0px; /* ลบ margin ด้านล่างออก */
 }
 
-/* ปุ่มเลื่อนซ้ายขวา */
 .scroll-btn {
     position: absolute;
     top: 40%;
@@ -146,24 +152,12 @@ if ($result->num_rows > 0) {
 .scroll-btn.right {
     right: 5px;
 }
-
 </style>
-
-
 
 <script>
 function scrollshop(direction) {
     const box = document.getElementById('shop-scroll-box');
-    const scrollAmount = 320; // 300px ความกว้าง + 20px ช่องว่าง
-    if (direction === 'left') {
-        box.scrollLeft -= scrollAmount;
-    } else {
-        box.scrollLeft += scrollAmount;
-    }
-}
-function scrollshop(direction) {
-    const box = document.getElementById('shop-scroll-box');
-    const scrollAmount = 320; // 300px + 20px gap
+    const scrollAmount = 300 + 10; // ขนาด card + gap ที่ลดลง
     if (direction === 'left') {
         box.scrollLeft -= scrollAmount;
     } else {
@@ -171,23 +165,20 @@ function scrollshop(direction) {
     }
 }
 
-// ✅ ฟังก์ชัน auto scroll แบบวนลูป
 function startAutoScroll() {
     const box = document.getElementById('shop-scroll-box');
-    const scrollAmount = 400;
+    const scrollAmount = 300 + 10;
     const scrollMax = box.scrollWidth - box.clientWidth;
 
     setInterval(() => {
-        // ถ้าเลื่อนไปจนสุด → กลับไปเริ่ม
         if (box.scrollLeft >= scrollMax) {
             box.scrollLeft = 0;
         } else {
             box.scrollLeft += scrollAmount;
         }
-    }, 3000); // ทุก 3 วินาที
+    }, 3000);
 }
 
-// ✅ เริ่ม auto scroll ทันทีเมื่อโหลดหน้า
 window.addEventListener('DOMContentLoaded', startAutoScroll);
 </script>
 
@@ -217,9 +208,3 @@ window.addEventListener('DOMContentLoaded', startAutoScroll);
         <?php endforeach; ?>
     </div>
 </div>
-
-
-
-
-
-
