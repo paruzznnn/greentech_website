@@ -7,13 +7,19 @@ $(document).ready(function () {
             maxHeight: 500,
             toolbar: [
                 ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontname', 'fontsize']],
+                ['font', ['fontname', 'fontsize']], // ให้แน่ใจว่ามี 'fontname' และ 'fontsize'
                 ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video', 'table']], // เพิ่ม 'table' เข้าไปในกลุ่ม 'insert'
+                ['insert', ['link', 'picture', 'video', 'table']],
                 ['view', ['fullscreen', 'codeview']],
                 ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
             ],
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+            // 💡 สำคัญ: เพิ่มฟอนต์ "Kanit" เข้าไปในรายการ
+            fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+            fontNamesIgnoreCheck: ['Kanit'], // อาจจำเป็นสำหรับบางเวอร์ชันของ Summernote เพื่อให้แสดงฟอนต์ที่กำหนด
+            fontsizeUnits: ['px', 'pt'], // อาจช่วยให้ควบคุมขนาดได้แม่นยำขึ้น
+            // กำหนดฟอนต์เริ่มต้น (ถ้า Summernote ของคุณรองรับ)
+            // defaultFontName: 'Kanit', // ลองเพิ่มบรรทัดนี้
+            // defaultFontSize: '18px', // ลองเพิ่มบรรทัดนี้
             fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
             callbacks: {
                 // ... (ส่วน callbacks เดิมของคุณ)
