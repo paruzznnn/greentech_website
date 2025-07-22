@@ -1,9 +1,10 @@
-<?php include '../check_permission.php'; ?>
-
-
+<?php
+include '../check_permission.php';
+// require_once(__DIR__ . '/../../../../lib/connect.php'); // Include your database connection
+?>
 <!DOCTYPE html>
 <html lang="th">
-    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,42 +56,46 @@
         }
 
         .banner-img {
-        height: 60px; /* กำหนดความสูงที่ต้องการ */
-        width: auto; /* ให้ความกว้างปรับตามสัดส่วนของภาพ */
-        max-width: 150px; /* <<<--- เพิ่มอันนี้ เพื่อจำกัดความกว้างสูงสุด */
-        object-fit: cover;
-        border: 1px solid #ccc;
-    }
+            height: 60px; /* กำหนดความสูงที่ต้องการ */
+            width: auto; /* ให้ความกว้างปรับตามสัดส่วนของภาพ */
+            max-width: 150px; /* เพิ่มอันนี้ เพื่อจำกัดความกว้างสูงสุด */
+            object-fit: cover;
+            border: 1px solid #ccc;
+            border-radius: 4px; /* เพิ่มมนมุม */
+            padding: 2px; /* เพิ่ม padding */
+        }
+        .line-ref {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-left: 5px solid #f57c00;
+            padding-left: 10px;
+            color: #333;
+        }
     </style>
 </head>
- <?php include '../template/header.php'; ?>
-<?php
-$result = $conn->query("SELECT * FROM banner ORDER BY id ASC");
-?>
 <body>
+<?php include '../template/header.php'; ?>
 
 <div class="content-sticky">
     <div class="container-fluid">
-        <div class="box-content">
+        <div class="box-content p-4 bg-light rounded shadow-sm">
             <div class="responsive-grid">
                 <div style="margin: 10px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <h4 class="line-ref mb-3">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 class="line-ref mb-0">
                             <i class="fa-solid fa-image"></i>
                             Banner List
                         </h4>
-                        
-
                         <a class="btn btn-primary" href="setup_banner.php">
                             <i class="fa-solid fa-plus"></i> เพิ่ม Banner
                         </a>
                     </div>
-                    <div style="gab :20px"><h5>
-                            <div style="padding-bottom :5px">ความสูงรูปภาพ: 360px;</div>
-                            <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
-                            <!-- <div style="padding-bottom :30px">*หมายเหตุ ถ้าขนาดพอดีจะสวยงามที่สุดถ้ามากว่าหรือน้อยกว่าอาจจะไม่สวยเหมือนที่ดีไซน์</div> -->
-                        </h5></div>
-                    <table id="td_list_Banner" class="table table-hover" style="width:100%;">
+                    <div style="gap :20px"><h5>
+                        <div style="padding-bottom :5px">ความสูงรูปภาพ: 300px;</div>
+                        <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
+                    </h5></div>
+                    <table id="td_list_Banner" class="table table-hover table-striped table-bordered" style="width:100%;">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -100,22 +105,7 @@ $result = $conn->query("SELECT * FROM banner ORDER BY id ASC");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= $i++ ?></td>
-                                    <td><img src="<?= $row['image_path'] ?>" class="banner-img" /></td>
-                                    <td><?= date('d/m/Y H:i', strtotime($row['created_at'])) ?></td>
-                                    <td>
-                                        <a href="edit_banner.php?id=<?= $row['id'] ?>" class="btn btn-circle btn-edit" title="แก้ไข">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <a href="delete_banner.php?id=<?= $row['id'] ?>" onclick="return confirm('ยืนยันการลบ?')" class="btn btn-circle btn-del" title="ลบ">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
+                            </tbody>
                     </table>
 
                 </div>
@@ -125,10 +115,111 @@ $result = $conn->query("SELECT * FROM banner ORDER BY id ASC");
 </div>
 
 <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/banner_.js?v=<?php echo time(); ?>'></script>
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        var bannerTable = $('#td_list_Banner').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "actions/process_banner.php",
+                "type": "POST",
+                "data": function (d) {
+                    d.action = 'getData_banner'; // Specify the action for fetching data
+                }
+            },
+            "columns": [
+                { "data": null, "orderable": false, "searchable": false, "render": function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1; // Auto-incrementing numbering
+                }},
+                { "data": "image_path", "render": function (data, type, row) {
+                    return '<img src="' + data + '" class="banner-img" alt="Banner Image">';
+                }},
+                { "data": "created_at", "render": function (data, type, row) { // ใช้ created_at
+                    // Format created_at if needed, assuming it's returned as YYYY-MM-DD HH:MM:SS
+                    if (data) {
+                        const date = new Date(data);
+                        return date.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
+                               date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                    }
+                    return '';
+                }},
+                { "data": "id", "orderable": false, "searchable": false, "render": function (data, type, row) { // ใช้ id
+                    // Assuming 'id' is the primary key for actions
+                    return `
+                        <button class="btn btn-circle btn-edit btn-sm me-2" title="แก้ไข" data-id="${data}">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-circle btn-del btn-sm" title="ลบ" data-id="${data}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                }}
+            ],
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json" // Thai language for DataTables
+            }
+        });
+
+        // Handle delete button click
+        $(document).on('click', '.btn-del', function() {
+            var bannerId = $(this).data('id'); // ใช้ id
+            Swal.fire({
+                title: 'คุณแน่ใจหรือไม่?',
+                text: "คุณต้องการลบแบนเนอร์นี้หรือไม่!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'actions/process_banner.php', // Call process_banner.php for deletion
+                        type: 'POST',
+                        data: {
+                            action: 'delbanner',
+                            id: bannerId // ส่ง id
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire(
+                                    'ลบแล้ว!',
+                                    'แบนเนอร์ถูกลบเรียบร้อยแล้ว.',
+                                    'success'
+                                ).then(() => {
+                                    bannerTable.ajax.reload(null, false); // Reload DataTables without resetting pagination
+                                });
+                            } else {
+                                Swal.fire(
+                                    'เกิดข้อผิดพลาด!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error deleting banner:", error, xhr.responseText);
+                            Swal.fire(
+                                'เกิดข้อผิดพลาด!',
+                                'ไม่สามารถลบแบนเนอร์ได้.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        // Handle edit button click (redirect to an edit page)
+        $(document).on('click', '.btn-edit', function() {
+            var bannerId = $(this).data('id'); // ใช้ id
+            window.location.href = 'edit_banner.php?id=' + bannerId; // Redirect to an edit page
+        });
+    });
+</script>
 
 </body>
 </html>
-
-
-
