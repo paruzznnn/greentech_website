@@ -127,9 +127,9 @@ function handleFileUpload($files, $is_single_file = false)
                 if (move_uploaded_file($fileTmpPath, $destFilePath)) {
                     $uploadResults[] = [
                         'success' => true,
-                        'fileName' => $fileName, // ใช้ชื่อไฟล์เดิมสำหรับบันทึกใน DB
+                        'fileName' => $fileName, // ใช้ชื่อไฟล์เดิมสำหรับบันทึกใน DB (ซึ่งจะถูกใช้เป็น original_filename ใน DB)
                         'serverFileName' => $serverFileName, // ชื่อไฟล์ที่บันทึกบน server
-                        'originalFileName' => $fileName, // ชื่อไฟล์เดิมที่อัปโหลด
+                        // 'originalFileName' => $fileName, // ไม่ต้องใช้แล้ว เราจะใช้ fileName เก็บเป็น original
                         'fileSize' => $fileSize,
                         'fileType' => $fileType,
                         'filePath' => $destFilePath,
@@ -209,8 +209,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['fileInput'], true); // true indicates single file
             if (!empty($fileInfos) && $fileInfos[0]['success']) {
                 $fileInfo = $fileInfos[0];
+                // Use 'file_name' for both file_name and original_filename logic
                 $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
+                $fileValues = [$new_shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 สำหรับ Cover photo
                 if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                     throw new Exception('Error inserting cover photo for new shop.');
                 }
@@ -220,7 +221,7 @@ try {
         } else {
             // ถ้าไม่มีการอัปโหลดไฟล์ หรือมีข้อผิดพลาดในการอัปโหลดไฟล์ (ไม่ใช่แค่ UPLOAD_ERR_NO_FILE) ให้ throw error
             if (!isset($_FILES['fileInput']) || $_FILES['fileInput']['error'] !== UPLOAD_ERR_NO_FILE) {
-                 throw new Exception("Cover photo is required or there was an upload error.");
+                throw new Exception("Cover photo is required or there was an upload error.");
             }
         }
 
@@ -230,8 +231,9 @@ try {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
-                    $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
-                    $fileValues = [$new_shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
+                    // Use 'file_name' for both file_name and original_filename logic
+                    $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                    $fileValues = [$new_shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
                     if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                         error_log('Error inserting content image: ' . $fileInfo['fileName']);
                         // ไม่ต้อง throw exception เพื่อให้ request สำเร็จหากมีแค่บางรูปที่อัปโหลดไม่ได้
@@ -326,14 +328,14 @@ try {
                     if ($existingCount > 0) {
                         // Update existing cover photo record
                         $updateCoverStmt = $conn->prepare("UPDATE dn_shop_doc
-                                                        SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
-                                                        WHERE shop_id = ? AND status = 1 AND del = 0");
+                                SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
+                                WHERE shop_id = ? AND status = 1 AND del = 0");
                         if ($updateCoverStmt === false) {
                             throw new Exception("SQL Prepare failed for updating cover photo: " . $conn->error);
                         }
                         $updateCoverStmt->bind_param(
                             "sisssi",
-                            $fileInfo['originalFileName'],
+                            $fileInfo['fileName'], // Using fileName here
                             $fileInfo['fileSize'],
                             $fileInfo['fileType'],
                             $fileInfo['filePath'],
@@ -347,7 +349,7 @@ try {
                     } else {
                         // No existing cover photo, insert a new one
                         $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                        $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 for Cover photo
+                        $fileValues = [$shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 1]; // status = 1 for Cover photo
                         if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
                             throw new Exception('Error inserting new cover photo.');
                         }
@@ -370,24 +372,110 @@ try {
         // --- End Handle Cover photo upload (fileInput) ---
 
 
-        // Handle content images upload (image_files)
-        // ควรลบรูปภาพที่ไม่อยู่ใน content แล้ว หรือ update เฉพาะที่จำเป็น
-        // ตัวอย่างนี้เป็นการเพิ่มรูปใหม่เข้าไปเท่านั้น ยังไม่ได้จัดการเรื่องลบรูปเก่าที่ไม่มีอยู่ใน content แล้ว
-        // การจัดการรูปภาพในเนื้อหา Summernote ที่ซับซ้อน (เพิ่ม, ลบ, เปลี่ยน) ควรมี logic ที่ละเอียดอ่อนมากขึ้น
-        // เช่น ตรวจสอบว่ารูปภาพใดใน DB ยังอยู่ใน content_shop หรือไม่ ถ้าไม่ก็ลบออกจาก DB และ Server
+        // --- Start Handle content images from Summernote (new logic) ---
+        // 1. Load the HTML content into a DOMDocument
+        $dom = new DOMDocument();
+        // Suppress warnings about malformed HTML
+        libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $shop_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        $dom->encoding = 'UTF-8'; // Ensure UTF-8 encoding
+
+        $imgs = $dom->getElementsByTagName('img');
+
+        foreach ($imgs as $img) {
+            $src = $img->getAttribute('src');
+            $dataFilename = $img->getAttribute('data-filename');
+
+            // If data-filename exists, use it to find the corresponding image in the database using 'file_name'
+            if (!empty($dataFilename)) {
+                $stmt_check = $conn->prepare("SELECT api_path FROM dn_shop_doc WHERE file_name = ? AND shop_id = ? AND status = 0 AND del = 0");
+                if ($stmt_check) {
+                    $stmt_check->bind_param("si", $dataFilename, $shop_id);
+                    $stmt_check->execute();
+                    $row_check = $stmt_check->get_result()->fetch_assoc();
+                    $stmt_check->close();
+
+                    if ($row_check && !empty($row_check['api_path'])) {
+                        // If found, update the src attribute and remove data-filename
+                        $newSrc = $row_check['api_path'];
+                        $img->setAttribute('src', $newSrc);
+                        $img->removeAttribute('data-filename'); // Remove data-filename as it's processed
+                    } else {
+                        // Log if image not found in DB for a data-filename image (might be a new image not yet saved to DB, or a broken reference)
+                        error_log("Image with data-filename '{$dataFilename}' not found in dn_shop_doc for shop_id {$shop_id}.");
+                        // If the src is still base64, Summernote might handle it on the client-side for new pastes.
+                        // If it's a broken link, it will remain as such.
+                    }
+                } else {
+                    error_log("SQL Prepare failed for checking dn_shop_doc: " . $conn->error);
+                }
+            }
+            // Additional check for base64 images that might not have data-filename (less common with Summernote's default file upload handler)
+            // This part might be redundant if Summernote always provides data-filename for uploaded/pasted images.
+            // If Summernote can still produce base64 without data-filename (e.g., direct copy-paste from other sources), you might need to handle this.
+            /*
+            else if (strpos($src, 'data:') === 0) {
+                 // This is a base64 encoded image. You might need to save it to a file
+                 // and insert it into dn_shop_doc if it's new.
+                 // This typically requires more complex logic to extract the image data,
+                 // generate a unique filename, save it, and update the src.
+                 error_log("Base64 image found in content without data-filename. Consider if this needs specific handling: " . substr($src, 0, 100) . "...");
+            }
+            */
+        }
+        $shop_content = $dom->saveHTML();
+        // Remove the added XML declaration if present
+        $shop_content = str_replace('<?xml encoding="UTF-8">', '', $shop_content);
+        // Remove unwanted html, body, and doctype tags if they were added by loadHTML
+        $shop_content = preg_replace('/<!DOCTYPE html[^>]*>/i', '', $shop_content);
+        $shop_content = preg_replace('/<html[^>]*>(.*?)<\/html>/is', '$1', $shop_content);
+        $shop_content = preg_replace('/<head[^>]*>(.*?)<\/head>/is', '', $shop_content);
+        $shop_content = preg_replace('/<body[^>]*>(.*?)<\/body>/is', '$1', $shop_content);
+
+
+        // Update the content_shop with the modified HTML
+        $stmt_update_content = $conn->prepare("UPDATE dn_shop SET content_shop = ? WHERE shop_id = ?");
+        if ($stmt_update_content === false) {
+            throw new Exception("SQL Prepare failed for updating content_shop: " . $conn->error);
+        }
+        $stmt_update_content->bind_param("si", $shop_content, $shop_id);
+        if (!$stmt_update_content->execute()) {
+            throw new Exception("Execute statement failed for updating content_shop: " . $stmt_update_content->error);
+        }
+        $stmt_update_content->close();
+        // --- End Handle content images from Summernote ---
+
+
+        // Handle content images upload (image_files) - This section processes new file uploads
+        // It's for images directly uploaded via a separate file input (if used), not images pasted into Summernote that are already part of the content string.
         if (isset($_FILES['image_files']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
             $fileInfos = handleFileUpload($_FILES['image_files']);
             foreach ($fileInfos as $fileInfo) {
                 if ($fileInfo['success']) {
-                    $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status']; // เพิ่ม status ด้วย
-                    $fileValues = [$shop_id, $fileInfo['originalFileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
-                    if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
-                        error_log('Error inserting content image: ' . $fileInfo['fileName']);
-                        // ไม่ต้อง throw exception เพื่อให้ request สำเร็จหากมีแค่บางรูปที่อัปโหลดไม่ได้
+                    // Check if this file already exists for this shop_id and status=0 (content image)
+                    // This prevents duplicate entries if a user uploads the same file again.
+                    $checkDuplicateStmt = $conn->prepare("SELECT COUNT(*) FROM dn_shop_doc WHERE shop_id = ? AND file_name = ? AND status = 0 AND del = 0"); // Check against file_name
+                    if ($checkDuplicateStmt) {
+                        $checkDuplicateStmt->bind_param("is", $shop_id, $fileInfo['fileName']); // Use fileName here
+                        $checkDuplicateStmt->execute();
+                        $isDuplicate = $checkDuplicateStmt->get_result()->fetch_row()[0];
+                        $checkDuplicateStmt->close();
+
+                        if ($isDuplicate == 0) {
+                            $fileColumns = ['shop_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                            $fileValues = [$shop_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $fileInfo['apiPath'], 0]; // status = 0 สำหรับ content images
+                            if (!insertIntoDatabase($conn, 'dn_shop_doc', $fileColumns, $fileValues)) {
+                                error_log('Error inserting content image: ' . $fileInfo['fileName']);
+                            }
+                        } else {
+                            error_log("Duplicate content image detected and skipped: " . $fileInfo['fileName']);
+                        }
+                    } else {
+                        error_log("SQL Prepare failed for checking duplicate content image: " . $conn->error);
                     }
                 } else {
                     error_log('Error uploading content image: ' . ($fileInfo['fileName'] ?? 'N/A') . ' - ' . $fileInfo['error']);
-                    // ไม่ต้อง throw exception เพื่อให้ request สำเร็จหากมีแค่บางรูปที่อัปโหลดไม่ได้
                 }
             }
         }
@@ -460,26 +548,26 @@ try {
 
         // Query สำหรับนับจำนวนที่ filter แล้ว
         $totalFilteredQuery = "SELECT COUNT(s.shop_id)
-                                    FROM dn_shop s
-                                    LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                                    LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                                    WHERE $whereClause";
+                                FROM dn_shop s
+                                LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                                LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                                WHERE $whereClause";
         $totalFilteredResult = $conn->query($totalFilteredQuery);
         $totalFiltered = $totalFilteredResult->fetch_row()[0];
 
 
         $dataQuery = "SELECT
-                                    s.shop_id,
-                                    s.subject_shop,
-                                    s.date_create,
-                                    sub.group_name AS sub_group_name,
-                                    parent.group_name AS main_group_name
-                                 FROM dn_shop s
-                                 LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                                 LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                                 WHERE $whereClause
-                                 ORDER BY $orderBy
-                                 LIMIT $start, $length";
+                                s.shop_id,
+                                s.subject_shop,
+                                s.date_create,
+                                sub.group_name AS sub_group_name,
+                                parent.group_name AS main_group_name
+                             FROM dn_shop s
+                             LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                             LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                             WHERE $whereClause
+                             ORDER BY $orderBy
+                             LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];
@@ -514,3 +602,4 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
+?>
