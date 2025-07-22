@@ -112,8 +112,8 @@ include '../check_permission.php';
 
 <div class="container mt-4">
     <div style="gap: 20px"><h5>
-        <div style="padding-bottom: 5px">ความสูงรูปภาพ: 300px;</div>
-        <div style="padding-bottom: 5px">ความกว้างรูปภาพ: 1920px;</div>
+        <div style="padding-bottom: 5px">ความสูงรูปภาพ: 360px;</div>
+        <div style="padding-bottom: 5px">ความกว้างรูปภาพ: 1521px;</div>
     </h5></div>
     <div class="box-content p-4 bg-light rounded shadow-sm">
         <h4 class="line-ref">
