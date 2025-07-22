@@ -86,7 +86,7 @@ $result = $conn->query("SELECT * FROM banner ORDER BY id ASC");
                         </a>
                     </div>
                     <div style="gab :20px"><h5>
-                            <div style="padding-bottom :5px">ความสูงรูปภาพ: 300px;</div>
+                            <div style="padding-bottom :5px">ความสูงรูปภาพ: 360px;</div>
                             <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
                             <!-- <div style="padding-bottom :30px">*หมายเหตุ ถ้าขนาดพอดีจะสวยงามที่สุดถ้ามากว่าหรือน้อยกว่าอาจจะไม่สวยเหมือนที่ดีไซน์</div> -->
                         </h5></div>
