@@ -2,6 +2,8 @@
 <?php include '../check_permission.php'; ?>
 
 <?php
+// ส่วนนี้จะถูกลบออกหรือแก้ไขให้ไม่ทำงาน เพราะการอัปโหลดไฟล์จะถูกจัดการโดย process_banner.php ผ่าน AJAX
+/*
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uploadDir = '../../public/img/';
     $fileName = basename($_FILES['image']['name']);
@@ -19,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<script>alert('อัปโหลดล้มเหลว');</script>";
     }
 }
+*/
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -95,23 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
- 
+
 <body>
 <?php include '../template/header.php'; ?>
 
 
 <div class="container mt-4">
-                        <div style="gab :20px"><h5>
-                            <div style="padding-bottom :5px">ความสูงรูปภาพ: 360px;</div>
-                            <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
-                            <!-- <div style="padding-bottom :30px">*หมายเหตุ ถ้าขนาดพอดีจะสวยงามที่สุดถ้ามากว่าหรือน้อยกว่าอาจจะไม่สวยเหมือนที่ดีไซน์</div> -->
-                        </h5></div>
+    <div style="gab :20px"><h5>
+        <div style="padding-bottom :5px">ความสูงรูปภาพ: 360px;</div>
+        <div style="padding-bottom :5px">ความกว้างรูปภาพ: 1920px;</div>
+        </h5></div>
     <div class="box-content p-4 bg-light rounded shadow-sm">
         <h4 class="line-ref">
             <i class="fa-solid fa-image"></i> เพิ่ม Banner
         </h4>
 
-        <form method="post" enctype="multipart/form-data">
+        <form id="formbanner" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-section">
@@ -119,17 +121,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="previewContainer">
                             <img id="previewImage" src="#" alt="Preview">
                         </div>
-                        <input type="file" class="form-control mt-2" id="image" name="image" required onchange="previewFile()">
+                        <input type="file" class="form-control mt-2" id="image" name="fileInput[]" required onchange="previewFile()">
                     </div>
                 </div>
                 <div class="col-md-8 d-flex align-items-end">
                     <div class="form-section w-100 text-end">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" id="submitAddbanner" class="btn btn-primary">
                             <i class="fas fa-upload"></i> บันทึก
                         </button>
                     </div>
                 </div>
             </div>
+             <input type="hidden" name="banner_subject" id="banner_subject" value="Banner Subject">
+            <input type="hidden" name="banner_description" id="banner_description" value="Banner Description">
+            <input type="hidden" name="banner_content" id="banner_content" value="Banner Content">
         </form>
 
     </div>
@@ -155,7 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </script>
 
-<!-- FontAwesome -->
 <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/banner_.js?v=<?php echo time(); ?>'></script>
 </body>
