@@ -1,27 +1,23 @@
 $(document).ready(function () {
 
     if ($(".summernote").length > 0) {
-        $(".summernote").summernote({
-            height: 400,
-            minHeight: 200,
-            maxHeight: 500,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontname', 'fontsize']], // ให้แน่ใจว่ามี 'fontname' และ 'fontsize'
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video', 'table']],
-                ['view', ['fullscreen', 'codeview']],
-                ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-            ],
-            // 💡 สำคัญ: เพิ่มฟอนต์ "Kanit" เข้าไปในรายการ
-            fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
-            fontNamesIgnoreCheck: ['Kanit'], // อาจจำเป็นสำหรับบางเวอร์ชันของ Summernote เพื่อให้แสดงฟอนต์ที่กำหนด
-            fontsizeUnits: ['px', 'pt'], // อาจช่วยให้ควบคุมขนาดได้แม่นยำขึ้น
-            // กำหนดฟอนต์เริ่มต้น (ถ้า Summernote ของคุณรองรับ)
-            // defaultFontName: 'Kanit', // ลองเพิ่มบรรทัดนี้
-            // defaultFontSize: '18px', // ลองเพิ่มบรรทัดนี้
-            fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-            callbacks: {
+    $(".summernote").summernote({
+        height: 600,
+        minHeight: 600,
+        maxHeight: 600,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['fontname', 'fontsize', 'forecolor']], // เพิ่ม 'forecolor' สำหรับสีฟอนต์
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'video', 'table']],
+            ['view', ['fullscreen', ['codeview', 'fullscreen']]], // แก้ไขให้ถูกต้องสำหรับ fullscreen
+            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+        ],
+        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+        fontNamesIgnoreCheck: ['Kanit'],
+        fontsizeUnits: ['px', 'pt'],
+        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+        callbacks: {
                 // ... (ส่วน callbacks เดิมของคุณ)
             }
         });
