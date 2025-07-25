@@ -39,6 +39,14 @@ if (isset($_GET['id'])) {
         img{
             max-width: 600px;
         }
+        .shop-content-display {
+            font-family: sans-serif, "Roboto" !important; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
+            /* ถ้าอยากให้มั่นใจว่าครอบคลุมทุกองค์ประกอบในเนื้อหา */
+            /* .shop-content-display * {
+                font-family: sans-serif, "Kanit", "Roboto" !important;
+            } */
+        }
+
 
     </style>
 
@@ -102,7 +110,7 @@ if (isset($_GET['id'])) {
                                                 echo "";
                                             }
 
-                                            echo '<div style="">';
+                                            echo '<div class="shop-content-display">';
                                             echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
                                             echo '</div>';
                                         }
