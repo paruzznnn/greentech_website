@@ -48,7 +48,7 @@ $dropdownItems = [
     background-color: white;
     position: relative;
     z-index: 999;
-    border-bottom: 1px solid #ddd;
+    /* border-bottom: 1px solid #ddd; */
     overflow: visible;
     background-color: #ff9900;
 }
