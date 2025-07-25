@@ -55,6 +55,11 @@ $decodedId = $_POST['shop_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
+        body {
+            margin: 0;
+            font-family: sans-serif, "Kanit", "Roboto" !important; /* เปลี่ยนลำดับ */
+            scroll-behavior: smooth;
+        }
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -84,6 +89,12 @@ $decodedId = $_POST['shop_id'];
             top: 70px !important;
             z-index: 1 !important;
         }
+        .box-content p {
+        color: #424242;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
     </style>
 </head>
 
