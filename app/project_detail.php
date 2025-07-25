@@ -38,6 +38,14 @@ if (isset($_GET['id'])) {
         img{
             max-width: 600px;
         }
+        .shop-content-display {
+            font-family: sans-serif, "Roboto" !important; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
+            /* ถ้าอยากให้มั่นใจว่าครอบคลุมทุกองค์ประกอบในเนื้อหา */
+            /* .shop-content-display * {
+                font-family: sans-serif, "Kanit", "Roboto" !important;
+            } */
+        }
+
 
     </style>
 
@@ -101,7 +109,7 @@ if (isset($_GET['id'])) {
                                                 echo "";
                                             }
 
-                                            echo '<div style="">';
+                                            echo '<div class="shop-content-display">';
                                             echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
                                             echo '</div>';
                                         }
@@ -128,7 +136,7 @@ if (isset($_GET['id'])) {
                 <div style="padding-left:50px;">
                 <hr style="border-top: dashed 1px; margin: 40px 0;">
                 <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
-                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/shop/</a></p>
+                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/store/</a></p>
                 <p>📱 Line OA : @Trandaraocoustic 
                     <a href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</a>
                 </p>
