@@ -40,7 +40,7 @@ if (isset($_GET['id'])) {
             max-width: 600px;
         }
         .shop-content-display {
-            font-family: sans-serif, "Kanit", "Roboto"; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
+            font-family: sans-serif, "Roboto" !important; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
             /* ถ้าอยากให้มั่นใจว่าครอบคลุมทุกองค์ประกอบในเนื้อหา */
             /* .shop-content-display * {
                 font-family: sans-serif, "Kanit", "Roboto" !important;
