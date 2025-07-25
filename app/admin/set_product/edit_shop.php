@@ -55,8 +55,8 @@ $decodedId = $_POST['shop_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
-        .note-editable {
-            font-family: sans-serif, "Kanit", "Roboto" !important; /* ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            .note-editable {
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
@@ -66,8 +66,10 @@ $decodedId = $_POST['shop_id'];
             /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
+            /* font-family: sans-serif */
             color: #424242;
         }
+
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -97,11 +99,6 @@ $decodedId = $_POST['shop_id'];
             top: 70px !important;
             z-index: 1 !important;
         }
-        .box-content p {
-        color: #424242;
-        font-size: 16px;
-        line-height: 1.5;
-    }
 
     </style>
 </head>
