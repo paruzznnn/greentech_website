@@ -56,7 +56,7 @@ include '../check_permission.php';
 
         /* สไตล์เฉพาะสำหรับพื้นที่ Summernote Editor */
         .note-editable {
-            font-family: sans-serif, "Kanit", "Roboto" !important; /* ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
@@ -66,6 +66,7 @@ include '../check_permission.php';
             /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
+            /* font-family: sans-serif */
             color: #424242;
         }
 
