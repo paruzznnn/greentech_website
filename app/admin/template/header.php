@@ -32,7 +32,7 @@ if (!isset($base_path_admin)) {
       <span class="toggle-button" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </span>
-      <a href="#"><img class="logo" src="/public/img/trandar_logo_no_bg_100x55.png" alt=""></a>
+      <a href="#"><img class="logo" src="/public/img/LOGOTRAND.png" alt=""></a>
 
     </div>
 
