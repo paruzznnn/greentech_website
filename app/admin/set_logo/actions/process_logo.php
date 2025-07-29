@@ -1,8 +1,8 @@
 <?php
 // actions/process_logo.php
 include '../check_permission.php'; // ตรวจสอบสิทธิ์การเข้าถึง
-require_once(__DIR__ . '/../../../lib/connect.php'); // Include database connection
-require_once(__DIR__ . '/../../../lib/base_directory.php'); // Include base_directory.php for $base_path
+// require_once(__DIR__ . '/../../../lib/connect.php'); // Include database connection
+// require_once(__DIR__ . '/../../../lib/base_directory.php'); // Include base_directory.php for $base_path
 
 header('Content-Type: application/json'); // กำหนดให้ response เป็น JSON
 
