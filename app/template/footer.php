@@ -15,7 +15,7 @@ $menuItems = [
 ];
 
 // ** ส่วนเพิ่มใหม่: ดึงข้อมูล Footer จาก database **
-require_once(__DIR__ . '/lib/connect.php'); // ปรับ Path ตามจริง
+// require_once(__DIR__ . '/lib/connect.php'); // ปรับ Path ตามจริง
 require_once(__DIR__ . '/lib/base_directory.php'); // ปรับ Path ตามจริง (สำหรับ $base_path)
 
 global $conn;
