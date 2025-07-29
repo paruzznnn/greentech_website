@@ -1,10 +1,9 @@
 <?php
-//header-top-right
+// header-top-right (โค้ดส่วนนี้ไม่ได้แก้ไข)
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 $menuItems = [
-    //
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
@@ -13,25 +12,69 @@ $menuItems = [
         'link' => 'register' . $isFile,
         'modal_id' => ''
     ],
-    // [
-    // 'id' => 1,
-    // 'icon' => 'fas fa-sign-in-alt',
-    // 'text' => '',
-    // 'translate' => 'Sign_in',
-    // 'link' => '#',
-    // 'modal_id' => 'myBtn-sign-in'
-    // ],
 ];
+
+// ** ส่วนเพิ่มใหม่: ดึงข้อมูล Footer จาก database **
+require_once(__DIR__ . '/lib/connect.php'); // ปรับ Path ตามจริง
+require_once(__DIR__ . '/lib/base_directory.php'); // ปรับ Path ตามจริง (สำหรับ $base_path)
+
+global $conn;
+global $base_path;
+
+$footer_settings = [];
+$footer_id_for_display = 1;
+
+$stmt_footer = $conn->prepare("SELECT * FROM footer_settings WHERE id = ?");
+$stmt_footer->bind_param("i", $footer_id_for_display);
+$stmt_footer->execute();
+$result_footer = $stmt_footer->get_result();
+
+if ($data = $result_footer->fetch_assoc()) {
+    $footer_settings = $data;
+    // Decode JSON สำหรับ Social Links
+    $footer_settings['social_links'] = json_decode($footer_settings['social_links_json'], true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $footer_settings['social_links'] = []; // ถ้า decode ไม่ได้ ให้เป็น array ว่าง
+        error_log("Error decoding social_links_json in footer.php: " . json_last_error_msg());
+    }
+} else {
+    // กำหนดค่า default หากไม่พบข้อมูลใน database (ควรมีการ insert ข้อมูลเริ่มต้นไว้แล้ว)
+    $footer_settings = [
+        'bg_color' => '#393939',
+        'footer_top_title' => 'ลงทะเบียน',
+        'footer_top_subtitle' => 'สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ',
+        'about_heading' => 'เกี่ยวกับเรา',
+        'about_text' => 'บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก',
+        'contact_heading' => 'ติดต่อเรา',
+        'contact_address' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
+        'contact_phone' => '(+66)2 722 7007',
+        'contact_email' => 'info@trandar.com',
+        'contact_hours_wk' => 'Monday – Friday 08:30 AM – 05:00 PM',
+        'contact_hours_sat' => 'Saturday 08:30 AM – 12:00 PM',
+        'social_heading' => 'Follow Us',
+        'social_links' => [
+            ["icon" => "fab fa-facebook-f", "url" => "https://www.facebook.com/trandaracoustic/", "color" => "#3b5998"],
+            ["icon" => "fab fa-instagram", "url" => "https://www.instagram.com/trandaracoustics/", "color" => "#e1306c"],
+            ["icon" => "fab fa-youtube", "url" => "https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/", "color" => "#ff0000"],
+            ["icon" => "fab fa-line", "url" => "https://lin.ee/yoSCNwF", "color" => "#00c300"],
+            ["icon" => "fab fa-tiktok", "url" => "https://www.tiktok.com/@trandaracoustics", "color" => "#000000"]
+        ],
+        'copyright_text' => '© 2025 TRANDAR INTERNATIONAL CO., LTD. ALL RIGHTS RESERVED',
+    ];
+}
+$stmt_footer->close();
+// ** สิ้นสุดส่วนเพิ่มใหม่ **
 ?>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-<footer class="main-footer">
+<!-- กำหนดสีพื้นหลังแบบ Dynamic -->
+<footer class="main-footer" style="background-color: <?= htmlspecialchars($footer_settings['bg_color']) ?>;">
     <div class="container text-center footer-top-section">
-        <h2 class="footer-title">ลงทะเบียน</h2>
-        <p class="footer-subtitle">สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ</p>
+        <h2 class="footer-title"><?= htmlspecialchars($footer_settings['footer_top_title']) ?></h2>
+        <p class="footer-subtitle"><?= htmlspecialchars($footer_settings['footer_top_subtitle']) ?></p>
         <div class="mt-4">
             <div id="auth-buttons">
-                <?php foreach ($menuItems as $item): ?>
+                <?php foreach ($menuItems as $item): // โค้ดส่วนนี้คงเดิม ?>
                     <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
@@ -41,47 +84,50 @@ $menuItems = [
                 <?php endforeach; ?>
             </div>
         </div>
-
     </div>
 
     <div class="container main-footer-content">
         <div class="row">
             <div class="col-md-4 col-sm-12 mb-4 pr-md-5">
-                <p class="footer-heading">เกี่ยวกับเรา</p>
-                <p>บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก</p>
-                </div>
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['about_heading']) ?></p>
+                <p><?= nl2br(htmlspecialchars($footer_settings['about_text'])) ?></p>
+            </div>
 
             <div class="col-md-4 col-sm-12 mb-4 px-md-3">
-                <p class="footer-heading">ติดต่อเรา</p>
-                <p>102 Phatthanakan 40, Suan Luang, Bangkok 10250</p>
-                <p>(+66)2 722 7007</p>
-                <p>info@trandar.com</p>
-                <p>Monday – Friday 08:30 AM – 05:00 PM</p>
-                <p>Saturday 08:30 AM – 12:00 PM</p>
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['contact_heading']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_address']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_phone']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_email']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_hours_wk']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_hours_sat']) ?></p>
             </div>
 
             <div class="col-md-4 col-sm-12 mb-4 pl-md-5">
-                <p class="footer-heading">Follow Us</p>
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['social_heading']) ?></p>
                 <div class="social-icons-group">
-                    <a href="https://www.facebook.com/trandaracoustic/" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/trandaracoustics/" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
-                    <a href="https://lin.ee/yoSCNwF" class="social-icon line"><i class="fab fa-line"></i></a>
-                    <a href="https://www.tiktok.com/@trandaracoustics" class="social-icon tiktok"><i class="fab fa-tiktok"></i></a>
+                    <?php if (!empty($footer_settings['social_links'])): ?>
+                        <?php foreach ($footer_settings['social_links'] as $social_link): ?>
+                            <a href="<?= htmlspecialchars($social_link['url']) ?>" class="social-icon" style="background-color: <?= htmlspecialchars($social_link['color']) ?>;" target="_blank">
+                                <i class="<?= htmlspecialchars($social_link['icon']) ?>"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">ยังไม่มี Social Link กำหนดค่า.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
     <div class="footer-bottom-bar">
-        © 2025 TRANDAR INTERNATIONAL CO., LTD. ALL RIGHTS RESERVED
+        <?= htmlspecialchars($footer_settings['copyright_text']) ?>
     </div>
 
 </footer>
 
 <style>
     /* Main Footer Styles */
+    /* background-color ย้ายไปใน inline style ของ footer tag เพื่อให้ Dynamic */
     .main-footer {
-        background-color: #393939;
         color: #ccc;
         padding: 40px 0;
     }
@@ -136,26 +182,14 @@ $menuItems = [
         transform: translateY(-3px); /* Slightly lift on hover */
     }
 
-    /* Social Icon Background Colors */
-    .social-icon.facebook {
-        background-color: #3b5998;
-    }
+    /* Social Icon Background Colors - REMOVED, now set dynamically in HTML/PHP for each icon */
+    /* Keep these if you want default colors for specific icons, or remove if only dynamic */
+    /* .social-icon.facebook { background-color: #3b5998; } */
+    /* .social-icon.instagram { background-color: #e1306c; } */
+    /* .social-icon.youtube { background-color: #ff0000; } */
+    /* .social-icon.line { background-color: #00c300; } */
+    /* .social-icon.tiktok { background-color: #000000; } */
 
-    .social-icon.instagram {
-        background-color: #e1306c;
-    }
-
-    .social-icon.youtube {
-        background-color: #ff0000;
-    }
-
-    .social-icon.line {
-        background-color: #00c300;
-    }
-
-    .social-icon.tiktok {
-        background-color: #000000;
-    }
 
     /* Footer Bottom Bar */
     .footer-bottom-bar {
