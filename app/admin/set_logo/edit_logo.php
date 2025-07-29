@@ -2,22 +2,13 @@
 // edit_logo.php
 include '../check_permission.php'; // ตรวจสอบสิทธิ์การเข้าถึง
 
-// ** ต้องมีสองบรรทัดนี้ เพื่อให้เข้าถึง $conn และ $base_path ได้ **
-// Path สัมพันธ์จาก edit_logo.php -> set_logo/ -> admin/ -> app/ -> lib/
-require_once(__DIR__ . '/../../../lib/connect.php'); 
-require_once(__DIR__ . '/../../../lib/base_directory.php'); // ต้องมีไฟล์นี้ และมีการกำหนด $base_path ในนั้น
+// Include database connection and base_directory.php
+// // สมมติว่าไฟล์ connect.php และ base_directory.php อยู่ใน lib/
+// require_once(__DIR__ . '/../../../../lib/connect.php'); 
+// require_once(__DIR__ . '/../../../../lib/base_directory.php'); // ถ้ามี $base_path
 
 // ในกรณีของโลโก้ เราจะดึงข้อมูลจาก ID เดียวคือ 1 เสมอ
 $logo_id = 1; 
-
-// ตรวจสอบการเชื่อมต่อฐานข้อมูลก่อนใช้งาน
-if (!isset($conn) || !$conn) {
-    // กรณีที่ connect.php มีปัญหา หรือ $conn ไม่ได้ถูกกำหนด
-    error_log("Database connection not established in edit_logo.php");
-    // อาจจะ redirect หรือแสดงข้อความผิดพลาด
-    echo "<script>alert('Failed to connect to database.'); window.location.href='../dashboard.php';</script>";
-    exit;
-}
 
 $stmt = $conn->prepare("SELECT id, image_path FROM logo_settings WHERE id = ?");
 $stmt->bind_param("i", $logo_id);
@@ -26,26 +17,21 @@ $result = $stmt->get_result();
 $logo = $result->fetch_assoc();
 $stmt->close();
 
-// หากไม่พบข้อมูลโลโก้ ให้ใช้ค่า default และพยายาม insert เข้าไป
+// หากไม่พบข้อมูลโลโก้ (ซึ่งไม่ควรเกิดขึ้นหากมีการแทรกข้อมูลเริ่มต้นแล้ว)
 if (!$logo) {
-    $default_logo_path = '/public/img/LOGOTRAND.png'; // Path โลโก้ default (สัมพันธ์กับ Document Root)
-    
-    // ลอง insert ค่าเริ่มต้นถ้ายังไม่มี
-    $stmt_insert = $conn->prepare("INSERT INTO logo_settings (id, image_path, created_at) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE image_path = VALUES(image_path), updated_at = NOW()");
-    $stmt_insert->bind_param("is", $logo_id, $default_logo_path);
-    if ($stmt_insert->execute()) {
-        $logo = [
-            'id' => $logo_id,
-            'image_path' => $default_logo_path
-        ];
-    } else {
-        error_log("Failed to insert default logo settings: " . $conn->error);
-        $logo = [
-            'id' => $logo_id,
-            'image_path' => $default_logo_path // ใช้ default แม้ insert ไม่สำเร็จ
-        ];
-    }
-    $stmt_insert->close();
+    // อาจจะต้องแทรกข้อมูลเริ่มต้นเข้าไปใหม่ หรือแสดงข้อความแจ้งเตือน
+    // สำหรับตอนนี้ ถ้าไม่มี อาจจะใช้ค่า default หรือแจ้งให้ตั้งค่า
+    $logo = [
+        'id' => 1,
+        'image_path' => '../public/img/LOGOTRAND.png' // Path โลโก้ default หากไม่พบใน DB
+    ];
+    // หากต้องการให้ insert อัตโนมัติเมื่อไม่พบ
+    // $stmt = $conn->prepare("INSERT INTO logo_settings (id, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = image_path");
+    // $default_logo_path = '../public/img/LOGOTRAND.png';
+    // $stmt->bind_param("is", $logo_id, $default_logo_path);
+    // $stmt->execute();
+    // $stmt->close();
+    // $logo['image_path'] = $default_logo_path;
 }
 ?>
 
@@ -80,7 +66,7 @@ if (!$logo) {
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
-        /* สไตล์ที่คุณมีอยู่แล้ว */
+        /* สไตล์ที่คุณมีอยู่แล้ว สามารถนำมาใช้ได้ */
         .btn-circle {
             border: none;
             width: 30px;
@@ -99,7 +85,7 @@ if (!$logo) {
             background-color: #DC3545;
             color: white;
         }
-        .logo-img { /* เปลี่ยนจาก .banner-img เป็น .logo-img */
+        .banner-img { /* อาจจะเปลี่ยนเป็น .logo-img */
             height: 60px;
             object-fit: contain; /* เปลี่ยนเป็น contain เพื่อรักษาสัดส่วน */
             border: 1px solid #ccc;
@@ -161,12 +147,13 @@ if (!$logo) {
         <form id="editLogoForm" enctype="multipart/form-data">
             <input type="hidden" name="logo_id" value="<?= htmlspecialchars($logo['id']) ?>">
             <input type="hidden" name="old_image_path" value="<?= htmlspecialchars($logo['image_path']) ?>">
-            <input type="hidden" name="action" value="edit_logo"> <div class="row">
+
+            <div class="row">
                 <div class="col-md-4">
                     <div class="form-section">
                         <label>ภาพโลโก้ปัจจุบัน:</label>
                         <div class="previewContainer mb-2">
-                            <img id="currentImage" src="<?= htmlspecialchars($base_path . $logo['image_path']) ?>" alt="Current Logo" class="img-thumbnail">
+                            <img id="currentImage" src="<?= htmlspecialchars($logo['image_path']) ?>" alt="Current Logo" class="img-thumbnail">
                             <img id="previewNewImage" src="#" alt="New Logo Preview" style="display:none; margin-top: 10px;">
                         </div>
                         <label for="image">เลือกรูปภาพโลโก้ใหม่:</label>
@@ -233,7 +220,7 @@ if (!$logo) {
             e.preventDefault(); // ป้องกันการ submit form ปกติ
 
             var formData = new FormData($('#editLogoForm')[0]);
-            // formData.append('action', 'edit_logo'); // ไม่ต้องเพิ่มตรงนี้เพราะมี hidden input แล้ว
+            formData.append('action', 'edit_logo'); // ระบุ action สำหรับการแก้ไขโลโก้
 
             Swal.fire({
                 title: "ยืนยันการแก้ไข?",
@@ -262,12 +249,9 @@ if (!$logo) {
                                     'แก้ไขโลโก้เรียบร้อยแล้ว.',
                                     'success'
                                 ).then(() => {
-                                    // อัปเดตรูปภาพที่แสดงในหน้าโดยไม่ต้องโหลดหน้าใหม่
-                                    $('#currentImage').attr('src', '<?= htmlspecialchars($base_path) ?>' + response.new_image_path);
-                                    $('#currentImage').show(); // แสดงรูปปัจจุบัน
-                                    $('#previewNewImage').hide(); // ซ่อนรูปพรีวิว
-                                    // อัปเดต old_image_path ใน hidden input
-                                    $('input[name="old_image_path"]').val(response.new_image_path);
+                                    // หากต้องการให้รีเฟรชหน้า หรือไปที่หน้าอื่น
+                                    location.reload(); // รีโหลดหน้าเพื่อแสดงโลโก้ใหม่
+                                    // หรือ window.location.href = 'edit_logo.php';
                                 });
                             } else {
                                 Swal.fire(
