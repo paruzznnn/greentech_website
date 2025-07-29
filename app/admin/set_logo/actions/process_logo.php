@@ -7,16 +7,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-header('Content-Type: application/json'); // กำหนดให้ response เป็น JSON
-date_default_timezone_set('Asia/Bangkok'); // ตั้งค่าโซนเวลา
-
-// ** สำคัญ: ต้องมีสองบรรทัดนี้ ไม่งั้น $conn และ $base_path จะไม่ถูกกำหนด **
-// Path ที่ถูกต้องขึ้นอยู่กับโครงสร้างไฟล์ของคุณ
-// ตัวอย่าง: ถ้า process_logo.php อยู่ที่ app/admin/set_logo/actions/
-// และ lib/ อยู่ที่ root ของโปรเจกต์
-// Path จะเป็น ../../../lib/
-require_once(__DIR__ . '/../../../lib/connect.php'); // Include database connection
-require_once(__DIR__ . '/../../../lib/base_directory.php'); // Include base_directory.php for $base_path
+header('Content-Type: application/json');
+date_default_timezone_set('Asia/Bangkok');
+require_once(__DIR__ . '/../../../../lib/base_directory.php');
+require_once(__DIR__ . '/../../../../lib/connect.php');
+require_once(__DIR__ . '/../../../../inc/getFunctions.php');
 
 // ประกาศ global variable เพื่อให้เข้าถึงได้ (ถ้า connect.php และ base_directory.php กำหนดตัวแปรใน global scope)
 global $conn;
