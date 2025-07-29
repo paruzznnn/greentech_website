@@ -1,15 +1,15 @@
 <?php
 // edit_logo.php
-include '../check_permission.php';
+include '../check_permission.php'; // ตรวจสอบสิทธิ์การเข้าถึง
 
-// ** ต้องมีสองบรรทัดนี้ เพื่อให้เข้าถึง $conn และ $base_path ได้ **
-require_once(__DIR__ . '/../../../lib/connect.php'); // Include database connection
-require_once(__DIR__ . '/../../../lib/base_directory.php'); // Include base_directory.php for $base_path
+// Include database connection and base_directory.php
+// // สมมติว่าไฟล์ connect.php และ base_directory.php อยู่ใน lib/
+// require_once(__DIR__ . '/../../../../lib/connect.php'); 
+// require_once(__DIR__ . '/../../../../lib/base_directory.php'); // ถ้ามี $base_path
 
-// กำหนดให้ ID เป็น 1 เสมอสำหรับโลโก้หลัก
-$logo_id = 1;
+// ในกรณีของโลโก้ เราจะดึงข้อมูลจาก ID เดียวคือ 1 เสมอ
+$logo_id = 1; 
 
-// ดึงข้อมูลโลโก้จากฐานข้อมูล
 $stmt = $conn->prepare("SELECT id, image_path FROM logo_settings WHERE id = ?");
 $stmt->bind_param("i", $logo_id);
 $stmt->execute();
@@ -17,26 +17,30 @@ $result = $stmt->get_result();
 $logo = $result->fetch_assoc();
 $stmt->close();
 
-// หากไม่พบโลโก้ ให้ตั้งค่า Path เริ่มต้น (เช่น รูป default) หรือ redirect
+// หากไม่พบข้อมูลโลโก้ (ซึ่งไม่ควรเกิดขึ้นหากมีการแทรกข้อมูลเริ่มต้นแล้ว)
 if (!$logo) {
-    // สามารถตั้งค่า Path รูปภาพ default ได้ที่นี่
+    // อาจจะต้องแทรกข้อมูลเริ่มต้นเข้าไปใหม่ หรือแสดงข้อความแจ้งเตือน
+    // สำหรับตอนนี้ ถ้าไม่มี อาจจะใช้ค่า default หรือแจ้งให้ตั้งค่า
     $logo = [
         'id' => 1,
-        'image_path' => '/public/img/LOGOTRAND.png' // Path รูปภาพ default
+        'image_path' => '../public/img/LOGOTRAND.png' // Path โลโก้ default หากไม่พบใน DB
     ];
-    // หรือ redirect ไปหน้าแจ้งเตือน
-    // echo "<script>alert('Logo settings not found. Please set up default logo first.'); window.location.href='../dashboard.php';</script>";
-    // exit;
+    // หากต้องการให้ insert อัตโนมัติเมื่อไม่พบ
+    // $stmt = $conn->prepare("INSERT INTO logo_settings (id, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = image_path");
+    // $default_logo_path = '../public/img/LOGOTRAND.png';
+    // $stmt->bind_param("is", $logo_id, $default_logo_path);
+    // $stmt->execute();
+    // $stmt->close();
+    // $logo['image_path'] = $default_logo_path;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Logo</title>
+    <title>แก้ไขโลโก้</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -62,6 +66,7 @@ if (!$logo) {
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
+        /* สไตล์ที่คุณมีอยู่แล้ว สามารถนำมาใช้ได้ */
         .btn-circle {
             border: none;
             width: 30px;
@@ -72,20 +77,17 @@ if (!$logo) {
             align-items: center;
             justify-content: center;
         }
-
         .btn-edit {
             background-color: #FFC107;
             color: white;
         }
-
         .btn-del {
             background-color: #DC3545;
             color: white;
         }
-
-        .logo-img { /* เปลี่ยนจาก .banner-img เป็น .logo-img */
-            height: 60px; /* อาจจะปรับให้เหมาะสมกับโลโก้ */
-            object-fit: contain; /* เปลี่ยนเป็น contain เพื่อให้โลโก้ไม่ถูกตัด */
+        .banner-img { /* อาจจะเปลี่ยนเป็น .logo-img */
+            height: 60px;
+            object-fit: contain; /* เปลี่ยนเป็น contain เพื่อรักษาสัดส่วน */
             border: 1px solid #ccc;
         }
         .line-ref {
@@ -124,7 +126,6 @@ if (!$logo) {
         }
     </style>
 </head>
-
 <body>
 <?php include '../template/header.php'; ?>
 
@@ -135,38 +136,36 @@ if (!$logo) {
 </div>
 
 <div class="container mt-4">
-    <div style="gap :20px">
-        <h5>
-            <div style="padding-bottom :5px">ความสูงรูปภาพ: (ปรับตามขนาดโลโก้)px;</div>
-            <div style="padding-bottom :5px">ความกว้างรูปภาพ: (ปรับตามขนาดโลโก้)px;</div>
-        </h5>
-    </div>
+    <div style="gap :20px"><h5>
+        <div style="padding-bottom :5px">ขนาดรูปภาพที่แนะนำสำหรับโลโก้: กว้าง 100px; สูง 55px;</div>
+    </h5></div>
     <div class="box-content p-4 bg-light rounded shadow-sm">
         <h4 class="line-ref">
-            <i class="fa-solid fa-image"></i> แก้ไข Logo
+            <i class="fa-solid fa-image"></i> แก้ไขโลโก้เว็บไซต์
         </h4>
 
         <form id="editLogoForm" enctype="multipart/form-data">
             <input type="hidden" name="logo_id" value="<?= htmlspecialchars($logo['id']) ?>">
             <input type="hidden" name="old_image_path" value="<?= htmlspecialchars($logo['image_path']) ?>">
-            <input type="hidden" name="action" value="edit_logo"> <div class="row">
+
+            <div class="row">
                 <div class="col-md-4">
                     <div class="form-section">
-                        <label>ภาพปัจจุบัน:</label>
+                        <label>ภาพโลโก้ปัจจุบัน:</label>
                         <div class="previewContainer mb-2">
-                            <img id="currentImage" src="<?= htmlspecialchars($base_path . $logo['image_path']) ?>" alt="Current Logo" class="img-thumbnail">
+                            <img id="currentImage" src="<?= htmlspecialchars($logo['image_path']) ?>" alt="Current Logo" class="img-thumbnail">
                             <img id="previewNewImage" src="#" alt="New Logo Preview" style="display:none; margin-top: 10px;">
                         </div>
-                        <label for="image">เลือกรูปภาพใหม่:</label>
+                        <label for="image">เลือกรูปภาพโลโก้ใหม่:</label>
                         <input type="file" class="form-control" name="image" id="image" onchange="previewFile()">
-                        <small class="form-text text-muted">เลือกไฟล์ใหม่เพื่อเปลี่ยนรูปภาพ หากไม่เลือก รูปภาพเดิมจะถูกใช้</small>
+                        <small class="form-text text-muted">เลือกไฟล์ใหม่เพื่อเปลี่ยนรูปภาพโลโก้ หากไม่เลือก รูปภาพเดิมจะถูกใช้</small>
                     </div>
                 </div>
 
                 <div class="col-md-8 d-flex align-items-end">
                     <div class="form-section w-100 text-end">
                         <button type="submit" id="submitEditLogo" class="btn btn-primary">
-                            <i class="fas fa-edit"></i> อัปเดต
+                            <i class="fas fa-edit"></i> อัปเดตโลโก้
                         </button>
                     </div>
                 </div>
@@ -175,7 +174,7 @@ if (!$logo) {
     </div>
 </div>
 
-<script src='../js/index_.js?v=<?php echo time(); ?>'></script>
+<script src='../js/index_.js?v=<?php echo time(); ?>'></script> 
 <script>
     function previewFile() {
         const previewCurrent = document.getElementById('currentImage');
@@ -221,11 +220,11 @@ if (!$logo) {
             e.preventDefault(); // ป้องกันการ submit form ปกติ
 
             var formData = new FormData($('#editLogoForm')[0]);
-            // formData.append('action', 'edit_logo'); // ไม่ต้องเพิ่มตรงนี้เพราะมี hidden input แล้ว
+            formData.append('action', 'edit_logo'); // ระบุ action สำหรับการแก้ไขโลโก้
 
             Swal.fire({
                 title: "ยืนยันการแก้ไข?",
-                text: "คุณต้องการอัปเดตโลโก้นี้ใช่หรือไม่!",
+                text: "คุณต้องการอัปเดตโลโก้เว็บไซต์ใช่หรือไม่!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#FFC107", // สีเหลืองสำหรับแก้ไข
@@ -236,7 +235,7 @@ if (!$logo) {
                     $('#loading-overlay').fadeIn(); // แสดง loading overlay
 
                     $.ajax({
-                        url: "actions/process_logo.php", // เรียกไปยัง process_logo.php
+                        url: "actions/process_logo.php", // ไฟล์ PHP ที่จะใช้ประมวลผลการอัปเดตโลโก้
                         type: "POST",
                         data: formData,
                         processData: false,
@@ -250,15 +249,9 @@ if (!$logo) {
                                     'แก้ไขโลโก้เรียบร้อยแล้ว.',
                                     'success'
                                 ).then(() => {
-                                    // หากอัปเดตสำเร็จ ให้อัปเดตรูปภาพที่แสดงในหน้าโดยไม่ต้องโหลดหน้าใหม่
-                                    // หรือจะโหลดหน้าใหม่ก็ได้ถ้าต้องการความชัวร์
-                                    // window.location.reload(); 
-                                    // อัปเดตรูปภาพปัจจุบัน
-                                    $('#currentImage').attr('src', '<?= htmlspecialchars($base_path) ?>' + response.new_image_path);
-                                    $('#currentImage').show(); // แสดงรูปปัจจุบัน
-                                    $('#previewNewImage').hide(); // ซ่อนรูปพรีวิว
-                                    // อัปเดต old_image_path ใน hidden input
-                                    $('input[name="old_image_path"]').val(response.new_image_path);
+                                    // หากต้องการให้รีเฟรชหน้า หรือไปที่หน้าอื่น
+                                    location.reload(); // รีโหลดหน้าเพื่อแสดงโลโก้ใหม่
+                                    // หรือ window.location.href = 'edit_logo.php';
                                 });
                             } else {
                                 Swal.fire(
