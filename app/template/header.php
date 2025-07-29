@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 <meta property="og:title" content="<?= $meta['og_title'] ?? $meta['meta_title'] ?? 'Trandar' ?>">
 <meta property="og:description" content="<?= $meta['og_description'] ?? $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
 <meta property="og:type" content="website">
-<meta property="og:image" content="<?= $meta['og_image'] ?? '../../public/img/q-removebg-preview1.png' ?>">
+<meta property="og:image" content="<?= $meta['og_image'] ?? '../../public/img/LOGO TRANDAR.png' ?>">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -94,7 +94,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="header-top">
     <div class="header-top-left" style="display: flex; align-items: center;">
         <a href="https://www.trandar.com">
-            <img class="logo" src="../public/img/trandar_logo_no_bg_100x55.png" alt="">
+            <img class="logo" src="../public/img/LOGOTRAND.png" alt="">
         </a>
         <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
     </div>
