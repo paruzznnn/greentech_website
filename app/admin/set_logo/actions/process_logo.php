@@ -26,7 +26,7 @@ $response = ['status' => 'error', 'message' => 'Invalid request.'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_logo') {
     $logo_id = $_POST['logo_id'] ?? 0;
-    $old_image_path_db = $_POST['old_image_path'] ?? ''; // Path เก่าที่ได้จากฐานข้อมูล (อาจเป็น Full URL หรือ Relative Path)
+    $old_image_path_db = $_POST['old_image_path'] ?? ''; // Path เก่าที่ได้จากฐานข้อมูล (ตอนนี้เรารู้ว่ามันเป็น Full URL)
 
     // ตรวจสอบว่า ID เป็น 1 เสมอสำหรับโลโก้
     if ($logo_id != 1) {
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // กำหนด Path สำหรับเก็บรูปภาพโลโก้บนเซิร์ฟเวอร์ (Physical Path)
     // ควรใช้ $_SERVER['DOCUMENT_ROOT'] เพื่อให้เป็น Absolute Path ที่ถูกต้อง
-    $upload_dir_physical = $_SERVER['DOCUMENT_ROOT'] . '/public/img/';
+    $upload_dir_physical = $_SERVER['DOCUMENT_ROOT'] . '/public/img/'; 
     
     // ตรวจสอบและสร้างโฟลเดอร์ถ้ายังไม่มี
     if (!is_dir($upload_dir_physical)) {
@@ -58,15 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $destination_physical = $upload_dir_physical . $file_name_new;
 
         // ลบรูปภาพเก่าออกก่อน ถ้าไม่ใช่รูป default 'LOGOTRAND.png'
-        // $old_image_path_db คือ Path ที่ดึงมาจาก DB ซึ่งอาจเป็น URL Path เช่น https://www.trandar.com/public/img/old.png
-        // ต้องแปลงเป็น Physical Path ก่อนลบ
-        // ตรวจสอบว่าเป็น URL เต็มหรือไม่
-        $old_local_file_path = '';
-        if (strpos($old_image_path_db, $base_path) === 0) { // ถ้าเป็น URL เต็ม
-            $old_local_file_path = str_replace($base_path, $_SERVER['DOCUMENT_ROOT'], $old_image_path_db);
-        } else { // ถ้าเป็น relative path (เช่น /public/img/old.png)
-            $old_local_file_path = $_SERVER['DOCUMENT_ROOT'] . $old_image_path_db;
-        }
+        // $old_image_path_db คือ Path ที่ดึงมาจาก DB ซึ่งเป็น Full URL เช่น https://www.trandar.com/public/img/old.png
+        // แปลงเป็น Physical Path ก่อนลบ
+        // เนื่องจากเรารู้ว่า $old_image_path_db เป็น Full URL เสมอ เราสามารถใช้ str_replace ได้โดยตรง
+        $old_local_file_path = str_replace($base_path, $_SERVER['DOCUMENT_ROOT'], $old_image_path_db);
         
         // ตรวจสอบว่าไฟล์เก่าไม่ใช่ LOGOTRAND.png และไฟล์มีอยู่จริงก่อนลบ
         if ($old_image_path_db && strpos($old_image_path_db, 'LOGOTRAND.png') === false) {
@@ -81,14 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         if (move_uploaded_file($file_tmp_name, $destination_physical)) {
-            // Path ที่จะเก็บในฐานข้อมูล ควรเป็น relative path จาก Document Root
-            // เพื่อให้สามารถใช้ $base_path นำหน้าได้ในภายหลัง
-            $image_path_for_db = '/public/img/' . $file_name_new;
-
-            // **หากยืนยันว่าต้องการเก็บเป็น Full URL ใน DB จริงๆ**
-            // คุณสามารถเปลี่ยนบรรทัดด้านบนเป็น:
-            // $image_path_for_db = $base_path . '/public/img/' . $file_name_new; 
-            // แต่แนะนำให้เก็บเป็น relative path จะดีกว่า
+            // ** นี่คือจุดที่แก้ไข: เก็บเป็น Full URL ใน DB ตามที่ต้องการ **
+            $image_path_for_db = $base_path . '/public/img/' . $file_name_new; 
         } else {
             $response['message'] = 'Failed to upload new image.';
             echo json_encode($response);
@@ -104,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($stmt->execute()) {
             $response['status'] = 'success';
             $response['message'] = 'Logo updated successfully.';
-            // ส่ง Path ใหม่ที่บันทึกใน DB กลับไปให้ frontend
-            $response['new_image_path'] = $image_path_for_db;
+            // ส่ง Full URL ของ Path ใหม่ที่บันทึกใน DB กลับไปให้ frontend
+            $response['new_image_path'] = $image_path_for_db; // ถึงแม้ edit_logo.php จะไม่ได้ใช้โดยตรง แต่ก็ส่งกลับไปเผื่ออนาคต
         } else {
             $response['message'] = 'Failed to update logo in database: ' . $conn->error;
         }
