@@ -25,7 +25,13 @@ $menuItems = [
 ?>
 <?php
 require_once('../lib/connect.php');
+// ตรวจสอบให้แน่ใจว่า base_directory.php ถูก include ด้วย ถ้า logo_settings เก็บเป็น relative path และคุณต้องการแปลงเป็น full URL
+// หาก logo_settings เก็บเป็น full URL อยู่แล้ว อาจไม่จำเป็นต้องใช้ base_path ที่นี่ก็ได้
+// แต่ถ้ายังมีการใช้ base_path ในส่วนอื่น หรือเพื่อความสอดคล้อง แนะนำให้ include ไว้
+// require_once('../lib/base_directory.php'); 
+
 global $conn;
+// global $base_path; // หากต้องการใช้ $base_path เพื่อต่อกับ relative path
 
 // ✅ โหลดข้อมูล Meta Tags ตามชื่อหน้าอัตโนมัติ เช่น "about.php"
 $currentPage = basename($_SERVER['PHP_SELF']);
@@ -38,6 +44,21 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $meta = $result->fetch_assoc();
 }
+
+// ** ส่วนเพิ่มใหม่: ดึงข้อมูลโลโก้จาก database **
+$logo_path = '../public/img/LOGOTRAND.png'; // ตั้งค่า default path เผื่อกรณีดึงจาก DB ไม่ได้
+$logo_id_for_display = 1; // ID ของโลโก้ที่เราใช้ (ซึ่งคือ 1 เสมอ)
+
+$stmt_logo = $conn->prepare("SELECT image_path FROM logo_settings WHERE id = ?");
+$stmt_logo->bind_param("i", $logo_id_for_display);
+$stmt_logo->execute();
+$result_logo = $stmt_logo->get_result();
+
+if ($logo_data = $result_logo->fetch_assoc()) {
+    $logo_path = htmlspecialchars($logo_data['image_path']);
+}
+$stmt_logo->close();
+// ** สิ้นสุดส่วนเพิ่มใหม่ **
 
 // ✅ ตรวจสอบการเข้าสู่ระบบ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
@@ -94,7 +115,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="header-top">
     <div class="header-top-left" style="display: flex; align-items: center;">
         <a href="https://www.trandar.com">
-            <img class="logo" src="../public/img/LOGOTRAND.png" alt="">
+            <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
         <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
     </div>
