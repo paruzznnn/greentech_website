@@ -1,23 +1,24 @@
 $(document).ready(function () {
 
-    if($("#summernote").length > 0){
-
-        $("#summernote").summernote({
-            height: 400,
-            minHeight: 200,
-            maxHeight: 500,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontname', 'fontsize']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview']],
-                ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-            ],
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
-            fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-            callbacks: {
-
+    if ($(".summernote").length > 0) {
+    $(".summernote").summernote({
+        height: 600,
+        minHeight: 600,
+        maxHeight: 600,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['fontname', 'fontsize', 'forecolor']], // เพิ่ม 'forecolor' สำหรับสีฟอนต์
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'video', 'table']],
+            ['view', ['fullscreen', ['codeview', 'fullscreen']]], // แก้ไขให้ถูกต้องสำหรับ fullscreen
+            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+        ],
+        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+        fontNamesIgnoreCheck: ['Kanit'],
+        fontsizeUnits: ['px', 'pt'],
+        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+        callbacks: {
+                // ... (ส่วน callbacks เดิมของคุณ)
             }
         });
     }
@@ -98,13 +99,29 @@ $(document).ready(function () {
             },
             {
                 "target": 1,
+                data: "main_group_name",
+                render: function (data) {
+                    return data || "-";
+                }
+            },
+            {
+                "target": 2,
+                data: "sub_group_name",
+                render: function (data) {
+                    return data || "-";
+                }
+            },
+
+            {
+                "target": 3,
                 data: null,
                 render: function (data, type, row) {
                     return data.subject_shop;
                 }
             },
+            
             {
-                "target": 2,
+                "target": 4,
                 data: null,
                 render: function (data, type, row) {
                     return data.date_create;
@@ -112,7 +129,7 @@ $(document).ready(function () {
                 }
             },
             {
-                "target": 3,
+                "target": 5,
                 data: null,
                 render: function (data, type, row) {
 
@@ -185,6 +202,7 @@ $(document).ready(function () {
 
             editButton.off('click').on('click', function () {
                 // reDirect('edit_news.php', data.news_id);
+                // reDirect('list_shop.php', {
                 reDirect('edit_shop.php', {
                     shop_id: data.shop_id
                 });
@@ -242,6 +260,10 @@ $(document).ready(function () {
 
 
 function base64ToFile(base64, fileName) {
+    if (!base64 || typeof base64 !== "string" || !base64.startsWith("data:")) {
+        console.error("Invalid base64 input:", base64);
+        return null;
+    }
 
     var fileExtension = fileName.split(".").pop().toLowerCase();
 
@@ -263,25 +285,29 @@ function base64ToFile(base64, fileName) {
         case "txt":
             mimeType = "text/plain";
             break;
-
         default:
             mimeType = "application/octet-stream";
     }
 
-    var byteString = atob(base64.split(",")[1]);
+    try {
+        const base64Data = base64.split(",")[1];
+        const byteString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
 
-    var arrayBuffer = new ArrayBuffer(byteString.length);
-    var uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
 
-    for (var i = 0; i < byteString.length; i++) {
-        uint8Array[i] = byteString.charCodeAt(i);
+        const blob = new Blob([uint8Array], { type: mimeType });
+        const file = new File([blob], fileName, { type: mimeType });
+
+        return file;
+
+    } catch (e) {
+        console.error("Failed to decode base64:", e, base64);
+        return null;
     }
-
-    var blob = new Blob([uint8Array], { type: mimeType });
-
-    var file = new File([blob], fileName, { type: mimeType });
-
-    return file;
 }
 
 function alertError(textAlert) {
@@ -308,292 +334,425 @@ function isValidUrl(str) {
     return urlPattern.test(str) && !str.includes(" ");
 }
 
+// ฟังก์ชันสำหรับตรวจสอบว่าเป็น URL ที่ถูกต้องหรือไม่
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// ฟังก์ชันแปลง Base64 เป็น File Object
+function base64ToFile(base64, filename) {
+    try {
+        const arr = base64.split(',');
+        if (arr.length < 2) {
+            console.error("Invalid base64 string format:", base64);
+            return null;
+        }
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        if (!mimeMatch) {
+            console.error("Could not extract MIME type from base64 string:", arr[0]);
+            return null;
+        }
+        const mime = mimeMatch[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+    } catch (e) {
+        console.error("Error converting base64 to file:", e);
+        return null;
+    }
+}
+
+// ฟังก์ชัน alertError (ถ้ายังไม่มีใน index_.js)
+function alertError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: message,
+    });
+}
+
+
 $("#submitAddshop").on("click", function (event) {
     event.preventDefault();
+
+    let subGroupVal = $('#sub_group_select').val();
+    let mainGroupVal = $('#main_group_select').val();
+
+    // กำหนด group_id โดยใช้ group_id ของกลุ่มย่อย ถ้ามี ถ้าไม่มีใช้ group_id ของกลุ่มแม่
+    let groupId = subGroupVal ? subGroupVal : mainGroupVal;
 
     var formshop = $("#formshop")[0];
     var formData = new FormData(formshop);
     formData.append("action", "addshop");
-    var shopContent = formData.get("shop_content");
+    formData.set('group_id', groupId); // ✅ กำหนด group_id ชัดเจน
 
-    if (shopContent) {
+    // Get content from Summernote
+    var contentFromEditor = $("#summernote").summernote('code'); // ใช้ id #summernote สำหรับหน้าเพิ่ม
+    console.log("🔍 contentFromEditor (raw):", contentFromEditor);
+
+    var checkIsUrl = false;
+    var finalContent = '';
+
+    if (contentFromEditor) {
         var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = shopContent;
+        tempDiv.innerHTML = contentFromEditor;
+        console.log("🧩 Created tempDiv with innerHTML set");
+
         var imgTags = tempDiv.getElementsByTagName("img");
+        console.log("📸 Number of <img> tags found:", imgTags.length);
+
         for (var i = 0; i < imgTags.length; i++) {
             var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
+            console.log(`🔎 img[${i}] src:`, imgSrc, ", filename:", filename);
 
-            var checkIsUrl = false;
+            if (!imgSrc) {
+                console.warn(`⚠️ img[${i}] has no src, skipping.`);
+                continue;
+            }
 
-            let isUrl = isValidUrl(imgSrc);
-            if (!isUrl) {
-                var file = base64ToFile(imgSrc, filename);
+            imgSrc = imgSrc.replace(/ /g, "%20");
 
+            // ตรวจสอบว่ารูปภาพเป็น Base64 หรือไม่
+            if (imgSrc.startsWith("data:image")) {
+                console.log(`🛠️ img[${i}] src is a Base64 image, converting to file.`);
+                var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`); // เพิ่ม filename default
                 if (file) {
                     formData.append("image_files[]", file);
+                    console.log(`✅ Appended image_files[] with filename: ${file.name}`);
+                    imgTags[i].setAttribute("src", ""); // Clear src to avoid sending base64 again
+                } else {
+                    console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
-
-                if (imgSrc.startsWith("data:image")) {
-                    imgTags[i].setAttribute("src", "");
-                }
-            } else {
-
+            } else if (!isValidUrl(imgSrc)) {
+                console.log(`🌐 img[${i}] src is a valid URL or previously uploaded, no conversion needed.`);
                 checkIsUrl = true;
-            }
-
-        }
-        formData.set("shop_content", tempDiv.innerHTML);
-    }
-
-    $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
-
-        if (tag[0] === 'fileInput[]' && tag[1].name === '') {
-            alertError("Please add a cover photo.");
-            return;
-        }
-        if (tag[0] === 'shop_subject' && tag[1].trim() === '') {
-            $("#shop_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_description' && tag[1].trim() === '') {
-            $("#shop_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
-    }
-
-    if (checkIsUrl) {
-
-        Swal.fire({
-            title: "Image detection system from other websites?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
             } else {
-                $('#loading-overlay').fadeOut();
+                checkIsUrl = true; // เป็น URL ปกติ
             }
+        }
 
-
-        });
-
-
+        finalContent = tempDiv.innerHTML;
+        formData.set("shop_content", finalContent);
+        console.log("📝 finalContent (cleaned):", finalContent);
     } else {
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-        });
-
+        console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // Validate
+    $(".is-invalid").removeClass("is-invalid");
+
+    // ตรวจสอบ Cover photo
+    const fileInput = document.getElementById('fileInput');
+    if (!fileInput || fileInput.files.length === 0) {
+        alertError("Please add a cover photo.");
+        // ไม่มี field ให้ class is-invalid แต่สามารถเน้น input file ได้ถ้าต้องการ
+        return;
+    }
+
+    if (!$("#shop_subject").val().trim()) {
+        $("#shop_subject").addClass("is-invalid");
+        alertError("Please fill in the subject.");
+        return;
+    }
+    if (!$("#shop_description").val().trim()) {
+        $("#shop_description").addClass("is-invalid");
+        alertError("Please fill in the description.");
+        return;
+    }
+    if (!finalContent.trim()) {
+        alertError("Please fill in content information.");
+        return;
+    }
+    if (!groupId) { // ตรวจสอบว่าได้เลือกกลุ่มหรือไม่
+        alertError("Please select a group.");
+        $('#main_group_select').addClass("is-invalid");
+        $('#sub_group_select').addClass("is-invalid");
+        return;
+    }
+
+    // Logging FormData content for debugging (can be large)
+    console.log("📤 Form data prepared:");
+    for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+            console.log(`  ${key}: File (name: ${value.name}, type: ${value.type}, size: ${value.size} bytes)`);
+        } else {
+            console.log(`  ${key}: ${value}`);
+        }
+    }
+
+    Swal.fire({
+        title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+        text: "Do you want to add shop?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4CAF50",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Accept"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#loading-overlay').fadeIn();
+            console.log("🚀 Sending AJAX request...");
+
+            $.ajax({
+                url: "actions/process_shop.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("✅ AJAX success:", response);
+                    try {
+                        var json = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (json.status === 'success') {
+                            Swal.fire('Success', json.message, 'success').then(() => {
+                                window.location.reload(); // Reload หน้าเมื่อสำเร็จ
+                            });
+                        } else {
+                            Swal.fire('Error', json.message || 'Unknown error', 'error');
+                        }
+                    } catch (e) {
+                        console.error("❌ JSON parse error:", e);
+                        Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("❌ AJAX error:", status, error, xhr.responseText);
+                    Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
+                },
+                complete: function () {
+                    $('#loading-overlay').fadeOut();
+                }
+            });
+        } else {
+            console.log("❎ User cancelled action");
+            $('#loading-overlay').fadeOut();
+        }
+    });
 });
 
+
+// ฟังก์ชันสำหรับตรวจสอบว่าเป็น URL ที่ถูกต้องหรือไม่
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// ฟังก์ชันแปลง Base64 เป็น File Object
+function base64ToFile(base64, filename) {
+    try {
+        const arr = base64.split(',');
+        if (arr.length < 2) {
+            console.error("Invalid base64 string format:", base64);
+            return null;
+        }
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        if (!mimeMatch) {
+            console.error("Could not extract MIME type from base64 string:", arr[0]);
+            return null;
+        }
+        const mime = mimeMatch[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+    } catch (e) {
+        console.error("Error converting base64 to file:", e);
+        return null;
+    }
+}
+
+
+// ... (ส่วนบนของโค้ด)
 
 $("#submitEditshop").on("click", function (event) {
     event.preventDefault();
 
-    var formshop = $("#formshop_edit")[0];
-    var formData = new FormData(formshop);
-    formData.append("action", "editshop");
-    var shopContent = formData.get("shop_content");
-    // var formNews = $("#formNews_edit")[0];
-    // var formData = new FormData(formNews);
-    // formData.append("action", "editshop");
-    // var newsContent = formData.get("shop_content");
+    let subGroupVal = $('#sub_group_select').val();
+    let mainGroupVal = $('#main_group_select').val();
 
-    if (shopContent) {
+    let groupId = subGroupVal ? subGroupVal : mainGroupVal;
+
+    let formData = new FormData(document.getElementById('formshop_edit'));
+    formData.append('action', 'editshop');
+    formData.set('group_id', groupId);
+
+    var contentFromEditor = $("#summernote_update").summernote('code');
+    var checkIsUrl = false;
+    var finalContent = '';
+
+    if (contentFromEditor) {
         var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = shopContent;
+        tempDiv.innerHTML = contentFromEditor;
+
         var imgTags = tempDiv.getElementsByTagName("img");
+
         for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+            var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
 
-            var checkIsUrl = false;
-            let isUrl = isValidUrl(imgSrc);
+            if (!imgSrc) {
+                console.warn(`⚠️ img[${i}] has no src, skipping.`);
+                continue;
+            }
 
-            if (!isUrl) {
-                var file = base64ToFile(imgSrc, filename);
+            imgSrc = imgSrc.replace(/ /g, "%20");
 
+            if (imgSrc.startsWith("data:image")) {
+                console.log(`🛠️ img[${i}] src is a Base64 image, converting to file.`);
+                var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
                 if (file) {
                     formData.append("image_files[]", file);
-                }
-
-                if (imgSrc.startsWith("data:image")) {
+                    console.log(`✅ Appended image_files[] with filename: ${file.name}`);
+                    // เมื่อเป็น Base64 ที่กำลังจะถูกอัปโหลดใหม่ ให้ล้าง src เพื่อไม่ให้ส่ง Base64 ไปใน content_shop
+                    // แต่ถ้า Server ประสบความสำเร็จในการอัปโหลดรูปและส่ง path กลับมา
+                    // edit_shop.php จะเป็นคนจัดการแทนที่ src อีกครั้งเมื่อโหลดหน้า
                     imgTags[i].setAttribute("src", "");
+                } else {
+                    console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
+            } else if (isValidUrl(imgSrc)) {
+                // ถ้าเป็น URL อยู่แล้ว (เช่น รูปที่อัปโหลดไปก่อนหน้า)
+                // ไม่ต้องทำอะไรกับ src ปล่อยให้มันเป็น URL เดิม
+                checkIsUrl = true; // อาจจะมีรูปจาก URL อื่นๆ หรือรูปที่อัปโหลดไปแล้ว
+                console.log(`🌐 img[${i}] src is a valid URL, keeping original src.`);
             } else {
-
-                checkIsUrl = true;
+                // กรณีที่ไม่ใช่ Base64 และไม่ใช่ URL ที่ถูกต้อง (เช่น อาจจะเป็น blob: URL หรือ path ผิดๆ)
+                // ณ จุดนี้ โค้ดนี้อาจต้องจัดการเพิ่มเติม ขึ้นอยู่กับ Summernote สร้าง src แบบใด
+                // แต่โดยทั่วไป ถ้ามาจากไฟล์ที่อัปโหลดแล้ว มันควรเป็น URL ที่ถูกต้อง
+                console.warn(`❓ img[${i}] src is neither Base64 nor a valid URL: ${imgSrc}`);
+                // ถ้าเป็น blob URL (ของ Summernote เอง) เราอาจจะต้องพยายามแปลงเป็นไฟล์ด้วย
+                // แต่มักจะหมายถึงรูปที่เพิ่งวางและยังไม่ถูกอัปโหลด
+                // สำหรับตอนนี้ ให้คง src เดิมไว้หากไม่สามารถจัดการเป็นไฟล์ได้
             }
-
         }
-        formData.set("shop_content", tempDiv.innerHTML);
-    }
 
-    $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
-
-        // if (tag[0] === 'fileInput[]' && tag[1].name === '') {
-        //     alertError("Please add a cover photo.");
-        //     return;
-        // }
-        if (tag[0] === 'shop_subject' && tag[1].trim() === '') {
-            $("#shop_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_description' && tag[1].trim() === '') {
-            $("#shop_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'shop_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
-    }
-
-    if (checkIsUrl) {
-
-        Swal.fire({
-            title: "Image detection system from other websites?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.reload();
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-
-        });
-
-
+        finalContent = tempDiv.innerHTML;
+        formData.set("shop_content", finalContent);
     } else {
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to add shop.!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                $('#loading-overlay').fadeIn();
-
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            window.location.href = "list_shop.php";
-                        }
-                    },
-                    error: function (error) {
-                        console.log("error", error);
-                    },
-                });
-
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-
-        });
-
+        console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // ... (ส่วนที่เหลือของโค้ดเหมือนเดิม)
+    // ตรวจสอบไฟล์ Cover photo
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput && fileInput.files.length > 0) {
+        formData.append('fileInput', fileInput.files[0]);
+        console.log("📤 Appended fileInput (Cover photo).");
+    }
+
+    // Validate
+    $(".is-invalid").removeClass("is-invalid");
+
+    if (!$("#shop_subject").val().trim()) {
+        $("#shop_subject").addClass("is-invalid");
+        console.error("❌ Validation failed: shop_subject is empty");
+        alertError("Please fill in the subject.");
+        return;
+    }
+    if (!$("#shop_description").val().trim()) {
+        $("#shop_description").addClass("is-invalid");
+        console.error("❌ Validation failed: shop_description is empty");
+        alertError("Please fill in the description.");
+        return;
+    }
+    if (!finalContent.trim()) {
+        alertError("Please fill in content information.");
+        console.error("❌ Validation failed: shop_content is empty");
+        return;
+    }
+    if (!groupId) {
+        alertError("Please select a group.");
+        console.error("❌ Validation failed: group_id is empty");
+        $('#main_group_select').addClass("is-invalid");
+        $('#sub_group_select').addClass("is-invalid");
+        return;
+    }
+
+
+    formData.set("shop_subject", $("#shop_subject").val());
+    formData.set("shop_description", $("#shop_description").val());
+
+    Swal.fire({
+        title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+        text: "Do you want to edit shop?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4CAF50",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Accept"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#loading-overlay').fadeIn();
+            console.log("🚀 Sending AJAX request...");
+
+            $.ajax({
+                url: "actions/process_shop.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("✅ AJAX success:", response);
+                    try {
+                        var json = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (json.status === 'success') {
+                            Swal.fire('Success', json.message, 'success').then(() => {
+                                location.reload(); // This line refreshes the current page
+                            });
+                        } else {
+                            Swal.fire('Error', json.message || 'Unknown error', 'error');
+                        }
+                    } catch (e) {
+                        console.error("❌ JSON parse error:", e);
+                        Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("❌ AJAX error:", status, error, xhr.responseText);
+                    Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
+                },
+                complete: function () {
+                    $('#loading-overlay').fadeOut();
+                }
+            });
+        } else {
+            console.log("❎ User cancelled action");
+            $('#loading-overlay').fadeOut();
+        }
+    });
 });
+
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_shop.php";
+});
+
+// ฟังก์ชัน alertError (ถ้ายังไม่มีใน index_.js)
+function alertError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: message,
+    });
+}
+
+
 
 function reDirect(url, data) {
     var form = $('<form>', {

@@ -56,6 +56,21 @@
 
 
     <style>
+        .note-editable {
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            color: #424242;
+            font-size: 16px;
+            line-height: 1.5;
+            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
+            /* min-height: 600px; */
+            /* max-height: 600px; */
+            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
+        }
+        .box-content p {
+            /* font-family: sans-serif */
+            color: #424242;
+        }
+
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -119,6 +134,7 @@
                                     <div style="margin: 10px;">
                                         <label for="">
                                             <span>Cover photo</span>:
+                                             <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                                         </label>
                                         <div class="previewContainer">
                                             <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
@@ -154,12 +170,17 @@
                                 </div>
 
                                 <div class="col-md-8">
+                                   <div style='margin: 10px; text-align: end;'>
+                                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                                    <i class='fas fa-arrow-left'></i> Back 
+                                </button>
+                            </div>
                                     <div style="margin: 10px;">
                                         <label for="">
                                             <span>Content</span>:
                                         </label>
                                         <div>
-                                            <textarea class="form-control" id="summernote" name="project_content"></textarea>
+                                            <textarea class="form-control summernote" id="summernote" name="project_content"></textarea>
                                         </div>
                                     </div>
                                 </div>

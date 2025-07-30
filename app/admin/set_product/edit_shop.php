@@ -1,8 +1,4 @@
-<?php 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
+<?php
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
@@ -59,6 +55,21 @@ $decodedId = $_POST['shop_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
+            .note-editable {
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            color: #424242;
+            font-size: 16px;
+            line-height: 1.5;
+            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
+            /* min-height: 600px; */
+            /* max-height: 600px; */
+            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
+        }
+        .box-content p {
+            /* font-family: sans-serif */
+            color: #424242;
+        }
+
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -88,6 +99,7 @@ $decodedId = $_POST['shop_id'];
             top: 70px !important;
             z-index: 1 !important;
         }
+
     </style>
 </head>
 
@@ -102,21 +114,17 @@ $decodedId = $_POST['shop_id'];
                         <i class="far fa-newspaper"></i> Edit shop
                     </h4>
                     <?php
+// ดึงข้อมูลหลักของ shop และดึงข้อมูลรูปภาพแยกออกมา
 $stmt = $conn->prepare("
-    SELECT 
-    dn.shop_id, 
-    dn.subject_shop, 
-    dn.description_shop,
-    dn.content_shop, 
-    dn.date_create, 
-    GROUP_CONCAT(dnc.file_name) AS file_name,
-    GROUP_CONCAT(dnc.api_path) AS pic_path,
-    MAX(dnc.status) AS status
-FROM dn_shop dn
-LEFT JOIN dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
-WHERE dn.shop_id = ?
-GROUP BY dn.shop_id
-
+    SELECT
+        dn.shop_id,
+        dn.subject_shop,
+        dn.description_shop,
+        dn.content_shop,
+        dn.date_create,
+        dn.group_id
+    FROM dn_shop dn
+    WHERE dn.shop_id = ?
 ");
 
 if ($stmt === false) {
@@ -128,61 +136,149 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $content = $row['content_shop'];
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+    $row = $result->fetch_assoc();
+    $content = $row['content_shop'];
+    $current_group_id = $row['group_id'];
 
-        foreach ($files as $index => $file) {
-            $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
-            if (preg_match($pattern, $content, $matches)) {
-                $new_src = $paths[$index];
-                $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
-                $content = str_replace($matches[0], $new_img_tag, $content);
-            }
+    // ดึงข้อมูลรูปภาพทั้งหมดที่เกี่ยวข้องกับ shop_id นี้
+      $stmt_pics = $conn->prepare("SELECT file_name, api_path, status FROM dn_shop_doc WHERE shop_id = ? AND del = 0 ORDER BY status DESC, id ASC");
+    if ($stmt_pics === false) {
+        die('❌ SQL Prepare for images failed: ' . $conn->error);
+    }
+    $stmt_pics->bind_param('i', $decodedId);
+    $stmt_pics->execute();
+    $pics_result = $stmt_pics->get_result();
+
+    $pic_data = [];
+    $previewImageSrc = '';
+
+    while ($pic_row = $pics_result->fetch_assoc()) {
+        if ($pic_row['status'] == 1) { // นี่คือ Cover Photo
+            $previewImageSrc = htmlspecialchars($pic_row['api_path']);
+        } else { // รูปภาพใน Content
+            $pic_data[htmlspecialchars($pic_row['file_name'])] = htmlspecialchars($pic_row['api_path']);
         }
+    }
+    $stmt_pics->close();
 
-        $previewImageSrc = !empty($paths[0]) ? htmlspecialchars($paths[0]) : '';
-        $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+    // แทนที่ src ของรูปภาพใน content ด้วย api_path ที่ถูกต้องจาก $pic_data
+    // ใช้ DOMDocument เพื่อ parsing HTML อย่างปลอดภัยและแม่นยำ
+    $dom = new DOMDocument();
+    // ปิด error warnings สำหรับ HTML ไม่สมบูรณ์
+    libxml_use_internal_errors(true);
+    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
 
-        echo "
-        <form id='formshop_edit' enctype='multipart/form-data'>
-            <input type='hidden' class='form-control' id='shop_id' name='shop_id' value='" . htmlspecialchars($row['shop_id']) . "'>
-            <div class='row'>
-                <div class='col-md-4'>
-                    <div style='margin: 10px;'>
-                        <label><span>Cover photo</span>:</label>
-                        <div id='previewContainer' class='previewContainer'>
-                            <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
-                        </div>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <input type='file' class='form-control' id='fileInput' name='fileInput[]'>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <label><span>Subject</span>:</label>
-                        <input type='text' class='form-control' id='shop_subject' name='shop_subject' value='" . htmlspecialchars($row['subject_shop']) . "'>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <label><span>Description</span>:</label>
-                        <textarea class='form-control' id='shop_description' name='shop_description'>" . htmlspecialchars($row['description_shop']) . "</textarea>
-                    </div>
-                    <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditshop' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save shop
-                        </button>
+    $images = $dom->getElementsByTagName('img');
+    foreach ($images as $img) {
+        $data_filename = $img->getAttribute('data-filename');
+        if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+            $img->setAttribute('src', $pic_data[$data_filename]);
+        }
+    }
+    $content_with_correct_paths = $dom->saveHTML();
+
+    // เตรียม options สำหรับกลุ่มแม่
+    $mainGroupQuery = $conn->query("SELECT group_id, group_name FROM dn_shop_groups WHERE parent_group_id IS NULL ORDER BY group_name ASC");
+    $mainGroupOptions = '';
+    while ($group = $mainGroupQuery->fetch_assoc()) {
+        $mainGroupOptions .= "<option value='{$group['group_id']}'>{$group['group_name']}</option>";
+    }
+
+    // ตรวจสอบว่า group_id ปัจจุบันเป็นกลุ่มแม่หรือกลุ่มย่อย
+    $groupInfoQuery = $conn->prepare("SELECT group_id, parent_group_id FROM dn_shop_groups WHERE group_id = ?");
+    $groupInfoQuery->bind_param("i", $current_group_id);
+    $groupInfoQuery->execute();
+    $groupResult = $groupInfoQuery->get_result();
+    $groupInfo = $groupResult->fetch_assoc();
+
+    $mainGroupSelected = null;
+    $subGroupSelected = null;
+
+    if ($groupInfo['parent_group_id'] !== null) {
+        // เป็นกลุ่มย่อย
+        $mainGroupSelected = $groupInfo['parent_group_id'];
+        $subGroupSelected = $groupInfo['group_id'];
+    } else {
+        // เป็นกลุ่มแม่
+        $mainGroupSelected = $groupInfo['group_id'];
+    }
+
+    echo "
+    <form id='formshop_edit' enctype='multipart/form-data'>
+        <input type='hidden' class='form-control' id='shop_id' name='shop_id' value='" . htmlspecialchars($row['shop_id']) . "'>
+        <div class='row'>
+            <div class='col-md-4'>
+                <div style='margin: 10px;'>
+                    <label><span>Cover photo</span>:</label>
+                    <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                    <div id='previewContainer' class='previewContainer'>
+                        <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                     </div>
                 </div>
-                <div class='col-md-8'>
-                    <div style='margin: 10px;'>
-                        <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='shop_content'>" . htmlspecialchars($content) . "</textarea>
-                    </div>
+                <div style='margin: 10px;'>
+                    <input type='file' class='form-control' id='fileInput' name='fileInput'> </div>
+                <div style='margin: 10px;'>
+                    <label><span>Subject</span>:</label>
+                    <input type='text' class='form-control' id='shop_subject' name='shop_subject' value='" . htmlspecialchars($row['subject_shop']) . "'>
+                </div>
+                <div style='margin: 10px;'>
+                    <label><span>Description</span>:</label>
+                    <textarea class='form-control' id='shop_description' name='shop_description'>" . htmlspecialchars($row['description_shop']) . "</textarea>
+                </div>
+                <div style='margin: 10px;'>
+                    <label><span>กลุ่มแม่</span>:</label>
+                    <select id='main_group_select' class='form-control'>
+                        <option value=''>-- เลือกกลุ่มแม่ --</option>
+                        "; // ปิด PHP เพื่อใส่ mainGroupOptions
+                            echo $mainGroupOptions;
+                        echo "
+                    </select>
+                </div>
+                <div style='margin: 10px;'>
+                    <label><span>กลุ่มย่อย</span>:</label>
+                    <select id='sub_group_select' name='group_id' class='form-control'>
+                        <option value=''>-- เลือกกลุ่มย่อย --</option>
+                    </select>
+                </div>
+                <div style='margin: 10px; text-align: end;'>
+                    <button type='button' id='submitEditshop' class='btn btn-success'>
+                        <i class='fas fa-save'></i> Save shop
+                    </button>
+                </div>
+               
+            </div>
+            <div class='col-md-8'>
+             <div style='margin: 10px; text-align: end;'>
+                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                    <i class='fas fa-arrow-left'></i> Back 
+                </button>
+            </div>
+                <div style='margin: 10px;'>
+                    <label><span>Content</span>:</label>
+                    <textarea class='form-control summernote' id='summernote_update' name='shop_content'>" . htmlspecialchars($content_with_correct_paths) . "</textarea>
                 </div>
             </div>
-        </form>
-        ";
-    }
+        </div>
+    </form>
+    <script>
+        // Set selected values for dropdowns after they are rendered
+        $(document).ready(function() {
+            var mainGroupSelected = " . json_encode($mainGroupSelected) . ";
+            var subGroupSelected = " . json_encode($subGroupSelected) . ";
+
+            if (mainGroupSelected) {
+                $('#main_group_select').val(mainGroupSelected).trigger('change');
+                // setTimeout to allow AJAX to complete and populate sub-group options
+                setTimeout(function() {
+                    if (subGroupSelected) {
+                        $('#sub_group_select').val(subGroupSelected);
+                    }
+                }, 500); // อาจจะต้องปรับเวลาให้เหมาะสม
+            }
+        });
+    </script>
+    ";
 } else {
     echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
 }
@@ -208,6 +304,27 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
         });
     }
 });
+$('#main_group_select').on('change', function() {
+    var mainGroupId = $(this).val();
+    if (!mainGroupId) {
+        $('#sub_group_select').html('<option value="">-- เลือกกลุ่มย่อย --</option>');
+        return;
+    }
+
+    $.ajax({
+        url: 'actions/get_sub_groups.php',
+        type: 'POST',
+        data: { main_group_id: mainGroupId },
+        success: function(response) {
+            $('#sub_group_select').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error:", status, error);
+            $('#sub_group_select').html('<option value="">-- เกิดข้อผิดพลาด --</option>');
+        }
+    });
+});
+
 </script>
 
                 </div>

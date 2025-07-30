@@ -39,6 +39,14 @@ if (isset($_GET['id'])) {
         img{
             max-width: 600px;
         }
+        .shop-content-display {
+            font-family: sans-serif, "Roboto" !important; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
+            /* ถ้าอยากให้มั่นใจว่าครอบคลุมทุกองค์ประกอบในเนื้อหา */
+            /* .shop-content-display * {
+                font-family: sans-serif, "Kanit", "Roboto" !important;
+            } */
+        }
+
 
     </style>
 
@@ -55,7 +63,7 @@ if (isset($_GET['id'])) {
 
                 <div class="row">
 
-                    <div class="col-md-9">
+                    <div class="">
                         <?php
 
                             if (isset($_GET['id'])) {
@@ -102,7 +110,7 @@ if (isset($_GET['id'])) {
                                                 echo "";
                                             }
 
-                                            echo '<div style="">';
+                                            echo '<div class="shop-content-display">';
                                             echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
                                             echo '</div>';
                                         }
@@ -119,11 +127,11 @@ if (isset($_GET['id'])) {
                         ?>
                     </div>
 
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="page-plugin mt-3">
                         <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftrandaracoustic%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
                         <!-- แสดงฟอร์มด้านล่างนี้ -->

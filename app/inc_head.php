@@ -24,3 +24,6 @@
     <link href="../inc/select2/css/select2.min.css" rel="stylesheet">
     <script src="../inc/select2/js/select2.min.js"></script>
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">

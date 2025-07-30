@@ -1,13 +1,19 @@
 <?php
-$perPage = 6;
+$perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-$totalQuery = "SELECT COUNT(*) as total FROM dn_project dn";
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and valid documents ---
+$totalQuery = "SELECT COUNT(DISTINCT dn.project_id) as total 
+               FROM dn_project dn
+               LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
+                                           AND dnc.del = '0' 
+                                           AND dnc.status = '1' 
+               WHERE dn.del = '0'"; // Filter projects that are not deleted
 if ($searchQuery) {
-    $totalQuery .= " WHERE dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    $totalQuery .= " AND dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -15,28 +21,42 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
+// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation ---
 $sql = "SELECT 
             dn.project_id, 
             dn.subject_project, 
             dn.description_project,
             dn.content_project, 
             dn.date_create, 
-            GROUP_CONCAT(dnc.file_name) AS file_name,
-            GROUP_CONCAT(dnc.api_path) AS pic_path
+            GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
+            GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
         FROM 
             dn_project dn
         LEFT JOIN 
             dn_project_doc dnc ON dn.project_id = dnc.project_id
         WHERE 
-            dn.del = '0' AND
-            dnc.del = '0' AND
-            dnc.status = '1'"; // Ensure there's a space before "WHERE"
+            dn.del = '0'"; // Only select projects where del is 0
 
 if ($searchQuery) {
     $sql .= "
     AND dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
     ";
 }
+
+// Add a subquery or a HAVING clause to ensure at least one valid document exists
+// for projects if you truly want to only show projects that have active, non-deleted documents.
+// However, if a project can exist without documents or with only deleted documents,
+// and you still want to show it, the current LEFT JOIN + WHERE dn.del = '0' is fine,
+// but the dnc.file_name and dnc.api_path will be NULL if no valid documents are found.
+// The original problem description suggests that "No project found" is the issue,
+// implying projects that *should* be there (del=0) are not.
+
+// To ensure that GROUP_CONCAT only includes non-deleted and active documents,
+// the conditions for dnc should be in the JOIN clause itself for LEFT JOIN.
+// If you only want to show projects that *have* at least one valid document,
+// you would need a subquery or an INNER JOIN on a subquery of dnc.
+// For now, let's stick to LEFT JOIN and ensure the WHERE clause only applies to dn.
+// The GROUP_CONCAT will automatically exclude rows from dnc that don't meet its JOIN conditions.
 
 $sql .= " 
 GROUP BY dn.project_id 
@@ -45,28 +65,25 @@ LIMIT $perPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
-
 $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
         $content = $row['content_project'];
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
-            // Ensure matches is not empty before accessing the value
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+        // Handle cases where pic_path or file_name might be NULL if no valid documents
+        $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
+        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
 
-        // Check if $iframeSrc is set and not null before accessing it
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesNews[] = [
             'id' => $row['project_id'],
-            'image' =>  $paths[0],
+            'image' => !empty($paths) ? $paths[0] : null, // Set to null if no valid image path
             'date_time' => $row['date_create'],
             'title' => $row['subject_project'],
             'description' => $row['description_project'],
@@ -74,14 +91,14 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
+    // This 'No project found.' will now correctly reflect if no projects match the criteria.
     echo "No project found.";
 }
 ?>
 <div style="display: flex; justify-content: space-between;">
 
     <div>
-        <!-- <p>Showing <?php echo $page; ?> to <?php echo $totalPages; ?> of <?php echo $totalItems; ?> entry</p> -->
-    </div>
+        </div>
 
     <div>
         <form method="GET" action="">
@@ -104,10 +121,14 @@ if ($result->num_rows > 0) {
                 <a href="project_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
                     
                     <?php
-                    if(empty($box['image'])){
+                    // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
+                    if(!empty($box['iframe'])){
                         echo '<iframe frameborder="0" src="' . $box['iframe'] . '" width="100%" height="100%" class="note-video-clip"></iframe>';
-                    }else{
+                    } else if (!empty($box['image'])){
                         echo '<img src="' . $box['image'] . '" alt="Image for ' . htmlspecialchars($box['title']) . '">';
+                    } else {
+                        // Optionally, display a default placeholder image or leave empty
+                        echo '<img src="path/to/default/placeholder.jpg" alt="No image available">'; 
                     }
                     ?>
                     
@@ -140,9 +161,8 @@ if ($result->num_rows > 0) {
     <?php endif; ?>
 </div>
 
-
 <!-- แสดงฟอร์มด้านล่างนี้ -->
-<h3>ใส่ความคิดเห็น</h3>
+<!-- <h3>ใส่ความคิดเห็น</h3>
 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
 <form id="commentForm" style="max-width: 600px;">
     <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
@@ -207,4 +227,4 @@ document.getElementById("commentForm").addEventListener("submit", function(e) {
     });
 });
 </script>
-
+ -->

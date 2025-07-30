@@ -229,7 +229,7 @@ $(document).ready(function() {
                             
                             Toast.fire({
                             icon: "success",
-                            title: "คัดลอกสำเร็จ"
+                            title: "Successfully copied"
                             });
 
                         } else {
@@ -248,7 +248,7 @@ $(document).ready(function() {
                             
                             Toast.fire({
                             icon: "error",
-                            title: "คัดลอกไม่สำเร็จ"
+                            title: "Failed to copy"
                             });
 
                         }
@@ -299,17 +299,17 @@ $(document).ready(function() {
         inputGroupClass: "input-group-sm",
         // showCaption: false,
         // previewZoomButtonIcons: {
-        //     fullscreen: '',   // ปิดไอคอน fullscreen
-        //     borderless: '',   // ปิดไอคอน borderless
-        //     close: '',        // ปิดไอคอน close
+        //     fullscreen: '',   // close icon fullscreen
+        //     borderless: '',   // close icon borderless
+        //     close: '',        // icon close
         // },
         // previewZoomButtonClasses: {
-        //     fullscreen: '',   // ปิดคลาส fullscreen
-        //     borderless: '',   // ปิดคลาส borderless
-        //     close: '',        // ปิดคลาส close
+        //     fullscreen: '',   // close class fullscreen
+        //     borderless: '',   // close class borderless
+        //     close: '',        // class close
         // },
     }).on('filezoomshown', function(event, params) {
-        $('.kv-zoom-title').hide();  // ซ่อนชื่อไฟล์เมื่อแสดง preview
+        $('.kv-zoom-title').hide();  // hidden preview
         $('.modal-backdrop').css('z-index', 'auto'); 
     });
 

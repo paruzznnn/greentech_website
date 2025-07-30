@@ -39,6 +39,13 @@ if (isset($_GET['id'])) {
         img{
             max-width: 600px;
         }
+        .shop-content-display {
+            font-family: sans-serif, "Roboto" !important; /* ไม่ต้องใช้ !important ที่นี่ก็ได้ ถ้าไม่มีกฎอื่นมาขัดแย้ง */
+            /* ถ้าอยากให้มั่นใจว่าครอบคลุมทุกองค์ประกอบในเนื้อหา */
+            /* .shop-content-display * {
+                font-family: sans-serif, "Kanit", "Roboto" !important;
+            } */
+        }
 
     </style>
 
@@ -54,83 +61,75 @@ if (isset($_GET['id'])) {
             <div class="box-content">
 
                 <div class="row">
+                <div class="">
+                    <?php
+                    if (isset($_GET['id'])) {
+                        $decodedId = base64_decode(urldecode($_GET['id']));
 
-                    <div class="col-md-9">
-                        <?php
+                        if ($decodedId !== false) {
+                            $stmt = $conn->prepare("SELECT
+                                dn.shop_id,
+                                dn.subject_shop,
+                                dn.content_shop,
+                                dn.date_create,
+                                GROUP_CONCAT(dnc.file_name) AS file_name,
+                                GROUP_CONCAT(dnc.api_path) AS pic_path
+                                FROM dn_shop dn
+                                LEFT JOIN dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
+                                WHERE dn.shop_id = ?
+                                GROUP BY dn.shop_id");
 
-                            if (isset($_GET['id'])) {
-                                $decodedId = base64_decode(urldecode($_GET['id']));
-                                
-                                if ($decodedId !== false) {
-                                    $stmt = $conn->prepare("SELECT 
-                                        dn.shop_id, 
-                                        dn.subject_shop, 
-                                        dn.content_shop, 
-                                        dn.date_create, 
-                                        GROUP_CONCAT(dnc.file_name) AS file_name,
-                                        GROUP_CONCAT(dnc.api_path) AS pic_path
-                                        FROM dn_shop dn
-                                        LEFT JOIN dn_shop_doc dnc ON dn.shop_id = dnc.shop_id
-                                        WHERE dn.shop_id = ?
-                                        GROUP BY dn.shop_id");
+                            $stmt->bind_param('i', $decodedId);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
 
-                                    $stmt->bind_param('i', $decodedId); 
-                                    $stmt->execute();
-                                    $result = $stmt->get_result();
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    $content = $row['content_shop'];
+                                    $paths = explode(',', $row['pic_path']);
+                                    $files = explode(',', $row['file_name']);
+                                    $found = false;
 
-                                    if ($result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
-                                            $content = $row['content_shop'];
-                                            $paths = explode(',', $row['pic_path']);
-                                            $files = explode(',', $row['file_name']);
-                                            $found = false;
+                                    foreach ($files as $index => $file) {
+                                        $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
 
-                                            foreach ($files as $index => $file) {
-                                                $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
+                                        if (preg_match($pattern, $content, $matches)) {
+                                            $new_src = $paths[$index];
+                                            $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
 
-                                                if (preg_match($pattern, $content, $matches)) {
-                                                    $new_src = $paths[$index];
-                                                    $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
+                                            $content = str_replace($matches[0], $new_img_tag, $content);
 
-                                                    $content = str_replace($matches[0], $new_img_tag, $content);
-                                                    
-                                                    $found = true;
-                                                }
-                                            }
-
-                                            if (!$found) {
-                                                echo "";
-                                            }
-
-                                            echo '<div style="">';
-                                            echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
-                                            echo '</div>';
+                                            $found = true;
                                         }
-                                    } else {
-                                        echo "ไม่มีข้อมูล";
                                     }
 
-                                    $stmt->close(); 
-                                } else {
-                                    echo "Invalid ID.";
+                                    if (!$found) {
+                                        echo "";
+                                    }
+
+                                    // *** เปลี่ยนตรงนี้ ***
+                                    echo '<div class="shop-content-display">';
+                                    echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+                                    echo '</div>';
                                 }
+                            } else {
+                                echo "ไม่มีข้อมูล";
                             }
 
-                        ?>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="page-plugin mt-3">
-                        <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftrandaracoustic%2F&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
-                        </div>
-                    </div>
-
+                            $stmt->close();
+                        } else {
+                            echo "Invalid ID.";
+                        }
+                    }
+                    ?>
                 </div>
+
+    </div>
 
             <div style="padding-left:50px;">
                 <hr style="border-top: dashed 1px; margin: 40px 0;">
                 <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
-                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/shop/</a></p>
+                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/store/</a></p>
                 <p>📱 Line OA : @Trandaraocoustic 
                     <a href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</a>
                 </p>

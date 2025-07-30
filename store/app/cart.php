@@ -12,7 +12,9 @@ if(!empty($_SESSION)){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
+    <title>TRANDAR STORE</title>
+
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
 
     <link href="../inc/jquery/css/jquery-ui.css" rel="stylesheet">
     <script src="../inc/jquery/js/jquery-3.6.0.min.js"></script>

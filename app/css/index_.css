@@ -1,134 +1,119 @@
 body {
     margin: 0;
     font-family: "Kanit", "Roboto", sans-serif !important;
-    /* font-family: Arial, sans-serif; */
     scroll-behavior: smooth;
-    /* ทำให้เลื่อนหน้าอย่างนุ่มนวล */
 }
 
-
+/* --- Header Top Section --- */
 .header-top {
     overflow: hidden;
-    /* background-color: #777474; */
     background-color: #fafafafa;
-    /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
-    padding: 0px 10px;
-    position: fixed;
-    /* ทำให้ header อยู่ติดด้านบน */
-    top: 0;
+    padding: 0px 20px;
     width: 100%;
-    transition: top 0.3s;
-    z-index: 1000;
     display: flex;
     justify-content: space-between;
-    position: relative;
+    align-items: center; /* จัดแนวกลางในแนวตั้ง */
+    min-height: 50px; /* เพิ่ม min-height เพื่อไม่ให้มันบีบมากเกินไป */
 }
 
 .header-top a {
-    float: left;
     color: #55555569;
     text-align: center;
     padding: 8px;
     text-decoration: none;
     font-size: 14px;
     line-height: 25px;
-    /* border-radius: 4px; */
 }
 
 .header-top a:hover {
     color: #ff9800;
 }
-/* ปรับปุ่ม Sign in / Sign up ให้มีขนาดพอดี */
-.header-top-right a#myBtn-sign-in,
-.header-top-right a[href*="register"] {
-    display: inline-block;
-    padding: 6px 10px;
-    font-size: 13px;
-    background: #ffffffff;
-    color: black;
-    border-radius: 4px;
-    margin-left: 6px;
-    white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
-}
 
-/* ปรับปุ่ม Trandar Store */
-.header-top-right .header-link a[href*="shop"] {
-    padding: 6px 10px;
-    font-size: 13px;
-    display: inline-block;
-    white-space: nowrap;
-}
-
-/* ปรับ container ให้ไม่ล้น */
-.header-top-right {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-/* Responsive เฉพาะหน้าจอเล็ก */
-@media (max-width: 768px) {
-    .header-top-right a#myBtn-sign-in,
-    .header-top-right a[href*="register"],
-    .header-top-right .header-link a[href*="shop"],
-    .header-top-right .header-link a {
-        font-size: 12px;
-        padding: 4px 8px;
-    }
-
-    .header-top-right {
-        justify-content: flex-start;
-        gap: 4px;
-    }
-
-    .language-select {
-        font-size: 13px;
-        padding: 3px 6px;
-        max-width: 100px;
-    }
-}
 .header-top img.logo {
     width: auto;
+    max-width: 150px; /* จำกัดขนาดโลโก้ */
     height: auto;
-    object-fit: contain; /* หรือใช้ 'cover' ตามลักษณะภาพ */
+    object-fit: contain;
     display: block;
 }
 
-
-.header-top-right {
-    float: right;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    /* border-bottom: 2px solid #eeeeeea3; */
-}
-
 .header-top-left {
-    float: left;
     display: flex;
     align-items: center;
+    gap: 15px; /* เพิ่มระยะห่างระหว่างองค์ประกอบ */
 }
 
+/* ปรับปุ่ม Sign in / Sign up และ Trandar Store */
+.header-top-right {
+    display: flex;
+    flex-wrap: wrap; /* ให้เนื้อหาสามารถขึ้นบรรทัดใหม่ได้ถ้าไม่พอ */
+    gap: 10px; /* ลด gap เพื่อให้ใช้พื้นที่น้อยลงบนหน้าจอปกติ */
+    align-items: center;
+    justify-content: flex-end;
+    flex-grow: 1; /* ทำให้ .header-top-right ขยายเต็มพื้นที่ที่เหลือ */
+}
 
+.header-top-right a#myBtn-sign-in,
+.header-top-right a[href*="register"] {
+    display: inline-block;
+    padding: 8px 15px;
+    font-size: 14px;
+    background: #ffffffff;
+    color: black;
+    border-radius: 4px;
+    white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
+    box-sizing: border-box; /* สำคัญเพื่อให้ padding ไม่ดันกว้างเกินไป */
+}
+
+.header-top-right .header-link a[href*="shop"] {
+    padding: 8px 15px;
+    font-size: 14px;
+    display: inline-block;
+    white-space: nowrap;
+    background: #ffa719;
+    color: black;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.language-select {
+    width: 100px;
+    padding: 6px;
+    font-size: 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #fafafa;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-left: 30px;
+    transition: background-color 0.3s, border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.language-select option {
+    padding: 8px;
+}
+
+.language-select:hover {
+    background-color: #e9ecef;
+    border-color: #ccc;
+}
+
+.language-select:focus {
+    outline: none;
+}
+
+/* --- Main Navigation Bar (Reverted to original behavior and styles) --- */
 .header-center {
     background-color: #f1f1f178;
-    /* margin-top: 80px; */
-    /* padding-top: 5px;
-    padding-bottom: 5px; */
 }
 
-
 #navbar-menu {
-    /* position: sticky; */
     position: relative;
     top: 0;
-    /* background-color: #f28b1f; */
     background-color: #fafafa;
-    /* background-color: #ff9800; */
     white-space: nowrap;
-    /* box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1); */
     font-size: 16px;
     z-index: 1000;
 }
@@ -137,7 +122,7 @@ body {
     padding: 10px 20px;
     display: inline-block;
     text-decoration: none;
-    color: #58585a;
+    color: #ffffff;
     transition: color 0.3s;
 }
 
@@ -146,17 +131,12 @@ body {
 }
 
 .dropdown {
-    /* display: inline-block; */
     position: relative;
 }
 
 .dropdown-content {
     display: none;
-    /* position: absolute; */
-    /* top: 100%; 
-    left: 0; */
     background-color: #f9f9f9;
-    /* background-color: #434242; */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 999;
     margin-top: 0;
@@ -178,7 +158,6 @@ body {
 .over-menu {
     overflow-x: auto;
     white-space: nowrap;
-    /* scrollbar-width: thin; */
 }
 
 .over-menu::-webkit-scrollbar {
@@ -194,313 +173,8 @@ body {
     background: #f1f1f1;
 }
 
-
-
-
-.content-sticky {
-    padding: 0px;
-    background-color: #ffffff;
-}
-
-.box-section {
-    margin: 20px 0px;
-    border-bottom: 1px solid #f1f1f1;
-}
-
-.box-content {
-    background-color: #ffffff;
-    padding: 40px 20px 20px 20px;
-    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); */
-    border-radius: 8px;
-    color: #555;
-}
-
-.box-content1 {
-    background-color: #ffffff;
-    padding: 0px 20px 20px 20px;
-    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); */
-    border-radius: 8px;
-    color: #555;
-}
-
-.box-content img {
-    /* width: 100%; */
-    /* height: auto; */
-    /* border-radius: 8px; */
-    /* transition: transform 0.3s ease; */
-}
-
-/* .box-content img:hover {
-    transform: scale(1.1);
-} */
-
-
-.footer {
-    overflow: hidden;
-    background-color: #777474;
-    /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
-    padding: 15px 10px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    /* transition: top 0.3s; */
-    z-index: 1000;
-    color: #fff;
-}
-
-.footer-logo {
-    width: 20%;
-}
-
-.cloud-services {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-}
-
-.box {
-    width: 150px;
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 1px 2px #e3e3e3;
-}
-
-.box img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    padding: 20px;
-}
-
-
-
-.content-hrm,
-.content-svr {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-}
-
-.box-hrm {
-    width: 250px;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 8px;
-    background-color: #ffffff;
-    padding: 10px;
-}
-
-.box-svr {
-    width: auto;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 8px;
-    background-color: #ffffff;
-    padding: 10px;
-}
-
-.box-hrm img,
-.box-svr img {
-    width: 100%;
-    height: 100px;
-    object-fit: contain;
-}
-
-.box-hrm h6,
-.box-hrm h4,
-.box-hrm h5,
-.box-svr h6,
-.box-svr h4,
-.box-svr h5 {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 10px 0 5px 0;
-    text-align: center;
-    color: #555;
-}
-
-.box-hrm p,
-.box-svr p {
-    font-size: 14px;
-    color: #666666;
-    text-align: center;
-    flex-grow: 1;
-    padding: 0 10px;
-    margin: 0;
-}
-
-.btn {
-    margin-top: 10px;
-    align-self: center;
-}
-
-
-#map-plugin {
-    width: 100%;
-    overflow: hidden;
-}
-
-.page-plugin {
-    position: sticky;
-    top: 10px;
-    width: 100%;
-    overflow: auto;
-    white-space: nowrap;
-    box-shadow: -2px 0px 4px #ececec;
-    border-radius: 3px;
-}
-
-.page-plugin::-webkit-scrollbar {
-    height: 6px;
-}
-
-.page-plugin::-webkit-scrollbar-thumb {
-    background-color: #c0c0c0;
-    border-radius: 10px;
-}
-
-.page-plugin::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-
-.box {
-    width: 100%;
-    max-width: 80px;
-    height: auto;
-}
-
-
-.text-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-    color: #555;
-}
-
-
-.carousel-control-next,
-.carousel-control-prev {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 5%;
-    padding: 0;
-    color: #fff;
-    text-align: center;
-    background: 0 0;
-    border: 0;
-    opacity: .5;
-    transition: opacity .15s ease;
-}
-
-.icon-row {
-    display: flex;
-    /* justify-content: center; */
-    flex-wrap: wrap;
-    text-align: center;
-    gap: 20px;
-    padding: 20px;
-}
-
-.icon-col {
-    width: 65px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.icon-col img {
-    width: 65px;
-    height: auto;
-}
-
-.icon-col p {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #333;
-    /* color: #111010; */
-}
-
-
-
-#background-blur.tab-open {
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    transition: background-color 0.3s, backdrop-filter 0.3s;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100;
-}
-
-/* #navbar-menu.tab-open {
-    position: sticky;
-    top: 0;
-    background-color: #fafafa;
-    white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    z-index: 1000;
-} */
-
-.language-select {
-    width: 90px;
-    padding: 5px;
-    font-size: 16px;
-    border: none;
-    /* border: 1px solid #ddd; */
-    border-radius: 4px;
-    background-color: #fafafa;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-left: 30px;
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-.language-select option {
-    padding: 8px;
-}
-
-.language-select:hover {
-    background-color: #e9ecef;
-    border-color: #ccc;
-}
-
-.language-select:focus {
-    /* background-color: #f0f8ff; 
-    border-color: #007bff; */
-    outline: none;
-}
-
+/* --- News Ticker Section (Reverted to original behavior and styles) --- */
 #navbar-news {
-    /* position: sticky; */
     position: relative;
     top: 0;
     background-color: #fafafa;
@@ -529,25 +203,6 @@ body {
     border-radius: 0px 70px 10px 0px;
 }
 
-/* .blinking-icon {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    background-color: red; 
-    border-radius: 50%; 
-    margin-right: 10px;
-    animation: blinking 2s infinite;
-}
-
-@keyframes blinking {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
-} */
-
 .blinking-icon {
     position: relative;
     display: inline-block;
@@ -556,7 +211,6 @@ body {
     background-color: #f8d9c8;
     border-radius: 50%;
     margin-right: 10px;
-    /* animation: blinking 2s infinite; */
 }
 
 .blinking-icon::after {
@@ -567,15 +221,6 @@ body {
     border: 2px solid #ffb78e;
     animation: blinking 2s infinite;
 }
-
-
-/* .blinking-icon::before {
-    width: 18px;  
-    height: 18px; 
-    top: -4px;
-    left: -4px;
-} */
-
 
 .blinking-icon::after {
     width: 25px;
@@ -589,16 +234,10 @@ body {
         transform: scale(0.5);
         opacity: 0.5;
     }
-
     50% {
         transform: scale(1);
         opacity: 1;
     }
-
-    /* 100% {
-        transform: scale(1.5);  
-        opacity: 0.5;
-    } */
 }
 
 #newsMarquee-link {
@@ -616,6 +255,232 @@ body {
     color: #f28b1f;
 }
 
+
+/* --- Other Sections (Maintained as provided) --- */
+.content-sticky {
+    padding-bottom: 60px;
+    background-color: #ffffff;
+}
+
+.box-section {
+    margin: 20px 0px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.box-content {
+    background-color: #ffffff;
+    padding: 40px 20px 20px 20px;
+    border-radius: 8px;
+    color: #555;
+}
+
+.box-content1 {
+    background-color: #ffffff;
+    padding: 0px 20px 20px 20px;
+    border-radius: 8px;
+    color: #555;
+}
+
+.footer {
+    overflow: hidden;
+    background-color: #777474;
+    padding: 15px 10px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+    color: #fff;
+}
+
+.footer-logo {
+    width: 20%;
+}
+
+.cloud-services, .content-hrm, .content-svr {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.box {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 1px 2px #e3e3e3;
+    box-sizing: border-box;
+}
+
+.box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 20px;
+}
+
+.box-hrm, .box-svr {
+    width: 250px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    flex-grow: 1;
+    flex-basis: 250px;
+}
+
+.box-hrm img,
+.box-svr img {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+}
+
+.box-hrm h6, .box-hrm h4, .box-hrm h5,
+.box-svr h6, .box-svr h4, .box-svr h5 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+    text-align: center;
+    color: #555;
+}
+
+.box-hrm p, .box-svr p {
+    font-size: 14px;
+    color: #666666;
+    text-align: center;
+    flex-grow: 1;
+    padding: 0 10px;
+    margin: 0;
+}
+
+.btn {
+    margin-top: 10px;
+    align-self: center;
+}
+
+#map-plugin {
+    width: 100%;
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.page-plugin {
+    position: sticky;
+    top: 10px;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    box-shadow: -2px 0px 4px #ececec;
+    border-radius: 3px;
+    padding: 10px 0;
+}
+
+.page-plugin::-webkit-scrollbar {
+    height: 6px;
+}
+
+.page-plugin::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 10px;
+}
+
+.page-plugin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Corrected .box in .page-plugin (as per previous correct fix) */
+.page-plugin .box {
+    display: inline-flex;
+    width: auto;
+    min-width: 80px;
+    height: 80px;
+    margin: 0 5px;
+    vertical-align: top;
+}
+
+.text-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #555;
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5%;
+    padding: 0;
+    color: #fff;
+    text-align: center;
+    background: 0 0;
+    border: 0;
+    opacity: .5;
+    transition: opacity .15s ease;
+}
+
+.icon-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.icon-col {
+    width: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.icon-col img {
+    width: 65px;
+    height: auto;
+}
+
+.icon-col p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    word-break: break-word;
+}
+
+#background-blur.tab-open {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    transition: background-color 0.3s, backdrop-filter 0.3s;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+}
+
 .caption-top {
     text-align: center;
     font-size: 14px;
@@ -625,12 +490,13 @@ body {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0));
     padding: 5px;
     z-index: 1;
-    box-sizing: border-box;  /* Ensure padding is included in the width */
+    box-sizing: border-box;
+    color: #9c9c9c;
 }
 
 .caption-top a {
     text-decoration: none !important;
-    color: #9c9c9c;
+    color: inherit;
 }
 
 .caption-top a:hover {
@@ -641,24 +507,24 @@ body {
 
 .image-wrapper {
     position: relative;
-    width: 100%;  /* Ensure it takes full width of its parent */
-    height: 100%; /* Ensure it stretches to full height */
+    width: 100%;
+    height: 100%;
 }
 
 .overflow {
     position: relative;
     overflow: hidden;
     border-radius: 6px;
-    height: 100%; /* Ensure it stretches to full height */
+    height: 100%;
 }
 
 .zoom img,
 .zoom iframe {
     transition: all 0.2s linear;
     border-radius: 6px;
-    width: 100%; 
-    height: 100%; /* Fill the height */
-    object-fit: cover; /* This will ensure the aspect ratio is maintained */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .zoom:hover img,
@@ -669,7 +535,7 @@ body {
 .image-wrapper img,
 .image-wrapper iframe {
     width: 100%;
-    height: 100%;  /* Ensure the image/iframe fills the space */
+    height: 100%;
 }
 
 .line-clamp {
@@ -677,61 +543,12 @@ body {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: normal;  /* Allow text wrapping */
+    white-space: normal;
 }
-
-
-/* .owl-carousel .item {
-    color: #fff;
-    border-radius: 5px;
-    text-align: center;
-} */
-
-.custom-card {
-    /* width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    margin: 10px;
-    background-color: #fff; */
-}
-
-.custom-card-header {
-    /* background-color: #f4f4f4;
-    padding: 15px;
-    text-align: center;
-    font-weight: bold; */
-}
-
-.custom-card-img img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.custom-card-body {
-    /* padding: 15px; */
-}
-
-.custom-card-title {
-    /* font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px; */
-}
-
-.custom-card-text {
-    /* font-size: 14px;
-    color: #555; */
-}
-
-
 
 .banner-section {
     position: relative;
     width: 100%;
-    /* max-width: 800px;   */
-    /* height: 300px;  */
     margin: 0 auto;
     overflow: hidden;
     z-index: 999;
@@ -752,10 +569,24 @@ body {
 
 .banner-image {
     width: 100%;
-    max-height: 300px;
-    max-width: 100%;
+    max-height: 360px;
     height: auto;
     object-fit: cover;
+    /* Add these lines for the overlay */
+    position: relative; /* Needed for absolute positioning of the pseudo-element */
+    z-index: 1; /* Ensure the image is above the overlay if the overlay is a sibling element */
+}
+
+/* Add this new CSS rule for the overlay */
+.banner-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Black color with 40% opacity */
+    z-index: 2; /* Place the overlay above the image */
 }
 
 .banner-control-prev,
@@ -763,7 +594,6 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    /* background-color: rgba(0, 0, 0, 0.5); */
     background-color: rgb(0 0 0 / 11%);
     border-radius: 6px;
     color: white;
@@ -795,7 +625,6 @@ body {
     height: 8px;
     margin: 0 5px;
     border-radius: 50%;
-    /* background-color: rgba(0, 0, 0, 0.5); */
     background-color: rgb(0 0 0 / 11%);
     cursor: pointer;
 }
@@ -804,28 +633,19 @@ body {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-
 /* The Modal (background) */
 .modal {
     display: none;
-    /* Hidden by default */
     position: fixed;
-    /* Stay in place */
     z-index: 9999;
     padding-top: 70px;
-    /* Location of the box */
     left: 0;
     top: 0;
     width: 100%;
-    /* Full width */
     height: 100%;
-    /* Full height */
     overflow: auto;
-    /* Enable scroll if needed */
     background-color: rgb(0, 0, 0);
-    /* Fallback color */
     background-color: rgba(0, 0, 0, 0.4);
-    /* Black w/ opacity */
 }
 
 /* Modal Content */
@@ -849,7 +669,6 @@ body {
         top: -300px;
         opacity: 0
     }
-
     to {
         top: 0;
         opacity: 1
@@ -861,7 +680,6 @@ body {
         top: -300px;
         opacity: 0
     }
-
     to {
         top: 0;
         opacity: 1
@@ -871,32 +689,27 @@ body {
 /* The Close Button */
 .modal-close,
 .modal-close-sign-in,
-.modal-close-forgot-password
- {
+.modal-close-forgot-password {
     color: #555;
     float: right;
     font-size: 28px;
     font-weight: bold;
 }
 
-
 .modal-close:hover,
 .modal-close:focus,
 .modal-close-sign-in:hover,
 .modal-close-sign-in:focus,
 .modal-close-forgot-password:hover,
-.modal-close-forgot-password:focus
-{
+.modal-close-forgot-password:focus {
     color: #e91e63;
     text-decoration: none;
     cursor: pointer;
 }
 
-
 .modal-header {
     padding: 2px 16px;
     background-color: #fefefe;
-    /* color: white; */
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
@@ -906,25 +719,23 @@ body {
     padding: 2px 16px;
 }
 
-.modal-body>div {
+.modal-body > div {
     margin: 10px;
 }
 
-.modal-body>div a {
+.modal-body > div a {
     text-decoration: none;
     color: #555;
 }
 
-.modal-body>div a:hover {
+.modal-body > div a:hover {
     color: #ff9800;
 }
 
 .modal-footer {
     padding: 2px 16px;
     background-color: #fefefe;
-    /* color: white; */
 }
-
 
 .emet-login {
     width: 100%;
@@ -940,41 +751,6 @@ body {
     box-shadow: 1px 2px 7px 2px rgb(255 234 212);
 }
 
-
-/* For small smartphones */
-@media screen and (max-width: 480px) {
-    .header-top a {
-        float: none;
-        display: block;
-        text-align: left;
-        padding: 6px;
-    }
-
-    .header-top-right {
-        float: right;
-    }
-
-    .header-link {
-        display: flex;
-    }
-
-    .header-top-left {
-        float: none;
-    }
-
-    #map-plugin {
-        max-width: 280px;
-        overflow: hidden;
-    }
-
-    .box {
-        width: 80px;
-        height: 80px;
-    }
-
-
-}
-
 .line-ref {
     border-left: 5px solid #f46e20;
     padding-left: 10px;
@@ -983,9 +759,8 @@ body {
     border-left: 5px solid #f46e20;
     padding-left: 10px;
     margin-top: 50px;
-    line-height: 1.2; /* คุมความสูงข้อความ */
+    line-height: 1.2;
 }
-
 
 #loading-overlay {
     position: fixed;
@@ -1010,9 +785,9 @@ body {
 }
 
 @keyframes spin {
-to {
-    transform: rotate(360deg);
-}
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .hidden {
@@ -1030,27 +805,154 @@ to {
     color: white;
 }
 
+/* --- Media Queries for Responsive Design (Header focused, other parts reverted) --- */
+
 /* For medium-sized smartphones */
-@media screen and (max-width: 768px) {
-    .row>[class*="col-"] {
+@media (max-width: 768px) {
+    /* Header related adjustments (kept as per user's positive feedback) */
+    .header-top {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+    .header-top-left {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .header-top img.logo {
+        max-width: 120px;
+        margin-bottom: 5px;
+    }
+    .header-top a {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    .header-top-right {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+        gap: 6px;
+        margin-top: 10px;
+    }
+    .header-top-right a#myBtn-sign-in,
+    .header-top-right a[href*="register"],
+    .header-top-right .header-link a[href*="shop"] {
+        font-size: 11px;
+        padding: 5px 8px;
+        margin: 0;
+    }
+    .language-select {
+        font-size: 12px;
+        padding: 3px 6px;
+        width: 80px;
+        padding-left: 20px;
+    }
+
+    /* Original behavior for row/col, map-plugin */
+    .row > [class*="col-"] {
         flex: 0 0 100%;
         max-width: 100%;
     }
-
     #map-plugin {
         max-width: 420px;
         overflow: hidden;
+        padding: 10px;
+    }
+    .modal-content {
+        width: 90%;
+    }
+
+    .box-hrm, .box-svr {
+        width: 100%;
+        max-width: 300px;
+        margin: auto;
     }
 }
 
-/* For tablets */
-@media screen and (max-width: 1024px) {}
+/* For small smartphones */
+@media (max-width: 480px) {
+    /* Header related adjustments (kept as per user's positive feedback) */
+    .header-top {
+        padding: 5px;
+    }
+    .header-top img.logo {
+        max-width: 100px;
+    }
+    .header-top-right a#myBtn-sign-in,
+    .header-top-right a[href*="register"],
+    .header-top-right .header-link a[href*="shop"] {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+    .language-select {
+        font-size: 11px;
+        padding: 2px 4px;
+        width: 70px;
+        padding-left: 15px;
+    }
 
-/* For small laptops */
-@media screen and (max-width: 1366px) {}
+    #map-plugin {
+        max-width: 280px;
+        overflow: hidden;
+    }
 
-/* For standard desktop screens */
-@media screen and (max-width: 1920px) {}
+    /* Adjustments for content boxes in smaller screens */
+    .box-content, .box-content1 {
+        padding: 20px 10px;
+    }
+    .box-hrm h6, .box-hrm h4, .box-hrm h5,
+    .box-svr h6, .box-svr h4, .box-svr h5 {
+        font-size: 16px;
+    }
+    .box-hrm p, .box-svr p {
+        font-size: 13px;
+    }
+    .caption-top {
+        font-size: 12px;
+        padding: 3px;
+    }
+    .caption-top a:hover {
+        font-size: 14px;
+    }
+    .icon-col {
+        width: 55px;
+    }
+    .icon-col img {
+        width: 55px;
+    }
+    .icon-col p {
+        font-size: 12px;
+    }
+    .box-hrm, .box-svr {
+        max-width: 280px;
+    }
+}
 
-/* For large screens (4K resolution) */
-@media screen and (min-width: 1921px) {}
+
+/* For the smallest screens (e.g., iPhone 5/SE - 320px) - My added breakpoint, carefully adjust header only */
+@media (max-width: 375px) {
+    .header-top {
+        padding: 3px;
+    }
+    .header-top img.logo {
+        max-width: 90px;
+    }
+    .header-top-right {
+        gap: 4px;
+        justify-content: space-around;
+    }
+    .header-top-right a#myBtn-sign-in,
+    .header-top-right a[href*="register"],
+    .header-top-right .header-link a[href*="shop"] {
+        font-size: 9px;
+        padding: 3px 5px;
+    }
+    .language-select {
+        font-size: 10px;
+        width: 60px;
+        padding-left: 10px;
+    }
+}

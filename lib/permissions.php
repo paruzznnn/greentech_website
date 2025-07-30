@@ -60,10 +60,10 @@ function checkSession($data){
         exit();
     }
 
-    if ($data['exp'] < time()) {
-        header("Location: {$base_path_admin}logout.php");
-        exit();
-    }
+    // if ($data['exp'] < time()) {
+    //     header("Location: {$base_path_admin}logout.php");
+    //     exit();
+    // }
 
     if ($data['role_id'] <= 0) {
         header("Location: {$base_path_admin}logout.php");

@@ -4,13 +4,10 @@ body {
     scroll-behavior: smooth;
 }
 
-
 .header-top {
     overflow: hidden;
     background-color: #fafafafa;
-    /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 5px 10px;
-    /* position: fixed; */
     top: 0px;
     width: 100%;
     transition: top 0.3s;
@@ -45,7 +42,6 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* border-bottom: 2px solid #eeeeeea3; */
     padding: 5px;
 }
 
@@ -82,9 +78,7 @@ body {
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: normal;
-    /* Allow text wrapping */
 }
-
 
 @media screen and (max-width: 500px) {
     .header-top a {
@@ -103,16 +97,10 @@ body {
     }
 }
 
-
 .header-center {
     background-color: #f1f1f178;
-    /* margin-top: 80px; */
     padding-top: 10px;
 }
-
-
-
-
 
 .dropdown {
     position: relative;
@@ -128,11 +116,7 @@ body {
     font-size: 16px;
 }
 
-
-.dropdown-btn:hover {
-    /* background-color: #45a049; */
-}
-
+.dropdown-btn:hover {}
 
 .dropdown-content {
     display: none;
@@ -145,7 +129,6 @@ body {
     z-index: 1;
 }
 
-
 .dropdown-content a {
     color: #555555;
     padding: 8px 12px;
@@ -154,17 +137,13 @@ body {
     font-size: 14px;
 }
 
-
 .dropdown-content a:hover {
     background-color: #ddd;
 }
 
-
 .dropdown:hover .dropdown-content {
     display: block;
 }
-
-
 
 .content-sticky {
     padding: 16px;
@@ -189,17 +168,13 @@ body {
     width: 100%;
     height: auto;
     border-radius: 8px;
-    /* transition: transform 0.3s ease; */
 }
 
-.box-content img:hover {
-    /* transform: scale(1.1); */
-}
+.box-content img:hover {}
 
 .box-content h3 {
     color: #555;
     margin-top: 0;
-    /* font-size: 24px; */
 }
 
 .box-content p {
@@ -226,12 +201,10 @@ body {
 .footer {
     overflow: hidden;
     background-color: #434242;
-    /* box-shadow: 0px 3px 4px 0px #d9d9d9; */
     padding: 15px 10px;
     position: relative;
     bottom: 0;
     width: 100%;
-    /* transition: top 0.3s; */
     z-index: 1000;
     color: #fff;
 }
@@ -267,8 +240,6 @@ body {
     object-fit: contain;
     padding: 20px;
 }
-
-
 
 .content-hrm,
 .content-svr {
@@ -334,12 +305,6 @@ body {
     margin: 0;
 }
 
-/* .btn {
-    margin-top: 10px;
-    align-self: center;
-} */
-
-
 iframe {
     width: 100%;
     max-width: 420px;
@@ -351,13 +316,11 @@ iframe {
     height: auto;
 }
 
-
 @media screen and (max-width: 700px) {
     iframe {
         max-width: 420px;
     }
 }
-
 
 @media screen and (max-width: 400px) {
     iframe {
@@ -370,7 +333,6 @@ iframe {
     }
 }
 
-
 .text-content {
     display: flex;
     align-items: center;
@@ -379,7 +341,6 @@ iframe {
     text-align: center;
     color: #555;
 }
-
 
 .carousel-control-next,
 .carousel-control-prev {
@@ -402,18 +363,14 @@ iframe {
 
 .icon-row {
     display: flex;
-    /* justify-content: center; */
     flex-wrap: wrap;
-    /* Allows wrapping on smaller screens */
     text-align: center;
     gap: 20px;
-    /* Space between each column */
     padding: 20px;
 }
 
 .icon-col {
     width: 65px;
-    /* Set width of each column */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -421,7 +378,6 @@ iframe {
 
 .icon-col img {
     width: 65px;
-    /* Adjust the image size */
     height: auto;
 }
 
@@ -431,10 +387,7 @@ iframe {
     color: #333;
 }
 
-
-
 #background-blur.tab-open {
-    /* background-color: rgba(0, 0, 0, 0.5); */
     backdrop-filter: blur(5px);
     transition: background-color 0.3s, backdrop-filter 0.3s;
     height: 100vh;
@@ -445,29 +398,17 @@ iframe {
     z-index: 9;
 }
 
-/* #navbar-menu.tab-open {
-    position: sticky;
-    top: 0;
-    background-color: #fafafa;
-    white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    z-index: 1000;
-} */
-
 .language-select {
     width: 30px;
     padding: 5px;
     font-size: 16px;
     border: none;
-    /* border: 1px solid #ddd; */
     border-radius: 4px;
     background-color: #fafafa;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     padding-left: 30px;
-    /* Space for the flag on the left */
     transition: background-color 0.3s, border-color 0.3s;
 }
 
@@ -475,18 +416,13 @@ iframe {
     padding: 8px;
 }
 
-/* Hover state */
 .language-select:hover {
     background-color: #e9ecef;
     border-color: #ccc;
 }
 
-/* Focus/Active state */
 .language-select:focus {
-    /* background-color: #f0f8ff; 
-    border-color: #007bff; */
     outline: none;
-    /* Remove default outline */
 }
 
 .toggle-button {
@@ -494,13 +430,10 @@ iframe {
     color: #555555;
 }
 
-/* Basic styling for the sidebar */
 .sidebar {
     width: 200px;
-    /* background-color: #f1f1f1; */
     background-color: #fafafa;
     position: fixed;
-    /* top: 0px; */
     height: 100%;
     padding-top: 20px;
     box-shadow: 2px 2px 4px 0px #e8e8ea;
@@ -548,7 +481,6 @@ iframe {
         position: relative;
         overflow: visible;
         padding: 0;
-        /* margin-left: 50px; */
         cursor: pointer;
         width: 40px
     }
@@ -737,7 +669,6 @@ iframe {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-
 }
 
 th {
@@ -780,66 +711,9 @@ td {
     display: none;
 }
 
-/* 
-.table-styled {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-
-.table-styled th {
-    padding: 10px;
-    background-color: #FFC107;
-    color: white;
-    text-align: left;
-    font-size: 16px;
-}
-
-
-.table-styled td {
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 14px;
-    color: #333;
-}
-
-
-.table-styled tr:hover {
-    background-color: #f2f2f2;
-    cursor: pointer;
-}
-
-
-.table-styled,
-.table-styled th,
-.table-styled td {
-    border: 1px solid #ddd;
-}
-
-
-.table-styled {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-@media screen and (max-width: 768px) {
-    .table-styled {
-        font-size: 12px;
-    }
-
-    .table-styled th,
-    .table-styled td {
-        padding: 8px;
-    }
-} */
-
-
 .tables-over {
     overflow-x: auto;
     white-space: nowrap;
-    /* scrollbar-width: thin; */
 }
 
 .tables-over::-webkit-scrollbar {
@@ -860,43 +734,56 @@ td {
     padding-left: 10px;
 }
 
-.table-icons{
+.table-icons {
     border: 1px solid #dee2e6;
 }
 
-/* .table-custom {
-    width: 100%;
-    border-collapse: collapse;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
+/* ============================================================================ */
+/* สไตล์สำหรับเนื้อหาจาก Summernote (เน้นการจัดการฟอนต์) */
+/* เพิ่ม class หรือ ID ให้กับ div ที่แสดงผลเนื้อหาจาก Summernote ของคุณ */
+/* ตัวอย่าง: ถ้าคุณมี <div id="shopContentDisplay">...</div> */
+#shopContentDisplay,
+#shopContentDisplay p,
+#shopContentDisplay span,
+#shopContentDisplay h1,
+#shopContentDisplay h2,
+#shopContentDisplay h3,
+#shopContentDisplay h4,
+#shopContentDisplay h5,
+#shopContentDisplay h6,
+#shopContentDisplay div,
+#shopContentDisplay font {
+    font-family: 'Kanit', sans-serif !important;
+    color: rgb(85, 85, 85) !important; /* กำหนดสีข้อความเริ่มต้น */
 }
 
+/* จัดการขนาดตัวอักษรสำหรับ heading (ถ้า inline style ไม่ทำงาน) */
+#shopContentDisplay h1 { font-size: 48px !important; }
+#shopContentDisplay h2 { font-size: 36px !important; }
+#shopContentDisplay h3 { font-size: 30px !important; }
+#shopContentDisplay h4 { font-size: 24px !important; }
+#shopContentDisplay h5 { font-size: 20px !important; }
+#shopContentDisplay h6 { font-size: 18px !important; }
 
-.table-custom th, .table-custom td {
-    padding: 12px;
-    border: 1px solid #ddd;
+/* จัดการ margin และ line-height สำหรับ paragraph */
+#shopContentDisplay p {
+    margin-right: 0px !important;
+    margin-bottom: 1em !important; /* เพิ่ม margin ด้านล่างเล็กน้อย */
+    margin-left: 0px !important;
+    line-height: 1.6 !important;
 }
 
-.table-custom th {
-    font-weight: 600;
+/* บังคับให้ span ใช้ font-family Kanit */
+#shopContentDisplay span {
+    font-family: 'Kanit', sans-serif !important;
 }
 
-.table-custom td {
-    background-color: #ffffff;
-    color: #333;
-    font-size: 14px;
-
+/* จัดการรูปภาพ */
+#shopContentDisplay img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0.5em auto !important; /* เพิ่ม margin บนล่าง */
 }
 
-.table-custom tr:nth-child(even) {
-    background-color: #f7f7f7;
-}
-
-.table-custom tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-}  */
-
-
-
+/* ============================================================================ */

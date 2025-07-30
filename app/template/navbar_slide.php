@@ -1,6 +1,6 @@
 <?php
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
-require_once('../lib/connect.php');
+// require_once('../lib/connect.php');
 $newsList = [];
 $sql = "SELECT news_id, subject_news FROM dn_news ORDER BY date_create DESC LIMIT 3";
 $result = $conn->query($sql);
@@ -42,13 +42,12 @@ $dropdownItems = [
 ];
 ?>
 
-<!-- ✅ CSS -->
 <style>
 #navbar-menu {
     background-color: white;
     position: relative;
     z-index: 999;
-    border-bottom: 1px solid #ddd;
+    /* border-bottom: 1px solid #ddd; */
     overflow: visible;
     background-color: #ff9900;
 }
@@ -75,12 +74,28 @@ $dropdownItems = [
     padding: 0px 0px;
     min-width: 100px; /* ✅ ป้องกันเมนูแคบเกิน */
     white-space: nowrap;
+    /* เพิ่ม transition เพื่อความ smooth ในการปรับขนาด */
+    transition: all 0.3s ease; 
 }
 
 @media (max-width: 768px) {
     .over-menu a,
     .over-menu .dropdown {
-        flex: 1 1 45%; /* ✅ ให้แสดง 2 แถบเต็มแนวมือถือ */
+        /* ปรับ flex-basis ให้ยืดหยุ่นมากขึ้น และ min-width ลดลง */
+        flex: 1 1 30%; /* อาจจะให้แสดง 3 คอลัมน์ ถ้าข้อความสั้นพอ หรือ 2 คอลัมน์ที่ยืดหยุ่นกว่า */
+        min-width: 80px; /* ลด min-width ลงเพื่อให้หดได้มากขึ้น */
+        font-size: 0.8em; /* ลดขนาดตัวอักษรลง */
+        padding: 5px 2px; /* ลด padding */
+    }
+}
+
+@media (max-width: 480px) { /* สำหรับมือถือที่เล็กกว่า */
+    .over-menu a,
+    .over-menu .dropdown {
+        flex: 1 1 45%; /* อาจจะกลับไป 2 คอลัมน์ หรือ 100% ถ้าข้อความยาวมาก */
+        min-width: 120px; /* อาจจะขยายกลับถ้าอยากให้เมนูใหญ่ขึ้นเมื่อแสดง 2 คอลัมน์ */
+        font-size: 0.9em; /* ปรับขนาดตัวอักษรให้เหมาะสม */
+        padding: 5px 0px;
     }
 }
 
@@ -109,12 +124,13 @@ $dropdownItems = [
 
 .dropdown-item {
     padding: 10px 15px;
-    color: #333;
+    /* color: #565656ff; */
     text-decoration: none;
+    background-color: #bebcbcff;
 }
 
 .dropdown-item:hover {
-    background-color: #f0f0f0;
+    /* background-color: #302f2fff; */
 }
 
 .dropbtn {
@@ -125,8 +141,8 @@ $dropdownItems = [
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #f28b1f;
-    color: #58585a;
+    background-color: #ff9900;
+    color: #ffffff;
     /* color: white; */
     padding: 15px 40px 20px 10px;
     font-weight: bold;
@@ -136,9 +152,22 @@ $dropdownItems = [
     border-radius: 0px 70px 10px 0px;
 }
 
+/* ปรับขนาด font-size ของ text-ticker สำหรับหน้าจอขนาดเล็ก */
+@media (max-width: 768px) {
+    .text-ticker {
+        font-size: 18px; /* ลดขนาด font-size */
+        padding: 10px 20px 15px 5px; /* ลด padding */
+    }
+}
+
+@media (max-width: 480px) {
+    .text-ticker {
+        font-size: 14px; /* ลดขนาด font-size เพิ่มเติม */
+        padding: 8px 15px 10px 5px; /* ลด padding เพิ่มเติม */
+    }
+}
 </style>
 
-<!-- ✅ HTML + PHP Navbar -->
 <div id="navbar-menu">
     <div class="container">
         <div class="over-menu">
@@ -156,7 +185,6 @@ $dropdownItems = [
                             </span>
                         </a>
 
-                        <!-- ✅ ใส่ dropdown-content ภายใน dropdown -->
                         <div class="dropdown-content" id="<?php echo $item['id']; ?>">
                             <div class="dropdown-show">
                                 <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
@@ -183,7 +211,6 @@ $dropdownItems = [
     </div>
 </div>
 
-<!-- ✅ JavaScript -->
 <script>
 let currentDropdown = null;
 
@@ -219,12 +246,12 @@ function closeAllDropdowns() {
                 <span class="blinking-icon"></span>
                 Daily News
             </span>
-             <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+               <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
     <div id="newsMarquee-link" style="display: inline;">
         <?php foreach ($newsList as $news): ?>
             <span style="padding: 0 50px;">
-                 <a href="news.php?id=<?= $news['news_id'] ?>" style="text-decoration: none; color: inherit;">
-                    <?= htmlspecialchars($news['subject_news']) ?>
+                    <a href="news.php?id=<?= $news['news_id'] ?>" style="text-decoration: none; color: inherit;">
+                        <?= htmlspecialchars($news['subject_news']) ?>
                 </a>
             </span>
         <?php endforeach; ?>

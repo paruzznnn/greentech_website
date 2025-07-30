@@ -365,9 +365,25 @@ const setupEventHandlers = (id, type) => {
     }else if(type == 'order_buy'){
 
         $('.remove-orderBuy').on('click', function(e) {
+
             e.preventDefault();
             const dataID = $(this).data('key');
-            reDataOrder(null, dataID, 'remove');
+
+            Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to delete the data?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#4caf50",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ok",
+            cancelButtonText: "cancel" 
+            }).then((result) => {
+            if (result.isConfirmed) {
+                reDataOrder(null, dataID, 'remove');
+            }
+            });
+
         });
 
         $('.print-orderBuy').on('click', function(e) {
@@ -830,13 +846,12 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                     let divShowOrderBuy = '';
 
                     dataMemberOrder.forEach(order => {
-                        
-                        
-                        const productIds = order.product_ids.split(',');
-                        const prices = order.prices.split(',');
-                        const quantities = order.quantities.split(',');
-                        const totalPrices = order.total_prices.split(',');
-                        const keyOrder = order.order_keys.split(',');
+
+                        const productIds = order.product_ids?.split(',') ?? [];
+                        const prices = order.prices?.split(',') ?? [];
+                        const quantities = order.quantities?.split(',') ?? [];
+                        const totalPrices = order.total_prices?.split(',') ?? [];
+                        const keyOrder = order.order_keys?.split(',') ?? [];
                     
                         let payChannel = '';
                         let transportChannel = '';
@@ -844,12 +859,11 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
 
                         let totalQty = 0; // Total quantity
                         let totalAmount = 0; // Total amount
-                        let tmsPrice = order.vehicle_price;
+                        let tmsPrice = parseInt(order.vehicle_price);
 
-                        // $vat = ($totalPrice + $tmsPrice) * 0.07; 
-                        // $totalPriceWithVat = $totalPrice + $tmsPrice + $vat;
                     
                         switch (order.pay_channel) {
+                            case "1":
                             case 1:
                                 payChannel = `<img src="../public/img/bankPay.png" class="" style="width: 80%;">
                                                 <label>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</label>
@@ -857,6 +871,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                     ธ.กรุงศรีอยุธยา 320-1-13702-8
                                                 </div>`;
                                 break;
+                            case "2":
                             case 2:
                                 payChannel = `
                                             <img src="../public/img/prompt-pay-logo.png" class="" style="width: 70%;"></img>
@@ -868,11 +883,13 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         }
                     
                         switch (order.type) {
+                            case "1":
                             case 1:
                                 transportChannel = `<i class="fas fa-truck"></i> 
                                                     ตามที่อยู่ที่กำหนด
                                                     `;
                                 break;
+                            case "2":
                             case 2:
                                 transportChannel = `<i class="fas fa-people-carry"></i>
                                                     รับหน้าร้าน
@@ -883,6 +900,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                         }
 
                         switch (order.is_status) {
+                            case "0":
                             case 0:
                                 statusHtml = `
                                             รอส่งหลักฐานการชำระเงิน
@@ -893,6 +911,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                             </div>
                                             `;
                                 break;
+                            case "1":
                             case 1:
                                 statusHtml = `
                                 ส่งหลักฐานแล้วรอตรวจสอบ
@@ -900,9 +919,11 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                 </div>
                                 `;
                                 break;
+                            case "2":
                             case 2:
                                 statusHtml = ``;
                                 break;
+                            case "3":
                             case 3:
                                 statusHtml = `
                                         รอส่งหลักฐานการชำระเงินอีกครั้ง
@@ -916,7 +937,11 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                             default:
                                 break;
                         }
-                    
+
+                        const mapped_items = keyOrder.map(key =>
+                            response.data_item.find(item => item.material_id === key)
+                        );
+
                         // Calculate totals
                         productIds.forEach((productId, index) => {
                             totalQty += parseInt(quantities[index], 10); // Sum quantities
@@ -995,7 +1020,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                         <thead>
                                                             <tr>
                                                                 <th class="text-center">#</th>
-                                                                <th class="text-center">สินค้า</th>
+                                                                <th class="text-start" style="width: 35%;">สินค้า</th>
                                                                 <th class="text-center">ราคา</th>
                                                                 <th class="text-center">ปริมาณ</th>
                                                                 <th class="text-center">ราคารวม</th>
@@ -1007,7 +1032,7 @@ const buildMemberOrderHitory = (page = 1, limit = 1) =>{
                                                             divShowOrderBuy += `
                                                             <tr>
                                                                 <td class="text-end">${index + 1}</td>
-                                                                <td class="text-end">${keyOrder[index]}</td>
+                                                                <td class="text-start" style="width: 35%;">${mapped_items[index]?.description}</td>
                                                                 <td class="text-end">${formatNumberWithComma(prices[index])}</td>
                                                                 <td class="text-end">${quantities[index]}</td>
                                                                 <td class="text-end">${formatNumberWithComma(totalPrices[index])}</td>

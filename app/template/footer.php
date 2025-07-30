@@ -1,209 +1,221 @@
 <?php
-//header-top-right
+// header-top-right (โค้ดส่วนนี้ไม่ได้แก้ไข)
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 $menuItems = [
-    // 
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
         'text' => '',
         'translate' => 'Sign_up',
-        'link' => 'register'. $isFile,
+        'link' => 'register' . $isFile,
         'modal_id' => ''
     ],
-    // [
-    //     'id' => 1,
-    //     'icon' => 'fas fa-sign-in-alt',
-    //     'text' => '',
-    //     'translate' => 'Sign_in',
-    //     'link' => '#',
-    //     'modal_id' => 'myBtn-sign-in'
-    // ],
 ];
+
+// ** ส่วนเพิ่มใหม่: ดึงข้อมูล Footer จาก database **
+// require_once(__DIR__ . '/lib/connect.php'); // ปรับ Path ตามจริง
+// require_once(__DIR__ . '/lib/base_directory.php'); // ปรับ Path ตามจริง (สำหรับ $base_path)
+
+global $conn;
+global $base_path;
+
+$footer_settings = [];
+$footer_id_for_display = 1;
+
+$stmt_footer = $conn->prepare("SELECT * FROM footer_settings WHERE id = ?");
+$stmt_footer->bind_param("i", $footer_id_for_display);
+$stmt_footer->execute();
+$result_footer = $stmt_footer->get_result();
+
+if ($data = $result_footer->fetch_assoc()) {
+    $footer_settings = $data;
+    // Decode JSON สำหรับ Social Links
+    $footer_settings['social_links'] = json_decode($footer_settings['social_links_json'], true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $footer_settings['social_links'] = []; // ถ้า decode ไม่ได้ ให้เป็น array ว่าง
+        error_log("Error decoding social_links_json in footer.php: " . json_last_error_msg());
+    }
+} else {
+    // กำหนดค่า default หากไม่พบข้อมูลใน database (ควรมีการ insert ข้อมูลเริ่มต้นไว้แล้ว)
+    $footer_settings = [
+        'bg_color' => '#393939',
+        'footer_top_title' => 'ลงทะเบียน',
+        'footer_top_subtitle' => 'สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ',
+        'about_heading' => 'เกี่ยวกับเรา',
+        'about_text' => 'บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก',
+        'contact_heading' => 'ติดต่อเรา',
+        'contact_address' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
+        'contact_phone' => '(+66)2 722 7007',
+        'contact_email' => 'info@trandar.com',
+        'contact_hours_wk' => 'Monday – Friday 08:30 AM – 05:00 PM',
+        'contact_hours_sat' => 'Saturday 08:30 AM – 12:00 PM',
+        'social_heading' => 'Follow Us',
+        'social_links' => [
+            ["icon" => "fab fa-facebook-f", "url" => "https://www.facebook.com/trandaracoustic/", "color" => "#3b5998"],
+            ["icon" => "fab fa-instagram", "url" => "https://www.instagram.com/trandaracoustics/", "color" => "#e1306c"],
+            ["icon" => "fab fa-youtube", "url" => "https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/", "color" => "#ff0000"],
+            ["icon" => "fab fa-line", "url" => "https://lin.ee/yoSCNwF", "color" => "#00c300"],
+            ["icon" => "fab fa-tiktok", "url" => "https://www.tiktok.com/@trandaracoustics", "color" => "#000000"]
+        ],
+        'copyright_text' => '© 2025 TRANDAR INTERNATIONAL CO., LTD. ALL RIGHTS RESERVED',
+    ];
+}
+$stmt_footer->close();
+// ** สิ้นสุดส่วนเพิ่มใหม่ **
 ?>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-<footer style="background-color: #393939; color: #ccc; padding: 40px 0; ">
-    <div style="text-align: center; margin-bottom: 40px;">
-       <!-- <img src="../public/img/q-removebg-preview.png" alt="Your Logo"
-     style="height: 50px; margin-bottom: 20px; 
-            background-color: #f0f0f0; /* สีเทาอ่อน */
-            border-radius: 50%;         /* ทำให้เป็นวงกลม */
-            padding: 10px;              /* ระยะห่างรอบรูป */
-            display: inline-block;"> -->
-
-        <!-- <img class="footer-logo" src="../public/img/q-removebg-preview.png" alt="">
- <img class="footer-logo" src="../public/img/2logo-png.png" alt=""> -->
-        <h2 style="color: #fff; font-weight: bold;">ลงทะเบียน</h2>
-        <p style="color: #aaa;">สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ</p>
-        <div style="margin-top: 20px;">
+<!-- กำหนดสีพื้นหลังแบบ Dynamic -->
+<footer class="main-footer" style="background-color: <?= htmlspecialchars($footer_settings['bg_color']) ?>;">
+    <div class="container text-center footer-top-section">
+        <h2 class="footer-title"><?= htmlspecialchars($footer_settings['footer_top_title']) ?></h2>
+        <p class="footer-subtitle"><?= htmlspecialchars($footer_settings['footer_top_subtitle']) ?></p>
+        <div class="mt-4">
             <div id="auth-buttons">
-    <?php foreach ($menuItems as $item): ?>
-        <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
-            <i class="<?php echo $item['icon']; ?>"></i>
-            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                <?php echo $item['text']; ?>
-            </span>
-        </a>
-    <?php endforeach; ?>
-</div>
+                <?php foreach ($menuItems as $item): // โค้ดส่วนนี้คงเดิม ?>
+                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
+                        <i class="<?php echo $item['icon']; ?>"></i>
+                        <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                            <?php echo $item['text']; ?>
+                        </span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
-        
     </div>
 
-    <div style="display: flex; justify-content: center; flex-wrap: wrap; max-width: 1200px; margin: 0 auto;">
-        <div style="flex: 1; width: 300px; margin-bottom: 30px; padding-right:60px;">
-            <p style="font-size :25px;">เกี่ยวกับเรา</p>
-            <p>บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง ฝ้ากันเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก</p>
-            <!-- <p>การจัดส่งสินค้า</p> -->
-            
+    <div class="container main-footer-content">
+        <div class="row">
+            <div class="col-md-4 col-sm-12 mb-4 pr-md-5">
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['about_heading']) ?></p>
+                <p><?= nl2br(htmlspecialchars($footer_settings['about_text'])) ?></p>
+            </div>
+
+            <div class="col-md-4 col-sm-12 mb-4 px-md-3">
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['contact_heading']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_address']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_phone']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_email']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_hours_wk']) ?></p>
+                <p><?= htmlspecialchars($footer_settings['contact_hours_sat']) ?></p>
+            </div>
+
+            <div class="col-md-4 col-sm-12 mb-4 pl-md-5">
+                <p class="footer-heading"><?= htmlspecialchars($footer_settings['social_heading']) ?></p>
+                <div class="social-icons-group">
+                    <?php if (!empty($footer_settings['social_links'])): ?>
+                        <?php foreach ($footer_settings['social_links'] as $social_link): ?>
+                            <a href="<?= htmlspecialchars($social_link['url']) ?>" class="social-icon" style="background-color: <?= htmlspecialchars($social_link['color']) ?>;" target="_blank">
+                                <i class="<?= htmlspecialchars($social_link['icon']) ?>"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">ยังไม่มี Social Link กำหนดค่า.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
-        <!-- <div style="flex: 1; min-width: 200px; margin-bottom: 30px;">
-            <p>นโยบายการเปลี่ยน/คืน</p>
-            <p>รถเข็นสินค้า</p>
-            <p>แคตตาล็อกและโบรชัวร์</p>
-        </div> -->
-        <div style="flex: 1; width: 300px; margin-bottom: 30px;  padding-left:30px;  padding-right:30px;">
-            <p style="font-size :25px;">ติดต่อเรา</p>
-            <p>102 Phatthanakan 40, Suan Luang, Bangkok 10250</p>
-            <p>(+66)2 722 7007</p>
-            <p>info@trandar.com</p>
-            <p>Monday – Friday 08:30 AM – 05:00 PM</p>
-            <p>Saturday 08:30 AM – 12:00 PM</p>
-            
-            <div style="margin-top: 0px;">
-    <!-- <a href="https://www.facebook.com/trandaracoustic/" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-    <a href="https://www.instagram.com/trandaracoustics/" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
-    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
-    <a href="https://lin.ee/yoSCNwF" class="social-icon line"><i class="fab fa-line"></i></a>
-    <a href="https://www.tiktok.com/@trandaracoustics" class="social-icon tiktok"><i class="fab fa-tiktok"></i></a> -->
-</div>
-        </div>
-         <div style="flex: 1; width: 300px; margin-bottom: 30px;  padding-left:60px; ">
-            <p style="font-size :25px;">Follow Us</p>
-            <div style="margin-top: 0px;">
-    <a href="https://www.facebook.com/trandaracoustic/" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-    <a href="https://www.instagram.com/trandaracoustics/" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
-    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
-    <a href="https://lin.ee/yoSCNwF" class="social-icon line"><i class="fab fa-line"></i></a>
-    <a href="https://www.tiktok.com/@trandaracoustics" class="social-icon tiktok"><i class="fab fa-tiktok"></i></a>
-        
     </div>
-        </div>
-        </div>
-    <div style="text-align: center; color: #888; font-size: 13px; margin-top: 40px;">
-        © 2025 TRANDAR INTERNATIONAL CO., LTD. ALL RIGHTS RESERVED
+    <div class="footer-bottom-bar">
+        <?= htmlspecialchars($footer_settings['copyright_text']) ?>
     </div>
-    
+
 </footer>
 
 <style>
-   .social-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 22px;
-  color: white;
-  margin: 0 8px;
-  text-decoration: none;
-}
-
-/* สีพื้นหลังของแต่ละไอคอน */
-.social-icon.facebook {
-  background-color: #3b5998;
-}
-.social-icon.instagram {
-  background-color: #e1306c;
-}
-.social-icon.youtube {
-  background-color: #ff0000;
-}
-.social-icon.line {
-  background-color: #00c300;
-}
-.social-icon.tiktok {
-  background-color: #000000;
-}
-
-    /* --- Footer Styles --- */
-
-/* --- Footer Styles --- */
-.footer {
-    /* background-color: #353535; สีพื้นหลังเทาเข้มจากภาพ moodandtone */
-    color: #cccccc;           /* สีตัวอักษรตั้งต้น */
-    padding: 60px 0 20px 0;    /* การเว้นระยะขอบ */
-    
-}
-
-/* --- Footer Links List --- */
-.footer-links {
-    list-style: none; /* เอา bullet point หน้า list ออก */
-    padding: 0;
-    margin: 0;
-}
-
-.footer-links li {
-    margin-bottom: 12px; /* ระยะห่างระหว่างลิ้งค์ */
-}
-
-.footer-links a {
-    color: #cccccc;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.footer-links a:hover {
-    color: #ffffff; /* ทำให้ลิ้งค์สว่างขึ้นเมื่อเมาส์ชี้ */
-}
-
-
-/* --- Footer Bottom Bar (สไตล์จากภาพ trandar.com) --- */
-.footer-bottom {
-    border-top: 1px solid #555555; /* เส้นคั่นด้านบน */
-    padding-top: 20px;
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between; /* จัดให้ข้อความและไอคอนอยู่คนละฝั่ง */
-    align-items: center;
-}
-
-.copyright-text p {
-    margin: 0;
-    color: #aaaaaa;
-    font-size: 12px;
-}
-
-.footer-social-icons a {
-    color: #aaaaaa;
-    margin-left: 15px; /* ระยะห่างระหว่างไอคอน */
-    text-decoration: none;
-    font-size: 14px;
-    /* คุณสามารถใส่สไตล์เพิ่มเติมให้ไอคอนเป็นกล่องๆได้ถ้าต้องการ */
-}
-
-.footer-social-icons a:hover {
-    color: #ffffff;
-}
-
-/* --- Responsive for mobile --- */
-@media (max-width: 767px) {
-    .footer-links {
-        margin-bottom: 30px; /* เพิ่มระยะห่างระหว่างคอลัมน์บนมือถือ */
+    /* Main Footer Styles */
+    /* background-color ย้ายไปใน inline style ของ footer tag เพื่อให้ Dynamic */
+    .main-footer {
+        color: #ccc;
+        padding: 40px 0;
     }
-    .footer-bottom {
-        flex-direction: column; /* บนมือถือให้เรียงบน-ล่าง */
+
+    /* Top section (Register) */
+    .footer-top-section {
+        margin-bottom: 40px;
+    }
+
+    .footer-title {
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .footer-subtitle {
+        color: #aaa;
+    }
+
+    /* Main Content Sections */
+    .main-footer-content {
+        /* This container already manages horizontal spacing */
+    }
+
+    .footer-heading {
+        font-size: 25px;
+        font-weight: bold; /* Added for prominence */
+        margin-bottom: 15px; /* Spacing below heading */
+        color: #fff; /* Make headings stand out */
+    }
+
+    .main-footer-content p {
+        font-size: 14px; /* Adjust text size for readability */
+        line-height: 1.6; /* Improve line spacing */
+    }
+
+    /* Social Icons */
+    .social-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 22px;
+        color: white;
+        margin: 0 8px; /* Adjusted margin for better spacing */
+        text-decoration: none;
+        transition: transform 0.2s ease-in-out; /* Add smooth hover effect */
+    }
+
+    .social-icon:hover {
+        transform: translateY(-3px); /* Slightly lift on hover */
+    }
+
+    /* Social Icon Background Colors - REMOVED, now set dynamically in HTML/PHP for each icon */
+    /* Keep these if you want default colors for specific icons, or remove if only dynamic */
+    /* .social-icon.facebook { background-color: #3b5998; } */
+    /* .social-icon.instagram { background-color: #e1306c; } */
+    /* .social-icon.youtube { background-color: #ff0000; } */
+    /* .social-icon.line { background-color: #00c300; } */
+    /* .social-icon.tiktok { background-color: #000000; } */
+
+
+    /* Footer Bottom Bar */
+    .footer-bottom-bar {
         text-align: center;
+        color: #888;
+        font-size: 13px;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border for subtlety */
     }
-    .copyright-text {
-        margin-bottom: 15px;
+
+    /* Responsive Adjustments */
+    @media (max-width: 767.98px) { /* For small devices (tablets and below) */
+        .pr-md-5, .px-md-3, .pl-md-5 {
+            padding-right: 15px !important;
+            padding-left: 15px !important;
+            margin-bottom: 20px; /* Reduce margin on mobile */
+        }
+        .footer-heading {
+            text-align: center;
+        }
+        .social-icons-group {
+            text-align: center;
+        }
+        .main-footer-content p {
+            text-align: center; /* Center align text on mobile */
+        }
     }
-    .footer-social-icons a {
-        margin: 0 8px;
-    }
-}
 </style>

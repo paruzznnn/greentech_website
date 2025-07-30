@@ -32,31 +32,28 @@ if (!isset($base_path_admin)) {
       <span class="toggle-button" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </span>
-      <a href="#"><img class="logo" src="/public/img/trandar_logo_no_bg_100x55.png" alt=""></a>
+      <a href="#"><img class="logo" src="/public/img/LOGOTRAND.png" alt=""></a>
 
     </div>
 
     <!-- ขวา -->
     <div class="header-top-right dropdown-wrapper">
-      <div id="showOrigamiAiHtml"></div>
-    <script src="https://dev.origami.life/plugin_chat_ai/plugin_chat.js"></script>
-      <!-- 🔔 กระดิ่งแจ้งเตือน -->
+          <!-- <div id="showOrigamiAiHtml"></div>
+        <script src="https://dev.origami.life/plugin_chat_ai/plugin_chat.js"></script> -->
+          <!-- 🔔 กระดิ่งแจ้งเตือน -->
       <div class="header-item">
-  <i class="fas fa-bell" style="font-size: 30px;"></i>
-</div>
+        <i class="fas fa-bell" style="font-size: 30px;"></i>
+      </div>
 
       <!-- 📦 Origami Dropdown -->
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
         <img src="/public/img/origami_app.png" height="25" style="cursor:pointer;">
         <div id="origamiDropdownMenu" class="dropdown-box hidden">
-          <a href="https://origami.example.com">
+          <a href="https://www.origami.life">
             <img src="/public/img/2_20180425103337.ico" height="40"><br>
             <span>Origami</span>
           </a>
-          <a href="https://robusta.example.com">
-            <img src="/public/img/6_20181018145034.png" height="40"><br>
-            <span>Robusta</span>
-          </a>
+          
         </div>
       </div>
 

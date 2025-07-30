@@ -7,20 +7,20 @@ include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
 
-// ตรวจสอบว่าได้รับค่า blog_id หรือไม่
-if (!isset($_POST['blog_id'])) {
+// ตรวจสอบว่าได้รับค่า Blog_id หรือไม่
+if (!isset($_POST['Blog_id'])) {
     echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
     exit;
 }
 
-$decodedId = $_POST['blog_id'];
+$decodedId = $_POST['Blog_id'];
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit blog</title>
+    <title>Edit Blog</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -59,6 +59,20 @@ $decodedId = $_POST['blog_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
+        .note-editable {
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            color: #424242;
+            font-size: 16px;
+            line-height: 1.5;
+            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
+            /* min-height: 600px; */
+            /* max-height: 600px; */
+            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
+        }
+        .box-content p {
+            /* font-family: sans-serif */
+            color: #424242;
+        }
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -99,23 +113,23 @@ $decodedId = $_POST['blog_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit blog
+                        <i class="far fa-newspaper"></i> Edit Blog
                     </h4>
                     <?php
 $stmt = $conn->prepare("
     SELECT 
-    dn.blog_id, 
-    dn.subject_blog, 
-    dn.description_blog,
-    dn.content_blog, 
+    dn.Blog_id, 
+    dn.subject_Blog, 
+    dn.description_Blog,
+    dn.content_Blog, 
     dn.date_create, 
     GROUP_CONCAT(dnc.file_name) AS file_name,
     GROUP_CONCAT(dnc.api_path) AS pic_path,
     MAX(dnc.status) AS status
 FROM dn_blog dn
-LEFT JOIN dn_blog_doc dnc ON dn.blog_id = dnc.blog_id
-WHERE dn.blog_id = ?
-GROUP BY dn.blog_id
+LEFT JOIN dn_blog_doc dnc ON dn.Blog_id = dnc.Blog_id
+WHERE dn.Blog_id = ?
+GROUP BY dn.Blog_id
 
 ");
 
@@ -129,7 +143,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $content = $row['content_blog'];
+        $content = $row['content_Blog'];
         $paths = explode(',', $row['pic_path']);
         $files = explode(',', $row['file_name']);
 
@@ -147,11 +161,12 @@ if ($result->num_rows > 0) {
 
         echo "
         <form id='formBlog_edit' enctype='multipart/form-data'>
-            <input type='hidden' class='form-control' id='blog_id' name='blog_id' value='" . htmlspecialchars($row['blog_id']) . "'>
+            <input type='hidden' class='form-control' id='Blog_id' name='Blog_id' value='" . htmlspecialchars($row['Blog_id']) . "'>
             <div class='row'>
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
                         <label><span>Cover photo</span>:</label>
+                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                         <div id='previewContainer' class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>
@@ -161,22 +176,27 @@ if ($result->num_rows > 0) {
                     </div>
                     <div style='margin: 10px;'>
                         <label><span>Subject</span>:</label>
-                        <input type='text' class='form-control' id='blog_subject' name='blog_subject' value='" . htmlspecialchars($row['subject_blog']) . "'>
+                        <input type='text' class='form-control' id='Blog_subject' name='Blog_subject' value='" . htmlspecialchars($row['subject_Blog']) . "'>
                     </div>
                     <div style='margin: 10px;'>
                         <label><span>Description</span>:</label>
-                        <textarea class='form-control' id='blog_description' name='blog_description'>" . htmlspecialchars($row['description_blog']) . "</textarea>
+                        <textarea class='form-control' id='Blog_description' name='Blog_description'>" . htmlspecialchars($row['description_Blog']) . "</textarea>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditblog' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save blog
+                        <button type='button' id='submitEditBlog' class='btn btn-success'>
+                            <i class='fas fa-save'></i> Save Blog
                         </button>
                     </div>
                 </div>
                 <div class='col-md-8'>
+                 <div style='margin: 10px; text-align: end;'>
+                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                    <i class='fas fa-arrow-left'></i> Back 
+                </button>
+            </div>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='blog_content'>" . htmlspecialchars($content) . "</textarea>
+                        <textarea class='form-control summernote' id='summernote_update' name='Blog_content'>" . htmlspecialchars($content) . "</textarea>
                     </div>
                 </div>
             </div>
@@ -219,3 +239,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     <script src='js/Blog_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
+
+
+
+

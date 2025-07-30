@@ -1,26 +1,28 @@
 $(document).ready(function () {
 
-    if($("#summernote").length > 0){
-
-        $("#summernote").summernote({
-            height: 400,
-            minHeight: 200,
-            maxHeight: 500,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontname', 'fontsize']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview']],
-                ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-            ],
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'], // เพิ่ม sans-serif
-            fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-            callbacks: {
-
+    if ($(".summernote").length > 0) {
+    $(".summernote").summernote({
+        height: 600,
+        minHeight: 600,
+        maxHeight: 600,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['fontname', 'fontsize', 'forecolor']], // เพิ่ม 'forecolor' สำหรับสีฟอนต์
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'video', 'table']],
+            ['view', ['fullscreen', ['codeview', 'fullscreen']]], // แก้ไขให้ถูกต้องสำหรับ fullscreen
+            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+        ],
+        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+        fontNamesIgnoreCheck: ['Kanit'],
+        fontsizeUnits: ['px', 'pt'],
+        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+        callbacks: {
+                // ... (ส่วน callbacks เดิมของคุณ)
             }
         });
     }
+
 
     var readURL = function (input) {
         if (input.files && input.files[0]) {
@@ -243,6 +245,10 @@ $(document).ready(function () {
 
 
 function base64ToFile(base64, fileName) {
+    if (!base64 || typeof base64 !== "string" || !base64.startsWith("data:")) {
+        console.error("Invalid base64 input:", base64);
+        return null;
+    }
 
     var fileExtension = fileName.split(".").pop().toLowerCase();
 
@@ -264,25 +270,29 @@ function base64ToFile(base64, fileName) {
         case "txt":
             mimeType = "text/plain";
             break;
-
         default:
             mimeType = "application/octet-stream";
     }
 
-    var byteString = atob(base64.split(",")[1]);
+    try {
+        const base64Data = base64.split(",")[1];
+        const byteString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
 
-    var arrayBuffer = new ArrayBuffer(byteString.length);
-    var uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
 
-    for (var i = 0; i < byteString.length; i++) {
-        uint8Array[i] = byteString.charCodeAt(i);
+        const blob = new Blob([uint8Array], { type: mimeType });
+        const file = new File([blob], fileName, { type: mimeType });
+
+        return file;
+
+    } catch (e) {
+        console.error("Failed to decode base64:", e, base64);
+        return null;
     }
-
-    var blob = new Blob([uint8Array], { type: mimeType });
-
-    var file = new File([blob], fileName, { type: mimeType });
-
-    return file;
 }
 
 function alertError(textAlert) {
@@ -594,71 +604,109 @@ $("#submitAddBlog").on("click", function (event) {
 $("#submitEditBlog").on("click", function (event) {
     event.preventDefault();
 
+    // console.log("👉 Start submitEditBlog handler");
+
     var formBlog = $("#formBlog_edit")[0];
     var formData = new FormData(formBlog);
-    formData.append("action", "editBlog"); // ใช้ action นี้เพื่อให้ฝั่ง PHP รู้ว่าเป็นแก้ไข
 
-    var BlogContent = formData.get("Blog_content");
-    let checkIsUrl = false;
+    formData.set("action", "editBlog");
+    formData.set("Blog_id", $("#Blog_id").val());
 
-    if (BlogContent) {
+    // Get content from Summernote
+    var contentFromEditor = $("#summernote_update").summernote('code');
+    // console.log("🔍 contentFromEditor (raw):", contentFromEditor);
+
+    var checkIsUrl = false;
+    var finalContent = '';
+
+    if (contentFromEditor) {
         var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = BlogContent;
+        tempDiv.innerHTML = contentFromEditor;
+        // console.log("🧩 Created tempDiv with innerHTML set");
+
         var imgTags = tempDiv.getElementsByTagName("img");
+        // console.log("📸 Number of <img> tags found:", imgTags.length);
+
         for (var i = 0; i < imgTags.length; i++) {
-            var imgSrc = imgTags[i].getAttribute("src").replace(/ /g, "%20");
+            var imgSrc = imgTags[i].getAttribute("src");
             var filename = imgTags[i].getAttribute("data-filename");
+            // console.log(`🔎 img[${i}] src:`, imgSrc, ", filename:", filename);
 
-            let isUrl = isValidUrl(imgSrc);
+            if (!imgSrc) {
+                console.warn(`⚠️ img[${i}] has no src, skipping.`);
+                continue;
+            }
 
-            if (!isUrl) {
+            imgSrc = imgSrc.replace(/ /g, "%20");
+
+            if (!isValidUrl(imgSrc)) {
+                // console.log(`🛠️ img[${i}] src is NOT a valid URL, converting base64 to file.`);
                 var file = base64ToFile(imgSrc, filename);
                 if (file) {
                     formData.append("image_files[]", file);
+                    // console.log(`✅ Appended image_files[] with filename: ${file.name}`);
+                } else {
+                    console.warn(`⚠️ Failed to convert base64 to file for img[${i}]`);
                 }
-
                 if (imgSrc.startsWith("data:image")) {
                     imgTags[i].setAttribute("src", "");
+                    // console.log(`🔄 Cleared src of img[${i}] after base64 processing.`);
                 }
             } else {
                 checkIsUrl = true;
+                // console.log(`🌐 img[${i}] src is a valid URL.`);
             }
         }
 
-        formData.set("Blog_content", tempDiv.innerHTML);
+        finalContent = tempDiv.innerHTML;
+        formData.set("Blog_content", finalContent);
+        // console.log("📝 finalContent (cleaned):", finalContent);
+    } else {
+        console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // Validate
     $(".is-invalid").removeClass("is-invalid");
-    for (var tag of formData.entries()) {
-        if (tag[0] === 'Blog_subject' && tag[1].trim() === '') {
-            $("#Blog_subject").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'Blog_description' && tag[1].trim() === '') {
-            $("#Blog_description").addClass("is-invalid");
-            return;
-        }
-        if (tag[0] === 'Blog_content' && tag[1].trim() === '') {
-            alertError("Please fill in content information.");
-            return;
-        }
+
+    if (!$("#Blog_subject").val().trim()) {
+        $("#Blog_subject").addClass("is-invalid");
+        console.error("❌ Validation failed: Blog_subject is empty");
+        return;
+    }
+    if (!$("#Blog_description").val().trim()) {
+        $("#Blog_description").addClass("is-invalid");
+        console.error("❌ Validation failed: Blog_description is empty");
+        return;
+    }
+    if (!finalContent.trim()) {
+        alertError("Please fill in content information.");
+        console.error("❌ Validation failed: Blog_content is empty");
+        return;
     }
 
-    let confirmOptions = {
-        title: checkIsUrl
-            ? "Image detection system from other websites?"
-            : "Are you sure?",
-        text: "Do you want to edit Blog.!",
+    formData.set("Blog_subject", $("#Blog_subject").val());
+    formData.set("Blog_description", $("#Blog_description").val());
+
+    // console.log("📤 Form data prepared:", {
+    //     Blog_id: $("#Blog_id").val(),
+    //     Blog_subject: $("#Blog_subject").val(),
+    //     Blog_description: $("#Blog_description").val(),
+    //     Blog_content: finalContent,
+    //     image_files_count: formData.getAll("image_files[]").length
+    // });
+
+    Swal.fire({
+        title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+        text: "Do you want to edit Blog?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#4CAF50",
         cancelButtonColor: "#d33",
         confirmButtonText: "Accept"
-    };
-
-    Swal.fire(confirmOptions).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
             $('#loading-overlay').fadeIn();
+            console.log("🚀 Sending AJAX request...");
 
             $.ajax({
                 url: "actions/process_Blog.php",
@@ -667,19 +715,36 @@ $("#submitEditBlog").on("click", function (event) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    if (response.status == 'success') {
-                        window.location.href = "list_Blog.php"; // ✅ ไปหน้า list
+                    console.log("✅ AJAX success:", response);
+                    try {
+                        var json = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (json.status === 'success') {
+                           location.reload(); // This line refreshes the current page
+                        } else {
+                            Swal.fire('Error', json.message || 'Unknown error', 'error');
+                        }
+                    } catch (e) {
+                        console.error("❌ JSON parse error:", e);
+                        Swal.fire('Error', 'Invalid response from server', 'error');
                     }
                 },
-                error: function (error) {
-                    console.log("error", error);
+                error: function (xhr) {
+                    console.error("❌ AJAX error:", xhr.responseText);
+                    Swal.fire('Error', 'AJAX request failed', 'error');
+                    $('#loading-overlay').fadeOut();
                 },
             });
         } else {
+            console.log("❎ User cancelled action");
             $('#loading-overlay').fadeOut();
         }
     });
 });
+
+$("#backToShopList").on("click", function () {
+    window.location.href = "list_Blog.php";
+});
+
 
 
 // function reDirect(url, data) {

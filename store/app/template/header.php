@@ -142,9 +142,9 @@ $basePath = $base_path_admin;
 
                     <article class="card-body">
 
-                        <div class="box-logo-container">
+                        <!-- <div class="box-logo-container"> -->
 
-                            <a href="<?php echo $basePath .'login.php'?>">
+                            <!-- <a href="<?php echo $basePath .'login.php'?>">
                                 <div class="box-logo">
                                     <div class="box-logo-image">
                                         <img src="../public/img/trandar_logo.png" alt="Trandar Logo">
@@ -153,7 +153,7 @@ $basePath = $base_path_admin;
                                         Trandar
                                     </div>
                                 </div>
-                            </a>
+                            </a> -->
 
                             <a href="https://www.origami.life//login.php#/">
                                 <div class="box-logo">
@@ -166,7 +166,7 @@ $basePath = $base_path_admin;
                                 </div>
                             </a>
 
-                        </div>
+                        <!-- </div> -->
 
                         <br>
                         <h6 style="text-align: center; color: #555;" class="mt-2">

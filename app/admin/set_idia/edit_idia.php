@@ -59,6 +59,20 @@ $decodedId = $_POST['idia_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
+        .note-editable {
+            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+            color: #424242;
+            font-size: 16px;
+            line-height: 1.5;
+            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
+            /* min-height: 600px; */
+            /* max-height: 600px; */
+            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
+        }
+        .box-content p {
+            /* font-family: sans-serif */
+            color: #424242;
+        }
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -152,6 +166,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
                         <label><span>Cover photo</span>:</label>
+                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                         <div id='previewContainer' class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>
@@ -174,9 +189,14 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
                 <div class='col-md-8'>
+                 <div style='margin: 10px; text-align: end;'>
+                <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                    <i class='fas fa-arrow-left'></i> Back 
+                </button>
+            </div>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
-                        <textarea class='form-control' id='summernote' name='idia_content'>" . htmlspecialchars($content) . "</textarea>
+                        <textarea class='form-control summernote' id='summernote_update' name='idia_content'>" . htmlspecialchars($content) . "</textarea>
                     </div>
                 </div>
             </div>
@@ -219,3 +239,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     <script src='js/idia_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
+
+
+
+
