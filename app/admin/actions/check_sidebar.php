@@ -16,21 +16,19 @@ $allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermis
     ? explode(',', $arrPermiss['menus_id']) 
     : [];
 
-$sql = "SELECT ml_menus.* FROM ml_menus WHERE ml_menus.del = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt === false) {
+$sql_parent = "SELECT ml_menus.* FROM ml_menus WHERE ml_menus.del = ? AND parent_id = 0";
+$stmt_parent = $conn->prepare($sql_parent);
+if ($stmt_parent === false) {
     echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
     exit();
 }
 
 $del = 0;
-$stmt->bind_param("i", $del);
-$stmt->execute();
-$result = $stmt->get_result();
-$arrayMenu = $result->fetch_all(MYSQLI_ASSOC);
-
-$sidebarItems = [];
-foreach ($arrayMenu as $row) {
+$stmt_parent->bind_param("i", $del);
+$stmt_parent->execute();
+$result = $stmt_parent->get_result();
+$arrayMainMenu = $result->fetch_all(MYSQLI_ASSOC);
+foreach ($arrayMainMenu as $row) {
     if (in_array($row['menu_id'], $allowedMenus)) {
         if ($row['parent_id'] == 0) {
             $sidebarItems[] = [
@@ -41,23 +39,37 @@ foreach ($arrayMenu as $row) {
                 'order' => $row['menu_order'],
                 'subItems' => [],
             ];
-        } else {
-            foreach ($sidebarItems as &$parentItem) {
-                if ($parentItem['id'] == $row['parent_id']) {
-                    $parentItem['subItems'][] = [
-                        'id' => $row['menu_id'],
-                        'icon' => $row['menu_icon'],
-                        'label' => $row['menu_label'],
-                        'link' => ($row['menu_link']) ? $base_path_admin . str_replace('.php', '', $row['menu_link']) . $isFile : '#',
-                        'order' => $row['menu_order'],
-                        'parentId' => $row['parent_id'],
-                    ];
-                    break;
-                }
-            }
-            unset($parentItem);
         }
     }
+}
+
+// Childen menus
+$sql_childen = "SELECT ml_menus.* FROM ml_menus WHERE ml_menus.del = ? AND parent_id > 0";
+$stmt_childen = $conn->prepare($sql_childen);
+if ($stmt_childen === false) {
+    echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
+    exit();
+}
+
+$stmt_childen->bind_param("i", $del);
+$stmt_childen->execute();
+$result = $stmt_childen->get_result();
+$arraySubMenu = $result->fetch_all(MYSQLI_ASSOC);
+foreach ($arraySubMenu as $childen) {
+    foreach ($sidebarItems as &$parentItem) {
+        if ($parentItem['id'] == $childen['parent_id']) {
+            $parentItem['subItems'][] = [
+                'id' => $childen['menu_id'],
+                'icon' => $childen['menu_icon'],
+                'label' => $childen['menu_label'],
+                'link' => ($childen['menu_link']) ? $base_path_admin . str_replace('.php', '', $childen['menu_link']) . $isFile : '#',
+                'order' => $childen['menu_order'],
+                'parentId' => $childen['parent_id'],
+            ];
+            break;
+        }
+    }
+    // unset($parentItem);
 }
 
 echo json_encode([
