@@ -4,13 +4,15 @@ include '../check_permission.php'; // ตรวจสอบสิทธิ์ก
 
 // Include database connection and base_directory.php
 // // สมมติว่าไฟล์ connect.php และ base_directory.php อยู่ใน lib/
-// require_once(__DIR__ . '/../../../../lib/connect.php'); 
+// require_once(__DIR__ . '/../../../../lib/connect.php');
 // require_once(__DIR__ . '/../../../../lib/base_directory.php'); // ถ้ามี $base_path
 
-// ในกรณีของโลโก้ เราจะดึงข้อมูลจาก ID เดียวคือ 1 เสมอ
-$logo_id = 1; 
+global $conn;
 
-$stmt = $conn->prepare("SELECT id, image_path FROM logo_settings WHERE id = ?");
+// ในกรณีของโลโก้ เราจะดึงข้อมูลจาก ID เดียวคือ 1 เสมอ
+$logo_id = 1;
+
+$stmt = $conn->prepare("SELECT id, image_path, image_modal_path FROM logo_settings WHERE id = ?");
 $stmt->bind_param("i", $logo_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -19,20 +21,35 @@ $stmt->close();
 
 // หากไม่พบข้อมูลโลโก้ (ซึ่งไม่ควรเกิดขึ้นหากมีการแทรกข้อมูลเริ่มต้นแล้ว)
 if (!$logo) {
-    // อาจจะต้องแทรกข้อมูลเริ่มต้นเข้าไปใหม่ หรือแสดงข้อความแจ้งเตือน
-    // สำหรับตอนนี้ ถ้าไม่มี อาจจะใช้ค่า default หรือแจ้งให้ตั้งค่า
     $logo = [
         'id' => 1,
-        'image_path' => '../public/img/LOGOTRAND.png' // Path โลโก้ default หากไม่พบใน DB
+        'image_path' => '../public/img/LOGOTRAND.png', // Path โลโก้ default หากไม่พบใน DB
+        'image_modal_path' => '../public/img/trandar.jpg' // Path รูปภาพ Modal default หากไม่พบใน DB
     ];
-    // หากต้องการให้ insert อัตโนมัติเมื่อไม่พบ
-    // $stmt = $conn->prepare("INSERT INTO logo_settings (id, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = image_path");
-    // $default_logo_path = '../public/img/LOGOTRAND.png';
-    // $stmt->bind_param("is", $logo_id, $default_logo_path);
-    // $stmt->execute();
-    // $stmt->close();
-    // $logo['image_path'] = $default_logo_path;
+    // สามารถเพิ่ม logic เพื่อ insert ค่า default เข้าไปใน DB ได้ที่นี่ หากจำเป็น
 }
+
+// ดึงข้อมูล contact settings
+$contact_settings_id = 1; // สมมติว่ามี ID 1 สำหรับการตั้งค่าหลัก
+$contact_settings = [
+    'trandar_store_link' => '',
+    'trandar_store_text' => '',
+    'facebook_link' => '',
+    'youtube_link' => '',
+    'instagram_link' => '',
+    'line_link' => '',
+    'tiktok_link' => ''
+];
+
+$stmt_contact = $conn->prepare("SELECT trandar_store_link, trandar_store_text, facebook_link, youtube_link, instagram_link, line_link, tiktok_link FROM contact_settings WHERE id = ?");
+$stmt_contact->bind_param("i", $contact_settings_id);
+$stmt_contact->execute();
+$result_contact = $stmt_contact->get_result();
+if ($data_contact = $result_contact->fetch_assoc()) {
+    $contact_settings = $data_contact;
+}
+$stmt_contact->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +57,7 @@ if (!$logo) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แก้ไขโลโก้</title>
+    <title>แก้ไขโลโก้และข้อมูลติดต่อ</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -137,7 +154,8 @@ if (!$logo) {
 
 <div class="container mt-4">
     <div style="gap :20px"><h5>
-        <div style="padding-bottom :5px">ขนาดรูปภาพที่แนะนำสำหรับโลโก้: กว้าง 100px; สูง 55px;</div>
+        <div style="padding-bottom :5px">ขนาดรูปภาพที่แนะนำสำหรับโลโก้หลัก: กว้าง 100px; สูง 55px;</div>
+        <div style="padding-bottom :5px">ขนาดรูปภาพที่แนะนำสำหรับโลโก้ใน Modal: กว้าง 70% ของ Modal (ประมาณ 245px); สูงอัตโนมัติ;</div>
     </h5></div>
     <div class="box-content p-4 bg-light rounded shadow-sm">
         <h4 class="line-ref">
@@ -147,39 +165,98 @@ if (!$logo) {
         <form id="editLogoForm" enctype="multipart/form-data">
             <input type="hidden" name="logo_id" value="<?= htmlspecialchars($logo['id']) ?>">
             <input type="hidden" name="old_image_path" value="<?= htmlspecialchars($logo['image_path']) ?>">
+            <input type="hidden" name="old_image_modal_path" value="<?= htmlspecialchars($logo['image_modal_path']) ?>">
 
-            <div class="row">
-                <div class="col-md-4">
+            <div class="row mb-4">
+                <div class="col-md-6">
                     <div class="form-section">
-                        <label>ภาพโลโก้ปัจจุบัน:</label>
+                        <label>ภาพโลโก้หลักปัจจุบัน:</label>
                         <div class="previewContainer mb-2">
                             <img id="currentImage" src="<?= htmlspecialchars($logo['image_path']) ?>" alt="Current Logo" class="img-thumbnail">
                             <img id="previewNewImage" src="#" alt="New Logo Preview" style="display:none; margin-top: 10px;">
                         </div>
-                        <label for="image">เลือกรูปภาพโลโก้ใหม่:</label>
-                        <input type="file" class="form-control" name="image" id="image" onchange="previewFile()">
-                        <small class="form-text text-muted">เลือกไฟล์ใหม่เพื่อเปลี่ยนรูปภาพโลโก้ หากไม่เลือก รูปภาพเดิมจะถูกใช้</small>
+                        <label for="image">เลือกรูปภาพโลโก้หลักใหม่:</label>
+                        <input type="file" class="form-control" name="image" id="image" onchange="previewFile('image', 'currentImage', 'previewNewImage')">
+                        <small class="form-text text-muted">เลือกไฟล์ใหม่เพื่อเปลี่ยนรูปภาพโลโก้หลัก หากไม่เลือก รูปภาพเดิมจะถูกใช้</small>
                     </div>
                 </div>
 
-                <div class="col-md-8 d-flex align-items-end">
-                    <div class="form-section w-100 text-end">
-                        <button type="submit" id="submitEditLogo" class="btn btn-primary">
-                            <i class="fas fa-edit"></i> อัปเดตโลโก้
-                        </button>
+                <div class="col-md-6">
+                    <div class="form-section">
+                        <label>ภาพโลโก้ใน Modal ปัจจุบัน:</label>
+                        <div class="previewContainer mb-2">
+                            <img id="currentImageModal" src="<?= htmlspecialchars($logo['image_modal_path']) ?>" alt="Current Modal Logo" class="img-thumbnail">
+                            <img id="previewNewImageModal" src="#" alt="New Modal Logo Preview" style="display:none; margin-top: 10px;">
+                        </div>
+                        <label for="image_modal">เลือกรูปภาพโลโก้ใน Modal ใหม่:</label>
+                        <input type="file" class="form-control" name="image_modal" id="image_modal" onchange="previewFile('image_modal', 'currentImageModal', 'previewNewImageModal')">
+                        <small class="form-text text-muted">เลือกไฟล์ใหม่เพื่อเปลี่ยนรูปภาพโลโก้ใน Modal หากไม่เลือก รูปภาพเดิมจะถูกใช้</small>
                     </div>
+                </div>
+            </div>
+
+            <h4 class="line-ref mt-5">
+                <i class="fa-solid fa-share-nodes"></i> แก้ไขข้อมูลติดต่อและ Social Media
+            </h4>
+            <input type="hidden" name="contact_settings_id" value="<?= htmlspecialchars($contact_settings_id) ?>">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="trandar_store_link" class="form-label">ลิงก์ Trandar Store:</label>
+                    <input type="url" class="form-control" id="trandar_store_link" name="trandar_store_link" value="<?= htmlspecialchars($contact_settings['trandar_store_link']) ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="trandar_store_text" class="form-label">ข้อความ Trandar Store:</label>
+                    <input type="text" class="form-control" id="trandar_store_text" name="trandar_store_text" value="<?= htmlspecialchars($contact_settings['trandar_store_text']) ?>">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="facebook_link" class="form-label">ลิงก์ Facebook:</label>
+                    <input type="url" class="form-control" id="facebook_link" name="facebook_link" value="<?= htmlspecialchars($contact_settings['facebook_link']) ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="youtube_link" class="form-label">ลิงก์ YouTube:</label>
+                    <input type="url" class="form-control" id="youtube_link" name="youtube_link" value="<?= htmlspecialchars($contact_settings['youtube_link']) ?>">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="instagram_link" class="form-label">ลิงก์ Instagram:</label>
+                    <input type="url" class="form-control" id="instagram_link" name="instagram_link" value="<?= htmlspecialchars($contact_settings['instagram_link']) ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="line_link" class="form-label">ลิงก์ Line:</label>
+                    <input type="url" class="form-control" id="line_link" name="line_link" value="<?= htmlspecialchars($contact_settings['line_link']) ?>">
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="tiktok_link" class="form-label">ลิงก์ TikTok:</label>
+                    <input type="url" class="form-control" id="tiktok_link" name="tiktok_link" value="<?= htmlspecialchars($contact_settings['tiktok_link']) ?>">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 text-end">
+                    <button type="submit" id="submitEditLogo" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> อัปเดตข้อมูล
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<script src='../js/index_.js?v=<?php echo time(); ?>'></script> 
+<script src='../js/index_.js?v=<?php echo time(); ?>'></script>
 <script>
-    function previewFile() {
-        const previewCurrent = document.getElementById('currentImage');
-        const previewNew = document.getElementById('previewNewImage');
-        const file = document.getElementById('image').files[0];
+    function previewFile(inputId, currentImgId, previewImgId) {
+        const previewCurrent = document.getElementById(currentImgId);
+        const previewNew = document.getElementById(previewImgId);
+        const file = document.getElementById(inputId).files[0];
         const reader = new FileReader();
 
         reader.onloadend = function () {
@@ -220,11 +297,11 @@ if (!$logo) {
             e.preventDefault(); // ป้องกันการ submit form ปกติ
 
             var formData = new FormData($('#editLogoForm')[0]);
-            formData.append('action', 'edit_logo'); // ระบุ action สำหรับการแก้ไขโลโก้
+            formData.append('action', 'edit_all_settings'); // ระบุ action สำหรับการแก้ไขทั้งหมด
 
             Swal.fire({
                 title: "ยืนยันการแก้ไข?",
-                text: "คุณต้องการอัปเดตโลโก้เว็บไซต์ใช่หรือไม่!",
+                text: "คุณต้องการอัปเดตข้อมูลทั้งหมดใช่หรือไม่!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#FFC107", // สีเหลืองสำหรับแก้ไข
@@ -235,7 +312,7 @@ if (!$logo) {
                     $('#loading-overlay').fadeIn(); // แสดง loading overlay
 
                     $.ajax({
-                        url: "actions/process_logo.php", // ไฟล์ PHP ที่จะใช้ประมวลผลการอัปเดตโลโก้
+                        url: "actions/process_logo.php", // ไฟล์ PHP ที่จะใช้ประมวลผลการอัปเดต
                         type: "POST",
                         data: formData,
                         processData: false,
@@ -246,12 +323,10 @@ if (!$logo) {
                             if (response.status === 'success') {
                                 Swal.fire(
                                     'สำเร็จ!',
-                                    'แก้ไขโลโก้เรียบร้อยแล้ว.',
+                                    'แก้ไขข้อมูลเรียบร้อยแล้ว.',
                                     'success'
                                 ).then(() => {
-                                    // หากต้องการให้รีเฟรชหน้า หรือไปที่หน้าอื่น
-                                    location.reload(); // รีโหลดหน้าเพื่อแสดงโลโก้ใหม่
-                                    // หรือ window.location.href = 'edit_logo.php';
+                                    location.reload(); // รีโหลดหน้าเพื่อแสดงข้อมูลใหม่
                                 });
                             } else {
                                 Swal.fire(
@@ -266,7 +341,7 @@ if (!$logo) {
                             console.error("AJAX Error:", status, error, xhr.responseText);
                             Swal.fire(
                                 'เกิดข้อผิดพลาด!',
-                                'ไม่สามารถแก้ไขโลโก้ได้: ' + error,
+                                'ไม่สามารถแก้ไขข้อมูลได้: ' + error,
                                 'error'
                             );
                         }
