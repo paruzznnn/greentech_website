@@ -294,6 +294,58 @@ $stmt->close();
 ?>
 
 <?php
+// นับจำนวนแถวทั้งหมดในตาราง dn_idia ที่ del = 0
+$latestlogoId = 0; // เปลี่ยนชื่อตัวแปรนี้ให้สื่อความหมายมากขึ้น เช่น $totalIdiasCount
+$stmt = $conn->prepare("SELECT COUNT(*) AS total_rows FROM logo_settings");
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $latestlogoId = $row['total_rows']; // เก็บจำนวนแถวทั้งหมด
+    }
+}
+$stmt->close();
+?>
+
+<?php
+// นับจำนวนแถวทั้งหมดในตาราง dn_idia ที่ del = 0
+$latestvideosId = 0; // เปลี่ยนชื่อตัวแปรนี้ให้สื่อความหมายมากขึ้น เช่น $totalIdiasCount
+$stmt = $conn->prepare("SELECT COUNT(*) AS total_rows FROM videos ");
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $latestvideosId = $row['total_rows']; // เก็บจำนวนแถวทั้งหมด
+    }
+}
+$stmt->close();
+?>
+
+<?php
+// นับจำนวนแถวทั้งหมดในตาราง dn_idia ที่ del = 0
+$latestIdiaId = 0; // เปลี่ยนชื่อตัวแปรนี้ให้สื่อความหมายมากขึ้น เช่น $totalIdiasCount
+$stmt = $conn->prepare("SELECT COUNT(*) AS total_rows FROM dn_idia WHERE del = 0");
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $latestIdiaId = $row['total_rows']; // เก็บจำนวนแถวทั้งหมด
+    }
+}
+$stmt->close();
+?>
+
+<?php
+// นับจำนวนแถวทั้งหมดในตาราง dn_idia ที่ del = 0
+$latestfooterId = 0; // เปลี่ยนชื่อตัวแปรนี้ให้สื่อความหมายมากขึ้น เช่น $totalIdiasCount
+$stmt = $conn->prepare("SELECT COUNT(*) AS total_rows FROM footer_settings");
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $latestfooterId = $row['total_rows']; // เก็บจำนวนแถวทั้งหมด
+    }
+} 
+$stmt->close();
+?>
+
+<?php
 // นับจำนวนแถวทั้งหมดในตาราง dn_shop ที่ del = 0
 $latestShopId = 0; // เปลี่ยนชื่อตัวแปรนี้ให้สื่อความหมายมากขึ้น เช่น $totalIdiasCount
 $stmt = $conn->prepare("SELECT COUNT(*) AS total_rows FROM dn_shop WHERE del = 0");
@@ -358,130 +410,242 @@ $username = $_SESSION['fullname'] ?? 'Admin'; // หรือใส่ชื่�
 <h3 class="mb-5">ผู้ใช้งาน</h3>
 
     <div class="dashboard-layout">
-        <div class="row justify-content-center"> <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#ffa726;">
-                <a href="#"> <div class="card-inner">
-                            <div class="emoji">👤</div>
-                            <div class="text-area">
-                                <h3>ผู้ใช้งาน</h3>
-                                <div class="count"><?= $latestUserId ?></div>
-                                <div class="label">ทั้งหมดในระบบ</div>
-                            </div>
-                        </div>
-                        <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
+        <div class="row justify-content-center">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#ffa726;">
+            <a href="#">
+                <div class="card-inner">
+                    <div class="emoji">👤</div>
+                    <div class="text-area">
+                        <h3>ผู้ใช้งาน</h3>
+                        <div class="count"><?= $latestUserId ?></div>
+                        <div class="label">ทั้งหมดในระบบ</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
         </div>
+    </div>
+
+
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#42a5f5;">
+            <a href="set_product/list_shop.php">
+                <div class="card-inner">
+                    <div class="emoji">📦</div>
+                    <div class="text-area">
+                        <h3>Product</h3>
+                        <div class="count"><?= $latestShopId ?></div>
+                        <div class="label">Product ทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#26c6da;">
+            <a href="set_project/list_project.php">
+                <div class="card-inner">
+                    <div class="emoji">📁</div>
+                    <div class="text-area">
+                        <h3>โปรเจกต์</h3>
+                        <div class="count"><?= $latestProjectId ?></div>
+                        <div class="label">โปรเจกต์ในระบบทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#ab47bc;">
+            <a href="set_Blog/list_Blog.php">
+                <div class="card-inner">
+                    <div class="emoji">✍️</div>
+                    <div class="text-area">
+                        <h3>Blog</h3>
+                        <div class="count"><?= $latestBlogId ?></div>
+                        <div class="label">บทความทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#78909c;">
+            <a href="set_idia/list_idia.php">
+                <div class="card-inner">
+                    <div class="emoji">💡</div>
+                    <div class="text-area">
+                        <h3>Acoustic knowledge</h3>
+                        <div class="count"><?= $latestIdiaId ?></div>
+                        <div class="label">Acoustic knowledge ทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#8bc34a;">
+            <a href="set_video/admin_video_list.php">
+                <div class="card-inner">
+                    <div class="emoji">🎥</div>
+                    <div class="text-area">
+                        <h3>Video</h3>
+                        <div class="count"><?= $latestvideosId ?></div>
+                        <div class="label">video ทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
 
         <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#ec407a;">
-                <a href="set_news/list_news.php">
-                    <div class="card-inner">
-                        <div class="emoji">📰</div>
-                        <div class="text-area">
-                            <h3>ข่าวสาร</h3>
-                            <div class="count"><?= $latestNewsId ?></div>
-                            <div class="label">ในระบบทั้งหมด</div>
-                        </div>
+        <div class="dashboard-card" style="background-color:#ec407a;">
+            <a href="set_news/list_news.php">
+                <div class="card-inner">
+                    <div class="emoji">📰</div>
+                    <div class="text-area">
+                        <h3>ข่าวสาร</h3>
+                        <div class="count"><?= $latestNewsId ?></div>
+                        <div class="label">ในระบบทั้งหมด</div>
                     </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
         </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#730ac9;">
+            <a href="set_metatags/list_metatags.php">
+                <div class="card-inner">
+                    <div class="emoji">🏷️</div>
+                    <div class="text-area">
+                        <h3>Edit Meta tags</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#ff7043;">
+            <a href="set_logo/edit_logo.php">
+                <div class="card-inner">
+                    <div class="emoji">⚙️</div>
+                    <div class="text-area">
+                        <h3>edit header</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#ffca28;">
+            <a href="set_banner/list_banner.php">
+                <div class="card-inner">
+                    <div class="emoji">🖼️</div>
+                    <div class="text-area">
+                        <h3>Banner หน้าหลัก</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#d4e157;">
+            <a href="set_footer/edit_footer.php">
+                <div class="card-inner">
+                    <div class="emoji">⬇️</div>
+                    <div class="text-area">
+                        <h3>Edit footer</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#ef5350;">
+            <a href="set_about/edit_about.php">
+                <div class="card-inner">
+                    <div class="emoji">ℹ️</div>
+                    <div class="text-area">
+                        <h3>Edit หน้า about</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#66bb6a;">
+            <a href="set_service/edit_service.php">
+                <div class="card-inner">
+                    <div class="emoji">🛠️</div>
+                    <div class="text-area">
+                        <h3>Edit หน้า service</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+        <div class="dashboard-card" style="background-color:#29b6f6;">
+            <a href="set_contact/edit_contact.php">
+                <div class="card-inner">
+                    <div class="emoji">📞</div>
+                    <div class="text-area">
+                        <h3>Edit หน้า contact</h3>
+                    </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
+        </div>
+    </div>
 
         <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#26c6da;">
-                <a href="set_project/list_project.php">
-                    <div class="card-inner">
-                        <div class="emoji">📁</div>
-                        <div class="text-area">
-                            <h3>โปรเจกต์</h3>
-                            <div class="count"><?= $latestProjectId ?></div>
-                            <div class="label">โปรเจกต์ในระบบทั้งหมด</div>
-                        </div>
+        <div class="dashboard-card" style="background-color:#26a69a;">
+            <a href="set_comment/comment_service.php">
+                <div class="card-inner">
+                    <div class="emoji">💬</div>
+                    <div class="text-area">
+                        <h3>ความคิดเห็น</h3>
+                        <div class="count"><?= $latestCommentId ?></div>
+                        <div class="label">ทั้งหมดในระบบ</div>
                     </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
+                </div>
+                <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            </a>
         </div>
+    </div>
 
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#42a5f5;">
-                <a href="set_product/list_shop.php">
-                    <div class="card-inner">
-                        <div class="emoji">📦</div>
-                        <div class="text-area">
-                            <h3>Product</h3>
-                            <div class="count"><?= $latestShopId ?></div>
-                            <div class="label">Product ทั้งหมด</div>
-                        </div>
-                    </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#ab47bc;">
-                <a href="set_Blog/list_Blog.php">
-                    <div class="card-inner">
-                        <div class="emoji">📝</div>
-                        <div class="text-area">
-                            <h3>Blog</h3>
-                            <div class="count"><?= $latestBlogId ?></div>
-                            <div class="label">บทความทั้งหมด</div>
-                        </div>
-                    </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#26a69a;">
-                <a href="set_comment/comment_service.php">
-                    <div class="card-inner">
-                        <div class="emoji">💬</div>
-                        <div class="text-area">
-                            <h3>ความคิดเห็น</h3>
-                            <div class="count"><?= $latestCommentId ?></div>
-                            <div class="label">ทั้งหมดในระบบ</div>
-                        </div>
-                    </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#ec879a;">
-                <a href="set_banner/list_banner.php">
-                    <div class="card-inner">
-                        <div class="emoji">🪧</div>
-                        <div class="text-area">
-                            <h3>Banner หน้าหลัก</h3>
-                            </div>
-                    </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
-            <div class="dashboard-card" style="background-color:#730ac9;">
-                <a href="set_metatags/list_metatags.php">
-                    <div class="card-inner">
-                        <div class="emoji">🏷️</div>
-                        <div class="text-area">
-                            <h3>Edit Meta tags</h3>
-                            </div>
-                    </div>
-                    <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-                </a>
-            </div>
-        </div>
-
-        </div>
+</div>
     </div> <script src="js/index_.js?v=<?= time(); ?>"></script>
 </body>
 </html>
