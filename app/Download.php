@@ -13,19 +13,19 @@
 <?php include 'template/header.php'?>
 <?php include 'template/navbar_slide.php'?>
 
-<div class="container my-5">
+<div class="container my-5" style="color: #555;">
     <!-- Windows Section -->
     <h4><i class="bi bi-pc-display-horizontal text-danger"></i> <span class="text-danger">Insul for Windows</span></h4>
     <p>Trial licenses are currently only available for Windows.</p>
-    <table class="table table-bordered">
-        <thead>
+    <table class="table table-bordered" >
+        <thead >
             <tr>
-                <th>File</th>
+                <th style="color: #555;">File</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td >
                     INSUL version 10.0.6 (Windows, base install 10.0.6)<br>
                     <a href="https://www.insul.co.nz/media/45381/insul10-setup-signed.msi" class="text-primary">Download</a>
                 </td>
@@ -48,7 +48,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>File</th>
+                <th style="color: #555;">File</th>
             </tr>
         </thead>
         <tbody>
@@ -74,7 +74,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>File</th>
+                <th style="color: #555;">File</th>
             </tr>
         </thead>
         <tbody>
@@ -109,7 +109,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>File</th>
+                <th style="color: #555;">File</th>
             </tr>
         </thead>
         <tbody>
@@ -162,7 +162,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>File</th>
+                <th style="color: #555;">File</th>
             </tr>
         </thead>
         <tbody>

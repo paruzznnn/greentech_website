@@ -355,7 +355,7 @@ $(document).ready(function() {
 .main-category-block .block-title-info h3 {
     font-size: 1.3em;
     font-weight: bold;
-    color: #333;
+    color: #555;
     margin: 0 0 5px 0;
 }
 

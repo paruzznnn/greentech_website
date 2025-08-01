@@ -111,7 +111,7 @@ if ($result->num_rows > 0) {
 .card-title {
     font-weight: bold;
     margin-bottom: 0px; /* **สำคัญ:** ลบ margin ด้านล่างออก เพื่อให้ชิดกับ description */
-    color: #333;
+    color: #555;
     white-space: nowrap; /* ตรวจสอบให้แน่ใจว่าไม่ขึ้นบรรทัดใหม่ */
     overflow: hidden;
     text-overflow: ellipsis;

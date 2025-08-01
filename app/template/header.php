@@ -28,7 +28,7 @@ require_once('../lib/connect.php');
 // ตรวจสอบให้แน่ใจว่า base_directory.php ถูก include ด้วย ถ้า logo_settings เก็บเป็น relative path และคุณต้องการแปลงเป็น full URL
 // หาก logo_settings เก็บเป็น full URL อยู่แล้ว อาจไม่จำเป็นต้องใช้ base_path ที่นี่ก็ได้
 // แต่ถ้ายังมีการใช้ base_path ในส่วนอื่น หรือเพื่อความสอดคล้อง แนะนำให้ include ไว้
-// require_once('../lib/base_directory.php');
+// require_once('../lib/base_directory.php'); 
 
 global $conn;
 // global $base_path; // หากต้องการใช้ $base_path เพื่อต่อกับ relative path
@@ -45,46 +45,20 @@ if ($result->num_rows > 0) {
     $meta = $result->fetch_assoc();
 }
 
-// ** ส่วนแก้ไข: ดึงข้อมูลโลโก้และรูปภาพ Modal จาก database **
+// ** ส่วนเพิ่มใหม่: ดึงข้อมูลโลโก้จาก database **
 $logo_path = '../public/img/LOGOTRAND.png'; // ตั้งค่า default path เผื่อกรณีดึงจาก DB ไม่ได้
 $logo_id_for_display = 1; // ID ของโลโก้ที่เราใช้ (ซึ่งคือ 1 เสมอ)
-$image_modal_path = '../public/img/trandar.jpg'; // ตั้งค่า default path สำหรับรูปภาพใน Modal
 
-$stmt_logo = $conn->prepare("SELECT image_path, image_modal_path FROM logo_settings WHERE id = ?");
+$stmt_logo = $conn->prepare("SELECT image_path FROM logo_settings WHERE id = ?");
 $stmt_logo->bind_param("i", $logo_id_for_display);
 $stmt_logo->execute();
 $result_logo = $stmt_logo->get_result();
 
 if ($logo_data = $result_logo->fetch_assoc()) {
     $logo_path = htmlspecialchars($logo_data['image_path']);
-    $image_modal_path = htmlspecialchars($logo_data['image_modal_path']);
 }
 $stmt_logo->close();
-// ** สิ้นสุดส่วนแก้ไขโลโก้ **
-
-// ** ส่วนเพิ่มใหม่: ดึงข้อมูล Trandar Store และ Social Media Links จาก database **
-$contact_settings = [
-    'trandar_store_link' => 'https://www.trandar.com/store/',
-    'trandar_store_text' => 'Trandar Store',
-    'facebook_link' => 'https://www.facebook.com/trandaracoustic/',
-    'youtube_link' => 'https://www.youtube.com/@trandaracoustic', // แก้ไขให้ถูกต้องตามที่ต้องการ
-    'instagram_link' => 'https://www.instagram.com/trandaracoustics/',
-    'line_link' => 'https://lin.ee/yoSCNwF',
-    'tiktok_link' => 'https://www.tiktok.com/@trandaracoustics'
-]; // Default values
-
-$stmt_contact = $conn->prepare("SELECT trandar_store_link, trandar_store_text, facebook_link, youtube_link, instagram_link, line_link, tiktok_link FROM contact_settings WHERE id = 1"); // สมมติว่ามี ID 1 สำหรับการตั้งค่าหลัก
-$stmt_contact->execute();
-$result_contact = $stmt_contact->get_result();
-
-if ($contact_data = $result_contact->fetch_assoc()) {
-    foreach ($contact_data as $key => $value) {
-        $contact_settings[$key] = htmlspecialchars($value);
-    }
-}
-$stmt_contact->close();
 // ** สิ้นสุดส่วนเพิ่มใหม่ **
-
 
 // ✅ ตรวจสอบการเข้าสู่ระบบ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
@@ -201,28 +175,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
         <div class="header-link">
-            <a href="<?= $contact_settings['trandar_store_link'] ?>" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
-                <?= $contact_settings['trandar_store_text'] ?> <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
+            <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+                Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
             </a>
         </div>
         <div>
             <select id="language-select" class="language-select">
             </select>
         </div>
-        <div class="header-link" >
-            <a href="<?= $contact_settings['facebook_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
+        <div class="header-link">
+            <a href="https://www.facebook.com/trandaracoustic/" target="_blank" style="background: #ffa719; color: #fafafa;">
                 <i class="fab fa-facebook-square"></i>
             </a>
-            <a href="<?= $contact_settings['youtube_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
+            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank" style="background: #ffa719; color: #fafafa;">
                 <i class="fab fa-youtube"></i>
             </a>
-            <a href="<?= $contact_settings['instagram_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
+            <a href="https://www.instagram.com/trandaracoustics/" target="_blank" style="background: #ffa719; color: #fafafa;">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="<?= $contact_settings['line_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
+            <a href="https://lin.ee/yoSCNwF" target="_blank" style="background: #ffa719; color: #fafafa;">
                 <i class="fab fa-line"></i>
             </a>
-            <a href="<?= $contact_settings['tiktok_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
+            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank" style="background: #ffa719; color: #fafafa;">
                 <i class="fab fa-tiktok"></i>
             </a>
         </div>
@@ -242,7 +216,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="card">
                     <section class="card-body">
                         <div style="text-align: center;">
-                            <img class="modal-logo" style="width: 70%;" src="<?= $image_modal_path ?>" alt="Trandar Logo">
+                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
                         </div>
 
                         <h6 style="text-align: center; color: #555;" class="mt-2">
@@ -326,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="card">
                     <section class="card-body">
                         <div style="text-align: center;">
-                            <img class="modal-logo" style="width: 70%;" src="<?= $image_modal_path ?>" alt="Trandar Logo">
+                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
                         </div>
 
                         <h6 style="text-align: center; color: #555;" class="mt-2">

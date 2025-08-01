@@ -19,7 +19,7 @@
 <body>
 
 
-<div class="container my-5">
+<div class="container my-5" style="color: #555;">
     <h2 class="text-center fw-bold mb-4">Instructions</h2>
     <h4 class="text-center mb-4">ซอฟต์แวร์ Sound Insulation Prediction</h4>
 
