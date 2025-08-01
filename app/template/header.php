@@ -8,15 +8,15 @@ $menuItems = [
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
-        'text' => '',
+        'text' => 'Sign up', // แก้ไข: เพิ่มข้อความกลับเข้าไป
         'translate' => 'Sign_up',
-        'link' => 'register'. $isFile,
+        'link' => 'register' . $isFile,
         'modal_id' => ''
     ],
     [
         'id' => 1,
         'icon' => 'fas fa-sign-in-alt',
-        'text' => '',
+        'text' => 'Sign in', // แก้ไข: เพิ่มข้อความกลับเข้าไป
         'translate' => 'Sign_in',
         'link' => '#',
         'modal_id' => 'myBtn-sign-in'
@@ -25,15 +25,8 @@ $menuItems = [
 ?>
 <?php
 require_once('../lib/connect.php');
-// ตรวจสอบให้แน่ใจว่า base_directory.php ถูก include ด้วย ถ้า logo_settings เก็บเป็น relative path และคุณต้องการแปลงเป็น full URL
-// หาก logo_settings เก็บเป็น full URL อยู่แล้ว อาจไม่จำเป็นต้องใช้ base_path ที่นี่ก็ได้
-// แต่ถ้ายังมีการใช้ base_path ในส่วนอื่น หรือเพื่อความสอดคล้อง แนะนำให้ include ไว้
-// require_once('../lib/base_directory.php'); 
-
 global $conn;
-// global $base_path; // หากต้องการใช้ $base_path เพื่อต่อกับ relative path
 
-// ✅ โหลดข้อมูล Meta Tags ตามชื่อหน้าอัตโนมัติ เช่น "about.php"
 $currentPage = basename($_SERVER['PHP_SELF']);
 $meta = [];
 
@@ -45,9 +38,8 @@ if ($result->num_rows > 0) {
     $meta = $result->fetch_assoc();
 }
 
-// ** ส่วนเพิ่มใหม่: ดึงข้อมูลโลโก้จาก database **
-$logo_path = '../public/img/LOGOTRAND.png'; // ตั้งค่า default path เผื่อกรณีดึงจาก DB ไม่ได้
-$logo_id_for_display = 1; // ID ของโลโก้ที่เราใช้ (ซึ่งคือ 1 เสมอ)
+$logo_path = '../public/img/LOGOTRAND.png';
+$logo_id_for_display = 1;
 
 $stmt_logo = $conn->prepare("SELECT image_path FROM logo_settings WHERE id = ?");
 $stmt_logo->bind_param("i", $logo_id_for_display);
@@ -58,9 +50,7 @@ if ($logo_data = $result_logo->fetch_assoc()) {
     $logo_path = htmlspecialchars($logo_data['image_path']);
 }
 $stmt_logo->close();
-// ** สิ้นสุดส่วนเพิ่มใหม่ **
 
-// ✅ ตรวจสอบการเข้าสู่ระบบ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -112,8 +102,201 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div id="background-blur"></div>
 
+<style>
+/* CSS สำหรับ Desktop Header */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    position: relative; /* เพิ่มเพื่อให้ z-index ทำงาน */
+    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า Daily News */
+}
+.header-top-left {
+    display: flex;
+    align-items: center;
+}
+.header-top .logo {
+    height: 40px;
+    max-height: 40px;
+    width: auto;
+}
+.header-top-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* ระยะห่างระหว่างแต่ละส่วน */
+}
+
+/* กลุ่มปุ่มเข้าสู่ระบบ, ลงทะเบียน, Store */
+.header-top-buttons {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* ระยะห่างระหว่างปุ่ม */
+}
+.header-top-buttons a,
+.header-top-buttons button {
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* เพิ่มเพื่อให้ข้อความอยู่ตรงกลาง */
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+.header-top-buttons .auth-btn {
+    background: #555;
+}
+.header-top-buttons .auth-btn:hover {
+    background: #333;
+}
+.header-top-buttons .store-btn {
+    background: #ffa719;
+}
+.header-top-buttons .store-btn:hover {
+    background: #ff9900;
+}
+#logout-btn {
+    background: #ff3333;
+}
+#logout-btn:hover {
+    background: #cc0000;
+}
+
+/* ภาษา */
+/* แก้ไข: เพิ่ม CSS สำหรับ dropdown ภาษาและธงชาติ */
+.language-select-container {
+    position: relative;
+    display: inline-block;
+}
+.flag-icon {
+    width: 24px;
+    height: auto;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+.flag-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0; /* เปลี่ยนจาก left เป็น right เพื่อให้ dropdown แสดงผลทางขวา */
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1002;
+    border-radius: 4px;
+    padding: 5px 0;
+}
+.flag-dropdown a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+.flag-dropdown a:hover {
+    background-color: #f1f1f1;
+}
+
+
+/* โซเชียลมีเดีย */
+.header-social-links {
+    display: flex;
+    gap: 5px;
+}
+.header-social-links a {
+    background: #ffa719;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+.header-social-links a:hover {
+    background-color: #ff9900;
+}
+
+/* Mobile Header (ซ่อนบน Desktop) */
+.header-mobile {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า Daily News */
+}
+.mobile-dropdown-tab {
+    position: relative;
+    z-index: 1001; /* ตั้งค่า z-index ของ Dropdown tab ให้สูงกว่าตัว Navbar */
+}
+.mobile-dropdown-button {
+    background-color: #ffa719;
+    color: #555;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mobile-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1002; /* z-index ของ content ต้องสูงกว่า tab */
+    border-radius: 4px;
+    margin-top: 5px;
+    padding: 10px 0;
+}
+.mobile-dropdown-content a,
+.mobile-dropdown-content button,
+.mobile-dropdown-content select {
+    color: #555;
+    padding: 12px 16px;
+    text-decoration: none;
+    /* display: block; */
+    width: 100%;
+    text-align: left;
+    background-color: #ff9900; /* แก้ไข: เปลี่ยนสีพื้นหลังเป็นโปร่งใส */
+    border: none;
+    cursor: pointer;
+}
+.mobile-dropdown-content a:hover,
+.mobile-dropdown-content button:hover {
+    background-color: #f1f1f1;
+}
+
+/* Media Query */
+@media (max-width: 1024px) {
+    .header-top {
+        display: none; /* ซ่อน Header Desktop บนหน้าจอเล็ก */
+    }
+    .header-mobile {
+        display: flex; /* แสดง Header Mobile บนหน้าจอเล็ก */
+    }
+}
+</style>
+
 <div class="header-top">
-    <div class="header-top-left" style="display: flex; align-items: center;">
+    <div class="header-top-left">
         <a href="https://www.trandar.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
@@ -121,7 +304,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <script>
-        // สคริปต์แสดงวันที่
         const dateEl = document.getElementById("current-date");
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const today = new Date().toLocaleDateString('en-US', options);
@@ -130,221 +312,270 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
     <div class="header-top-right">
-        <div id="auth-buttons">
-            <?php foreach ($menuItems as $item): ?>
-                <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
-                    <i class="<?php echo $item['icon']; ?>"></i>
-                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                        <?php echo $item['text']; ?>
-                    </span>
-                </a>
-            <?php endforeach; ?>
-        </div>
+        <div class="header-top-buttons">
+            <div id="auth-buttons">
+                <?php foreach ($menuItems as $item): ?>
+                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>" class="auth-btn">
+                        <i class="<?php echo $item['icon']; ?>"></i>
+                        <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                            <?php echo $item['text']; ?>
+                        </span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
 
-        <a href="#" id="logout-btn" style="display:none; background: #ff3333; color: white; padding: 8px 15px; border-radius: 4px; margin-left: 10px;">
-            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-        </a>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const jwt = sessionStorage.getItem("jwt");
-
-                if (jwt) {
-                    fetch('actions/protected.php', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + jwt
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-                            // viewer login แล้ว
-                            document.getElementById("auth-buttons").style.display = "none";
-                            document.getElementById("logout-btn").style.display = "inline-block";
-                        }
-                    })
-                    .catch(error => console.error("Token verification failed:", error));
-                }
-
-                document.getElementById("logout-btn").addEventListener("click", function () {
-                    sessionStorage.removeItem("jwt");
-                    location.reload(); // รีเฟรชหน้าเพื่อให้กลับสู่สถานะไม่ได้ล็อกอิน
-                });
-            });
-        </script>
-
-
-        <div class="header-link">
-            <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: #555; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+            <a href="#" id="logout-btn" style="display:none;">
+                <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+            </a>
+            
+            <a href="https://www.trandar.com/store/" target="_blank" class="store-btn">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
             </a>
+
+            <div class="language-select-container">
+                <img id="current-flag" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon" onclick="toggleFlagDropdown('desktop')">
+                <div id="flag-dropdown-desktop" class="flag-dropdown">
+                    <a href="#" data-lang="th">
+                        <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
+                    </a>
+                    <a href="#" data-lang="en">
+                        <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
+                    </a>
+                </div>
+            </div>
         </div>
-        <div>
-            <select id="language-select" class="language-select">
-            </select>
-        </div>
-        <div class="header-link">
-            <a href="https://www.facebook.com/trandaracoustic/" target="_blank" style="background: #ffa719; color: #fafafa;">
+
+        <div class="header-social-links">
+            <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
                 <i class="fab fa-facebook-square"></i>
             </a>
-            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank" style="background: #ffa719; color: #fafafa;">
+            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
                 <i class="fab fa-youtube"></i>
             </a>
-            <a href="https://www.instagram.com/trandaracoustics/" target="_blank" style="background: #ffa719; color: #fafafa;">
+            <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="https://lin.ee/yoSCNwF" target="_blank" style="background: #ffa719; color: #fafafa;">
+            <a href="https://lin.ee/yoSCNwF" target="_blank">
                 <i class="fab fa-line"></i>
             </a>
-            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank" style="background: #ffa719; color: #fafafa;">
+            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
                 <i class="fab fa-tiktok"></i>
             </a>
         </div>
     </div>
-
 </div>
+
+<div class="header-mobile">
+    <div class="header-top-left">
+        <a href="https://www.trandar.com">
+            <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
+        </a>
+    </div>
+
+    <div class="header-top-right">
+        <div class="mobile-dropdown-tab">
+            <button class="mobile-dropdown-button">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-dropdown-content">
+                 <div id="auth-buttons-mobile">
+                    <?php foreach ($menuItems as $item): ?>
+                        <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
+                            <i class="<?php echo $item['icon']; ?>"></i>
+                            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                                <?php echo $item['text']; ?>
+                            </span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <a href="#" id="logout-btn-mobile" style="display:none;">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+
+                <hr style="margin: 10px 0; border-color: #ddd;">
+
+                <a href="https://www.trandar.com/store/" target="_blank">
+                    <i class="fas fa-shopping-cart"></i>
+                    Trandar Store
+                </a>
+                
+                <div class="language-select-container" style="padding: 12px 16px;">
+                    <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon" onclick="toggleFlagDropdown('mobile')">
+                    <div id="flag-dropdown-mobile" class="flag-dropdown">
+                         <a href="#" data-lang="th">
+                            <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
+                        </a>
+                        <a href="#" data-lang="en">
+                            <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
+                        </a>
+                    </div>
+                </div>
+                
+                <hr style="margin: 10px 0; border-color: #ddd;">
+
+                <div class="header-social-links" style="padding: 12px 16px;">
+                    <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+                        <i class="fab fa-facebook-square"></i>
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://lin.ee/yoSCNwF" target="_blank">
+                        <i class="fab fa-line"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // สคริปต์สำหรับ Modal และ JWT
+    document.addEventListener("DOMContentLoaded", function () {
+        const jwt = sessionStorage.getItem("jwt");
+        const authButtonsDesktop = document.getElementById("auth-buttons");
+        const logoutBtnDesktop = document.getElementById("logout-btn");
+        const signinModalBtn = document.getElementById("myBtn-sign-in");
+        
+        const authButtonsMobile = document.getElementById("auth-buttons-mobile");
+        const logoutBtnMobile = document.getElementById("logout-btn-mobile");
+        
+        // ตรวจสอบ JWT Token
+        if (jwt) {
+            fetch('actions/protected.php', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + jwt
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+                    // Desktop
+                    if(authButtonsDesktop) authButtonsDesktop.style.display = "none";
+                    if(logoutBtnDesktop) logoutBtnDesktop.style.display = "block";
+                    // Mobile
+                    if(authButtonsMobile) authButtonsMobile.style.display = "none";
+                    if(logoutBtnMobile) logoutBtnMobile.style.display = "block";
+                }
+            })
+            .catch(error => console.error("Token verification failed:", error));
+        } else {
+             // Desktop
+            if(authButtonsDesktop) authButtonsDesktop.style.display = "block";
+            if(logoutBtnDesktop) logoutBtnDesktop.style.display = "none";
+            // Mobile
+            if(authButtonsMobile) authButtonsMobile.style.display = "block";
+            if(logoutBtnMobile) logoutBtnMobile.style.display = "none";
+        }
+    
+        // Modal Event Listeners
+        const modal = document.getElementById('myModal-sign-in');
+        const span = document.querySelector('.modal-close-sign-in');
+        
+        if (signinModalBtn) {
+             signinModalBtn.onclick = function() {
+                modal.style.display = 'block';
+            }
+        }
+
+        if (span) {
+            span.onclick = function() {
+                modal.style.display = 'none';
+            }
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    
+        // Logout Event Listener (Desktop & Mobile)
+        if(logoutBtnDesktop) {
+            logoutBtnDesktop.addEventListener("click", function (e) {
+                e.preventDefault(); // ป้องกันการเปลี่ยนหน้า
+                sessionStorage.removeItem("jwt");
+                location.reload(); 
+            });
+        }
+         if(logoutBtnMobile) {
+            logoutBtnMobile.addEventListener("click", function (e) {
+                e.preventDefault();
+                sessionStorage.removeItem("jwt");
+                location.reload();
+            });
+        }
+        
+        // Mobile dropdown tab toggle
+        const mobileDropdownTab = document.querySelector('.mobile-dropdown-tab');
+        const mobileDropdownButton = document.querySelector('.mobile-dropdown-button');
+        const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
+
+        mobileDropdownButton.addEventListener('click', function(event) {
+            mobileDropdownContent.style.display = mobileDropdownContent.style.display === 'block' ? 'none' : 'block';
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!mobileDropdownTab.contains(event.target)) {
+                mobileDropdownContent.style.display = 'none';
+            }
+        });
+
+        // สคริปต์สำหรับจัดการภาษาและธงชาติ
+        window.toggleFlagDropdown = function(mode = 'desktop') {
+            const dropdownId = mode === 'mobile' ? 'flag-dropdown-mobile' : 'flag-dropdown-desktop';
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        };
+
+        const flagLinks = document.querySelectorAll('.flag-dropdown a');
+        flagLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const lang = this.dataset.lang;
+
+                // อัปเดตธงที่แสดง
+                const currentFlagDesktop = document.getElementById('current-flag');
+                const currentFlagMobile = document.getElementById('current-flag-mobile');
+                const newFlagSrc = this.querySelector('img').src;
+                const newFlagAlt = this.querySelector('img').alt;
+
+                currentFlagDesktop.src = newFlagSrc;
+                currentFlagDesktop.alt = newFlagAlt;
+                currentFlagMobile.src = newFlagSrc;
+                currentFlagMobile.alt = newFlagAlt;
+
+                // ซ่อน dropdown
+                document.getElementById('flag-dropdown-desktop').style.display = 'none';
+                document.getElementById('flag-dropdown-mobile').style.display = 'none';
+            });
+        });
+        
+        document.addEventListener('click', function(event) {
+            const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
+            const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+            const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+
+            if (!isClickInsideFlagDropdown) {
+                if (flagDropdownDesktop) flagDropdownDesktop.style.display = 'none';
+                if (flagDropdownMobile) flagDropdownMobile.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 <div id="myModal-sign-in" class="modal">
-    <div class="modal-content" style="width: 350px !important;">
-        <div class="modal-header">
-            <span class="modal-close-sign-in">×</span>
-        </div>
-        <div class="modal-body" style="background-color: #9e9e9e1f;">
-
-            <div class="box-sign-in-container">
-
-                <div class="card">
-                    <section class="card-body">
-                        <div style="text-align: center;">
-                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
-                        </div>
-
-                        <h6 style="text-align: center; color: #555;" class="mt-2">
-                            <span><i class="fas fa-unlock"></i></span>
-                            <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
-                        </h6>
-
-                        <hr>
-
-                        <form id="loginModal" action="" method="post">
-
-                            <div class="form-group mt-4">
-                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your email.">
-                            </div>
-
-                            <div class="form-group mt-2" style="position: relative;">
-                                <input id="password" type="password" class="emet-login inpu" data-type="password">
-                                <span class=""
-                                    style="position: absolute; top: 10px; right: 20px; color: #555555;"
-                                    id="togglePasswordSignin">
-                                    <i class="fas fa-eye-slash"></i>
-                                </span>
-                            </div>
-
-
-                            <div class="row mt-4">
-
-
-                                <div class="col-md-12 text-end"
-                                style="
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                ">
-                                    <a href="<?php echo 'register'.$isFile ?>">
-                                        <span style="font-size: 13px !important;">
-                                            สมัครสมาชิก
-                                        </span>
-                                    </a>
-
-                                    <a type="button" href="#"  id="myBtn-forgot-password">
-                                        <span style="font-size: 13px !important;">
-                                            ลืมรหัสผ่าน
-                                        </span>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <div class="d-inline-flex">
-                                        <button type="submit" class=""
-                                            style="
-                                            width: 260px;
-                                            border: none;
-                                            border-radius: 4px;
-                                            padding: 10px;
-                                            background: #ff8200;
-                                            color: white;
-                                            "> Login </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
-                </div>
-            </div>
-
-        </div>
     </div>
-</div>
-
 
 <div id="myModal-forgot-password" class="modal">
-    <div class="modal-content" style="width: 350px !important;">
-        <div class="modal-header">
-            <span class="modal-close-forgot-password">×</span>
-        </div>
-        <div class="modal-body" style="background-color: #9e9e9e1f;">
-
-            <div class="box-forgot-password-container">
-
-                <div class="card">
-                    <section class="card-body">
-                        <div style="text-align: center;">
-                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
-                        </div>
-
-                        <h6 style="text-align: center; color: #555;" class="mt-2">
-                            <span>
-                                <i class="fas fa-key"></i>
-                            </span>
-                            <span data-key-lang="" lang="US">Forgot your password?</span>
-                        </h6>
-
-                        <hr>
-
-                        <form id="forgotModal" action="" method="post">
-
-                            <div class="form-group mt-4">
-                                <input
-                                id="forgot_email"
-                                name="forgot_email" type="text"
-                                class="form-control emet-login input"
-                                placeholder="Please enter your email.">
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-md-12">
-                                    <div class="d-inline-flex">
-                                        <button type="button"
-                                        id="submitForgot"
-                                        class=""
-                                        style="
-                                        width: 260px;
-                                        border: none;
-                                        border-radius: 4px;
-                                        padding: 10px;
-                                        background: #ff8200;
-                                        color: white;
-                                        "> send email </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-
-                    </section>
-                </div>
-            </div>
-
-        </div>
     </div>
-</div>
