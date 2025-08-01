@@ -238,8 +238,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 }
 .mobile-dropdown-tab {
     position: absolute;
-    top: 10px;
-    right: 20px;
+    /* top: 10px; */
+    left: 3px;
     z-index: 1001;
 }
 .mobile-dropdown-button {
@@ -257,7 +257,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 .mobile-dropdown-content {
     display: none;
     position: absolute;
-    right: 0;
+    /* right: 0; */
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -443,7 +443,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
     
-    <div class="header-top-left">
+   <div class="mobile-logo-container">
         <a href="https://www.trandar.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
