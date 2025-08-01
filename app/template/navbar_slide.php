@@ -1,13 +1,6 @@
 <?php
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
 // require_once('../lib/connect.php');
-// ตรวจสอบว่า $conn ถูกกำหนดแล้วหรือไม่ก่อนเรียกใช้
-if (!isset($conn)) {
-    // หากไม่มีการเชื่อมต่อ ให้สร้างขึ้นมาใหม่หรือแจ้งเตือน
-    // require_once('../lib/connect.php');
-    // หรือใส่โค้ดสำหรับสร้างการเชื่อมต่อฐานข้อมูลตรงนี้
-}
-
 $newsList = [];
 $sql = "SELECT news_id, subject_news FROM dn_news ORDER BY date_create DESC LIMIT 3";
 // ตรวจสอบว่า $conn ถูกกำหนดและมีการเชื่อมต่อก่อนเรียกใช้
@@ -53,27 +46,27 @@ $dropdownItems = [
 
 <style>
 /* ------------------------------------------------------------- */
-/* CSS สำหรับ Desktop Menu (ขนาดจอ > 1024px) */
+/* CSS สำหรับ Desktop Menu โดยเฉพาะ (ใหม่) */
 /* ------------------------------------------------------------- */
-.navbar-menu-desktop {
+.navbar-desktop {
     background-color: #ff9900;
     position: relative;
     z-index: 999;
     padding: 6px 0;
-    display: block; /* แสดงผลบน Desktop */
 }
 
-.over-menu-desktop {
+.desktop-menu-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    white-space: nowrap; /* สำคัญ: ป้องกันการขึ้นบรรทัดใหม่ */
-    gap: 15px; /* เว้นระยะห่างระหว่างเมนู */
+    overflow: visible;
+    white-space: nowrap;
+    gap: 15px;
 }
 
-.over-menu-desktop a,
-.over-menu-desktop .dropdown-desktop {
+.desktop-menu-item {
+    position: relative; /* สำคัญ: เป็น parent ของ dropdown-content */
+    display: inline-block;
     color: #ffffff;
     text-decoration: none;
     padding: 10px 15px;
@@ -81,18 +74,12 @@ $dropdownItems = [
     transition: background-color 0.3s;
 }
 
-.over-menu-desktop a:hover,
-.over-menu-desktop .dropdown-desktop:hover {
+.desktop-menu-item:hover {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
 
-.dropdown-desktop {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-desktop-content {
+.desktop-dropdown-content {
     display: none;
     position: absolute;
     top: 100%;
@@ -104,28 +91,29 @@ $dropdownItems = [
     border-radius: 4px;
 }
 
-.dropdown-desktop:hover .dropdown-desktop-content {
+.desktop-menu-item:hover .desktop-dropdown-content {
     display: block;
 }
 
-.dropdown-desktop-content a {
+.desktop-dropdown-content a {
     color: #565656;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     text-align: left;
-    white-space: normal; /* อนุญาตให้ข้อความใน dropdown ขึ้นบรรทัดใหม่ */
+    white-space: normal;
 }
 
-.dropdown-desktop-content a:hover {
+.desktop-dropdown-content a:hover {
     background-color: #f1f1f1;
 }
 
 /* ------------------------------------------------------------- */
-/* CSS สำหรับ Mobile Menu (ขนาดจอ <= 1024px) */
+/* CSS สำหรับ Mobile Menu โดยเฉพาะ (ใหม่) */
 /* ------------------------------------------------------------- */
-.navbar-menu-mobile {
-    display: none; /* ซ่อนไว้บน Desktop */
+.navbar-mobile-container {
+    display: none; /* ซ่อนเมนูนี้บนหน้าจอใหญ่ */
+    position: relative;
     background-color: #ff9900;
 }
 
@@ -146,18 +134,18 @@ $dropdownItems = [
     background-color: #ff9900;
     position: fixed;
     top: 0;
-    right: 0; /* เปลี่ยนจาก left เป็น right */
-    width: 250px; /* กำหนดความกว้างของเมนู */
+    right: 0;
+    width: 250px;
     height: 100%;
     overflow-y: auto;
     z-index: 9999;
-    transform: translateX(100%); /* ซ่อนเมนูไปทางขวา */
+    transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
-    padding-top: 60px; /* เว้นพื้นที่ด้านบนสำหรับปุ่มปิด */
+    padding-top: 60px;
 }
 
 .mobile-slide-out-menu.open {
-    transform: translateX(0); /* เลื่อนเมนูเข้ามา */
+    transform: translateX(0);
 }
 
 .mobile-slide-out-menu a {
@@ -188,6 +176,13 @@ $dropdownItems = [
     display: block;
 }
 
+.mobile-slide-out-menu .dropdown-content a {
+    padding: 10px 25px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: none;
+}
+
 .close-btn {
     position: absolute;
     top: 15px;
@@ -198,19 +193,25 @@ $dropdownItems = [
 }
 
 /* ------------------------------------------------------------- */
-/* Media Query เพื่อสลับเมนู */
+/* Media Query เพื่อสลับการแสดงผลเมนู */
 /* ------------------------------------------------------------- */
 @media (max-width: 1024px) {
-    .navbar-menu-desktop {
-        display: none;
+    .navbar-desktop {
+        display: none; /* ซ่อนเมนู Desktop */
     }
-    .navbar-menu-mobile {
-        display: block;
+    .navbar-mobile-container {
+        display: block; /* แสดงเมนู Mobile */
+    }
+}
+@media (min-width: 1025px) {
+     .navbar-mobile-container {
+        display: none; /* ซ่อนเมนู Mobile บน Desktop */
     }
 }
 
+
 /* ------------------------------------------------------------- */
-/* สไตล์อื่นๆ ตามโค้ดเดิมของคุณ */
+/* CSS ของ News Ticker (ไม่แตะต้อง) */
 /* ------------------------------------------------------------- */
 .text-ticker {
     position: absolute;
@@ -226,27 +227,33 @@ $dropdownItems = [
     font-size: 24px;
     border-radius: 0px 70px 10px 0px;
 }
+
 @media (max-width: 768px) {
     .text-ticker {
         font-size: 18px;
         padding: 10px 20px 15px 5px;
     }
 }
+
 @media (max-width: 480px) {
     .text-ticker {
         font-size: 14px;
         padding: 8px 15px 10px 5px;
     }
 }
+a {
+    color: #ffffff;
+    /* text-decoration: underline; */
+}
 </style>
 
-<div class="navbar-menu-desktop">
+<div class="navbar-desktop">
     <div class="container">
-        <div class="over-menu-desktop">
+        <div class="desktop-menu-container">
             <?php foreach ($navbarItems as $item): ?>
                 <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
-                    <div class="dropdown-desktop">
-                        <a href="<?php echo $item['link']; ?>" class="dropbtn">
+                    <div class="desktop-menu-item">
+                        <a href="<?php echo $item['link']; ?>">
                             <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                                 <?php echo $item['text']; ?>
                             </span>
@@ -254,7 +261,7 @@ $dropdownItems = [
                                 <i class="fas fa-caret-down"></i>
                             </span>
                         </a>
-                        <div class="dropdown-desktop-content">
+                        <div class="desktop-dropdown-content">
                             <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
                                 <a href="<?php echo $dropdownItem['link']; ?>">
                                     <i class="<?php echo $dropdownItem['icon']; ?>"></i>
@@ -266,7 +273,7 @@ $dropdownItems = [
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="<?php echo $item['link']; ?>">
+                    <a href="<?php echo $item['link']; ?>" class="desktop-menu-item">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
@@ -278,7 +285,8 @@ $dropdownItems = [
     </div>
 </div>
 
-<div class="navbar-menu-mobile">
+
+<div class="navbar-mobile-container">
     <div class="mobile-header">
         <div class="hamburger" onclick="openMobileNav()">&#9776;</div>
     </div>
@@ -294,7 +302,7 @@ $dropdownItems = [
                         </span>
                         <span class="dropdown-icon" style="float:right;">&#9660;</span>
                     </a>
-                    <div class="dropdown-content" id="<?php echo $item['id']; ?>">
+                    <div class="dropdown-content" id="<?php echo $item['id']; ?>_mobile">
                         <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
                             <a href="<?php echo $dropdownItem['link']; ?>">
                                 <i class="<?php echo $dropdownItem['icon']; ?>"></i>
@@ -317,32 +325,8 @@ $dropdownItems = [
     </div>
 </div>
 
-
 <script>
-// JavaScript สำหรับ Desktop Dropdown (ยังคงใช้ได้อยู่)
-let currentDropdown = null;
-
-function toggleDropdown(id) {
-    if (currentDropdown && currentDropdown !== id) {
-        const prev = document.getElementById(currentDropdown);
-        if (prev) prev.style.display = "none";
-    }
-    const dropdown = document.getElementById(id);
-    if (dropdown) {
-        dropdown.style.display = "block";
-        currentDropdown = id;
-    }
-}
-
-function closeAllDropdowns() {
-    if (currentDropdown) {
-        const dropdown = document.getElementById(currentDropdown);
-        if (dropdown) dropdown.style.display = "none";
-        currentDropdown = null;
-    }
-}
-
-// JavaScript สำหรับ Mobile Slide-out Menu
+// JavaScript สำหรับ Mobile Menu
 const mobileMenu = document.getElementById("mobileMenu");
 const hamburger = document.querySelector(".hamburger");
 
@@ -355,19 +339,16 @@ function closeMobileNav() {
 }
 
 function toggleMobileDropdown(id) {
-    const dropdown = document.getElementById(id);
+    const dropdown = document.getElementById(id + "_mobile");
     if (dropdown) {
         dropdown.classList.toggle("show");
     }
 }
 
-// ฟังก์ชันสำหรับปิดเมนูเมื่อคลิกนอกพื้นที่
 document.addEventListener('click', function(event) {
-    // ตรวจสอบว่าการคลิกไม่ได้เกิดขึ้นภายใน mobileMenu หรือบน hamburger button
     const isClickInsideMenu = mobileMenu.contains(event.target);
     const isClickOnHamburger = hamburger.contains(event.target);
 
-    // ถ้าเมนูกำลังเปิดอยู่ และการคลิกเกิดขึ้นนอกเมนูและนอกปุ่ม hamburger
     if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger) {
         closeMobileNav();
     }
