@@ -89,6 +89,7 @@ $dropdownItems = [
     z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า News Ticker */
     min-width: 180px;
     border-radius: 4px;
+    style="text-decoration: none;"
 }
 
 .desktop-menu-item:hover .desktop-dropdown-content {
@@ -253,12 +254,12 @@ a {
         <div class="desktop-menu-container">
             <?php foreach ($navbarItems as $item): ?>
                 <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
-                    <div class="desktop-menu-item">
-                        <a href="<?php echo $item['link']; ?>">
-                            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                    <div class="desktop-menu-item" style="text-decoration: none;">
+                        <a href ="<?php echo $item['link']; ?>" style="text-decoration: none;">
+                            <span data-translate="<?php echo $item['translate']; ?>" lang="th" style="text-decoration: none;">
                                 <?php echo $item['text']; ?>
                             </span>
-                            <span class="dropdown-icon">
+                            <span class="dropdown-icon" style="text-decoration: none;">
                                 <i class="fas fa-caret-down"></i>
                             </span>
                         </a>
