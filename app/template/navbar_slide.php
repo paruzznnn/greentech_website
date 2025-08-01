@@ -51,7 +51,7 @@ $dropdownItems = [
 .navbar-desktop {
     background-color: #ff9900;
     position: relative;
-    z-index: 999;
+    z-index: 999; /* ปรับลดค่านี้ให้ต่ำลงเล็กน้อย */
     padding: 6px 0;
 }
 
@@ -86,7 +86,7 @@ $dropdownItems = [
     left: 0;
     background-color: #fff;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
-    z-index: 10000;
+    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า News Ticker */
     min-width: 180px;
     border-radius: 4px;
 }
@@ -213,16 +213,17 @@ $dropdownItems = [
 /* ------------------------------------------------------------- */
 /* CSS ของ News Ticker (ไม่แตะต้อง) */
 /* ------------------------------------------------------------- */
-.text-ticker {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #ff9900;
-    color: #ffffff;
-    padding: 15px 40px 20px 10px;
+#navbar-news {
+    position: relative;
+    z-index: 998; /* ปรับลดค่านี้ให้ต่ำกว่า navbar-desktop และ dropdown */
+}
+.news-ticker {แ
+    position: relative; /* เปลี่ยนเป็น relative เพื่อให้ z-index ทำงาน */
+    background-color: #ffffffff;
+    color: #555;
+    /* padding: 15px 40px 20px 10px; */
     font-weight: bold;
-    z-index: 1;
+    z-index: 998;
     white-space: nowrap;
     font-size: 24px;
     border-radius: 0px 70px 10px 0px;
@@ -288,11 +289,11 @@ a {
 
 <div class="navbar-mobile-container">
     <div class="mobile-header">
-        <div class="hamburger" onclick="openMobileNav()">&#9776;</div>
+        <div class="hamburger" onclick="openMobileNav()">☰</div>
     </div>
 
     <div class="mobile-slide-out-menu" id="mobileMenu">
-        <a href="javascript:void(0)" class="close-btn" onclick="closeMobileNav()">&times;</a>
+        <a href="javascript:void(0)" class="close-btn" onclick="closeMobileNav()">×</a>
         <?php foreach ($navbarItems as $item): ?>
             <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
                 <div class="dropdown-mobile">
@@ -300,8 +301,7 @@ a {
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
                         </span>
-                        <span class="dropdown-icon" style="float:right;">&#9660;</span>
-                    </a>
+                        </a>
                     <div class="dropdown-content" id="<?php echo $item['id']; ?>_mobile">
                         <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
                             <a href="<?php echo $dropdownItem['link']; ?>">
