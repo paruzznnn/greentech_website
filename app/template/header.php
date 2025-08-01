@@ -117,7 +117,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="https://www.trandar.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
-        <div id="current-date" style="margin-left: 20px; color:rgb(58, 54, 54); font-size: 16px; font-weight: 500;"></div>
+        <div id="current-date" style="margin-left: 20px; color:#555; font-size: 16px; font-weight: 500;"></div>
     </div>
 
     <script>
@@ -175,7 +175,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
         <div class="header-link">
-            <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: black; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
+            <a href="https://www.trandar.com/store/" target="_blank" style="background: #ffa719; color: #555; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
             </a>
         </div>
