@@ -210,19 +210,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </select>
         </div>
         <div class="header-link" >
-            <a href="<?= $contact_settings['facebook_link'] ?>" target="_blank" style="color: #ffa719; font-size: 28px;">
+            <a href="<?= $contact_settings['facebook_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
                 <i class="fab fa-facebook-square"></i>
             </a>
-            <a href="<?= $contact_settings['youtube_link'] ?>" target="_blank" style="color: #ffa719; font-size: 28px;">
+            <a href="<?= $contact_settings['youtube_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
                 <i class="fab fa-youtube"></i>
             </a>
-            <a href="<?= $contact_settings['instagram_link'] ?>" target="_blank" style="color: #ffa719; font-size: 28px;">
+            <a href="<?= $contact_settings['instagram_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="<?= $contact_settings['line_link'] ?>" target="_blank" style="color: #ffa719; font-size: 28px;">
+            <a href="<?= $contact_settings['line_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
                 <i class="fab fa-line"></i>
             </a>
-            <a href="<?= $contact_settings['tiktok_link'] ?>" target="_blank" style="color: #ffa719; font-size: 28px;">
+            <a href="<?= $contact_settings['tiktok_link'] ?>" target="_blank" style="color: #ffa719; font-size: 26px;">
                 <i class="fab fa-tiktok"></i>
             </a>
         </div>
