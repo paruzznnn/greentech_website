@@ -218,7 +218,7 @@ $dropdownItems = [
     position: relative;
     z-index: 998; /* ปรับลดค่านี้ให้ต่ำกว่า navbar-desktop และ dropdown */
 }
-.news-ticker {แ
+.news-ticker {
     position: relative; /* เปลี่ยนเป็น relative เพื่อให้ z-index ทำงาน */
     background-color: #ffffffff;
     color: #555;
@@ -290,11 +290,11 @@ a {
 
 <div class="navbar-mobile-container">
     <div class="mobile-header">
-        <div class="hamburger" onclick="openMobileNav()">☰</div>
+        <div class="hamburger" onclick="toggleMobileNav()">☰</div>
     </div>
 
     <div class="mobile-slide-out-menu" id="mobileMenu">
-        <a href="javascript:void(0)" class="close-btn" onclick="closeMobileNav()">×</a>
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleMobileNav()">×</a>
         <?php foreach ($navbarItems as $item): ?>
             <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
                 <div class="dropdown-mobile">
@@ -302,7 +302,7 @@ a {
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
                         </span>
-                        </a>
+                    </a>
                     <div class="dropdown-content" id="<?php echo $item['id']; ?>_mobile">
                         <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
                             <a href="<?php echo $dropdownItem['link']; ?>">
@@ -331,12 +331,9 @@ a {
 const mobileMenu = document.getElementById("mobileMenu");
 const hamburger = document.querySelector(".hamburger");
 
-function openMobileNav() {
-    mobileMenu.classList.add("open");
-}
-
-function closeMobileNav() {
-    mobileMenu.classList.remove("open");
+// ฟังก์ชันสำหรับสลับสถานะเมนู (เปิด/ปิด)
+function toggleMobileNav() {
+    mobileMenu.classList.toggle("open");
 }
 
 function toggleMobileDropdown(id) {
@@ -349,9 +346,10 @@ function toggleMobileDropdown(id) {
 document.addEventListener('click', function(event) {
     const isClickInsideMenu = mobileMenu.contains(event.target);
     const isClickOnHamburger = hamburger.contains(event.target);
+    const closeBtn = document.querySelector(".close-btn"); // เรียกใช้ closeBtn ตรงนี้
 
-    if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger) {
-        closeMobileNav();
+    if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger && !closeBtn.contains(event.target)) {
+        toggleMobileNav();
     }
 });
 </script>
