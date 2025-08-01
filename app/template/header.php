@@ -8,7 +8,7 @@ $menuItems = [
     [
         'id' => 0,
         'icon' => 'fas fa-user-plus',
-        'text' => 'Sign up', // แก้ไข: เพิ่มข้อความกลับเข้าไป
+        'text' => 'Sign up',
         'translate' => 'Sign_up',
         'link' => 'register' . $isFile,
         'modal_id' => ''
@@ -16,7 +16,7 @@ $menuItems = [
     [
         'id' => 1,
         'icon' => 'fas fa-sign-in-alt',
-        'text' => 'Sign in', // แก้ไข: เพิ่มข้อความกลับเข้าไป
+        'text' => 'Sign in',
         'translate' => 'Sign_in',
         'link' => '#',
         'modal_id' => 'myBtn-sign-in'
@@ -111,8 +111,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     padding: 10px 20px;
     background-color: #f1f1f1;
     border-bottom: 1px solid #ddd;
-    position: relative; /* เพิ่มเพื่อให้ z-index ทำงาน */
-    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า Daily News */
+    position: relative;
+    z-index: 1000;
 }
 .header-top-left {
     display: flex;
@@ -126,14 +126,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 .header-top-right {
     display: flex;
     align-items: center;
-    gap: 15px; /* ระยะห่างระหว่างแต่ละส่วน */
+    gap: 15px;
 }
 
 /* กลุ่มปุ่มเข้าสู่ระบบ, ลงทะเบียน, Store */
 .header-top-buttons {
     display: flex;
     align-items: center;
-    gap: 5px; /* ระยะห่างระหว่างปุ่ม */
+    gap: 5px;
 }
 .header-top-buttons a,
 .header-top-buttons button {
@@ -147,7 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center; /* เพิ่มเพื่อให้ข้อความอยู่ตรงกลาง */
+    justify-content: center;
     gap: 5px;
     transition: background-color 0.3s;
 }
@@ -171,7 +171,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 }
 
 /* ภาษา */
-/* แก้ไข: เพิ่ม CSS สำหรับ dropdown ภาษาและธงชาติ */
 .language-select-container {
     position: relative;
     display: inline-block;
@@ -187,7 +186,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     display: none;
     position: absolute;
     top: 100%;
-    right: 0; /* เปลี่ยนจาก left เป็น right เพื่อให้ dropdown แสดงผลทางขวา */
+    right: 0;
     background-color: #f9f9f9;
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -207,7 +206,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 .flag-dropdown a:hover {
     background-color: #f1f1f1;
 }
-
 
 /* โซเชียลมีเดีย */
 .header-social-links {
@@ -232,15 +230,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /* Mobile Header (ซ่อนบน Desktop) */
 .header-mobile {
     display: none;
-    justify-content: space-between;
-    align-items: center;
     padding: 10px 20px;
     background-color: #f1f1f1;
-    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า Daily News */
+    z-index: 1000;
+    position: relative;
+    text-align: center;
 }
 .mobile-dropdown-tab {
-    position: relative;
-    z-index: 1001; /* ตั้งค่า z-index ของ Dropdown tab ให้สูงกว่าตัว Navbar */
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 1001;
 }
 .mobile-dropdown-button {
     background-color: #ffa719;
@@ -261,36 +261,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1002; /* z-index ของ content ต้องสูงกว่า tab */
+    z-index: 1002;
     border-radius: 4px;
-    margin-top: 5px;
     padding: 10px 0;
 }
+.mobile-dropdown-content a {
+    padding: 8px 12px;
+}
+/* แก้ไข CSS ในส่วนนี้ */
 .mobile-dropdown-content a,
-.mobile-dropdown-content button,
-.mobile-dropdown-content select {
+.mobile-dropdown-content button {
     color: #555;
-    padding: 12px 16px;
     text-decoration: none;
-    /* display: block; */
     width: 100%;
-    text-align: left;
-    background-color: #ff9900; /* แก้ไข: เปลี่ยนสีพื้นหลังเป็นโปร่งใส */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: #ff9900;
     border: none;
     cursor: pointer;
+}
+/* เพิ่มสไตล์สำหรับปุ่มที่เป็นสีส้มโดยเฉพาะ */
+.mobile-dropdown-content a[href*="store"],
+.mobile-dropdown-content button[id*="logout"] {
+    background-color: #ffa719;
+    color: white;
+}
+.mobile-dropdown-content a[href*="store"]:hover,
+.mobile-dropdown-content button[id*="logout"]:hover {
+    background-color: #ff9900;
 }
 .mobile-dropdown-content a:hover,
 .mobile-dropdown-content button:hover {
     background-color: #f1f1f1;
 }
+/* สิ้นสุดส่วนที่แก้ไข */
 
 /* Media Query */
 @media (max-width: 1024px) {
     .header-top {
-        display: none; /* ซ่อน Header Desktop บนหน้าจอเล็ก */
+        display: none;
     }
     .header-mobile {
-        display: flex; /* แสดง Header Mobile บนหน้าจอเล็ก */
+        display: block;
     }
 }
 </style>
@@ -366,19 +380,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <div class="header-mobile">
-    <div class="header-top-left">
-        <a href="https://www.trandar.com">
-            <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
-        </a>
-    </div>
-
     <div class="header-top-right">
         <div class="mobile-dropdown-tab">
             <button class="mobile-dropdown-button">
-                <i class="fas fa-bars"></i>
+                <i class="fas fa-grip-lines"></i>
             </button>
             <div class="mobile-dropdown-content">
-                 <div id="auth-buttons-mobile">
+                <div id="auth-buttons-mobile">
                     <?php foreach ($menuItems as $item): ?>
                         <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
                             <i class="<?php echo $item['icon']; ?>"></i>
@@ -403,7 +411,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="language-select-container" style="padding: 12px 16px;">
                     <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon" onclick="toggleFlagDropdown('mobile')">
                     <div id="flag-dropdown-mobile" class="flag-dropdown">
-                         <a href="#" data-lang="th">
+                        <a href="#" data-lang="th">
                             <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
                         </a>
                         <a href="#" data-lang="en">
@@ -412,7 +420,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </div>
                 
-                <hr style="margin: 10px 0; border-color: #ddd;">
+                <!-- <hr style="margin: 10px 0; border-color: #ddd;"> -->
 
                 <div class="header-social-links" style="padding: 12px 16px;">
                     <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
@@ -434,8 +442,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </div>
+    
+    <div class="header-top-left">
+        <a href="https://www.trandar.com">
+            <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
+        </a>
+    </div>
 </div>
-
 
 <script>
     // สคริปต์สำหรับ Modal และ JWT
