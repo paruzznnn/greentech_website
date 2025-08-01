@@ -30,9 +30,9 @@ body {
 }
 
 .header-top img.logo {
-    width: auto;
+    /* width: auto; */
     max-width: 150px; /* จำกัดขนาดโลโก้ */
-    height: auto;
+    /* height: auto; */
     object-fit: contain;
     display: block;
 }

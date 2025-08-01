@@ -119,8 +119,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     align-items: center;
 }
 .header-top .logo {
-    height: 40px;
-    max-height: 40px;
+    height: 55px;
+    max-height: 55px;
     width: auto;
 }
 .header-top-right {
