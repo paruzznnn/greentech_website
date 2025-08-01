@@ -59,6 +59,7 @@ if ($result->num_rows > 0) {
     border-radius: 6px;
     overflow: hidden;
     background-color: #fff;
+    color: #555;
 }
 
 .card-img-top {
@@ -92,7 +93,7 @@ if ($result->num_rows > 0) {
     font-size: 0.85rem; /* Match the current font size */
     margin-bottom: 0; /* Remove bottom margin to save space */
     line-height: 1.2em; /* Keep consistent line height */
-    color: #333; /* Darker color as requested */
+    color: #555; /* Darker color as requested */
 }
 
 /* Ensure equal height for the main columns */

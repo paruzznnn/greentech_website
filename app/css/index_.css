@@ -59,7 +59,7 @@ body {
     padding: 8px 15px;
     font-size: 14px;
     background: #ffffffff;
-    color: black;
+    color: #555;
     border-radius: 4px;
     white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
     box-sizing: border-box; /* สำคัญเพื่อให้ padding ไม่ดันกว้างเกินไป */
@@ -71,7 +71,7 @@ body {
     display: inline-block;
     white-space: nowrap;
     background: #ffa719;
-    color: black;
+    color: #555;
     border-radius: 4px;
     box-sizing: border-box;
 }
@@ -80,6 +80,7 @@ body {
     width: 100px;
     padding: 6px;
     font-size: 15px;
+    color: #555;
     border: none;
     border-radius: 4px;
     background-color: #fafafa;
