@@ -455,10 +455,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const authButtonsDesktop = document.getElementById("auth-buttons");
         const logoutBtnDesktop = document.getElementById("logout-btn");
         const signinModalBtn = document.getElementById("myBtn-sign-in");
-        
+
         const authButtonsMobile = document.getElementById("auth-buttons-mobile");
         const logoutBtnMobile = document.getElementById("logout-btn-mobile");
-        
+
         // ตรวจสอบ JWT Token
         if (jwt) {
             fetch('actions/protected.php', {
@@ -487,14 +487,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if(authButtonsMobile) authButtonsMobile.style.display = "block";
             if(logoutBtnMobile) logoutBtnMobile.style.display = "none";
         }
-    
+
         // Modal Event Listeners
         const modalSignin = document.getElementById('myModal-sign-in');
         const modalForgot = document.getElementById('myModal-forgot-password');
         const signinModalCloseBtn = document.querySelector('.modal-close-sign-in');
         const forgotModalBtn = document.getElementById('myBtn-forgot-password');
         const forgotModalCloseBtn = document.querySelector('.modal-close-forgot-password');
-        
+
         // Open Sign In Modal
         if (signinModalBtn) {
             signinModalBtn.onclick = function(e) {
@@ -502,7 +502,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 modalSignin.style.display = 'block';
             }
         }
-        
+
         // Close Sign In Modal
         if (signinModalCloseBtn) {
             signinModalCloseBtn.onclick = function() {
@@ -525,22 +525,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 modalForgot.style.display = 'none';
             }
         }
-        
-        window.onclick = function(event) {
-            if (event.target == modalSignin) {
-                modalSignin.style.display = 'none';
-            }
-            if (event.target == modalForgot) {
-                modalForgot.style.display = 'none';
-            }
-        }
-    
+
+        // เอาส่วนนี้ออก เพื่อไม่ให้ Modal ปิดเมื่อคลิกนอกหน้าต่าง
+        // window.onclick = function(event) {
+        //     if (event.target == modalSignin) {
+        //         modalSignin.style.display = 'none';
+        //     }
+        //     if (event.target == modalForgot) {
+        //         modalForgot.style.display = 'none';
+        //     }
+        // }
+
         // Logout Event Listener (Desktop & Mobile)
         if(logoutBtnDesktop) {
             logoutBtnDesktop.addEventListener("click", function (e) {
                 e.preventDefault(); // ป้องกันการเปลี่ยนหน้า
                 sessionStorage.removeItem("jwt");
-                location.reload(); 
+                location.reload();
             });
         }
          if(logoutBtnMobile) {
@@ -550,7 +551,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 location.reload();
             });
         }
-        
+
         // Mobile dropdown tab toggle
         const mobileDropdownTab = document.querySelector('.mobile-dropdown-tab');
         const mobileDropdownButton = document.querySelector('.mobile-dropdown-button');
@@ -596,7 +597,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 document.getElementById('flag-dropdown-mobile').style.display = 'none';
             });
         });
-        
+
         document.addEventListener('click', function(event) {
             const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
             const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
