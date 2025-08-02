@@ -420,8 +420,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </div>
                 
-                <!-- <hr style="margin: 10px 0; border-color: #ddd;"> -->
-
                 <div class="header-social-links" style="padding: 12px 16px;">
                     <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
                         <i class="fab fa-facebook-square"></i>
@@ -491,24 +489,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
     
         // Modal Event Listeners
-        const modal = document.getElementById('myModal-sign-in');
-        const span = document.querySelector('.modal-close-sign-in');
+        const modalSignin = document.getElementById('myModal-sign-in');
+        const modalForgot = document.getElementById('myModal-forgot-password');
+        const signinModalCloseBtn = document.querySelector('.modal-close-sign-in');
+        const forgotModalBtn = document.getElementById('myBtn-forgot-password');
+        const forgotModalCloseBtn = document.querySelector('.modal-close-forgot-password');
         
+        // Open Sign In Modal
         if (signinModalBtn) {
-             signinModalBtn.onclick = function() {
-                modal.style.display = 'block';
+            signinModalBtn.onclick = function(e) {
+                e.preventDefault();
+                modalSignin.style.display = 'block';
+            }
+        }
+        
+        // Close Sign In Modal
+        if (signinModalCloseBtn) {
+            signinModalCloseBtn.onclick = function() {
+                modalSignin.style.display = 'none';
             }
         }
 
-        if (span) {
-            span.onclick = function() {
-                modal.style.display = 'none';
+        // Open Forgot Password Modal
+        if (forgotModalBtn) {
+            forgotModalBtn.onclick = function(e) {
+                e.preventDefault();
+                modalSignin.style.display = 'none'; // Close sign in modal
+                modalForgot.style.display = 'block';
+            }
+        }
+
+        // Close Forgot Password Modal
+        if (forgotModalCloseBtn) {
+            forgotModalCloseBtn.onclick = function() {
+                modalForgot.style.display = 'none';
             }
         }
         
         window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            if (event.target == modalSignin) {
+                modalSignin.style.display = 'none';
+            }
+            if (event.target == modalForgot) {
+                modalForgot.style.display = 'none';
             }
         }
     
@@ -587,8 +610,124 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
 </script>
 
+
 <div id="myModal-sign-in" class="modal">
+    <div class="modal-content" style="width: 350px !important;">
+        <div class="modal-header">
+            <span class="modal-close-sign-in">×</span>
+        </div>
+        <div class="modal-body" style="background-color: #9e9e9e1f;">
+            <div class="box-sign-in-container">
+                <div class="card">
+                    <section class="card-body">
+                        <div style="text-align: center;">
+                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
+                        </div>
+                        <h6 style="text-align: center; color: #555;" class="mt-2">
+                            <span><i class="fas fa-unlock"></i></span>
+                            <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
+                        </h6>
+                        <hr>
+                        <form id="loginModal" action="" method="post">
+                            <div class="form-group mt-4">
+                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your email.">
+                            </div>
+                            <div class="form-group mt-2" style="position: relative;">
+                                <input id="password" type="password" class="emet-login inpu" data-type="password">
+                                <span class=""
+                                    style="position: absolute; top: 10px; right: 20px; color: #555555;"
+                                    id="togglePasswordSignin">
+                                    <i class="fas fa-eye-slash"></i>
+                                </span>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-12 text-end"
+                                style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                ">
+                                    <a href="<?php echo 'register'.$isFile ?>">
+                                        <span style="font-size: 13px !important;">
+                                            สมัครสมาชิก
+                                        </span>
+                                    </a>
+                                    <a type="button" href="#"  id="myBtn-forgot-password">
+                                        <span style="font-size: 13px !important;">
+                                            ลืมรหัสผ่าน
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="d-inline-flex">
+                                        <button type="submit" class=""
+                                            style="
+                                            width: 260px;
+                                            border: none;
+                                            border-radius: 4px;
+                                            padding: 10px;
+                                            background: #ff8200;
+                                            color: white;
+                                            "> Login </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
 <div id="myModal-forgot-password" class="modal">
+    <div class="modal-content" style="width: 350px !important;">
+        <div class="modal-header">
+            <span class="modal-close-forgot-password">×</span>
+        </div>
+        <div class="modal-body" style="background-color: #9e9e9e1f;">
+            <div class="box-forgot-password-container">
+                <div class="card">
+                    <section class="card-body">
+                        <div style="text-align: center;">
+                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
+                        </div>
+                        <h6 style="text-align: center; color: #555;" class="mt-2">
+                            <span>
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <span data-key-lang="" lang="US">Forgot your password?</span>
+                        </h6>
+                        <hr>
+                        <form id="forgotModal" action="" method="post">
+                            <div class="form-group mt-4">
+                                <input
+                                id="forgot_email"
+                                name="forgot_email" type="text"
+                                class="form-control emet-login input"
+                                placeholder="Please enter your email.">
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <div class="d-inline-flex">
+                                        <button type="button"
+                                        id="submitForgot"
+                                        class=""
+                                        style="
+                                        width: 260px;
+                                        border: none;
+                                        border-radius: 4px;
+                                        padding: 10px;
+                                        background: #ff8200;
+                                        color: white;
+                                        "> send email </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
