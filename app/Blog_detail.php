@@ -136,7 +136,7 @@ if (isset($_GET['id'])) {
             <div style="padding-left:50px;">
                 <hr style="border-top: dashed 1px; margin: 40px 0;">
                 <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
-                <p>🛒 Website : <a href="https://www.trandar.com" target="_blank">www.trandar.com/store/</a></p>
+                <p>🛒 Website : <a href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</a></p>
                 <p>📱 Line OA : @Trandaraocoustic 
                     <a href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</a>
                 </p>
