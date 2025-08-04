@@ -161,11 +161,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     }
 
     .header-top-buttons .auth-btn {
-        background: #555;
+        /* background: #555; */
     }
 
     .header-top-buttons .auth-btn:hover {
-        background: #333;
+        /* background: #333; */
     }
 
     .header-top-buttons .store-btn {
