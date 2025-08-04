@@ -244,7 +244,7 @@ $dropdownItems = [
     }
 }
 a {
-    color: #ffffff;
+    color: #381695ff;
     /* text-decoration: underline; */
 }
 </style>
