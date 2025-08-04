@@ -1,4 +1,22 @@
-<?php include '../check_permission.php'?>
+<?php 
+include '../check_permission.php';
+
+// ในความเป็นจริงต้องมีการเชื่อมต่อฐานข้อมูลตรงนี้
+// $conn = new mysqli("localhost", "user", "password", "database");
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
+
+// เพิ่มส่วนนี้: ดึงข้อมูลสินค้าทั้งหมดจากตาราง dn_shop
+$sql_shops = "SELECT shop_id, subject_shop FROM dn_shop WHERE del = 0 ORDER BY subject_shop ASC";
+$result_shops = $conn->query($sql_shops);
+$shops = [];
+if ($result_shops->num_rows > 0) {
+    while ($row = $result_shops->fetch_assoc()) {
+        $shops[] = $row;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -9,7 +27,6 @@
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
-
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
     <script src="../../../inc/jquery/js/jquery-ui.min.js"></script>
 
@@ -40,76 +57,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 
-
-    <!-- <link href="../../../inc/summernote/summernote-lite.min.css" rel="stylesheet">
-    <script src="../../../inc/summernote/summernote-lite.min.js"></script> -->
-
-
     <link href='../css/index_.css?v=<?php echo time();?>' rel='stylesheet'>
-
 
     <style>
         .note-editable {
-            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
-            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
-            /* min-height: 600px; */
-            /* max-height: 600px; */
-            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
-            /* font-family: sans-serif */
             color: #424242;
         }
-
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
-
         .responsive-button-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
-
-        /* Media query for smaller screens */
         @media (max-width: 768px) {
             .responsive-grid {
-                grid-template-columns: 1fr; /* Switch to a single column layout */
+                grid-template-columns: 1fr;
             }
         }
-
         @media (max-width: 480px) {
             .responsive-button-container div {
-                text-align: center; /* Center-align button on very small screens */
+                text-align: center;
             }
         }
-
         .note-toolbar{
             position: sticky !important;
             top: 70px !important;
             z-index: 1 !important;
         }
-
-        /* .note-editor .note-toolbar, .note-popover .popover-content {
-            margin: 0;
-            padding: 0 0 5px 5px;
-            position: sticky !important;
-            top: 0px !important;
-            z-index: 999 !important;
-        } */
-
     </style>
 </head>
 
@@ -121,86 +110,116 @@
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
-                <h4 class="line-ref mb-3">
-                    <i class="fa-solid fa-pen-clip"></i>
-                    write project
-                </h4>
+                    <h4 class="line-ref mb-3">
+                        <i class="fa-solid fa-pen-clip"></i>
+                        write project
+                    </h4>
                     
-                        <form id="formproject" enctype="multipart/form-data">
-
-                            <div class="row">
-
-                                <div class="col-md-4">
-                                    <div style="margin: 10px;">
-                                        <label for="">
-                                            <span>Cover photo</span>:
-                                             <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
-                                        </label>
-                                        <div class="previewContainer">
-                                            <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
-                                        </div>
+                    <form id="formproject" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div style="margin: 10px;">
+                                    <label for="">
+                                        <span>Cover photo</span>:
+                                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                    </label>
+                                    <div class="previewContainer">
+                                        <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
                                     </div>
-
-                                    <div style="margin: 10px;">
-                                        <input type="file" class="form-control" id="fileInput" name="fileInput[]">
+                                </div>
+                                <div style="margin: 10px;">
+                                    <input type="file" class="form-control" id="fileInput" name="fileInput[]">
+                                </div>
+                                <div style="margin: 10px;">
+                                    <label for="">
+                                        <span>Subject</span>:
+                                    </label>
+                                    <input type="text" class="form-control" id="project_subject" name="project_subject">
+                                </div>
+                                <div style="margin: 10px;">
+                                    <label for="">
+                                        <span>Description</span>:
+                                    </label>
+                                    <div>
+                                        <textarea class="form-control" id="project_description" name="project_description"></textarea>
                                     </div>
-                                    <div style="margin: 10px;">
-                                        <label for="">
-                                            <span>Subject</span>:
-                                        </label>
-                                        <input type="text" class="form-control" id="project_subject" name="project_subject">
-                                    </div>
-                                    <div style="margin: 10px;">
-                                        <label for="">
-                                            <span>Description</span>:
-                                        </label>
-                                        <div>
-                                            <textarea class="form-control" id="project_description" name="project_description"></textarea>
-                                        </div>
-                                    </div>
-                                    <div style="margin: 10px; text-align: end;">
-                                        <button 
+                                </div>
+                                
+                                <div style="margin: 10px;">
+                                    <label>สินค้าที่เกี่ยวข้อง (เลือกได้หลายชิ้น)</label>
+                                    <select class="form-control select2" multiple="multiple" name="related_shops[]" style="width: 100%;">
+                                        <?php foreach ($shops as $shop): ?>
+                                            <option value="<?= htmlspecialchars($shop['shop_id']) ?>">
+                                                <?= htmlspecialchars($shop['subject_shop']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div style="margin: 10px; text-align: end;">
+                                    <button 
                                         type="button" 
                                         id="submitAddproject"
                                         class="btn btn-primary">
-                                            <i class="fas fa-plus"></i>
-                                            project
-                                        </button>
+                                        <i class="fas fa-plus"></i>
+                                        project
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div style='margin: 10px; text-align: end;'>
+                                    <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                                        <i class='fas fa-arrow-left'></i> Back 
+                                    </button>
+                                </div>
+                                <div style="margin: 10px;">
+                                    <label for="">
+                                        <span>Content</span>:
+                                    </label>
+                                    <div>
+                                        <textarea class="form-control summernote" id="summernote" name="project_content"></textarea>
                                     </div>
                                 </div>
-
-                                <div class="col-md-8">
-                                   <div style='margin: 10px; text-align: end;'>
-                                <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                                    <i class='fas fa-arrow-left'></i> Back 
-                                </button>
                             </div>
-                                    <div style="margin: 10px;">
-                                        <label for="">
-                                            <span>Content</span>:
-                                        </label>
-                                        <div>
-                                            <textarea class="form-control summernote" id="summernote" name="project_content"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </form>
-                    
-
+                        </div>
+                    </form>
                 </div>
             </div>
-
         </div>
     </div>
-
-
 
 <script src='../js/index_.js?v=<?php echo time();?>'></script>
 <script src='js/project_.js?v=<?php echo time();?>'></script>
 
-</body>
+<script>
+    $(document).ready(function() {
+        // Init Summernote
+        $('#summernote').summernote({
+            placeholder: 'กรอกเนื้อหาโปรเจกต์',
+            tabsize: 2,
+            height: 300
+        });
 
+        // Init Select2
+        $('.select2').select2({
+            placeholder: "เลือกสินค้าที่เกี่ยวข้อง",
+            allowClear: true
+        });
+
+        // Image Preview Function
+        $('#fileInput').change(function() {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#previewImage').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                $('#previewImage').hide();
+            }
+        });
+    });
+</script>
+
+</body>
 </html>

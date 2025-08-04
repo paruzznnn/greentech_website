@@ -14,6 +14,29 @@ if (!isset($_POST['project_id'])) {
 }
 
 $decodedId = $_POST['project_id'];
+
+// เพิ่มส่วนนี้: ดึงข้อมูลสินค้าทั้งหมดจากตาราง dn_shop
+$sql_all_shops = "SELECT shop_id, subject_shop FROM dn_shop WHERE del = 0 ORDER BY subject_shop ASC";
+$result_all_shops = $conn->query($sql_all_shops);
+$all_shops = [];
+if ($result_all_shops->num_rows > 0) {
+    while ($row = $result_all_shops->fetch_assoc()) {
+        $all_shops[] = $row;
+    }
+}
+
+// เพิ่มส่วนนี้: ดึงข้อมูลสินค้าที่เกี่ยวข้องเดิม
+$related_shop_ids = [];
+$stmt_related_shops = $conn->prepare("SELECT shop_id FROM dn_project_shop WHERE project_id = ?");
+if ($stmt_related_shops) {
+    $stmt_related_shops->bind_param("i", $decodedId);
+    $stmt_related_shops->execute();
+    $result_related_shops = $stmt_related_shops->get_result();
+    while ($row = $result_related_shops->fetch_assoc()) {
+        $related_shop_ids[] = $row['shop_id'];
+    }
+    $stmt_related_shops->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -60,44 +83,33 @@ $decodedId = $_POST['project_id'];
 
     <style>
         .note-editable {
-            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
-            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
-            /* min-height: 600px; */
-            /* max-height: 600px; */
-            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
-            /* font-family: sans-serif */
             color: #424242;
         }
-
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
-
         .responsive-button-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
-
         @media (max-width: 768px) {
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
         }
-
         @media (max-width: 480px) {
             .responsive-button-container div {
                 text-align: center;
             }
         }
-
         .note-toolbar {
             position: sticky !important;
             top: 70px !important;
@@ -131,7 +143,6 @@ FROM dn_project dn
 LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
 WHERE dn.project_id = ?
 GROUP BY dn.project_id
-
 ");
 
 if ($stmt === false) {
@@ -167,7 +178,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
                         <label><span>Cover photo</span>:</label>
-                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                         <div id='previewContainer' class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>
@@ -183,6 +194,18 @@ if ($result->num_rows > 0) {
                         <label><span>Description</span>:</label>
                         <textarea class='form-control' id='project_description' name='project_description'>" . htmlspecialchars($row['description_project']) . "</textarea>
                     </div>
+
+                    <div style='margin: 10px;'>
+                        <label>สินค้าที่เกี่ยวข้อง (เลือกได้หลายชิ้น)</label>
+                        <select class='form-control select2' multiple='multiple' name='related_shops[]' style='width: 100%;'>
+                            ";
+                            foreach ($all_shops as $shop):
+                                $selected = in_array($shop['shop_id'], $related_shop_ids) ? 'selected' : '';
+                                echo "<option value='" . htmlspecialchars($shop['shop_id']) . "' " . $selected . ">" . htmlspecialchars($shop['subject_shop']) . "</option>";
+                            endforeach;
+                        echo "
+                        </select>
+                    </div>
                     <div style='margin: 10px; text-align: end;'>
                         <button type='button' id='submitEditproject' class='btn btn-success'>
                             <i class='fas fa-save'></i> Save project
@@ -190,11 +213,11 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
                 <div class='col-md-8'>
-                 <div style='margin: 10px; text-align: end;'>
-                <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                    <i class='fas fa-arrow-left'></i> Back 
-                </button>
-            </div>
+                    <div style='margin: 10px; text-align: end;'>
+                        <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                            <i class='fas fa-arrow-left'></i> Back 
+                        </button>
+                    </div>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
                         <textarea class='form-control summernote' id='summernote_update' name='project_content'>" . htmlspecialchars($content) . "</textarea>
@@ -238,9 +261,25 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/project_.js?v=<?php echo time(); ?>'></script>
+
+    <script>
+    $(document).ready(function() {
+        // Init Select2
+        $('.select2').select2({
+            placeholder: "เลือกสินค้าที่เกี่ยวข้อง",
+            allowClear: true
+        });
+
+        // Summernote init
+        $('#summernote_update').summernote({
+            placeholder: 'กรอกเนื้อหาโปรเจกต์',
+            tabsize: 2,
+            height: 300,
+            callbacks: {
+                // ... (your existing callbacks) ...
+            }
+        });
+    });
+    </script>
 </body>
 </html>
-
-
-
-
