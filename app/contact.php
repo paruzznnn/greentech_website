@@ -12,6 +12,16 @@ global $conn;
     <?php include 'inc_head.php' ?>
     <link href="css/index_.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="css/news_.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <style>
+
+        .box-content {
+            flex: 1;
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
 </head>
 <body>
     <?php
@@ -85,7 +95,7 @@ global $conn;
                         </ul>
                         <?php if (isset($contact_settings['link_image_path']) && isset($contact_settings['link_image_url'])): ?>
                             <a href="<?= htmlspecialchars($contact_settings['link_image_url']) ?>" target="_blank">
-                                <img src="<?= htmlspecialchars($contact_settings['link_image_path']) ?>" alt="Trandar Link" style="max-width: 70%; padding-top:18px">
+                                <img src="<?= htmlspecialchars($contact_settings['link_image_path']) ?>" alt="Trandar Link" style="max-width: 50%; padding-top:48px">
                             </a>
                         <?php endif; ?>
                     </div>
