@@ -84,17 +84,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
 <meta property="og:site_name" content="trandar.com">
 <meta property="og:title" content="<?= $meta['og_title'] ?? $meta['meta_title'] ?? 'Trandar' ?>">
-<meta property="og:description" content="<?= $meta['og_description'] ?? $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
+<meta property="og:description"
+    content="<?= $meta['og_description'] ?? $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
 <meta property="og:type" content="website">
 <meta property="og:image" content="<?= $meta['og_image'] ?? '../../public/img/LOGO TRANDAR.png' ?>">
 
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-N57LMZ6H');</script>
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N57LMZ6H"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+                new Date().getTime(), event='gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-N57LMZ6H');</script>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N57LMZ6H" height="0" width="0"
+        style="display:none;visibility:hidden"></iframe></noscript>
 <div id="loading-overlay" class="hidden">
     <div class="spinner"></div>
 </div>
@@ -103,210 +107,237 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="background-blur"></div>
 
 <style>
-/* CSS สำหรับ Desktop Header */
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #f1f1f1;
-    border-bottom: 1px solid #ddd;
-    position: relative;
-    z-index: 1000;
-}
-.header-top-left {
-    display: flex;
-    align-items: center;
-}
-.header-top .logo {
-    height: 55px;
-    max-height: 55px;
-    width: auto;
-}
-.header-top-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* กลุ่มปุ่มเข้าสู่ระบบ, ลงทะเบียน, Store */
-.header-top-buttons {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.header-top-buttons a,
-.header-top-buttons button {
-    padding: 8px 15px;
-    border-radius: 4px;
-    text-decoration: none;
-    color: white;
-    font-size: 14px;
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    transition: background-color 0.3s;
-}
-.header-top-buttons .auth-btn {
-    background: #555;
-}
-.header-top-buttons .auth-btn:hover {
-    background: #333;
-}
-.header-top-buttons .store-btn {
-    background: #ffa719;
-}
-.header-top-buttons .store-btn:hover {
-    background: #ff9900;
-}
-#logout-btn {
-    background: #ff3333;
-}
-#logout-btn:hover {
-    background: #cc0000;
-}
-
-/* ภาษา */
-.language-select-container {
-    position: relative;
-    display: inline-block;
-}
-.flag-icon {
-    width: 24px;
-    height: auto;
-    cursor: pointer;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-}
-.flag-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: #f9f9f9;
-    min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1002;
-    border-radius: 4px;
-    padding: 5px 0;
-}
-.flag-dropdown a {
-    color: black;
-    padding: 8px 16px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    white-space: nowrap;
-}
-.flag-dropdown a:hover {
-    background-color: #f1f1f1;
-}
-
-/* โซเชียลมีเดีย */
-.header-social-links {
-    display: flex;
-    gap: 5px;
-}
-.header-social-links a {
-    background: #ffa719;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s;
-}
-.header-social-links a:hover {
-    background-color: #ff9900;
-}
-
-/* Mobile Header (ซ่อนบน Desktop) */
-.header-mobile {
-    display: none;
-    padding: 10px 20px;
-    background-color: #f1f1f1;
-    z-index: 1000;
-    position: relative;
-    text-align: center;
-}
-.mobile-dropdown-tab {
-    position: absolute;
-    /* top: 10px; */
-    left: 3px;
-    z-index: 1001;
-}
-.mobile-dropdown-button {
-    background-color: #ffa719;
-    color: #555;
-    padding: 10px 15px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.mobile-dropdown-content {
-    display: none;
-    position: absolute;
-    /* right: 0; */
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1002;
-    border-radius: 4px;
-    padding: 10px 0;
-}
-.mobile-dropdown-content a {
-    padding: 8px 12px;
-}
-/* แก้ไข CSS ในส่วนนี้ */
-.mobile-dropdown-content a,
-.mobile-dropdown-content button {
-    color: #555;
-    text-decoration: none;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    background-color: #ff9900;
-    border: none;
-    cursor: pointer;
-}
-/* เพิ่มสไตล์สำหรับปุ่มที่เป็นสีส้มโดยเฉพาะ */
-.mobile-dropdown-content a[href*="store"],
-.mobile-dropdown-content button[id*="logout"] {
-    background-color: #ffa719;
-    color: white;
-}
-.mobile-dropdown-content a[href*="store"]:hover,
-.mobile-dropdown-content button[id*="logout"]:hover {
-    background-color: #ff9900;
-}
-.mobile-dropdown-content a:hover,
-.mobile-dropdown-content button:hover {
-    background-color: #f1f1f1;
-}
-/* สิ้นสุดส่วนที่แก้ไข */
-
-/* Media Query */
-@media (max-width: 1024px) {
+    /* CSS สำหรับ Desktop Header */
     .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+        z-index: 1000;
+    }
+
+    .header-top-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-top .logo {
+        height: 55px;
+        max-height: 55px;
+        width: auto;
+    }
+
+    .header-top-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* กลุ่มปุ่มเข้าสู่ระบบ, ลงทะเบียน, Store */
+    .header-top-buttons {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .header-top-buttons a,
+    .header-top-buttons button {
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .header-top-buttons .auth-btn {
+        background: #555;
+    }
+
+    .header-top-buttons .auth-btn:hover {
+        background: #333;
+    }
+
+    .header-top-buttons .store-btn {
+        background: #ffa719;
+    }
+
+    .header-top-buttons .store-btn:hover {
+        background: #ff9900;
+    }
+
+    #logout-btn {
+        background: #ff3333;
+    }
+
+    #logout-btn:hover {
+        background: #cc0000;
+    }
+
+    /* ภาษา */
+    .language-select-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .flag-icon {
+        width: 24px;
+        height: auto;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+    }
+
+    .flag-dropdown {
         display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1003;
+        /* แก้ไขค่า z-index เพื่อให้แสดงผลทับเมนูหลัก */
+        border-radius: 4px;
+        padding: 5px 0;
     }
+
+    .flag-dropdown a {
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+    }
+
+    .flag-dropdown a:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* โซเชียลมีเดีย */
+    .header-social-links {
+        display: flex;
+        gap: 5px;
+    }
+
+    .header-social-links a {
+        background: #ffa719;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+    }
+
+    .header-social-links a:hover {
+        background-color: #ff9900;
+    }
+
+    /* Mobile Header (ซ่อนบน Desktop) */
     .header-mobile {
-        display: block;
+        display: none;
+        padding: 10px 20px;
+        background-color: #f1f1f1;
+        z-index: 1000;
+        position: relative;
+        text-align: center;
     }
-}
+
+    .mobile-dropdown-tab {
+        position: absolute;
+        /* top: 10px; */
+        left: 3px;
+        z-index: 1001;
+    }
+
+    .mobile-dropdown-button {
+        background-color: #ffa719;
+        color: #555;
+        padding: 10px 15px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mobile-dropdown-content {
+        display: none;
+        position: absolute;
+        /* right: 0; */
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1002;
+        border-radius: 4px;
+        padding: 10px 0;
+    }
+
+    .mobile-dropdown-content a {
+        padding: 8px 12px;
+    }
+
+    /* แก้ไข CSS ในส่วนนี้ */
+    .mobile-dropdown-content a,
+    .mobile-dropdown-content button {
+        color: #555;
+        text-decoration: none;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        background-color: #ff9900;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* เพิ่มสไตล์สำหรับปุ่มที่เป็นสีส้มโดยเฉพาะ */
+    .mobile-dropdown-content a[href*="store"],
+    .mobile-dropdown-content button[id*="logout"] {
+        background-color: #ffa719;
+        color: white;
+    }
+
+    .mobile-dropdown-content a[href*="store"]:hover,
+    .mobile-dropdown-content button[id*="logout"]:hover {
+        background-color: #ff9900;
+    }
+
+    .mobile-dropdown-content a:hover,
+    .mobile-dropdown-content button:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* สิ้นสุดส่วนที่แก้ไข */
+
+    /* Media Query */
+    @media (max-width: 1024px) {
+        .header-top {
+            display: none;
+        }
+
+        .header-mobile {
+            display: block;
+        }
+    }
 </style>
 
 <div class="header-top">
@@ -329,7 +360,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="header-top-buttons">
             <div id="auth-buttons">
                 <?php foreach ($menuItems as $item): ?>
-                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>" class="auth-btn">
+                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>"
+                        class="auth-btn">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
@@ -341,41 +373,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="#" id="logout-btn" style="display:none;">
                 <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
             </a>
-            
+
             <a href="https://www.trandar.com/store/" target="_blank" class="store-btn">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
             </a>
 
-            <div class="language-select-container">
-                <img id="current-flag" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon" onclick="toggleFlagDropdown('desktop')">
-                <div id="flag-dropdown-desktop" class="flag-dropdown">
-                    <a href="#" data-lang="th">
-                        <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
-                    </a>
-                    <a href="#" data-lang="en">
-                        <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
-                    </a>
-                </div>
-            </div>
+            
         </div>
+    </div>
 
-        <div class="header-social-links">
-            <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
-                <i class="fab fa-facebook-square"></i>
-            </a>
-            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
-                <i class="fab fa-youtube"></i>
-            </a>
-            <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://lin.ee/yoSCNwF" target="_blank">
-                <i class="fab fa-line"></i>
-            </a>
-            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
-                <i class="fab fa-tiktok"></i>
-            </a>
-        </div>
+    <div>
+        <select id="language-select" class="language-select"></select>
+    </div>
+
+    <div class="header-social-links">
+        <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+            <i class="fab fa-facebook-square"></i>
+        </a>
+        <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+            <i class="fab fa-youtube"></i>
+        </a>
+        <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://lin.ee/yoSCNwF" target="_blank">
+            <i class="fab fa-line"></i>
+        </a>
+        <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+            <i class="fab fa-tiktok"></i>
+        </a>
     </div>
 </div>
 
@@ -403,13 +429,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 <hr style="margin: 10px 0; border-color: #ddd;">
 
-                <a href="https://www.trandar.com/store/" target="_blank">
-                    <i class="fas fa-shopping-cart"></i>
-                    Trandar Store
-                </a>
-                
+                <a href="https://www.trandar.com/store/" target="_blank"><i class="fas fa-shopping-cart"></i>Trandar
+                    Store</a>
+
                 <div class="language-select-container" style="padding: 12px 16px;">
-                    <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon" onclick="toggleFlagDropdown('mobile')">
+                    <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
+                        onclick="toggleFlagDropdown('mobile')">
                     <div id="flag-dropdown-mobile" class="flag-dropdown">
                         <a href="#" data-lang="th">
                             <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
@@ -419,7 +444,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </a>
                     </div>
                 </div>
-                
+
                 <div class="header-social-links" style="padding: 12px 16px;">
                     <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
                         <i class="fab fa-facebook-square"></i>
@@ -440,8 +465,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </div>
-    
-   <div class="mobile-logo-container">
+
+    <div class="mobile-logo-container">
         <a href="https://www.trandar.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
@@ -467,25 +492,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     'Authorization': 'Bearer ' + jwt
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-                    // Desktop
-                    if(authButtonsDesktop) authButtonsDesktop.style.display = "none";
-                    if(logoutBtnDesktop) logoutBtnDesktop.style.display = "block";
-                    // Mobile
-                    if(authButtonsMobile) authButtonsMobile.style.display = "none";
-                    if(logoutBtnMobile) logoutBtnMobile.style.display = "block";
-                }
-            })
-            .catch(error => console.error("Token verification failed:", error));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+                        // Desktop
+                        if (authButtonsDesktop) authButtonsDesktop.style.display = "none";
+                        if (logoutBtnDesktop) logoutBtnDesktop.style.display = "block";
+                        // Mobile
+                        if (authButtonsMobile) authButtonsMobile.style.display = "none";
+                        if (logoutBtnMobile) logoutBtnMobile.style.display = "block";
+                    }
+                })
+                .catch(error => console.error("Token verification failed:", error));
         } else {
-             // Desktop
-            if(authButtonsDesktop) authButtonsDesktop.style.display = "block";
-            if(logoutBtnDesktop) logoutBtnDesktop.style.display = "none";
+            // Desktop
+            if (authButtonsDesktop) authButtonsDesktop.style.display = "block";
+            if (logoutBtnDesktop) logoutBtnDesktop.style.display = "none";
             // Mobile
-            if(authButtonsMobile) authButtonsMobile.style.display = "block";
-            if(logoutBtnMobile) logoutBtnMobile.style.display = "none";
+            if (authButtonsMobile) authButtonsMobile.style.display = "block";
+            if (logoutBtnMobile) logoutBtnMobile.style.display = "none";
         }
 
         // Modal Event Listeners
@@ -497,7 +522,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         // Open Sign In Modal
         if (signinModalBtn) {
-            signinModalBtn.onclick = function(e) {
+            signinModalBtn.onclick = function (e) {
                 e.preventDefault();
                 modalSignin.style.display = 'block';
             }
@@ -505,14 +530,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         // Close Sign In Modal
         if (signinModalCloseBtn) {
-            signinModalCloseBtn.onclick = function() {
+            signinModalCloseBtn.onclick = function () {
                 modalSignin.style.display = 'none';
             }
         }
 
         // Open Forgot Password Modal
         if (forgotModalBtn) {
-            forgotModalBtn.onclick = function(e) {
+            forgotModalBtn.onclick = function (e) {
                 e.preventDefault();
                 modalSignin.style.display = 'none'; // Close sign in modal
                 modalForgot.style.display = 'block';
@@ -521,7 +546,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         // Close Forgot Password Modal
         if (forgotModalCloseBtn) {
-            forgotModalCloseBtn.onclick = function() {
+            forgotModalCloseBtn.onclick = function () {
                 modalForgot.style.display = 'none';
             }
         }
@@ -537,14 +562,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         // }
 
         // Logout Event Listener (Desktop & Mobile)
-        if(logoutBtnDesktop) {
+        if (logoutBtnDesktop) {
             logoutBtnDesktop.addEventListener("click", function (e) {
                 e.preventDefault(); // ป้องกันการเปลี่ยนหน้า
                 sessionStorage.removeItem("jwt");
                 location.reload();
             });
         }
-         if(logoutBtnMobile) {
+        if (logoutBtnMobile) {
             logoutBtnMobile.addEventListener("click", function (e) {
                 e.preventDefault();
                 sessionStorage.removeItem("jwt");
@@ -557,19 +582,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const mobileDropdownButton = document.querySelector('.mobile-dropdown-button');
         const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
 
-        mobileDropdownButton.addEventListener('click', function(event) {
+        mobileDropdownButton.addEventListener('click', function (event) {
             mobileDropdownContent.style.display = mobileDropdownContent.style.display === 'block' ? 'none' : 'block';
             event.stopPropagation();
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!mobileDropdownTab.contains(event.target)) {
                 mobileDropdownContent.style.display = 'none';
             }
         });
 
         // สคริปต์สำหรับจัดการภาษาและธงชาติ
-        window.toggleFlagDropdown = function(mode = 'desktop') {
+        window.toggleFlagDropdown = function (mode = 'desktop') {
             const dropdownId = mode === 'mobile' ? 'flag-dropdown-mobile' : 'flag-dropdown-desktop';
             const dropdown = document.getElementById(dropdownId);
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
@@ -577,7 +602,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         const flagLinks = document.querySelectorAll('.flag-dropdown a');
         flagLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
+            link.addEventListener('click', function (event) {
                 event.preventDefault();
                 const lang = this.dataset.lang;
 
@@ -589,16 +614,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 currentFlagDesktop.src = newFlagSrc;
                 currentFlagDesktop.alt = newFlagAlt;
-                currentFlagMobile.src = newFlagSrc;
-                currentFlagMobile.alt = newFlagAlt;
+                if (currentFlagMobile) {
+                    currentFlagMobile.src = newFlagSrc;
+                    currentFlagMobile.alt = newFlagAlt;
+                }
 
                 // ซ่อน dropdown
                 document.getElementById('flag-dropdown-desktop').style.display = 'none';
-                document.getElementById('flag-dropdown-mobile').style.display = 'none';
+                if (document.getElementById('flag-dropdown-mobile')) {
+                    document.getElementById('flag-dropdown-mobile').style.display = 'none';
+                }
             });
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
             const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
             const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
@@ -631,29 +660,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <hr>
                         <form id="loginModal" action="" method="post">
                             <div class="form-group mt-4">
-                                <input id="username" type="text" class="emet-login input" placeholder="Please enter your email.">
+                                <input id="username" type="text" class="emet-login input"
+                                    placeholder="Please enter your email.">
                             </div>
                             <div class="form-group mt-2" style="position: relative;">
                                 <input id="password" type="password" class="emet-login inpu" data-type="password">
-                                <span class=""
-                                    style="position: absolute; top: 10px; right: 20px; color: #555555;"
+                                <span class="" style="position: absolute; top: 10px; right: 20px; color: #555555;"
                                     id="togglePasswordSignin">
                                     <i class="fas fa-eye-slash"></i>
                                 </span>
                             </div>
                             <div class="row mt-4">
-                                <div class="col-md-12 text-end"
-                                style="
+                                <div class="col-md-12 text-end" style="
                                 display: flex;
                                 justify-content: space-between;
                                 align-items: center;
                                 ">
-                                    <a href="<?php echo 'register'.$isFile ?>">
+                                    <a href="<?php echo 'register' . $isFile ?>">
                                         <span style="font-size: 13px !important;">
                                             สมัครสมาชิก
                                         </span>
                                     </a>
-                                    <a type="button" href="#"  id="myBtn-forgot-password">
+                                    <a type="button" href="#" id="myBtn-forgot-password">
                                         <span style="font-size: 13px !important;">
                                             ลืมรหัสผ่าน
                                         </span>
@@ -661,8 +689,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
-                                        <button type="submit" class=""
-                                            style="
+                                        <button type="submit" class="" style="
                                             width: 260px;
                                             border: none;
                                             border-radius: 4px;
@@ -676,6 +703,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </form>
                     </section>
                 </div>
+
             </div>
         </div>
     </div>
@@ -702,19 +730,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <hr>
                         <form id="forgotModal" action="" method="post">
                             <div class="form-group mt-4">
-                                <input
-                                id="forgot_email"
-                                name="forgot_email" type="text"
-                                class="form-control emet-login input"
-                                placeholder="Please enter your email.">
+                                <input id="forgot_email" name="forgot_email" type="text"
+                                    class="form-control emet-login input" placeholder="Please enter your email.">
                             </div>
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
-                                        <button type="button"
-                                        id="submitForgot"
-                                        class=""
-                                        style="
+                                        <button type="button" id="submitForgot" class="" style="
                                         width: 260px;
                                         border: none;
                                         border-radius: 4px;
