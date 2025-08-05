@@ -4,8 +4,14 @@ global $conn;
 
 
 $subjectTitle = "โปรเจกต์"; // fallback title
+$pageUrl = ""; // Add this variable
 
 if (isset($_GET['id'])) {
+    $encodedId = $_GET['id'];
+    // Generate dynamic URL
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $pageUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
@@ -154,6 +160,44 @@ if (isset($_GET['id'])) {
             color: #3e5beaff;;
             text-decoration: underline;
         }
+        
+        /* New CSS for social sharing */
+        .social-share {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .social-share p {
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .social-share a {
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        .social-share img {
+            width: 40px;
+            height: 40px;
+            transition: transform 0.2s ease;
+        }
+        .social-share a:hover img {
+            transform: scale(1.1);
+        }
+        .copy-link-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .copy-link-btn:hover {
+            background-color: #5a6268;
+        }
     </style>
 
 
@@ -244,83 +288,83 @@ if (isset($_GET['id'])) {
                 <p>📱 Line OA : @Trandarstore 
                     <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
                 </p>
-                <p>☎️ Tel : 02-722-7007</p>                   
+                <p>☎️ Tel : 02-722-7007</p>           
             </div> 
 
-            <?php
-            if (isset($_GET['id'])) {
-                $decodedId = base64_decode(urldecode($_GET['id']));
-                if ($decodedId !== false) {
-                    $stmt_shop = $conn->prepare("
-                        SELECT 
-                            ds.shop_id, 
-                            ds.subject_shop, 
-                            ds.description_shop,
-                            ds.content_shop,
-                            GROUP_CONCAT(dnd.api_path) AS pic_path
-                        FROM dn_shop ds
-                        JOIN dn_project_shop dps ON ds.shop_id = dps.shop_id
-                        LEFT JOIN dn_shop_doc dnd ON ds.shop_id = dnd.shop_id AND dnd.del = '0' AND dnd.status = '1'
-                        WHERE dps.project_id = ?
-                        GROUP BY ds.shop_id
-                    ");
-                    $stmt_shop->bind_param('i', $decodedId);
-                    $stmt_shop->execute();
-                    $result_shop = $stmt_shop->get_result();
+                <?php
+                if (isset($_GET['id'])) {
+                    $decodedId = base64_decode(urldecode($_GET['id']));
+                    if ($decodedId !== false) {
+                        $stmt_shop = $conn->prepare("
+                            SELECT 
+                                ds.shop_id, 
+                                ds.subject_shop, 
+                                ds.description_shop,
+                                ds.content_shop,
+                                GROUP_CONCAT(dnd.api_path) AS pic_path
+                            FROM dn_shop ds
+                            JOIN dn_project_shop dps ON ds.shop_id = dps.shop_id
+                            LEFT JOIN dn_shop_doc dnd ON ds.shop_id = dnd.shop_id AND dnd.del = '0' AND dnd.status = '1'
+                            WHERE dps.project_id = ?
+                            GROUP BY ds.shop_id
+                        ");
+                        $stmt_shop->bind_param('i', $decodedId);
+                        $stmt_shop->execute();
+                        $result_shop = $stmt_shop->get_result();
 
-                    if ($result_shop->num_rows > 0) {
-                        echo '<h3 style="padding-top: 40px;">สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้</h3>';
-                        echo '<div class="shop-wrapper-container">';
-                        echo '<div class="scroll-btn left" onclick="scrollshop(\'left\')">&#10094;</div>';
-                        echo '<div class="scroll-btn right" onclick="scrollshop(\'right\')">&#10095;</div>';
-                        echo '<div class="shop-scroll" id="shop-scroll-box">';
-                        
-                        while ($row_shop = $result_shop->fetch_assoc()) {
-                            $shopIdEncoded = urlencode(base64_encode($row_shop['shop_id']));
-                            $shop_link = "shop_detail.php?id=" . $shopIdEncoded;
+                        if ($result_shop->num_rows > 0) {
+                            echo '<h3 style="padding-top: 40px;">สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้</h3>';
+                            echo '<div class="shop-wrapper-container">';
+                            echo '<div class="scroll-btn left" onclick="scrollshop(\'left\')">&#10094;</div>';
+                            echo '<div class="scroll-btn right" onclick="scrollshop(\'right\')">&#10095;</div>';
+                            echo '<div class="shop-scroll" id="shop-scroll-box">';
                             
-                            $content = $row_shop['content_shop'];
-                            $iframeSrc = null;
-                            if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
-                                $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
-                            }
-                            $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
+                            while ($row_shop = $result_shop->fetch_assoc()) {
+                                $shopIdEncoded = urlencode(base64_encode($row_shop['shop_id']));
+                                $shop_link = "shop_detail.php?id=" . $shopIdEncoded;
+                                
+                                $content = $row_shop['content_shop'];
+                                $iframeSrc = null;
+                                if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
+                                    $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
+                                }
+                                $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
-                            $paths = !empty($row_shop['pic_path']) ? explode(',', $row_shop['pic_path']) : [];
-                            $image_path = !empty($paths) ? $paths[0] : null;
-                            
-                            $placeholder_image = 'https://via.placeholder.com/300x220.png?text=Shop+Image';
+                                $paths = !empty($row_shop['pic_path']) ? explode(',', $row_shop['pic_path']) : [];
+                                $image_path = !empty($paths) ? $paths[0] : null;
+                                
+                                $placeholder_image = 'https://via.placeholder.com/300x220.png?text=Shop+Image';
 
-                            echo '<div class="shop-card">';
-                            echo '<a href="' . htmlspecialchars($shop_link) . '" class="related-shop-box">';
-                            
-                            if (!empty($iframe)) {
-                                echo '<iframe frameborder="0" src="' . htmlspecialchars($iframe) . '" width="100%" height="220px" class="note-video-clip"></iframe>';
-                            } else if (!empty($image_path)) {
-                                echo '<div class="card-image-wrapper">';
-                                echo '<img src="' . htmlspecialchars($image_path) . '" class="card-img-top" alt="' . htmlspecialchars($row_shop['subject_shop']) . '">';
+                                echo '<div class="shop-card">';
+                                echo '<a href="' . htmlspecialchars($shop_link) . '" class="related-shop-box">';
+                                
+                                if (!empty($iframe)) {
+                                    echo '<iframe frameborder="0" src="' . htmlspecialchars($iframe) . '" width="100%" height="220px" class="note-video-clip"></iframe>';
+                                } else if (!empty($image_path)) {
+                                    echo '<div class="card-image-wrapper">';
+                                    echo '<img src="' . htmlspecialchars($image_path) . '" class="card-img-top" alt="' . htmlspecialchars($row_shop['subject_shop']) . '">';
+                                    echo '</div>';
+                                } else {
+                                    echo '<div class="card-image-wrapper">';
+                                    echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="ไม่มีรูปภาพ">';
+                                    echo '</div>';
+                                }
+
+                                echo '<div class="card-body">';
+                                echo '<h5 class="card-title">' . htmlspecialchars($row_shop['subject_shop']) . '</h5>';
+                                echo '<p class="card-text">' . htmlspecialchars($row_shop['description_shop']) . '</p>';
                                 echo '</div>';
-                            } else {
-                                echo '<div class="card-image-wrapper">';
-                                echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="ไม่มีรูปภาพ">';
+                                echo '</a>';
                                 echo '</div>';
                             }
-
-                            echo '<div class="card-body">';
-                            echo '<h5 class="card-title">' . htmlspecialchars($row_shop['subject_shop']) . '</h5>';
-                            echo '<p class="card-text">' . htmlspecialchars($row_shop['description_shop']) . '</p>';
                             echo '</div>';
-                            echo '</a>';
                             echo '</div>';
                         }
-                        echo '</div>';
-                        echo '</div>';
+                        $stmt_shop->close();
                     }
-                    $stmt_shop->close();
                 }
-            }
-            ?>
-            <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
+                ?>
+                <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
                 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
                 <form id="commentForm" style="max-width: 600px;">
                     <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
@@ -331,6 +375,29 @@ if (isset($_GET['id'])) {
                     </button>
                 </form>
 
+                <div class="social-share">
+                    <p>แชร์หน้านี้:</p>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                    </a>
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                    </a>
+                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                </div>
+                
                 <script>
                 document.getElementById("commentForm").addEventListener("submit", function(e) {
                     e.preventDefault();
@@ -391,6 +458,16 @@ if (isset($_GET['id'])) {
                     } else {
                         box.scrollLeft += scrollAmount;
                     }
+                }
+                
+                // JavaScript for Copy Link functionality
+                function copyLink() {
+                    const pageUrl = "<?= $pageUrl ?>";
+                    navigator.clipboard.writeText(pageUrl).then(function() {
+                        alert("คัดลอกลิงก์เรียบร้อยแล้ว");
+                    }, function() {
+                        alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
+                    });
                 }
                 </script>
                 
