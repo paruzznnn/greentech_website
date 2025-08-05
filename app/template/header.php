@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     .header-mobile {
         display: none;
         padding: 10px 20px;
-        background-color: #f1f1f1;
+        /* background-color: #f1f1f1; */
         z-index: 1000;
         position: relative;
         text-align: center;
@@ -267,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 
     .mobile-dropdown-button {
         background-color: #ffa719;
-        color: #555;
+        color: #fff;
         padding: 10px 15px;
         font-size: 16px;
         border: none;
@@ -281,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     .mobile-dropdown-content {
         display: none;
         position: absolute;
-        /* right: 0; */
+        right: 0;
         background-color: #f9f9f9;
         min-width: 160px;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
@@ -404,68 +404,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
         </a>
     </div>
 </div>
-
 <div class="header-mobile">
-    <div class="header-top-right">
-        <div class="mobile-dropdown-tab">
-            <button class="mobile-dropdown-button">
-                <i class="fas fa-grip-lines"></i>
-            </button>
-            <div class="mobile-dropdown-content">
-                <div id="auth-buttons-mobile">
-                    <?php foreach ($menuItems as $item): ?>
-                        <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
-                            <i class="<?php echo $item['icon']; ?>"></i>
-                            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                                <?php echo $item['text']; ?>
-                            </span>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-
-                <a href="#" id="logout-btn-mobile" style="display:none;">
-                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-                </a>
-
-                <hr style="margin: 10px 0; border-color: #ddd;">
-
-                <a href="https://www.trandar.com/store/" target="_blank"><i class="fas fa-shopping-cart"></i>Trandar
-                    Store</a>
-
-                <div class="language-select-container" style="padding: 12px 16px;">
-                    <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
-                        onclick="toggleFlagDropdown('mobile')">
-                    <div id="flag-dropdown-mobile" class="flag-dropdown">
-                        <a href="#" data-lang="th">
-                            <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
-                        </a>
-                        <a href="#" data-lang="en">
-                            <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
-                        </a>
-                    </div>
-                </div>
-
-                <div class="header-social-links" style="padding: 12px 16px;">
-                    <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
-                        <i class="fab fa-facebook-square"></i>
-                    </a>
-                    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                    <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://lin.ee/yoSCNwF" target="_blank">
-                        <i class="fab fa-line"></i>
-                    </a>
-                    <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="mobile-logo-container">
         <a href="https://www.trandar.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">

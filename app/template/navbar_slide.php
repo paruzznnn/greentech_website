@@ -201,7 +201,10 @@ $dropdownItems = [
         display: none; /* ซ่อนเมนู Desktop */
     }
     .navbar-mobile-container {
-        display: block; /* แสดงเมนู Mobile */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1em; /* แสดงเมนู Mobile */
     }
 }
 @media (min-width: 1025px) {
@@ -289,41 +292,108 @@ a {
 
 
 <div class="navbar-mobile-container">
-    <div class="mobile-header">
-        <div class="hamburger" onclick="toggleMobileNav()">☰</div>
-    </div>
+    <!-- navbar menu -->
+    <div>
+        <div class="mobile-header">
+            <div class="hamburger" onclick="toggleMobileNav()">☰</div>
+        </div>
 
-    <div class="mobile-slide-out-menu" id="mobileMenu">
-        <a href="javascript:void(0)" class="close-btn" onclick="toggleMobileNav()">×</a>
-        <?php foreach ($navbarItems as $item): ?>
-            <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
-                <div class="dropdown-mobile">
-                    <a href="javascript:void(0)" class="dropdown-toggle" onclick="toggleMobileDropdown('<?php echo $item['id']; ?>')">
+        <div class="mobile-slide-out-menu" id="mobileMenu">
+            <a href="javascript:void(0)" class="close-btn" onclick="toggleMobileNav()">×</a>
+            <?php foreach ($navbarItems as $item): ?>
+                <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
+                    <div class="dropdown-mobile">
+                        <a href="javascript:void(0)" class="dropdown-toggle" onclick="toggleMobileDropdown('<?php echo $item['id']; ?>')">
+                            <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                                <?php echo $item['text']; ?>
+                            </span>
+                        </a>
+                        <div class="dropdown-content" id="<?php echo $item['id']; ?>_mobile">
+                            <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
+                                <a href="<?php echo $dropdownItem['link']; ?>">
+                                    <i class="<?php echo $dropdownItem['icon']; ?>"></i>
+                                    <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
+                                        <?php echo $dropdownItem['text']; ?>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="<?php echo $item['link']; ?>">
+                        <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
                         </span>
                     </a>
-                    <div class="dropdown-content" id="<?php echo $item['id']; ?>_mobile">
-                        <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
-                            <a href="<?php echo $dropdownItem['link']; ?>">
-                                <i class="<?php echo $dropdownItem['icon']; ?>"></i>
-                                <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
-                                    <?php echo $dropdownItem['text']; ?>
-                                </span>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <!-- header menu -->
+    <div>
+        <div class="header-mobile">
+            <div class="header-top-right">
+                <div class="mobile-dropdown-tab">
+                    <button class="mobile-dropdown-button">
+                        <i class="fas fa-user-shield"></i>
+                    </button>
+                    <div class="mobile-dropdown-content">
+                        <div id="auth-buttons-mobile">
+                            <?php foreach ($menuItems as $item): ?>
+                                <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
+                                    <i class="<?php echo $item['icon']; ?>"></i>
+                                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
+                                        <?php echo $item['text']; ?>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <a href="#" id="logout-btn-mobile" style="display:none;">
+                            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                        </a>
+
+                        <hr style="margin: 10px 0; border-color: #ddd;">
+
+                        <a href="https://www.trandar.com/store/" target="_blank"><i class="fas fa-shopping-cart"></i>Trandar
+                            Store</a>
+
+                        <div class="language-select-container" style="padding: 12px 16px;">
+                            <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
+                                onclick="toggleFlagDropdown('mobile')">
+                            <div id="flag-dropdown-mobile" class="flag-dropdown">
+                                <a href="#" data-lang="th">
+                                    <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
+                                </a>
+                                <a href="#" data-lang="en">
+                                    <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="header-social-links" style="padding: 12px 16px;">
+                            <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+                                <i class="fab fa-facebook-square"></i>
                             </a>
-                        <?php endforeach; ?>
+                            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://lin.ee/yoSCNwF" target="_blank">
+                                <i class="fab fa-line"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            <?php else: ?>
-                <a href="<?php echo $item['link']; ?>">
-                    <i class="<?php echo $item['icon']; ?>"></i>
-                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                        <?php echo $item['text']; ?>
-                    </span>
-                </a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
+            </div>
+        </div>
+    </div> 
 </div>
 
 <script>
