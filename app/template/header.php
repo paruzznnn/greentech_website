@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     }
 
     .header-top-buttons .store-btn {
-        background: #ffa719;
+        background: #ff9900;
     }
 
     .header-top-buttons .store-btn:hover {
@@ -233,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     }
 
     .header-social-links a {
-        background: #ffa719;
+        background: #ff9900;
         color: #fff;
         padding: 8px 12px;
         border-radius: 4px;
