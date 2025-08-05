@@ -135,12 +135,12 @@ $dropdownItems = [
     background-color: #ff9900;
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0;
     width: 250px;
     height: 100%;
     overflow-y: auto;
     z-index: 9999;
-    transform: translateX(100%);
+    transform: translateX(-100%); /* แก้ไขตรงนี้ */
     transition: transform 0.3s ease-in-out;
     padding-top: 60px;
 }
