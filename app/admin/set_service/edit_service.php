@@ -1,7 +1,6 @@
 <?php include '../check_permission.php'?>
 <!DOCTYPE html>
 <html lang="th">
-    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,45 +8,35 @@
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
-    <!-- jQuery & UI -->
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
     <script src="../../../inc/jquery/js/jquery-ui.min.js"></script>
 
-    <!-- Bootstrap -->
     <link href="../../../inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="../../../inc/bootstrap/js/bootstrap.min.js"></script>
 
-    <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Roboto&display=swap" rel="stylesheet">
 
-    <!-- SweetAlert2 -->
     <link href="../../../inc/sweetalert2/css/sweetalert2.min.css" rel="stylesheet">
     <script src="../../../inc/sweetalert2/js/sweetalert2.all.min.js"></script>
 
-    <!-- Select2 -->
     <link href="../../../inc/select2/css/select2.min.css" rel="stylesheet">
     <script src="../../../inc/select2/js/select2.min.js"></script>
 
-    <!-- DataTables -->
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.4/datatables.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.4/datatables.min.js"></script>
 
-    <!-- Iconpicker -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
-    <!-- Summernote -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
 
-    <!-- Custom CSS -->
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Sarabun&display=swap" rel="stylesheet">
     <style>
@@ -84,14 +73,12 @@
             color: #ffffff;
         }
        .note-editor .note-editable {
-    font-family: inherit !important;
-    /* ลบบรรทัดนี้ออก หรือคอมเมนต์ไว้ก่อน */
-    /* font-size: inherit !important; */
-}
+        font-family: inherit !important;
+    }
 
-.note-editable span[style*="font-size"] {
-    display: inline-block;
-}
+    .note-editable span[style*="font-size"] {
+        display: inline-block;
+    }
     </style>
 </head>
 
@@ -100,7 +87,7 @@
 <body>
 <div class="container mt-4">
     <h3>แก้ไขเนื้อหา "Service"</h3>
-    <form method="post" action="save_service.php">
+    <form method="post" action="save_service.php" enctype="multipart/form-data">
         <?php
         $result = $conn->query("SELECT * FROM service_content ORDER BY id ASC");
         while ($row = $result->fetch_assoc()):
@@ -119,16 +106,26 @@
                 <label>เนื้อหา (HTML)</label>
                 <textarea name="contents[]" class="form-control summernote"><?= htmlspecialchars($row['content']) ?></textarea>
 
-                <label>ลิงก์ภาพ (ถ้ามี)</label>
-                <input type="text" name="images[]" class="form-control" value="<?= htmlspecialchars($row['image_url']) ?>">
-
+                <label>รูปภาพ (ถ้ามี)</label>
+                <input type="file" name="images_files[]" class="form-control image-input">
+                <?php if (!empty($row['image_url'])): ?>
+                    <img src="<?= htmlspecialchars($row['image_url']) ?>" class="img-fluid mt-2 existing-image" style="max-height: 200px;">
+                    <br>
+                    <small class="form-text text-muted">รูปภาพเดิม</small>
+                    <input type="hidden" name="existing_images[]" value="<?= htmlspecialchars($row['image_url']) ?>">
+                <?php else: ?>
+                    <small class="form-text text-muted">ไม่มีรูปภาพเดิม</small>
+                    <input type="hidden" name="existing_images[]" value="">
+                <?php endif; ?>
+                <img src="#" class="img-fluid mt-2 new-image-preview" style="max-height: 200px; display: none;">
+                <div style="padding-top 25px;">
                 <label>ผู้พูด (สำหรับ quote)</label>
+                </div>
                 <input type="text" name="authors[]" class="form-control" value="<?= htmlspecialchars($row['author']) ?>">
 
                 <label>ตำแหน่ง</label>
                 <input type="text" name="positions[]" class="form-control" value="<?= htmlspecialchars($row['position']) ?>">
-                <!-- เพิ่มในแต่ละ .card-body ด้านล่างสุด -->
-<button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $row['id'] ?>">ลบบล็อคนี้</button>
+                <button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $row['id'] ?>">ลบบล็อคนี้</button>
             </div>
         </div>
         <?php endwhile; ?>
@@ -147,8 +144,9 @@
                 <label>เนื้อหา (HTML)</label>
                 <textarea name="new_content" class="form-control summernote"></textarea>
 
-                <label>ลิงก์ภาพ (ถ้ามี)</label>
-                <input type="text" name="new_image" class="form-control">
+                <label>รูปภาพ (ถ้ามี)</label>
+                <input type="file" name="new_image_file" class="form-control image-input">
+                <img src="#" class="img-fluid mt-2 new-image-preview" style="max-height: 200px; display: none;">
 
                 <label>ผู้พูด (สำหรับ quote)</label>
                 <input type="text" name="new_author" class="form-control">
@@ -162,58 +160,74 @@
     </form>
 </div>
 
-<!-- Summernote Config -->
 <script>
     $(document).ready(function () {
-    $('.summernote').summernote({
-        height: 250,
-        toolbar: [
-            ['style', ['style']],
-            ['font', ['fontname', 'fontsize', 'bold', 'italic', 'underline', 'clear']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['codeview']]
-        ],
-        fontNames: ['Kanit', 'Sarabun', 'Arial', 'Tahoma', 'Courier New', 'Impact', 'Times New Roman'],
-        fontNamesIgnoreCheck: ['Kanit', 'Sarabun'],
-        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36', '48', '64']
+        $('.summernote').summernote({
+            height: 250,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['fontname', 'fontsize', 'bold', 'italic', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['codeview']]
+            ],
+            fontNames: ['Kanit', 'Sarabun', 'Arial', 'Tahoma', 'Courier New', 'Impact', 'Times New Roman'],
+            fontNamesIgnoreCheck: ['Kanit', 'Sarabun'],
+            fontsize: ['8', '10', '12', '14', '16', '18', '24', '36', '48', '64']
+        });
     });
-});
 
-$(document).on('click', '.remove-block', function () {
-    const $button = $(this);
-    const blockId = $button.data('id');
+    $(document).on('click', '.remove-block', function () {
+        const $button = $(this);
+        const blockId = $button.data('id');
 
-    Swal.fire({
-        title: 'คุณแน่ใจหรือไม่?',
-        text: 'คุณต้องการลบบล็อคนี้จริงหรือ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ใช่, ลบเลย!',
-        cancelButtonText: 'ยกเลิก'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.post('delete_service_block.php', { id: blockId }, function (response) {
-                if (response.success) {
-                    Swal.fire({
-                        title: 'ลบแล้ว!',
-                        icon: 'success',
-                        timer: 1000,
-                        showConfirmButton: false
-                    });
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
-                }
-            }, 'json');
+        Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: 'คุณต้องการลบบล็อคนี้จริงหรือ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('delete_service_block.php', { id: blockId }, function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'ลบแล้ว!',
+                            icon: 'success',
+                            timer: 1000,
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
+                    }
+                }, 'json');
+            }
+        });
+    });
+
+    // เพิ่มโค้ด JavaScript เพื่อแสดงตัวอย่างรูปภาพที่อัปโหลด
+    $(document).on('change', '.image-input', function() {
+        const fileInput = this;
+        const previewImage = $(this).closest('.card-body').find('.new-image-preview');
+        const existingImage = $(this).closest('.card-body').find('.existing-image');
+        
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.attr('src', e.target.result).show();
+                existingImage.hide(); // ซ่อนภาพเดิม
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            previewImage.hide();
+            existingImage.show(); // ถ้าไม่มีไฟล์ใหม่ 
         }
     });
-});
-
-
 
 </script>
 
