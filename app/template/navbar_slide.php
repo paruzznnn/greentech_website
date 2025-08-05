@@ -61,7 +61,7 @@ $dropdownItems = [
     align-items: center;
     overflow: visible;
     white-space: nowrap;
-    gap: 15px;
+    gap: 40px;
 }
 
 .desktop-menu-item {
@@ -70,7 +70,7 @@ $dropdownItems = [
     color: #ffffff;
     text-decoration: none;
     padding: 10px 15px;
-    font-size: 16px;
+    font-size: 20px;
     transition: background-color 0.3s;
 }
 
