@@ -61,7 +61,7 @@ $dropdownItems = [
     align-items: center;
     overflow: visible;
     white-space: nowrap;
-    gap: 40px;
+    gap: 35px;
 }
 
 .desktop-menu-item {
