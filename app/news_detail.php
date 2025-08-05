@@ -46,7 +46,10 @@ if (isset($_GET['id'])) {
                 font-family: sans-serif, "Kanit", "Roboto" !important;
             } */
         }
-
+        aa {
+            color: #3e5beaff;;
+            text-decoration: underline;
+        }
 
     </style>
 
@@ -137,12 +140,12 @@ if (isset($_GET['id'])) {
                 <div style="padding-left:50px;">
                 <hr style="border-top: dashed 1px; margin: 40px 0;">
                 <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
-                <p>🛒 Website : <a href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</a></p>
+                <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                 <p>📱 Line OA : @Trandaraocoustic 
-                    <a href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</a>
+                    <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
                 </p>
                 <p>📱 Line OA : @Trandarstore 
-                    <a href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</a>
+                    <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
                 </p>
                 <p>☎️ Tel : 02-722-7007</p>         
             </div>                      
