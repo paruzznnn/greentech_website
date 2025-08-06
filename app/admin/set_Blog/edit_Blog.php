@@ -14,13 +14,36 @@ if (!isset($_POST['Blog_id'])) {
 }
 
 $decodedId = $_POST['Blog_id'];
+
+// เพิ่มส่วนนี้: ดึงข้อมูลสินค้าทั้งหมดจากตาราง dn_project
+$sql_all_projects = "SELECT project_id, subject_project FROM dn_project WHERE del = 0 ORDER BY subject_project ASC";
+$result_all_projects = $conn->query($sql_all_projects);
+$all_projects = [];
+if ($result_all_projects->num_rows > 0) {
+    while ($row = $result_all_projects->fetch_assoc()) {
+        $all_projects[] = $row;
+    }
+}
+
+// เพิ่มส่วนนี้: ดึงข้อมูลสินค้าที่เกี่ยวข้องเดิม
+$related_project_ids = [];
+$stmt_related_projects = $conn->prepare("SELECT project_id FROM dn_blog_project WHERE Blog_id = ?");
+if ($stmt_related_projects) {
+    $stmt_related_projects->bind_param("i", $decodedId);
+    $stmt_related_projects->execute();
+    $result_related_projects = $stmt_related_projects->get_result();
+    while ($row = $result_related_projects->fetch_assoc()) {
+        $related_project_ids[] = $row['project_id'];
+    }
+    $stmt_related_projects->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Blog</title>
+    <title>Edit blog</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -60,17 +83,11 @@ $decodedId = $_POST['Blog_id'];
 
     <style>
         .note-editable {
-            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
-            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
-            /* min-height: 600px; */
-            /* max-height: 600px; */
-            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
-            /* font-family: sans-serif */
             color: #424242;
         }
         .responsive-grid {
@@ -78,25 +95,21 @@ $decodedId = $_POST['Blog_id'];
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
-
         .responsive-button-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
-
         @media (max-width: 768px) {
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
         }
-
         @media (max-width: 480px) {
             .responsive-button-container div {
                 text-align: center;
             }
         }
-
         .note-toolbar {
             position: sticky !important;
             top: 70px !important;
@@ -113,15 +126,15 @@ $decodedId = $_POST['Blog_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit Blog
+                        <i class="far fa-newspaper"></i> Edit blog
                     </h4>
                     <?php
 $stmt = $conn->prepare("
     SELECT 
     dn.Blog_id, 
-    dn.subject_Blog, 
-    dn.description_Blog,
-    dn.content_Blog, 
+    dn.subject_blog, 
+    dn.description_blog,
+    dn.content_blog, 
     dn.date_create, 
     GROUP_CONCAT(dnc.file_name) AS file_name,
     GROUP_CONCAT(dnc.api_path) AS pic_path,
@@ -130,7 +143,6 @@ FROM dn_blog dn
 LEFT JOIN dn_blog_doc dnc ON dn.Blog_id = dnc.Blog_id
 WHERE dn.Blog_id = ?
 GROUP BY dn.Blog_id
-
 ");
 
 if ($stmt === false) {
@@ -143,7 +155,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $content = $row['content_Blog'];
+        $content = $row['content_blog'];
         $paths = explode(',', $row['pic_path']);
         $files = explode(',', $row['file_name']);
 
@@ -166,7 +178,7 @@ if ($result->num_rows > 0) {
                 <div class='col-md-4'>
                     <div style='margin: 10px;'>
                         <label><span>Cover photo</span>:</label>
-                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                         <div id='previewContainer' class='previewContainer'>
                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                         </div>
@@ -176,24 +188,36 @@ if ($result->num_rows > 0) {
                     </div>
                     <div style='margin: 10px;'>
                         <label><span>Subject</span>:</label>
-                        <input type='text' class='form-control' id='Blog_subject' name='Blog_subject' value='" . htmlspecialchars($row['subject_Blog']) . "'>
+                        <input type='text' class='form-control' id='Blog_subject' name='Blog_subject' value='" . htmlspecialchars($row['subject_blog']) . "'>
                     </div>
                     <div style='margin: 10px;'>
                         <label><span>Description</span>:</label>
-                        <textarea class='form-control' id='Blog_description' name='Blog_description'>" . htmlspecialchars($row['description_Blog']) . "</textarea>
+                        <textarea class='form-control' id='Blog_description' name='Blog_description'>" . htmlspecialchars($row['description_blog']) . "</textarea>
+                    </div>
+
+                    <div style='margin: 10px;'>
+                        <label>สินค้าที่เกี่ยวข้อง (เลือกได้หลายชิ้น)</label>
+                        <select class='form-control select2' multiple='multiple' name='related_projects[]' style='width: 100%;'>
+                            ";
+                            foreach ($all_projects as $project):
+                                $selected = in_array($project['project_id'], $related_project_ids) ? 'selected' : '';
+                                echo "<option value='" . htmlspecialchars($project['project_id']) . "' " . $selected . ">" . htmlspecialchars($project['subject_project']) . "</option>";
+                            endforeach;
+                        echo "
+                        </select>
                     </div>
                     <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditBlog' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save Blog
+                        <button type='button' id='submitEditblog' class='btn btn-success'>
+                            <i class='fas fa-save'></i> Save blog
                         </button>
                     </div>
                 </div>
                 <div class='col-md-8'>
-                 <div style='margin: 10px; text-align: end;'>
-                <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                    <i class='fas fa-arrow-left'></i> Back 
-                </button>
-            </div>
+                    <div style='margin: 10px; text-align: end;'>
+                        <button type='button' id='backToprojectList' class='btn btn-secondary'> 
+                            <i class='fas fa-arrow-left'></i> Back 
+                        </button>
+                    </div>
                     <div style='margin: 10px;'>
                         <label><span>Content</span>:</label>
                         <textarea class='form-control summernote' id='summernote_update' name='Blog_content'>" . htmlspecialchars($content) . "</textarea>
@@ -237,9 +261,25 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/Blog_.js?v=<?php echo time(); ?>'></script>
+
+    <script>
+    $(document).ready(function() {
+        // Init Select2
+        $('.select2').select2({
+            placeholder: "เลือกสินค้าที่เกี่ยวข้อง",
+            allowClear: true
+        });
+
+        // Summernote init
+        $('#summernote_update').summernote({
+            placeholder: 'กรอกเนื้อหาโปรเจกต์',
+            tabsize: 2,
+            height: 300,
+            callbacks: {
+                // ... (your existing callbacks) ...
+            }
+        });
+    });
+    </script>
 </body>
 </html>
-
-
-
-
