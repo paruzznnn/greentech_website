@@ -129,7 +129,7 @@ $(document).ready(function () {
             var deleteButton = $(row).find('.btn-del');
 
             editButton.off('click').on('click', function () {
-                reDirect('edit_blog.php', {
+                reDirect('edit_Blog.php', {
                     Blog_id: data.Blog_id
                 });
             });
@@ -147,7 +147,7 @@ $(document).ready(function () {
                     if (result.isConfirmed) {
                         $('#loading-overlay').fadeIn();
                         $.ajax({
-                            url: 'actions/process_blog.php',
+                            url: 'actions/process_Blog.php',
                             type: 'POST',
                             data: {
                                 action: 'delblog',
@@ -314,7 +314,7 @@ $("#submitAddblog").on("click", function (event) {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: "actions/process_blog.php",
+                    url: "actions/process_Blog.php",
                     type: "POST",
                     data: formData,
                     processData: false,
@@ -345,7 +345,7 @@ $("#submitAddblog").on("click", function (event) {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: "actions/process_blog.php",
+                    url: "actions/process_Blog.php",
                     type: "POST",
                     data: formData,
                     processData: false,
@@ -450,7 +450,7 @@ $("#submitEditblog").on("click", function (event) {
         if (result.isConfirmed) {
             $('#loading-overlay').fadeIn();
             $.ajax({
-                url: "actions/process_blog.php",
+                url: "actions/process_Blog.php",
                 type: "POST",
                 data: formData,
                 processData: false,
