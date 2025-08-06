@@ -39,7 +39,7 @@ $(document).ready(function () {
         readURL(this);
     });
 
-    var td_list_blog = new DataTable('#td_list_blog', {
+    var td_list_Blog = new DataTable('#td_list_Blog', {
         "autoWidth": false,
         "language": {
             "decimal": "",
