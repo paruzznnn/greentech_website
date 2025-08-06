@@ -2,7 +2,8 @@
 /****nationLanguages**** */
 
 function nationLanguages() {
-    $.getJSON('/api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
+    let newPath = $('#new_path').val();
+    $.getJSON(newPath + 'api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
@@ -40,7 +41,8 @@ function updateSelectedLanguageFlag() {
 }
 
 function changeLanguage(lang) {
-    fetch('/api/languages/' + lang + '.json')
+    let newPath = $('#new_path').val();
+    fetch(newPath+'api/languages/' + lang + '.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -83,14 +85,11 @@ const buildTabSidebar = () => {
     let currentPath = window.location.pathname;
 
     // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
-    let sidebarPath = (
-    currentPath.includes('dashboard.php') || 
-    currentPath.includes('profile.php')
-) 
-        ? '/app/admin/actions/check_sidebar.php'
-        : '../actions/check_sidebar.php';
-
-
+    if (currentPath.includes('dashboard.php') || currentPath.includes('profile.php')) {
+        sidebarPath = '/trandar/app/admin/actions/check_sidebar.php';
+    } else {
+        sidebarPath = '../actions/check_sidebar.php'
+    }
     console.log("✅ Loading sidebar from:", sidebarPath);
     $.ajax({
         url: sidebarPath,

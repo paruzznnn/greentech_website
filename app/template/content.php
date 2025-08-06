@@ -5,7 +5,7 @@
             <!-- What's New -->
             <div class="col-md-12 section" >
                 <div class="box-content1" style="padding-top: 1px;">
-                    <h4 class="line-ref1">What's New</h4>
+                    <h4 data-translate="WhatsNew" class="line-ref1" lang="th">What's New</h4>
                     <?php include 'template/news/news_home.php'; ?>
                 </div>
             </div>
