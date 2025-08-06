@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/base_directory.php';
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -25,7 +24,6 @@ if (!isset($base_path_admin)) {
 }
 ?>
 
-
 <!-- ✅ Header -->
 <div class="header-topp">
   <div class="container-fluid">
@@ -34,7 +32,7 @@ if (!isset($base_path_admin)) {
       <span class="toggle-button" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </span>
-      <a href="#"><img class="logo" src="<?php echo $newPath; ?>public/img/LOGOTRAND.png" alt=""></a>
+      <a href="#"><img class="logo" src="/public/img/LOGOTRAND.png" alt=""></a>
 
     </div>
 
@@ -49,10 +47,10 @@ if (!isset($base_path_admin)) {
 
       <!-- 📦 Origami Dropdown -->
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
-        <img src="<?php echo $newPath; ?>public/img/origami_app.png" height="25" style="cursor:pointer;">
+        <img src="/public/img/origami_app.png" height="25" style="cursor:pointer;">
         <div id="origamiDropdownMenu" class="dropdown-box hidden">
           <a href="https://www.origami.life">
-            <img src="<?php echo $newPath; ?>public/img/2_20180425103337.ico" height="40"><br>
+            <img src="/public/img/2_20180425103337.ico" height="40"><br>
             <span>Origami</span>
           </a>
           
@@ -67,17 +65,16 @@ if (!isset($base_path_admin)) {
         
       <!-- 🟣 Profile Dropdown -->
       <div class="profile-container dropdown-parent" onclick="toggleDropdown('globalProfileDropdown', event)">
-        <img src="<?php echo $newPath; ?>public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
+        <img src="/public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
         <div id="globalProfileDropdown" class="dropdown-box hidden">
-          <a href="<?php echo $path_admin; ?>profile.php">Profile</a>
-          <a href="<?php echo $path_admin; ?>logout.php">Logout</a>
+          <a href="/app/admin/profile.php">Profile</a>
+          <a href="/app/admin/logout.php">Logout</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-<input type="hidden" name="newPath" id="newPath" value="<?php echo $newPath; ?>">
-<input type="hidden" name="pathAdmin" id="pathAdmin" value="<?php echo $path_admin; ?>">
+
 <div id="showTabSidebar" class="row row-tab"></div>
 
 
