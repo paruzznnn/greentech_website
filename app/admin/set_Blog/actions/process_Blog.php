@@ -7,16 +7,12 @@ require_once(__DIR__ . '/../../../../inc/getFunctions.php');
 
 global $base_path;
 global $base_path_admin;
-
 global $conn;
 
 function insertIntoDatabase($conn, $table, $columns, $values)
 {
-
     $placeholders = implode(', ', array_fill(0, count($values), '?'));
-
     $query = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES ($placeholders)";
-
     $stmt = $conn->prepare($query);
 
     $types = str_repeat('s', count($values));
@@ -31,7 +27,6 @@ function insertIntoDatabase($conn, $table, $columns, $values)
 
 function updateInDatabase($conn, $table, $columns, $values, $whereClause, $whereValues)
 {
-
     $setPart = implode(', ', array_map(function ($col) {
         return "$col = ?";
     }, $columns));
@@ -40,7 +35,6 @@ function updateInDatabase($conn, $table, $columns, $values, $whereClause, $where
 
     $stmt = $conn->prepare($query);
 
-    // Bind parameters
     $types = str_repeat('s', count($values)) . str_repeat('s', count($whereValues));
     $stmt->bind_param($types, ...array_merge($values, $whereValues));
 
@@ -116,31 +110,26 @@ function handleFileUpload($files)
 }
 
 
-
 $response = array('status' => 'error', 'message' => '');
 
 try {
-
-
-    if (isset($_POST['action']) && $_POST['action'] == 'addBlog') {
-
+    if (isset($_POST['action']) && $_POST['action'] == 'addblog') {
         $Blog_array = [
             'Blog_subject' => $_POST['Blog_subject'] ?? '',
             'Blog_description' => $_POST['Blog_description'] ?? '',
             'Blog_content'  => $_POST['Blog_content'] ?? '',
         ];
+        
+        $related_projects = $_POST['related_projects'] ?? [];
 
         if (isset($Blog_array)) {
-
             $stmt = $conn->prepare("INSERT INTO dn_blog 
-                (subject_Blog, description_Blog, content_Blog, date_create) 
+                (subject_blog, description_blog, content_blog, date_create) 
                 VALUES (?, ?, ?, ?)");
 
             $Blog_subject = $Blog_array['Blog_subject'];
             $Blog_description = $Blog_array['Blog_description'];
-
             $Blog_content = mb_convert_encoding($Blog_array['Blog_content'], 'UTF-8', 'auto');
-
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
@@ -154,17 +143,24 @@ try {
             if (!$stmt->execute()) {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
-
             $last_inserted_id = $conn->insert_id;
 
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            // เพิ่มส่วนนี้: บันทึกข้อมูลสินค้าที่เกี่ยวข้อง
+            if (!empty($related_projects)) {
+                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (Blog_id, project_id) VALUES (?, ?)");
+                foreach ($related_projects as $project_id) {
+                    $stmt_project_insert->bind_param("ii", $last_inserted_id, $project_id);
+                    $stmt_project_insert->execute();
+                }
+                $stmt_project_insert->close();
+            }
 
+            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
-
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-
                         $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
@@ -173,15 +169,11 @@ try {
                     }
                 }
             }
-
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
-
                 $fileInfos = handleFileUpload($_FILES['image_files']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
-
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-
                         $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
@@ -190,12 +182,12 @@ try {
                     }
                 }
             }
+            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
 
             $response = array('status' => 'success', 'message' => 'save');
         }
-    } elseif (isset($_POST['action']) && $_POST['action'] == 'editBlog') {
 
-
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'editblog') {
         $Blog_array = [
             'Blog_id' => $_POST['Blog_id'] ?? '',
             'Blog_subject' => $_POST['Blog_subject'] ?? '',
@@ -203,19 +195,19 @@ try {
             'Blog_content'  => $_POST['Blog_content'] ?? '',
         ];
 
-        if (!empty($Blog_array['Blog_id'])) {
+        $related_projects = $_POST['related_projects'] ?? [];
 
+        if (!empty($Blog_array['Blog_id'])) {
             $stmt = $conn->prepare("UPDATE dn_blog 
-            SET subject_Blog = ?, 
-            description_Blog = ?, 
-            content_Blog = ?, 
+            SET subject_blog = ?, 
+            description_blog = ?, 
+            content_blog = ?, 
             date_create = ? 
             WHERE Blog_id = ?");
 
             $Blog_subject = $Blog_array['Blog_subject'];
             $Blog_description = $Blog_array['Blog_description'];
             $Blog_content = mb_convert_encoding($Blog_array['Blog_content'], 'UTF-8', 'auto');
-
             $current_date = date('Y-m-d H:i:s');
             $Blog_id = $Blog_array['Blog_id'];
 
@@ -232,88 +224,91 @@ try {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
 
-            $Blog_id = $Blog_array['Blog_id'];
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            // เพิ่มส่วนนี้: อัปเดตข้อมูลสินค้าที่เกี่ยวข้อง
+            // 1. ลบข้อมูลเก่าทั้งหมดของ blog นี้ออกจากตาราง dn_blog_project
+            $stmt_delete_projects = $conn->prepare("DELETE FROM dn_blog_project WHERE Blog_id = ?");
+            $stmt_delete_projects->bind_param("i", $Blog_id);
+            $stmt_delete_projects->execute();
+            $stmt_delete_projects->close();
 
+            // 2. เพิ่มข้อมูลใหม่
+            if (!empty($related_projects)) {
+                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (Blog_id, project_id) VALUES (?, ?)");
+                foreach ($related_projects as $project_id) {
+                    $stmt_project_insert->bind_param("ii", $Blog_id, $project_id);
+                    $stmt_project_insert->execute();
+                }
+                $stmt_project_insert->close();
+            }
+            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
-
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-
                         $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
                         $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-
-                        // กำหนด WHERE clause และค่าที่ใช้ใน WHERE clause
                         $fileWhereClause = 'Blog_id = ?';
                         $fileWhereValues = [$Blog_id];
-
                         updateInDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
                     } else {
                         throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
                     }
                 }
-            }  
-
+            }
             if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
-
-    $fileInfos = handleFileUpload($_FILES['image_files']);
-    foreach ($fileInfos as $fileInfo) {
-        if ($fileInfo['success']) {
-
-            $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-
-            $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
-            $fileValues = [$Blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
-
-            insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
-        } else {
-            throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-        }
-    }
-}
+                $fileInfos = handleFileUpload($_FILES['image_files']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$Blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
+            
             $response = array('status' => 'success', 'message' => 'edit save');
         }
-    } elseif (isset($_POST['action']) && $_POST['action'] == 'delBlog') {
 
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'delblog') {
         $Blog_id = $_POST['id'] ?? '';
         $del = '1';
         
-        // Update the `dn_blog` table
         $stmt = $conn->prepare("UPDATE dn_blog 
             SET del = ? 
-            WHERE Blog_id = ?"); // Removed the extra comma here
-        
-        $stmt->bind_param(
-            "si",
-            $del,
-            $Blog_id
-        );
-        
+            WHERE Blog_id = ?");
+        $stmt->bind_param("si", $del, $Blog_id);
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed: " . $stmt->error);
         }
+        $stmt->close();
         
-        // Update the `dn_blog_doc` table
         $stmt = $conn->prepare("UPDATE dn_blog_doc 
             SET del = ? 
-            WHERE Blog_id = ?"); // Removed the extra comma here
-        
-        $stmt->bind_param(
-            "si",
-            $del,
-            $Blog_id
-        );
-        
+            WHERE Blog_id = ?");
+        $stmt->bind_param("si", $del, $Blog_id);
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed: " . $stmt->error);
         }
+        $stmt->close();
+
+        // เพิ่มส่วนนี้: อัปเดตตาราง dn_blog_project
+        $stmt = $conn->prepare("UPDATE dn_blog_project 
+            SET del = ? 
+            WHERE Blog_id = ?");
+        $stmt->bind_param("si", $del, $Blog_id);
+        if (!$stmt->execute()) {
+            throw new Exception("Execute statement failed: " . $stmt->error);
+        }
+        $stmt->close();
         
         $response = array('status' => 'success', 'message' => 'Delete');
         
-
-
-    } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_Blog') {
+    } elseif (isset($_POST['action']) && $_POST['action'] == 'getData_blog') {
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
         $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
@@ -327,12 +322,12 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_Blog LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_blog LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
-        $dataQuery = "SELECT Blog_id, subject_Blog, date_create FROM dn_blog 
+        $dataQuery = "SELECT Blog_id, subject_blog, date_create FROM dn_blog 
                     WHERE $whereClause
                     ORDER BY $orderBy
                     LIMIT $start, $length";
