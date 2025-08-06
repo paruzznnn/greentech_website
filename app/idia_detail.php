@@ -98,6 +98,30 @@ if (isset($_GET['id'])) {
     <div class="content-sticky" id="">
         <div class="container">
             <div class="box-content">
+                 <div class="social-share">
+                    <p>แชร์หน้านี้:</p>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                    </a>
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                    </a>
+                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                </div>
+
+
 
                 <div class="row">
 
@@ -166,19 +190,7 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
 
-              
-                <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
-                <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
-                <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
-                        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
-                    <button type="submit"
-                        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        แสดงความคิดเห็น
-                    </button>
-                </form>
-
-                  <div class="social-share">
+                 <div class="social-share">
                     <p>แชร์หน้านี้:</p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
@@ -202,6 +214,20 @@ if (isset($_GET['id'])) {
                 </div>
 
 
+
+              
+                <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
+                <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
+                <form id="commentForm" style="max-width: 600px;">
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
+                        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
+                    <button type="submit"
+                        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+                        แสดงความคิดเห็น
+                    </button>
+                </form>
+
+                 
                 <script>
                 document.getElementById("commentForm").addEventListener("submit", function(e) {
                     e.preventDefault();

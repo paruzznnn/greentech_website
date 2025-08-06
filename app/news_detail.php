@@ -102,6 +102,28 @@ if (isset($_GET['id'])) {
     <div class="content-sticky" id="">
         <div class="container">
             <div class="box-content">
+                <div class="social-share">
+                <p>แชร์หน้านี้:</p>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                </a>
+                <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                </a>
+                <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                </a>
+                <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                </a>
+                <a href="https://www.instagram.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                </a>
+                <a href="https://www.tiktok.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                </a>
+                <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+            </div>
 
                 <div class="row">
 
@@ -170,18 +192,42 @@ if (isset($_GET['id'])) {
                     </div>
 
                 </div>
+                            <hr style="border-top: dashed 1px; margin: 20px 0;">
+                <div class="social-share">
+                    <p>แชร์หน้านี้:</p>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                    </a>
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                    </a>
+                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                </div>
                 <div style="padding-left:50px;">
-                <hr style="border-top: dashed 1px; margin: 40px 0;">
-                <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
-                <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
-                <p>📱 Line OA : @Trandaraocoustic 
-                    <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
-                </p>
-                <p>📱 Line OA : @Trandarstore 
-                    <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
-                </p>
-                <p>☎️ Tel : 02-722-7007</p>         
-            </div>
+                    <hr style="border-top: dashed 1px; margin: 20px 0;">
+                    
+                    <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
+                    <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
+                    <p>📱 Line OA : @Trandaraocoustic 
+                        <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
+                    </p>
+                    <p>📱 Line OA : @Trandarstore 
+                        <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
+                    </p>
+                    <p>☎️ Tel : 02-722-7007</p>           
+                </div> 
 
            
             
@@ -196,28 +242,7 @@ if (isset($_GET['id'])) {
                 </button>
             </form>
 
-             <div class="social-share">
-                <p>แชร์หน้านี้:</p>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                </a>
-                <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                </a>
-                <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                </a>
-                <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                </a>
-                <a href="https://www.instagram.com/" target="_blank">
-                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                </a>
-                <a href="https://www.tiktok.com/" target="_blank">
-                    <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                </a>
-                <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
-            </div>
+             
 
             <script>
             document.getElementById("commentForm").addEventListener("submit", function(e) {
