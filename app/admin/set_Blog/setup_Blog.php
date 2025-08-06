@@ -146,7 +146,7 @@ if ($result_projects->num_rows > 0) {
                                 </div>
                                 
                                 <div style="margin: 10px;">
-                                    <label>สินค้าที่เกี่ยวข้อง (เลือกได้หลายชิ้น)</label>
+                                    <label>โปรเจกต์ที่เกี่ยวข้อง (เลือกได้หลายโปรเจกต์)</label>
                                     <select class="form-control select2" multiple="multiple" name="related_projects[]" style="width: 100%;">
                                         <?php foreach ($projects as $project): ?>
                                             <option value="<?= htmlspecialchars($project['project_id']) ?>">
@@ -202,7 +202,7 @@ if ($result_projects->num_rows > 0) {
 
         // Init Select2
         $('.select2').select2({
-            placeholder: "เลือกสินค้าที่เกี่ยวข้อง",
+            placeholder: "เลือกโปรเจกต์ที่เกี่ยวข้อง",
             allowClear: true
         });
 
