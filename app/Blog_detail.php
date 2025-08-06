@@ -53,10 +53,11 @@ if (isset($_GET['id'])) {
         .project-wrapper-container {
             position: relative;
             max-width: 1280px;
-            margin: 0 auto; /* ปรับให้อยู่ตรงกลาง */
+            margin: 0; /* แก้ไข: ให้ margin เป็น 0 เพื่อให้ชิดซ้าย */
             overflow: hidden;
             padding: 0 20px; /* ลด padding เพื่อให้มีพื้นที่เพิ่มขึ้น */
             margin-bottom: 20px;
+            box-sizing: border-box; /* เพิ่ม box-sizing เพื่อให้ padding ไม่ขยายขนาดกล่อง */
         }
 
         .project-scroll {
@@ -206,6 +207,10 @@ if (isset($_GET['id'])) {
             font-size: 1.5rem;
             font-weight: bold;
             color: #555;
+            display: none; /* เริ่มต้นด้วยการซ่อนปุ่มไว้ก่อน */
+        }
+        .scroll-btn.show {
+            display: block; /* แสดงปุ่มเมื่อมี class 'show' */
         }
 
         .scroll-btn.left {
@@ -281,7 +286,6 @@ if (isset($_GET['id'])) {
         .copy-link-btn:hover {
             background-color: #5a6268;
         }
-
     </style>
 </head>
 <body>
@@ -377,7 +381,7 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
                 
-                            <hr style="border-top: dashed 1px; margin: 20px 0;">
+                <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
                     <p>แชร์หน้านี้:</p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
@@ -411,7 +415,7 @@ if (isset($_GET['id'])) {
                     <p>📱 Line OA : @Trandarstore 
                         <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
                     </p>
-                    <p>☎️ Tel : 02-722-7007</p>           
+                    <p>☎️ Tel : 02-722-7007</p> 
                 </div> 
 
                 <?php
@@ -434,25 +438,23 @@ if (isset($_GET['id'])) {
                         $stmt_project->bind_param('i', $decodedId);
                         $stmt_project->execute();
                         $result_project = $stmt_project->get_result();
+                        $project_cards_data = $result_project->fetch_all(MYSQLI_ASSOC);
 
                         if ($result_project->num_rows > 0) {
                             echo '<h3 style="padding-top: 40px;">โปรเจกต์ที่เกี่ยวข้องกับบทความนี้</h3>';
                             echo '<div class="project-wrapper-container">';
-                            echo '<div class="scroll-btn left" onclick="scrollProject(\'left\')">&#10094;</div>';
-                            echo '<div class="scroll-btn right" onclick="scrollProject(\'right\')">&#10095;</div>';
+                            echo '<div class="scroll-btn left" id="project-scroll-left" onclick="scrollProject(\'left\')">&#10094;</div>';
+                            echo '<div class="scroll-btn right" id="project-scroll-right" onclick="scrollProject(\'right\')">&#10095;</div>';
                             echo '<div class="project-scroll" id="project-scroll-box">';
                             
-                            while ($row_project = $result_project->fetch_assoc()) {
+                            foreach ($project_cards_data as $row_project) {
                                 $projectIdEncoded = urlencode(base64_encode($row_project['project_id']));
                                 $project_link = "project_detail.php?id=" . $projectIdEncoded;
                                 $paths_project = !empty($row_project['pic_path']) ? explode(',', $row_project['pic_path']) : [];
                                 $image_path_project = !empty($paths_project) ? $paths_project[0] : null;
                                 $placeholder_image = 'https://via.placeholder.com/350x220.png?text=Project+Image';
                                 
-                                // กล่อง Project แต่ละอัน
                                 echo '<div class="project-card">';
-                                
-                                // ส่วนภาพและรายละเอียดของ Project
                                 echo '<a href="' . htmlspecialchars($project_link) . '" class="related-project-box" style="text-decoration: none; color: inherit;">';
                                 echo '<div class="card-image-wrapper">';
                                 echo '<img src="' . htmlspecialchars($image_path_project ?: $placeholder_image) . '" class="card-img-top" alt="' . htmlspecialchars($row_project['subject_project']) . '">';
@@ -480,13 +482,14 @@ if (isset($_GET['id'])) {
                                 $stmt_shop->bind_param('i', $row_project['project_id']);
                                 $stmt_shop->execute();
                                 $result_shop = $stmt_shop->get_result();
+                                $shop_count = $result_shop->num_rows;
 
-                                if ($result_shop->num_rows > 0) {
+                                if ($shop_count > 0) {
                                     $shop_scroll_id = 'shop-scroll-' . $row_project['project_id'];
                                     echo '<h6 class="shop-title">สินค้าที่ใช้ในโปรเจกต์นี้</h6>';
                                     echo '<div class="shop-wrapper-container">';
-                                    echo '<div class="scroll-btn left" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'left\')">&#10094;</div>';
-                                    echo '<div class="scroll-btn right" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'right\')">&#10095;</div>';
+                                    echo '<div class="scroll-btn left" id="shop-scroll-left-' . $row_project['project_id'] . '" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'left\')">&#10094;</div>';
+                                    echo '<div class="scroll-btn right" id="shop-scroll-right-' . $row_project['project_id'] . '" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'right\')">&#10095;</div>';
                                     echo '<div class="shop-scroll" id="' . $shop_scroll_id . '">';
                                     
                                     while ($row_shop = $result_shop->fetch_assoc()) {
@@ -515,8 +518,7 @@ if (isset($_GET['id'])) {
                                     echo '</div>';
                                 }
                                 $stmt_shop->close();
-
-                                echo '</div>'; // close project-card
+                                echo '</div>';
                             }
                             echo '</div>'; // close project-scroll
                             echo '</div>'; // close project-wrapper-container
@@ -526,8 +528,6 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                
-
                 <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
                 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
                 <form id="commentForm" style="max-width: 600px;">
@@ -538,90 +538,128 @@ if (isset($_GET['id'])) {
                         แสดงความคิดเห็น
                     </button>
                 </form>
-
-                
                 
                 <script>
-                document.getElementById("commentForm").addEventListener("submit", function(e) {
-                    e.preventDefault();
+                    document.getElementById("commentForm").addEventListener("submit", function(e) {
+                        e.preventDefault();
+                        const jwt = sessionStorage.getItem("jwt");
+                        const comment = document.getElementById("commentText").value;
+                        const pageUrl = window.location.pathname;
 
-                    const jwt = sessionStorage.getItem("jwt");
-                    const comment = document.getElementById("commentText").value;
-                    const pageUrl = window.location.pathname;
-
-                    if (!jwt) {
-                        document.getElementById("myBtn-sign-in").click();
-                        return;
-                    }
-
-                    fetch('actions/protected.php', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + jwt
+                        if (!jwt) {
+                            document.getElementById("myBtn-sign-in").click();
+                            return;
                         }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-                            fetch('actions/save_comment.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': 'Bearer ' + jwt
-                                },
-                                body: JSON.stringify({
-                                    comment: comment,
-                                    page_url: pageUrl
+
+                        fetch('actions/protected.php', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': 'Bearer ' + jwt
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === "success" && parseInt(data.data.role_id) === 3) {
+                                fetch('actions/save_comment.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': 'Bearer ' + jwt
+                                    },
+                                    body: JSON.stringify({
+                                        comment: comment,
+                                        page_url: pageUrl
+                                    })
                                 })
-                            })
-                            .then(res => res.json())
-                            .then(result => {
-                                if (result.status === 'success') {
-                                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
-                                    document.getElementById("commentText").value = '';
-                                } else {
-                                    alert("เกิดข้อผิดพลาด: " + result.message);
-                                }
-                            });
-                        } else {
-                            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error verifying user:", err);
-                        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+                                .then(res => res.json())
+                                .then(result => {
+                                    if (result.status === 'success') {
+                                        alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                                        document.getElementById("commentText").value = '';
+                                    } else {
+                                        alert("เกิดข้อผิดพลาด: " + result.message);
+                                    }
+                                });
+                            } else {
+                                alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error verifying user:", err);
+                            alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+                        });
                     });
-                });
 
-                function scrollProject(direction) {
-                    const box = document.getElementById('project-scroll-box');
-                    const scrollAmount = 350 + 20; // card width + gap
-                    if (direction === 'left') {
-                        box.scrollLeft -= scrollAmount;
-                    } else {
-                        box.scrollLeft += scrollAmount;
+                    function scrollProject(direction) {
+                        const box = document.getElementById('project-scroll-box');
+                        const scrollAmount = 350 + 40; // card width + gap
+                        if (direction === 'left') {
+                            box.scrollLeft -= scrollAmount;
+                        } else {
+                            box.scrollLeft += scrollAmount;
+                        }
                     }
-                }
-                
-                function scrollShop(containerId, direction) {
-                    const container = document.getElementById(containerId);
-                    const scrollAmount = 180 + 10; // card width + gap
-                    if (direction === 'left') {
-                        container.scrollLeft -= scrollAmount;
-                    } else {
-                        container.scrollLeft += scrollAmount;
+                    
+                    function scrollShop(containerId, direction) {
+                        const container = document.getElementById(containerId);
+                        const scrollAmount = 180 + 10; // card width + gap
+                        if (direction === 'left') {
+                            container.scrollLeft -= scrollAmount;
+                        } else {
+                            container.scrollLeft += scrollAmount;
+                        }
                     }
-                }
-                
-                // JavaScript for Copy Link functionality
-                function copyLink() {
-                    const pageUrl = "<?= $pageUrl ?>";
-                    navigator.clipboard.writeText(pageUrl).then(function() {
-                        alert("คัดลอกลิงก์เรียบร้อยแล้ว");
-                    }, function() {
-                        alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
-                    });
-                }
+                    
+                    // JavaScript for Copy Link functionality
+                    function copyLink() {
+                        const pageUrl = "<?= $pageUrl ?>";
+                        navigator.clipboard.writeText(pageUrl).then(function() {
+                            alert("คัดลอกลิงก์เรียบร้อยแล้ว");
+                        }, function() {
+                            alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
+                        });
+                    }
+
+                    // Function to show/hide scroll buttons based on content count
+                    function toggleScrollButtons() {
+                        // For Project Slider
+                        const projectScrollBox = document.getElementById('project-scroll-box');
+                        if(projectScrollBox) {
+                            const projectCards = projectScrollBox.querySelectorAll('.project-card');
+                            const projectLeftBtn = document.getElementById('project-scroll-left');
+                            const projectRightBtn = document.getElementById('project-scroll-right');
+
+                            if (projectCards.length > 3) {
+                                projectLeftBtn.classList.add('show');
+                                projectRightBtn.classList.add('show');
+                            } else {
+                                projectLeftBtn.classList.remove('show');
+                                projectRightBtn.classList.remove('show');
+                            }
+                        }
+                        
+                        // For each Shop Slider
+                        document.querySelectorAll('.shop-scroll').forEach(shopContainer => {
+                            const shopCards = shopContainer.querySelectorAll('.shop-card');
+                            const containerId = shopContainer.id;
+                            // Extract project_id from containerId like 'shop-scroll-123'
+                            const projectId = containerId.split('-')[2];
+                            const shopLeftBtn = document.getElementById('shop-scroll-left-' + projectId);
+                            const shopRightBtn = document.getElementById('shop-scroll-right-' + projectId);
+
+                            if (shopCards.length >= 2) {
+                                if(shopLeftBtn) shopLeftBtn.classList.add('show');
+                                if(shopRightBtn) shopRightBtn.classList.add('show');
+                            } else {
+                                if(shopLeftBtn) shopLeftBtn.classList.remove('show');
+                                if(shopRightBtn) shopRightBtn.classList.remove('show');
+                            }
+                        });
+                    }
+
+                    // Run the function when the page loads and on resize
+                    window.addEventListener('load', toggleScrollButtons);
+                    window.addEventListener('resize', toggleScrollButtons);
                 </script>
             </div>
         </div>
