@@ -39,7 +39,7 @@ $(document).ready(function () {
         readURL(this);
     });
 
-    var td_list_Blog = new DataTable('#td_list_Blog', {
+    var td_list_blog = new DataTable('#td_list_blog', {
         "autoWidth": false,
         "language": {
             "decimal": "",
@@ -59,7 +59,7 @@ $(document).ready(function () {
         "processing": true,
         "serverSide": true,
         ajax: {
-            url: "actions/process_blog.php",
+            url: "actions/process_Blog.php",
             method: 'POST',
             dataType: 'json',
             data: function (d) {
