@@ -69,14 +69,15 @@ if (!isset($base_path_admin)) {
       <div class="profile-container dropdown-parent" onclick="toggleDropdown('globalProfileDropdown', event)">
         <img src="<?php echo $newPath; ?>public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
         <div id="globalProfileDropdown" class="dropdown-box hidden">
-          <a href="<?php echo $newPath; ?>app/admin/profile.php">Profile</a>
-          <a href="<?php echo $newPath; ?>app/admin/logout.php">Logout</a>
+          <a href="<?php echo $path_admin; ?>profile.php">Profile</a>
+          <a href="<?php echo $path_admin; ?>logout.php">Logout</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-<input type="hidden" name="new_path" id="new_path" value="<?php echo $newPath; ?>">
+<input type="hidden" name="newPath" id="newPath" value="<?php echo $newPath; ?>">
+<input type="hidden" name="pathAdmin" id="pathAdmin" value="<?php echo $path_admin; ?>">
 <div id="showTabSidebar" class="row row-tab"></div>
 
 
