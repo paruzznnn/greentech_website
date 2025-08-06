@@ -481,7 +481,7 @@ $("#submitEditblog").on("click", function (event) {
 });
 
 $("#backToprojectList").on("click", function () {
-    window.location.href = "list_blog.php";
+    window.location.href = "list_Blog.php";
 });
 
 function reDirect(url, data) {
