@@ -206,7 +206,7 @@
 } */
 </style>
 <div class="content-sticky" id="" style=" margin: 0 auto;">
-    <div style="max-width: 70%;">
+    <div style="max-width: 95%;">
         <div class="row">
 
             <div class="col-md-12 section bottom-shasow" >
