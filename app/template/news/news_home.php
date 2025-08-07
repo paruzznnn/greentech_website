@@ -50,116 +50,135 @@ if ($result->num_rows > 0) {
 ?>
 
 <style>
-/* Basic card styles, largely kept from previous iterations */
-.card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-    background-color: #fff;
-    color: #555;
-}
+    /* --- สไตล์ที่ปรับปรุงใหม่ทั้งหมดให้ดู Premium มากขึ้น ✨ --- */
+    .card-premium {
+        border: none;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: #ffffff;
+        color: #333;
+        transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
 
-.card-img-top {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    .card-premium:hover {
+       transform: translateY(-8px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
 
-.card-body {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
+    .sub-news-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.4s ease-in-out;
+    }
+    .news-box-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #555;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .sub-news-image-wrapper:hover {
+        transform: scale(1.05);
+    }
 
-/* Specific styles for the main news description (left side) */
-.main-news-description {
-    font-size: 0.9rem;
-    color: #555;
-    /* You can add line clamping here if needed for the main news as well */
-}
+    .sub-news-img {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        display: block;
+        border-radius: 12px;
+        transition: transform 0.4s ease-in-out;
+    }
 
-/* ✅ Style to limit bold text (title) on the right side to 2 lines */
-.sub-news-title {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit to 2 lines */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: bold; /* Ensure it stays bold */
-    font-size: 0.85rem; /* Match the current font size */
-    margin-bottom: 0; /* Remove bottom margin to save space */
-    line-height: 1.2em; /* Keep consistent line height */
-    color: #555; /* Darker color as requested */
-}
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 16px 16px 0 0;
+    }
 
-/* Ensure equal height for the main columns */
-.row.g-2.d-flex.align-items-stretch {
-    height: auto; /* Allow height to adjust */
-}
+    .card-body.sub-news {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
 
-/* Ensure sub-columns in the right section are of equal height */
-.col-md-4 > .row.row-cols-1.row-cols-md-2.g-2.h-100 {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: stretch; /* Stretches wrapped items to fill container height */
-}
+    .main-news-description {
+        font-size: 1rem;
+        color: #666;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-.col.d-flex {
-    display: flex; /* Makes each column a flex container */
-}
+    /* ปรับปรุงสไตล์นี้เพื่อจำกัดข้อความให้แสดงแค่ 3 บรรทัด */
+    .sub-news-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* เปลี่ยนจาก 2 เป็น 3 */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 4px;
+        line-height: 1.4em;
+        color: #222;
+    }
 
-.col.d-flex .card {
-    flex-grow: 1; /* Makes the card grow to fill available height */
-}
+    .news-small-text {
+        font-size: 0.85rem;
+        color: #888;
+    }
 
-/* Styles for carousel caption if applicable */
-.carousel-caption {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    border-radius: 5px;
-}
+    #mainNewsCarousel .carousel-item img {
+        height: 450px;
+        max-height: 450px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 6px 6px 0 0;
+    }
 
-/* Adjust main image height as seen in the new picture */
-#mainNewsCarousel .carousel-item img {
-    height: 350px; /* Adjust this value as needed to control the main image height */
-    max-height: 350px; /* Ensure it doesn't exceed this height */
-    width: 100%;
-    object-fit: cover;
-    border-radius: 6px;
-}
+    .p-3.bg-light {
+        background-color: #f5f6f8 !important;
+        border-radius: 0 0 6px 6px;
+        padding: 20px !important;
+    }
 </style>
 
 <script>
-// No changes needed for the JS functions based on the current request.
-// Keeping them commented out/as-is since they are not the focus of this fix.
-// function scrollNews(direction) { /* ... */ }
-// function startAutoScroll() { /* ... */ }
-// window.addEventListener('DOMContentLoaded', startAutoScroll);
+    // No changes needed for the JS functions
 </script>
 
 <?php if (!empty($boxesNews)): ?>
-    <div class="row g-2 d-flex align-items-stretch">
+    <div class="row g-4 d-flex align-items-stretch">
         <div class="col-md-8 d-flex flex-column">
-            <div class="card h-100">
+            <div class="card-premium">
                 <div id="mainNewsCarousel" class="carousel slide h-100 d-flex flex-column" data-bs-ride="carousel">
                     <div class="carousel-inner flex-grow-1">
                         <?php foreach (array_slice($boxesNews, 0, 4) as $i => $box): ?>
                             <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
                                 <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
-                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px; height: 350px; object-fit: cover;">
+                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px 6px 0 0; height: 450px; object-fit: cover;">
                                 </a>
                                 <div class="p-3 bg-light">
-                                    <h5 class="mb-1"><?= htmlspecialchars($box['title']) ?></h5>
+                                    <h4 class="news-box-title"><?= htmlspecialchars($box['title']) ?></h4>
                                     <p class="mb-0 text-muted main-news-description"><?= htmlspecialchars($box['description']) ?></p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
-
                     <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon"></span>
                     </button>
@@ -171,17 +190,19 @@ if ($result->num_rows > 0) {
         </div>
 
         <div class="col-md-4 d-flex flex-column">
-            <div class="row row-cols-1 row-cols-md-2 g-2 h-100">
-                <?php foreach (array_slice($boxesNews, 1) as $box): ?>
+            <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
+                <?php foreach (array_slice($boxesNews, offset: 1) as $box): ?>
                     <div class="col d-flex">
-                        <div class="card h-100 w-100">
-                            <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
-                                <img src="<?= htmlspecialchars($box['image']) ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                <div class="card-body p-2">
-                                    <h6 class="sub-news-title"><?= htmlspecialchars($box['title']) ?></h6>
-                                    </div>
-                            </a>
-                        </div>
+                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark w-100">
+                            <div class="card-premium p-0 d-flex flex-column">
+                                <div class="sub-news-image-wrapper flex-shrink-0">
+                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="sub-news-img">
+                                </div>
+                                <div class="card-body sub-news d-flex flex-column">
+                                    <h6 class="sub-news-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 <?php endforeach; ?>
             </div>

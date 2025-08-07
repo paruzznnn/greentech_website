@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
+// ลบ LIMIT 5 ออกเพื่อให้ดึงข้อมูลสินค้าทั้งหมด
 $sql = "SELECT
             dn.shop_id,
             dn.subject_shop,
@@ -19,8 +20,7 @@ $sql = "SELECT
             dnc.del = '0' AND
             dnc.status = '1'
         GROUP BY dn.shop_id
-        ORDER BY dn.date_create DESC
-        LIMIT 5";
+        ORDER BY dn.date_create DESC";
 
 $result = $conn->query($sql);
 $boxesshop = [];
@@ -50,72 +50,98 @@ if ($result->num_rows > 0) {
 ?>
 
 <style>
+/* --- สไตล์สำหรับส่วนสินค้าที่ปรับปรุงใหม่ --- */
 .shop-wrapper-container {
     position: relative;
-    max-width: 1280px;
+    max-width: 1500px;
     margin: auto;
-    overflow: hidden;
     padding: 0 40px;
+    overflow: hidden;
 }
 
 .shop-scroll {
+    /* ใช้ display: flex เพื่อให้สามารถเลื่อนซ้าย-ขวาได้ */
     display: flex;
-    gap: 0.5rem; /* ลดขนาด gap จาก 1rem เป็น 0.5rem */
+    gap: 2rem; /* เพิ่มระยะห่างระหว่างกล่อง */
     scroll-behavior: smooth;
-    overflow-x: auto;
+    overflow-x: auto; /* เปลี่ยนเป็น auto เพื่อให้ scrollbar แสดงเมื่อจำเป็น */
     padding-bottom: 1rem;
     scrollbar-width: none;
+    -ms-overflow-style: none;
 }
+
 .shop-scroll::-webkit-scrollbar {
     display: none;
 }
 
+/* ลบ .shop-scroll-inner ออกเพราะไม่ได้ใช้ */
+
 .shop-card {
-    flex: 0 0 300px;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    /* ปรับ flex property เพื่อให้แสดง 4 กล่องพอดีในหน้าจอ */
+    /* calc((100% - 6rem) / 4) คือ การคำนวณความกว้างของ 4 กล่อง โดยหัก gap 3 ช่อง (2rem * 3) */
+    flex: 0 0 calc((100% - 6rem) / 4);
+    height: auto;
 }
 
 .card {
     display: flex;
     flex-direction: column;
     height: 100%;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 6px;
     overflow: hidden;
     background-color: #fff;
+    transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .card-image-wrapper {
-    height: 200px;
+    padding-top: 100%;
+    position: relative;
     overflow: hidden;
+    border-radius: 6px 6px 0 0;
 }
 
 .card-img-top {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.card-img-top:hover {
+    transform: scale(1.05);
 }
 
 .card-body {
-    padding: 10px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    /* ลด min-height ลงอีกเพื่อให้ส่วนเนื้อหากระชับขึ้น */
-    min-height: 65px; /* ปรับค่านี้ตามความเหมาะสมเพื่อให้พอดีกับ 2 บรรทัด */
-    justify-content: center; /* จัดให้อยู่ตรงกลางแนวตั้งภายใน min-height */
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-grow: 1;
+    min-height: 100px;
 }
 
 .card-title {
-    font-weight: bold;
-    margin-bottom: 0px; /* **สำคัญ:** ลบ margin ด้านล่างออก เพื่อให้ชิดกับ description */
+    font-weight: 600;
+    margin-bottom: 5px;
     color: #555;
-    white-space: nowrap; /* ตรวจสอบให้แน่ใจว่าไม่ขึ้นบรรทัดใหม่ */
+    font-size: 1.1rem;
+    line-height: 1.3em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 1rem;
 }
 
 .card-text {
@@ -124,62 +150,79 @@ if ($result->num_rows > 0) {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #888;
-    font-size: 0.8rem;
-    margin-top: 0px; /* **สำคัญ:** ลบ margin ด้านบนออก เพื่อให้ชิดกับ title */
-    margin-bottom: 0px; /* ลบ margin ด้านล่างออก */
+    color: #777;
+    font-size: 0.9rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .scroll-btn {
     position: absolute;
-    top: 40%;
+    top: 50%;
+    transform: translateY(-50%);
     background-color: white;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
     text-align: center;
-    line-height: 30px;
+    line-height: 40px;
     cursor: pointer;
     z-index: 5;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.scroll-btn:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .scroll-btn.left {
-    left: 5px;
+    left: 10px;
 }
 
 .scroll-btn.right {
-    right: 5px;
+    right: 10px;
+}
+
+/* ปรับจำนวนคอลัมน์ตามขนาดหน้าจอ */
+@media (max-width: 1200px) {
+    .shop-card {
+        flex: 0 0 calc((100% - 6rem) / 4);
+    }
+}
+@media (max-width: 992px) {
+    .shop-card {
+        flex: 0 0 calc((100% - 4rem) / 3);
+    }
+}
+@media (max-width: 768px) {
+    .shop-card {
+        flex: 0 0 calc((100% - 2rem) / 2);
+    }
+}
+@media (max-width: 576px) {
+    .shop-card {
+        flex: 0 0 90%;
+    }
 }
 </style>
 
 <script>
 function scrollshop(direction) {
     const box = document.getElementById('shop-scroll-box');
-    const scrollAmount = 300 + 10; // ขนาด card + gap ที่ลดลง
+    
+    // หาความกว้างของ card-wrapper ตัวแรก (กล่องสินค้า 1 กล่อง)
+    const cardWidth = document.querySelector('.shop-card').offsetWidth + 32; // 32px คือ 2rem ที่เป็น gap ระหว่างกล่อง
+    
     if (direction === 'left') {
-        box.scrollLeft -= scrollAmount;
+        box.scrollLeft -= cardWidth * 4;
     } else {
-        box.scrollLeft += scrollAmount;
+        box.scrollLeft += cardWidth * 4;
     }
 }
-
-function startAutoScroll() {
-    const box = document.getElementById('shop-scroll-box');
-    const scrollAmount = 300 + 10;
-    const scrollMax = box.scrollWidth - box.clientWidth;
-
-    setInterval(() => {
-        if (box.scrollLeft >= scrollMax) {
-            box.scrollLeft = 0;
-        } else {
-            box.scrollLeft += scrollAmount;
-        }
-    }, 3000);
-}
-
-window.addEventListener('DOMContentLoaded', startAutoScroll);
 </script>
 
 <div class="shop-wrapper-container">
@@ -189,21 +232,21 @@ window.addEventListener('DOMContentLoaded', startAutoScroll);
     <div class="shop-scroll" id="shop-scroll-box">
         <?php foreach ($boxesshop as $box): ?>
             <div class="shop-card">
-                <div class="card">
-                    <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
+                <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
+                    <div class="card">
                         <?php if(empty($box['image'])): ?>
-                            <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip"></iframe>
+                            <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
                         <?php else: ?>
                             <div class="card-image-wrapper">
-                                <img src="<?= $box['image'] ?>" class="card-img-top" alt="ข่าว <?= htmlspecialchars($box['title']) ?>">
+                                <img src="<?= $box['image'] ?>" class="card-img-top" alt="สินค้า <?= htmlspecialchars($box['title']) ?>">
                             </div>
                         <?php endif; ?>
                         <div class="card-body">
                             <h6 class="card-title"><?= htmlspecialchars($box['title']) ?></h6>
                             <p class="card-text"><?= htmlspecialchars($box['description']) ?></p>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
             </div>
         <?php endforeach; ?>
     </div>
