@@ -95,7 +95,7 @@ if ($result->num_rows > 0) {
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-radius: 20px;
+    border-radius: 6px;
     overflow: hidden;
     background-color: #fff;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);

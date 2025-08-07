@@ -226,7 +226,7 @@
 .box-content-shop{
     background-color: #ff9900;
     padding: 40px 20px 50px 20px;
-    border-radius: 8px;
+    border-radius: 4px;
     color: #555;
 }
 .article-luxury-section {
