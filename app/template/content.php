@@ -22,7 +22,7 @@
     transform: translateY(-50%);
     width: 3px;
     height: 2.5rem;
-    background-color: #555;
+    background-color: #ff9900;
     border-radius: 2px;
 }
 
@@ -206,7 +206,7 @@
 } */
 </style>
 <div class="content-sticky" id="" style=" margin: 0 auto;">
-    <div style="max-width: 95%;">
+    <div style="max-width: 70%;">
         <div class="row">
 
             <div class="col-md-12 section bottom-shasow" >
