@@ -4,6 +4,15 @@ body {
     scroll-behavior: smooth;
 }
 
+/* --- สไตล์ที่ปรับปรุงใหม่สำหรับกล่องข่าวสาร What's New --- */
+
+/* เพิ่ม responsive design สำหรับ card-fancy */
+@media (max-width: 768px) {
+    .card-fancy {
+        margin-bottom: 15px; /* เพิ่มระยะห่างระหว่างกล่องบนมือถือ */
+    }
+}
+
 /* --- Header Top Section --- */
 .header-top {
     overflow: hidden;
@@ -257,11 +266,17 @@ body {
 }
 
 
-/* --- Other Sections (Maintained as provided) --- */
+
+    /* --- Other Sections (Maintained as provided) --- */
 .content-sticky {
     padding-bottom: 60px;
     background-color: #ffffff;
+    
+    /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
+    display: flex;
+    justify-content: center;
 }
+
 
 .box-section {
     margin: 20px 0px;
@@ -270,7 +285,7 @@ body {
 
 .box-content {
     background-color: #ffffff;
-    padding: 40px 20px 20px 20px;
+    padding: 0px 20px 20px 20px;
     border-radius: 8px;
     color: #555;
 }
@@ -753,11 +768,11 @@ body {
 }
 
 .line-ref {
-    border-left: 5px solid #f46e20;
+    /* border-left: 5px solid #f46e20; */
     padding-left: 10px;
 }
 .line-ref1 {
-    border-left: 5px solid #f46e20;
+    /* border-left: 5px solid #f46e20; */
     padding-left: 10px;
     margin-top: 50px;
     line-height: 1.2;
