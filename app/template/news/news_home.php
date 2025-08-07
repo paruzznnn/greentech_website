@@ -155,25 +155,6 @@ if ($result->num_rows > 0) {
         border-radius: 0 0 6px 6px;
         padding: 20px !important;
     }
-
-    /* โค้ดที่เพิ่มเข้าไปเพื่อแก้ไขปุ่มเลื่อน */
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-image: none;
-        background-color: #000; /* สีพื้นหลังของปุ่ม */
-        border-radius: 50%; /* ทำให้เป็นวงกลม */
-        width: 40px; /* ขนาดของปุ่ม */
-        height: 40px; /* ขนาดของปุ่ม */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 60px; /* เพิ่มความกว้างของพื้นที่ปุ่ม */
-        opacity: 1; /* แสดงปุ่มชัดเจนตลอด */
-    }
 </style>
 
 <script>
