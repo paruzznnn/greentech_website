@@ -52,7 +52,10 @@ if ($result->num_rows > 0) {
 /* Style สำหรับส่วน Project ที่ปรับปรุงใหม่ */
 .project-carousel {
     position: relative;
-    padding: 0 40px; /* เพิ่ม padding เพื่อให้ปุ่มควบคุมมีพื้นที่ */
+    /* เพิ่ม padding-left และ padding-right เพื่อให้เงาแสดงผลครบ */
+    padding-left: 50px;
+    padding-right: 50px;
+    /* ลบ overflow: hidden; ออกจากที่นี่ */
 }
 
 /* เพิ่มสไตล์สำหรับ carousel item ที่แสดงผล 4 กล่อง */
@@ -67,6 +70,8 @@ if ($result->num_rows > 0) {
     overflow-x: scroll; /* ทำให้เลื่อนได้ด้วย scrollbar */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth; /* ทำให้เลื่อนแบบนุ่มนวล */
+    /* เพิ่ม padding-top เพื่อป้องกันส่วนบนของกล่องถูกตัดเมื่อ hover */
+    padding-top: 10px;
 }
 
 /* ซ่อน scrollbar */
@@ -109,9 +114,8 @@ if ($result->num_rows > 0) {
 
 .project-image-wrapper {
     position: relative;
-    /* ปรับค่า padding-top ที่นี่ */
     padding-top: 80%; /* เพิ่มความสูงของรูปภาพ (ตัวอย่างสำหรับอัตราส่วน 4:3) */
-    overflow: hidden;
+    /* ลบ overflow: hidden ออกจากที่นี่ */
 }
 
 .project-img-top {
@@ -124,9 +128,10 @@ if ($result->num_rows > 0) {
     transition: transform 0.3s ease;
 }
 
-.project-card:hover .project-img-top {
+/* ลบสไตล์การ hover นี้ออก เพราะจะทำให้ภาพถูกตัด */
+/* .project-card:hover .project-img-top {
     transform: scale(1.05);
-}
+} */
 
 .project-body {
     padding: 1.25rem 1.25rem 1.5rem;
@@ -221,28 +226,31 @@ if ($result->num_rows > 0) {
 <div class="row">
     <div class="col-12">
         <div id="projectCarousel" class="project-carousel">
-            <div class="project-slider">
-                <?php foreach ($boxesproject as $box): ?>
-                    <div class="col-md-3 mb-4 d-flex">
-                        <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark w-100">
-                            <div class="project-card d-flex flex-column">
-                                <?php if (empty($box['image'])): ?>
-                                    <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="100%" class="note-video-clip" style="border-radius: 20px 20px 0 0;"></iframe>
-                                <?php else: ?>
-                                    <div class="project-image-wrapper">
-                                        <img src="<?= $box['image'] ?>" class="project-img-top" alt="<?= htmlspecialchars($box['title']) ?>">
+            <div class="project-slider-wrapper" style="overflow: hidden;">
+                <div class="project-slider">
+                    <?php foreach ($boxesproject as $box): ?>
+                        <div class="col-md-3 mb-4 d-flex">
+                            <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark w-100">
+                                <div class="project-card d-flex flex-column">
+                                    <?php if (empty($box['image'])): ?>
+                                        <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="100%" class="note-video-clip" style="border-radius: 20px 20px 0 0;"></iframe>
+                                    <?php else: ?>
+                                        <div class="project-image-wrapper">
+                                            <img src="<?= $box['image'] ?>" class="project-img-top" alt="<?= htmlspecialchars($box['title']) ?>">
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="project-body d-flex flex-column">
+                                        <h6 class="project-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
+                                        <p class="project-text"><?= htmlspecialchars($box['description']) ?></p>
+                                        <span class="learn-more">Learn more ></span>
                                     </div>
-                                <?php endif; ?>
-                                <div class="project-body d-flex flex-column">
-                                    <h6 class="project-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
-                                    <p class="project-text"><?= htmlspecialchars($box['description']) ?></p>
-                                    <span class="learn-more">Learn more ></span>
                                 </div>
-                            </div>
-                        </a>
-                    </div>
-                <?php endforeach; ?>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
+            
             <button class="carousel-control-prev" type="button" onclick="scrollProject('prev')">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
