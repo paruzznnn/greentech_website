@@ -325,7 +325,7 @@ document.addEventListener('click', function(event) {
 </script>
 
 <div id="navbar-news">
-    <div style="margin-left:2em;">
+    <div style="margin-left:10%;">
         <div class="news-ticker">
             <span class="text-ticker">
                 <span class="blinking-icon"></span>

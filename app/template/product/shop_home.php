@@ -162,7 +162,7 @@ if ($result->num_rows > 0) {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background-color: white;
+        background-color: #77777738;
         border: none;
         border-radius: 50%;
         width: 40px;
@@ -177,7 +177,7 @@ if ($result->num_rows > 0) {
     }
 
     .scroll-btn:hover {
-        background-color: #f0f0f0;
+        background-color: #77777738;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 

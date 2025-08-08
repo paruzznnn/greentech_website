@@ -178,7 +178,7 @@ if ($result->num_rows > 0) {
 .carousel-control-next {
     width: 40px;
     height: 40px;
-    background-color: #fff;
+    background-color: #c7c7c7dc;
     border-radius: 50%;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     opacity: 1;
@@ -191,7 +191,7 @@ if ($result->num_rows > 0) {
 
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
-    background-color: #f0f0f0;
+    background-color: #c7c7c7;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
