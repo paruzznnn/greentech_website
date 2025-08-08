@@ -53,7 +53,7 @@ if ($result->num_rows > 0) {
     /* --- สไตล์สำหรับส่วนสินค้าที่ปรับปรุงใหม่ --- */
     .shop-wrapper-container {
         position: relative;
-        max-width: 1500px;
+        max-width: 90%;
         margin: auto;
         /* เพิ่ม padding-left และ padding-right เพื่อให้เงาด้านข้างไม่ถูกตัด */
         padding-left: 50px;
