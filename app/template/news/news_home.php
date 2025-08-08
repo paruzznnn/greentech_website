@@ -156,49 +156,56 @@ if ($result->num_rows > 0) {
         padding: 20px !important;
     }
 
-    /* === สไตล์ที่เพิ่มเข้ามาเพื่อแก้ไขปุ่ม carousel === */
+    /* === สไตล์ที่ปรับปรุงใหม่สำหรับปุ่มเลื่อน carousel === */
     .carousel-control-prev,
     .carousel-control-next {
-        width: 60px; /* เพิ่มความกว้างของพื้นที่ปุ่ม */
-    }
-
-    /* เลื่อนปุ่มออกจากขอบเพื่อไม่ให้ถูกบัง */
-    .carousel-control-prev {
-        left: -30px;
-    }
-
-    .carousel-control-next {
-        right: -30px;
-    }
- /* แก้ไขปัญหาปุ่มถูกตัดโดยการจัดตำแหน่งใหม่ */
-    .carousel {
-        position: relative; /* กำหนดให้ carousel เป็น reference สำหรับการจัดตำแหน่งปุ่ม */
-    }
-
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 50px;
-        height: 50px;
-        background-color: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #2525256d; /* เปลี่ยนเป็นสีขาว */
+        border: none;
         border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0.8;
-        transition: opacity 0.2s ease-in-out;
-        z-index: 10; /* ให้ปุ่มอยู่เหนือภาพ */
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+        z-index: 5;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        opacity: 1; /* กำหนดให้ปุ่มมองเห็นได้ตลอด */
     }
 
     .carousel-control-prev:hover,
     .carousel-control-next:hover {
+        background-color: #3b3b3b4a;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         opacity: 1;
     }
+    
+    .carousel-control-prev {
+        left: -20px; /* ปรับตำแหน่งจากซ้าย */
+    }
 
+    .carousel-control-next {
+        right: -20px; /* ปรับตำแหน่งจากขวา */
+    }
+
+    /* สไตล์ไอคอนลูกศร */
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
         background-size: 100%, 100%;
-        width: 1rem;
-        height: 1rem;
+        width: 1.5rem; /* เพิ่มขนาดไอคอน */
+        height: 1.5rem;
+    }
+
+    .carousel-control-prev-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+    }
+
+    .carousel-control-next-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 </style>
 
@@ -221,12 +228,13 @@ if ($result->num_rows > 0) {
                         <?php endforeach; ?>
                     </div>
                 </div>
-
                 <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
                 </button>
             </div>
         </div>
