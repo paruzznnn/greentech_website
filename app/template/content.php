@@ -1,4 +1,9 @@
 <style>
+/* เพิ่มโค้ดส่วนนี้เข้าไป */
+body, html {
+    overflow-x: hidden;
+}
+
 /* สไตล์สำหรับ line-ref ที่แก้ไขแล้ว */
 .line-ref, .line-ref1 {
     display: block;
@@ -193,14 +198,14 @@
 
 /* สไตล์สำหรับพื้นหลังสีส้มเต็มจอ */
 .full-width-bg {
-    background-color: #ff9900; /* กำหนดสีพื้นหลังที่นี่ */
+    background-color: #ff9900;
     width: 100vw;
     position: relative;
     left: 50%;
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    padding: 20px 0; /* เพิ่ม padding บน-ล่าง ให้มีระยะห่าง */
+    padding: 20px 0;
 }
 .full-width-content {
     max-width: 70%;
@@ -212,8 +217,33 @@
 </style>
 
 <div class="content-sticky" id="" style=" margin: 0 auto;">
+    
     <div style="max-width: 70%;">
         <div class="row">
+            <div class="col-md-12 text-end" style="padding-top: 20px;">
+                <div class="social-share" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                    <p style="margin: 0;">แชร์หน้านี้:</p>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                    </a>
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                    </a>
+                     <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                </div>
+            </div>
             <div class="col-md-12 section bottom-shasow" >
                 <h4 data-translate="WhatsNew" class="line-ref1" lang="th" >What's New</h4>
                 <div class="box-content" >
@@ -247,6 +277,7 @@
 <div class="content-sticky" id="" style=" margin: 0 auto;">
     <div style="max-width: 70%;">
         <div class="row">
+            
             <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
                 <h4 class="line-ref">บทความ</h4>
                 <div class="box-content">
@@ -261,26 +292,26 @@
                 </div>
             </div>
 
-            <div class="social-share">
-                <p>แชร์หน้านี้:</p>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                </a>
-                <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                </a>
-                <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                </a>
-                <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                    <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                </a>
-                <a href="https://www.instagram.com/" target="_blank">
-                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                </a>
-                <a href="https://www.tiktok.com/" target="_blank">
-                    <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                </a>
+            <div class="col-md-12 text-start" style="padding-bottom:3em;">
+                <p style="margin: 0;">แชร์หน้านี้:</p>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                    </a>
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/" target="_blank">
+                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                    </a>
                 <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
             </div>
         </div>

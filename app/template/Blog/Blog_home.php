@@ -2,7 +2,7 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// จำกัดจำนวนบทความที่ดึงมาแสดงเป็น 6 รายการ
+// เปลี่ยน LIMIT เพื่อให้ดึงบทความมาแสดงได้มากขึ้น
 $sql = "SELECT 
             dn.Blog_id, 
             dn.subject_Blog, 
@@ -21,7 +21,7 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.Blog_id 
         ORDER BY dn.date_create DESC
-        LIMIT 6";
+        LIMIT 100"; // ดึงข้อมูลมามากขึ้นเพื่อรองรับการเลื่อน
 
 $result = $conn->query($sql);
 $boxesBlog = [];
@@ -53,23 +53,21 @@ if ($result->num_rows > 0) {
     /* --- สไตล์สำหรับส่วนบทความที่ปรับปรุงใหม่ --- */
     .blog-wrapper-container {
         position: relative;
-        max-width: 90%;
+        max-width: 100%;
         margin: auto;
-        /* เพิ่ม padding-left และ padding-right เพื่อให้เงาด้านข้างไม่ถูกตัด */
-        padding-left: 50px;
-        padding-right: 50px;
+        /* padding: 0 4rem; ปรับ padding ให้มีพื้นที่ด้านข้างเท่ากับ gap เพื่อให้กล่องแรกและกล่องสุดท้ายไม่ติดขอบ */
     }
-
+    
     .blog-scroll {
         display: flex;
-        gap: 2rem;
+        gap: 1rem;
         scroll-behavior: smooth;
         overflow-x: auto;
         padding-bottom: 1rem;
         scrollbar-width: none;
         -ms-overflow-style: none;
-        /* เพิ่ม padding-top เพื่อป้องกันกล่องด้านบนที่โดนตัดเมื่อ hover */
         padding-top: 10px;
+        /* margin: 0 -4rem; ลบ margin -4rem ออกจากโค้ดเดิม */
     }
 
     .blog-scroll::-webkit-scrollbar {
@@ -77,8 +75,10 @@ if ($result->num_rows > 0) {
     }
 
     .blog-card {
-        flex: 0 0 calc((100% - 4rem) / 3);
+        /* ปรับขนาดให้แสดง 5 กล่องพอดีหน้าจอ */
+        flex: 0 0 calc(20% - 1.6rem); /* 100%/5 = 20% และลบ gap ออก 4/5 ของ 2rem คือ 1.6rem */
         height: auto;
+        min-width: 200px;
     }
 
     .card {
@@ -173,24 +173,33 @@ if ($result->num_rows > 0) {
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
-    /* ปรับตำแหน่งปุ่มเลื่อนเพื่อให้ไม่ชนขอบและไม่บังเงา */
     .scroll-btn.left {
-        left: 0;
+        left: -50px;
     }
 
     .scroll-btn.right {
-        right: 0;
+        right: -50px;
     }
 
     /* ปรับจำนวนคอลัมน์ตามขนาดหน้าจอ */
+    @media (max-width: 1600px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 8rem) / 5); /* แสดง 5 กล่อง */
+        }
+    }
+    @media (max-width: 1400px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 6rem) / 4); /* แสดง 4 กล่อง */
+        }
+    }
     @media (max-width: 1200px) {
         .blog-card {
-            flex: 0 0 calc((100% - 4rem) / 3);
+            flex: 0 0 calc((100% - 4rem) / 3); /* แสดง 3 กล่อง */
         }
     }
     @media (max-width: 992px) {
         .blog-card {
-            flex: 0 0 calc((100% - 2rem) / 2);
+            flex: 0 0 calc((100% - 2rem) / 2); /* แสดง 2 กล่อง */
         }
     }
     @media (max-width: 768px) {
@@ -208,21 +217,22 @@ if ($result->num_rows > 0) {
 <script>
 function scrollBlog(direction) {
     const box = document.getElementById('blog-scroll-box');
-    
-    // หาความกว้างของ card-wrapper ตัวแรก (กล่องสินค้า 1 กล่อง)
-    const cardWidth = document.querySelector('.blog-card').offsetWidth + 32; // 32px คือ 2rem ที่เป็น gap ระหว่างกล่อง
+    const cardWidth = document.querySelector('.blog-card').offsetWidth;
+    const gap = 32; // 2rem
     
     if (direction === 'left') {
-        box.scrollLeft -= cardWidth * 3;
+        box.scrollLeft -= cardWidth + gap;
     } else {
-        box.scrollLeft += cardWidth * 3;
+        box.scrollLeft += cardWidth + gap;
     }
 }
 </script>
 
 <div class="blog-wrapper-container">
-    <div class="scroll-btn left" onclick="scrollBlog('left')">&#10094;</div>
-    <div class="scroll-btn right" onclick="scrollBlog('right')">&#10095;</div>
+    <?php if (count($boxesBlog) > 5): ?>
+        <div class="scroll-btn left" onclick="scrollBlog('left')">&#10094;</div>
+        <div class="scroll-btn right" onclick="scrollBlog('right')">&#10095;</div>
+    <?php endif; ?>
 
     <div style="overflow: hidden;">
         <div class="blog-scroll" id="blog-scroll-box">
