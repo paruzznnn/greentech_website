@@ -53,8 +53,8 @@ if ($result->num_rows > 0) {
 .project-carousel {
     position: relative;
     /* เพิ่ม padding-left และ padding-right เพื่อให้เงาแสดงผลครบ */
-    padding-left: 50px;
-    padding-right: 50px;
+    /* padding-left: 50px;
+    padding-right: 50px; */
     /* ลบ overflow: hidden; ออกจากที่นี่ */
 }
 
@@ -196,11 +196,11 @@ if ($result->num_rows > 0) {
 }
 
 .carousel-control-prev {
-    left: 0;
+    left: -50px;
     transform: translateX(-50%);
 }
 .carousel-control-next {
-    right: 0;
+    right: -50px;
     transform: translateX(50%);
 }
 .carousel-control-prev-icon,
@@ -223,7 +223,7 @@ if ($result->num_rows > 0) {
 }
 </style>
 
-<div class="row">
+<div class="row-project">
     <div class="col-12">
         <div id="projectCarousel" class="project-carousel">
             <div class="project-slider-wrapper" style="overflow: hidden;">

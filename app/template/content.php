@@ -1,3 +1,9 @@
+<?php
+// เพิ่มโค้ดส่วนนี้เพื่อสร้าง URL ของหน้าปัจจุบัน
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$pageUrl = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$subjectTitle = "Trandar - Website Title"; // กำหนดหัวข้อสำหรับแชร์ (สามารถเปลี่ยนได้)
+?>
 <style>
 /* เพิ่มโค้ดส่วนนี้เข้าไป */
 body, html {
@@ -50,6 +56,7 @@ body, html {
     background-color: #fff;
     border-radius: 2px;
 }
+
 /* สไตล์สำหรับส่วน "อะไรใหม่" ที่ปรับปรุงใหม่ */
 .news-wrapper {
     max-width: 1280px;
@@ -214,34 +221,60 @@ body, html {
 .full-width-content .line-ref2 {
     color: #fff;
 }
+
+/* สไตล์สำหรับปุ่มคัดลอกลิงก์ที่ปรับปรุงใหม่ */
+.copy-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; /* ปรับขนาดให้เท่ากับไอคอนอื่น */
+    height: 48px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #666;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    font-size: 1.5rem;
+}
+
+.copy-link-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+    color: #333;
+}
 </style>
 
 <div class="content-sticky" id="" style=" margin: 0 auto;">
-    
     <div style="max-width: 70%;">
         <div class="row">
-            <div class="col-md-12 text-end" style="padding-top: 20px;">
-                <div class="social-share" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
-                    <p style="margin: 0;">แชร์หน้านี้:</p>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                    </a>
-                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                    </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                    </a>
-                    <a href="https://www.tiktok.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                    </a>
-                     <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+            <div class="col-md-12 text-end" style="padding-top: 30px;">
+                <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                    <p style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                        </a>
+                        <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                        </a>
+                        <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                        </a>
+                        <a href="https://www.instagram.com/" target="_blank">
+                            <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                        </a>
+                        <a href="https://www.tiktok.com/" target="_blank">
+                            <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                        </a>
+                        <button class="copy-link-btn" onclick="copyLink()">
+                            <i class="fas fa-link"></i> 
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="col-md-12 section bottom-shasow" >
@@ -277,7 +310,6 @@ body, html {
 <div class="content-sticky" id="" style=" margin: 0 auto;">
     <div style="max-width: 70%;">
         <div class="row">
-            
             <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
                 <h4 class="line-ref">บทความ</h4>
                 <div class="box-content">
@@ -293,7 +325,8 @@ body, html {
             </div>
 
             <div class="col-md-12 text-start" style="padding-bottom:3em;">
-                <p style="margin: 0;">แชร์หน้านี้:</p>
+                <p style="margin: 0; padding-bottom: 10px; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                <div class="social-share" style="display: flex; align-items: center; gap: 10px;">
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -303,7 +336,7 @@ body, html {
                     <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
                     </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
                     </a>
                     <a href="https://www.instagram.com/" target="_blank">
@@ -312,8 +345,25 @@ body, html {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                    <button class="copy-link-btn" onclick="copyLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript for Copy Link functionality
+    function copyLink() {
+        const pageUrl = "<?= $pageUrl ?>";
+        navigator.clipboard.writeText(pageUrl).then(function() {
+            alert("คัดลอกลิงก์เรียบร้อยแล้ว");
+        }, function() {
+            alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
+        });
+    }
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
