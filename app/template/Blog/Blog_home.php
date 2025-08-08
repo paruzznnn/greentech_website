@@ -55,8 +55,9 @@ if ($result->num_rows > 0) {
     position: relative;
     max-width: 1500px;
     margin: auto;
-    overflow: hidden;
-    padding: 0 40px;
+    /* เพิ่ม padding เพื่อให้เงาแสดงผลครบ */
+    padding: 10px 50px;
+    /* ลบ overflow: hidden; ออกจากที่นี่ */
 }
 
 .blog-scroll {
@@ -66,6 +67,9 @@ if ($result->num_rows > 0) {
     overflow-x: auto;
     padding-bottom: 1rem;
     scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* เพิ่ม padding-top เพื่อป้องกันส่วนบนของกล่องถูกตัดเมื่อ hover */
+    padding-top: 10px;
 }
 
 .blog-scroll::-webkit-scrollbar {
@@ -98,6 +102,7 @@ if ($result->num_rows > 0) {
 .card-premium-blog {
     border: none;
     border-radius: 6px;
+    /* ย้าย overflow: hidden มาไว้ที่นี่แทน */
     overflow: hidden;
     background-color: #ffffff;
     color: #333;
@@ -115,7 +120,7 @@ if ($result->num_rows > 0) {
 
 .blog-card-image-wrapper {
     height: 250px;
-    overflow: hidden;
+    /* ลบ overflow: hidden ออกจากที่นี่ */
     border-radius: 6px 6px 0 0;
 }
 
@@ -126,9 +131,10 @@ if ($result->num_rows > 0) {
     transition: transform 0.4s ease;
 }
 
-.blog-card-img-top:hover {
+/* ลบสไตล์การ hover นี้ออก เพราะจะทำให้ภาพถูกตัด */
+/* .blog-card-img-top:hover {
     transform: scale(1.05);
-}
+} */
 
 .blog-card-body {
     padding: 25px;

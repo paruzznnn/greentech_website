@@ -72,7 +72,7 @@ if ($result->num_rows > 0) {
     .sub-news-image-wrapper {
         position: relative;
         overflow: hidden;
-        border-radius: 12px;
+        border-radius: 6px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.4s ease-in-out;
     }
@@ -95,7 +95,7 @@ if ($result->num_rows > 0) {
         height: 170px;
         object-fit: cover;
         display: block;
-        border-radius: 12px;
+        border-radius: 6px;
         transition: transform 0.4s ease-in-out;
     }
 
@@ -103,7 +103,7 @@ if ($result->num_rows > 0) {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 16px 16px 0 0;
+        border-radius: 6px 6px 0 0;
     }
 
     .card-body.sub-news {
@@ -155,17 +155,58 @@ if ($result->num_rows > 0) {
         border-radius: 0 0 6px 6px;
         padding: 20px !important;
     }
-</style>
 
-<script>
-    // No changes needed for the JS functions
-</script>
+    /* === สไตล์ที่เพิ่มเข้ามาเพื่อแก้ไขปุ่ม carousel === */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 60px; /* เพิ่มความกว้างของพื้นที่ปุ่ม */
+    }
+
+    /* เลื่อนปุ่มออกจากขอบเพื่อไม่ให้ถูกบัง */
+    .carousel-control-prev {
+        left: -30px;
+    }
+
+    .carousel-control-next {
+        right: -30px;
+    }
+ /* แก้ไขปัญหาปุ่มถูกตัดโดยการจัดตำแหน่งใหม่ */
+    .carousel {
+        position: relative; /* กำหนดให้ carousel เป็น reference สำหรับการจัดตำแหน่งปุ่ม */
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.8;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 10; /* ให้ปุ่มอยู่เหนือภาพ */
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        opacity: 1;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-size: 100%, 100%;
+        width: 1rem;
+        height: 1rem;
+    }
+</style>
 
 <?php if (!empty($boxesNews)): ?>
     <div class="row g-4 d-flex align-items-stretch">
         <div class="col-md-8 d-flex flex-column">
-            <div class="card-premium">
-                <div id="mainNewsCarousel" class="carousel slide h-100 d-flex flex-column" data-bs-ride="carousel">
+            <div id="mainNewsCarousel" class="carousel slide h-100 d-flex flex-column" data-bs-ride="carousel">
+                <div class="card-premium">
                     <div class="carousel-inner flex-grow-1">
                         <?php foreach (array_slice($boxesNews, 0, 4) as $i => $box): ?>
                             <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
@@ -179,13 +220,14 @@ if ($result->num_rows > 0) {
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
                 </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
         </div>
 
