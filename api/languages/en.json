@@ -4,15 +4,15 @@
     "Home": "Home",
     "News": "News",
     "About_us": "About us",
-    "Service_t": "service",
-    "product": "product",
-    "project": "project",
-    "blog": "blog",
+    "Service_t": "Service",
+    "product": "Product",
+    "project": "Project",
+    "blog": "Blog",
     "Design&Idia": "Acoustic knowledge",
-    "video": "video",
+    "video": "Video",
     "Contact_us": "Contact Us",
     "WhatsNew":"News",
     "share":"Share:",
-    "product1":"Product",
-    "project1":"Project reference"
+    "product1":"Product Trandar",
+    "project1":"Project Reference"
 }

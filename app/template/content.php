@@ -285,7 +285,7 @@ body, html {
             </div>
 
             <div class="col-md-12 section product-bg bottom-shasow" style="padding-top:40px;">
-                <h4 data-translate="product" lang="th" class="line-ref" >Product</h4>
+                <h4 data-translate="product1" lang="th" class="line-ref" >Product</h4>
                 <div class="box-content">
                     <?php include 'template/product/shop_home.php'; ?>
                 </div>
@@ -327,6 +327,9 @@ body, html {
             <div class="col-md-12 text-start" style="padding-bottom:3em;">
                 <p data-translate="share" lang="th" style="margin: 0; padding-bottom: 10px; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
                 <div class="social-share" style="display: flex; align-items: center; gap: 10px;">
+                    <button class="copy-link-btn" onclick="copyLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -345,9 +348,7 @@ body, html {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()">
-                        <i class="fas fa-link"></i>
-                    </button>
+                    
                 </div>
             </div>
         </div>
