@@ -38,7 +38,7 @@ $dropdownItems = [
     ],
     'dropdown4' => [
         ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
-        ['icon' => '', 'text' => 'ความรู้ด้านเสียง', 'translate' => 'Acoustic knowledge', 'link' => 'idia' . $isFile],
+        ['icon' => '', 'text' => 'ความรู้ด้านเสียง', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
         ['icon' => '', 'text' => 'วีดีโอ', 'translate' => 'video', 'link' => 'Video' . $isFile],
     ],
 ];
