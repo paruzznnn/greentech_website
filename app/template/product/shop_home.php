@@ -211,6 +211,15 @@ if ($result->num_rows > 0) {
             flex: 0 0 90%;
         }
     }
+    .content-sticky {
+    padding-bottom: 0px;
+    background-color: #ffffff;
+    
+    /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
+    display: flex;
+    justify-content: center;
+}
+
 </style>
 
 <script>

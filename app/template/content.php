@@ -3,20 +3,17 @@
 .line-ref, .line-ref1 {
     display: block;
     margin-bottom: 1.5rem;
-    /* padding-bottom: 0.5rem; */
     font-size: 1.8rem;
     font-weight: 600;
     color: #555;
     position: relative;
-    /* เพิ่มการจัดชิดซ้ายและปรับความกว้าง */
     text-align: left;
     width: fit-content;
-    padding-left: 15px; /* เพิ่ม padding เพื่อเว้นช่องว่างให้เส้น */
+    padding-left: 15px;
 }
 .line-ref:after, .line-ref1:after {
     content: '';
     position: absolute;
-    /* เปลี่ยนจากแนวนอนเป็นแนวตั้ง */
     top: 50%;
     left: 0;
     transform: translateY(-50%);
@@ -29,20 +26,17 @@
 .line-ref2 {
     display: block;
     margin-bottom: 1.5rem;
-    /* padding-bottom: 0.5rem; */
     font-size: 1.8rem;
     font-weight: 600;
     color: #555;
     position: relative;
-    /* เพิ่มการจัดชิดซ้ายและปรับความกว้าง */
     text-align: left;
     width: fit-content;
-    padding-left: 15px; /* เพิ่ม padding เพื่อเว้นช่องว่างให้เส้น */
+    padding-left: 15px;
 }
 .line-ref2:after {
     content: '';
     position: absolute;
-    /* เปลี่ยนจากแนวนอนเป็นแนวตั้ง */
     top: 50%;
     left: 0;
     transform: translateY(-50%);
@@ -57,7 +51,6 @@
     margin: 0 auto;
     padding: 0 40px;
     display: grid;
-    /* แบ่งคอลัมน์หลักเป็น 2 ส่วน: ส่วนใหญ่ 2/3 และส่วนเล็ก 1/3 */
     grid-template-columns: 2fr 1fr;
     gap: 1.5rem;
 }
@@ -79,7 +72,6 @@
 
 .news-main-image-wrapper {
     position: relative;
-    /* อัตราส่วน 16:9 */
     padding-top: 56.25%;
     overflow: hidden;
 }
@@ -136,7 +128,7 @@
 
 .news-side-img-wrapper {
     flex-shrink: 0;
-    width: 120px; /* ความกว้างของรูปภาพด้านข้าง */
+    width: 120px;
     height: 100%;
     position: relative;
 }
@@ -181,11 +173,10 @@
     }
 }
 
-/* สไตล์สำหรับบล็อกสินค้าเดิม (ไม่ได้แก้ไข) */
+/* สไตล์สำหรับบล็อกสินค้าเดิม */
 .section.product-bg {
     background-color: #ffffffff;
     padding: 30px 0;
-    /* border-radius: 10px; */
 }
 .box-content-shop{
     background-color: #ffead0;
@@ -199,80 +190,69 @@
     border-radius: 6px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
-/* .bottom-shasow{
-    padding: 2em 3em;
-    border-bottom: 4px solid #bfbfbf;
-    box-shadow: 0px 4px 0px 0px #bfbfbfa8;
-} */
+
+/* สไตล์สำหรับพื้นหลังสีส้มเต็มจอ */
+.full-width-bg {
+    background-color: #ff9900; /* กำหนดสีพื้นหลังที่นี่ */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 20px 0; /* เพิ่ม padding บน-ล่าง ให้มีระยะห่าง */
+}
+.full-width-content {
+    max-width: 70%;
+    margin: 0 auto;
+}
+.full-width-content .line-ref2 {
+    color: #fff;
+}
 </style>
+
 <div class="content-sticky" id="" style=" margin: 0 auto;">
     <div style="max-width: 70%;">
         <div class="row">
-
             <div class="col-md-12 section bottom-shasow" >
-                 <h4 data-translate="WhatsNew" class="line-ref1" lang="th" >What's New</h4>
+                <h4 data-translate="WhatsNew" class="line-ref1" lang="th" >What's New</h4>
                 <div class="box-content" >
                     <?php include 'template/news/news_home.php'; ?>
                 </div>
             </div>
 
-           <style>
-/* เพิ่มสไตล์สำหรับบล็อกสินค้า */
-.section.product-bg {
-    background-color: #ffffffff; /* ใช้สีส้มอ่อนๆ */
-    padding: 30px 0; /* เพิ่ม padding เพื่อให้มีพื้นที่รอบๆ เนื้อหา */
-    /* border-radius: 0px; เพิ่มขอบมนเล็กน้อย */
-}
-.box-content-shop{
-    background-color: #ff9900;
-    padding: 40px 20px 50px 20px;
-    border-radius: 4px;
-    color: #555;
-}
-.article-luxury-section {
-    background-color: #f8f9fa; /* สีพื้นหลังอ่อนๆ เพื่อให้การ์ดดูเด่นขึ้น */
-    padding: 40px 0; /* เพิ่มพื้นที่ด้านบนและล่าง */
-    border-radius: 6px; /* ขอบมนเพื่อให้ดูหรูหรา */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* เงาบางๆ ที่บล็อกทั้งหมด */
-}
-.shadow-divider {
-    border: none;
-    height: 5px; /* ทำให้เส้นหนาขึ้น */
-    background-color: #000000; /* กำหนดสีเส้นเป็นสีดำเข้มสุดๆ */
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.75); /* ปรับเงาให้เข้มและฟุ้งลงมาด้านล่าง */
-    margin: 2.5rem 0; /* เพิ่มระยะห่างด้านบนและล่างให้ชัดเจน */
-    width: 100%;
-}
-</style>
-<!-- <hr class="shadow-divider">  -->
-<div class="col-md-12 section product-bg bottom-shasow" style="padding-top:40px;">
-    <h4 class="line-ref" >Product</h4>
-    <div class="box-content">
-        
-        <?php include 'template/product/shop_home.php'; ?>
+            <div class="col-md-12 section product-bg bottom-shasow" style="padding-top:40px;">
+                <h4 class="line-ref" >Product</h4>
+                <div class="box-content">
+                    <?php include 'template/product/shop_home.php'; ?>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- <hr class="shadow-divider">  -->
-
-            <div class="col-md-12 section bottom-shasow">
-                <div class="box-content-shop">
-                    <h4 class="line-ref2" style="color:#fff;">โครงการล่าสุด</h4>
+<div class="full-width-bg">
+    <div class="full-width-content">
+        <div class="row">
+            <div class="col-md-12 section">
+                <div class="box-content-shop" style="background-color: transparent;">
+                    <h4 class="line-ref2">โครงการล่าสุด</h4>
                     <?php include 'template/project/project_home.php'; ?>
                 </div>
             </div>
-
-            <!-- <hr class="shadow-divider">  -->
-
-            <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
-                <h4 class="line-ref">บทความ</h4>
-    <div class="box-content">
-        
-        <?php include 'template/Blog/Blog_home.php'; ?>
+        </div>
     </div>
 </div>
 
-<!-- <hr class="shadow-divider">  -->
+<div class="content-sticky" id="" style=" margin: 0 auto;">
+    <div style="max-width: 70%;">
+        <div class="row">
+            <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
+                <h4 class="line-ref">บทความ</h4>
+                <div class="box-content">
+                    <?php include 'template/Blog/Blog_home.php'; ?>
+                </div>
+            </div>
 
             <div class="col-md-12 section bottom-shasow">
                 <div class="box-content">
@@ -280,31 +260,29 @@
                     <?php include 'template/video/video_home.php'; ?>
                 </div>
             </div>
-           
+
+            <div class="social-share">
+                <p>แชร์หน้านี้:</p>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                </a>
+                <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                </a>
+                <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                </a>
+                <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                </a>
+                <a href="https://www.instagram.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                </a>
+                <a href="https://www.tiktok.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                </a>
+                <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
             </div>
-             <div class="social-share">
-                    <p>แชร์หน้านี้:</p>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                    </a>
-                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                    </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                    </a>
-                    <a href="https://www.tiktok.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                    </a>
-                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
-                </div>
-
-
+        </div>
     </div>
 </div>
