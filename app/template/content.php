@@ -251,7 +251,7 @@ body, html {
         <div class="row">
             <div class="col-md-12 text-end" style="padding-top: 30px;">
                 <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                    <p style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                    <p data-translate="share" lang="th" style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
                     <div style="display: flex; gap: 10px;">
                         <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                             <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
@@ -285,7 +285,7 @@ body, html {
             </div>
 
             <div class="col-md-12 section product-bg bottom-shasow" style="padding-top:40px;">
-                <h4 class="line-ref" >Product</h4>
+                <h4 data-translate="product" lang="th" class="line-ref" >Product</h4>
                 <div class="box-content">
                     <?php include 'template/product/shop_home.php'; ?>
                 </div>
@@ -299,7 +299,7 @@ body, html {
         <div class="row">
             <div class="col-md-12 section">
                 <div class="box-content-shop" style="background-color: transparent;">
-                    <h4 class="line-ref2">โครงการล่าสุด</h4>
+                    <h4 data-translate="project1" lang="th" class="line-ref2">โครงการล่าสุด</h4>
                     <?php include 'template/project/project_home.php'; ?>
                 </div>
             </div>
@@ -311,7 +311,7 @@ body, html {
     <div style="max-width: 70%;">
         <div class="row">
             <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
-                <h4 class="line-ref">บทความ</h4>
+                <h4 data-translate="blog" lang="th" class="line-ref">บทความ</h4>
                 <div class="box-content">
                     <?php include 'template/Blog/Blog_home.php'; ?>
                 </div>
@@ -319,13 +319,13 @@ body, html {
 
             <div class="col-md-12 section bottom-shasow">
                 <div class="box-content">
-                    <h4 class="line-ref">วิดีโอแนะนำ</h4>
+                    <h4 data-translate="video" lang="th" class="line-ref">วิดีโอแนะนำ</h4>
                     <?php include 'template/video/video_home.php'; ?>
                 </div>
             </div>
 
             <div class="col-md-12 text-start" style="padding-bottom:3em;">
-                <p style="margin: 0; padding-bottom: 10px; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                <p data-translate="share" lang="th" style="margin: 0; padding-bottom: 10px; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
                 <div class="social-share" style="display: flex; align-items: center; gap: 10px;">
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
