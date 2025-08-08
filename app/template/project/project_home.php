@@ -196,11 +196,11 @@ if ($result->num_rows > 0) {
 }
 
 .carousel-control-prev {
-    left: -50px;
+    left: -25px;
     transform: translateX(-50%);
 }
 .carousel-control-next {
-    right: -50px;
+    right: -25px;
     transform: translateX(50%);
 }
 .carousel-control-prev-icon,
