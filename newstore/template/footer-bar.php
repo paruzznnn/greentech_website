@@ -91,87 +91,90 @@
 </div>
 
 <script type="module">
-    import {
-        setupCookieModal
-    } from '/newstore/js/modalBuilder.js?v=<?php echo time() ?>';
+    import(`${pathConfig.BASE_WEB}js/modalBuilder.js?v=<?= time() ?>`)
+        .then(({
+            setupCookieModal
+        }) => {
 
-    setupCookieModal();
+            setupCookieModal();
 
-    window.addEventListener('DOMContentLoaded', () => {
-        const consent = getCookie('cookieConsent');
-        const settingsBar = document.querySelector('.policy-cookie');
-        const modal = document.getElementById('cookie-modal');
-
-        if (!consent) {
-            settingsBar.style.display = 'flex';
-        } else {
-            settingsBar.style.display = 'none';
-        }
-
-        document.getElementById('acceptCookies').addEventListener('click', () => {
-            const prefs = {
-                necessary: true,
-                experience: false,
-                performance: false
-            };
-            document.cookie = "cookieConsent=accepted; path=/; max-age=31536000";
-            document.cookie = `cookieSettings=${encodeURIComponent(JSON.stringify(prefs))}; path=/; max-age=31536000`;
-            settingsBar.style.display = 'none';
-        });
-
-        document.getElementById('rejectCookies').addEventListener('click', () => {
-            document.cookie = "cookieConsent=rejected; path=/; max-age=31536000";
-            settingsBar.style.display = 'none';
-        });
-
-        const saved = getCookie('cookieSettings');
-        if (saved) {
-            try {
-                const prefs = JSON.parse(saved);
-                if ('experience' in prefs)
-                    document.querySelector('input[name="experience"]').checked = prefs.experience;
-                if ('performance' in prefs)
-                    document.querySelector('input[name="performance"]').checked = prefs.performance;
-                if ('necessary' in prefs)
-                    document.querySelector('input[name="necessary"]').checked = prefs.necessary;
-            } catch (e) {
-                console.warn('can`t convert cookieSettings:', e);
+            function getCookie(name) {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [key, ...rest] = cookie.trim().split('=');
+                    if (key === name) {
+                        return decodeURIComponent(rest.join('='));
+                    }
+                }
+                return null;
             }
-        }
+
+            const consent = getCookie('cookieConsent');
+            const settingsBar = document.querySelector('.policy-cookie');
+            const modal = document.getElementById('cookie-modal');
+
+            if (!consent) {
+                settingsBar.style.display = 'flex';
+            } else {
+                settingsBar.style.display = 'none';
+            }
+
+            document.getElementById('acceptCookies').addEventListener('click', () => {
+                const prefs = {
+                    necessary: true,
+                    experience: false,
+                    performance: false
+                };
+                document.cookie = "cookieConsent=accepted; path=/; max-age=31536000";
+                document.cookie = `cookieSettings=${encodeURIComponent(JSON.stringify(prefs))}; path=/; max-age=31536000`;
+                settingsBar.style.display = 'none';
+            });
+
+            document.getElementById('rejectCookies').addEventListener('click', () => {
+                document.cookie = "cookieConsent=rejected; path=/; max-age=31536000";
+                settingsBar.style.display = 'none';
+            });
+
+            const saved = getCookie('cookieSettings');
+            if (saved) {
+                try {
+                    const prefs = JSON.parse(saved);
+                    if ('experience' in prefs)
+                        document.querySelector('input[name="experience"]').checked = prefs.experience;
+                    if ('performance' in prefs)
+                        document.querySelector('input[name="performance"]').checked = prefs.performance;
+                    if ('necessary' in prefs)
+                        document.querySelector('input[name="necessary"]').checked = prefs.necessary;
+                } catch (e) {
+                    console.warn('can`t convert cookieSettings:', e);
+                }
+            }
 
 
-        document.getElementById('cookie-preferences').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const prefs = {
-                necessary: true,
-                experience: document.querySelector('input[name="experience"]').checked,
-                performance: document.querySelector('input[name="performance"]').checked
-            };
+            document.getElementById('cookie-preferences').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const prefs = {
+                    necessary: true,
+                    experience: document.querySelector('input[name="experience"]').checked,
+                    performance: document.querySelector('input[name="performance"]').checked
+                };
 
-            document.cookie = `cookieConsent=custom; path=/; max-age=31536000`;
-            document.cookie = `cookieSettings=${encodeURIComponent(JSON.stringify(prefs))}; path=/; max-age=31536000`;
-            modal.style.display = 'none';
-            settingsBar.style.display = 'none';
-        });
-
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target.id === "cookie-modal") {
+                document.cookie = `cookieConsent=custom; path=/; max-age=31536000`;
+                document.cookie = `cookieSettings=${encodeURIComponent(JSON.stringify(prefs))}; path=/; max-age=31536000`;
                 modal.style.display = 'none';
-            }
-        });
-    });
+                settingsBar.style.display = 'none';
+            });
 
-    function getCookie(name) {
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [key, ...rest] = cookie.trim().split('=');
-            if (key === name) {
-                return decodeURIComponent(rest.join('='));
-            }
-        }
-        return null;
-    }
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target.id === "cookie-modal") {
+                    modal.style.display = 'none';
+                }
+            });
+
+
+        })
+        .catch((e) => console.error("Module import failed", e));
 </script>
 
 <footer class="site-footer">
@@ -192,6 +195,51 @@
     </div>
 </footer>
 
+<script type="module">
+    import(`${pathConfig.BASE_WEB}js/language.js?v=<?= time() ?>`)
+        .then(({
+            loadLanguage,
+            applyTranslations
+        }) => {
+
+            const langButtons = document.getElementById('langButtons');
+            const defaultLang = localStorage.getItem('lang') || 'en';
+            let service = pathConfig.BASE_WEB + 'locales/';
+
+            function updateActiveButton(activeLang) {
+                [...langButtons.children].forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === activeLang);
+                });
+            }
+
+            async function setLang(lang, service) {
+                try {
+                    const dict = await loadLanguage(lang, service);
+                    applyTranslations(dict);
+                    localStorage.setItem('lang', lang);
+                    document.documentElement.lang = lang;
+                    updateActiveButton(lang);
+                } catch (err) {
+                    console.error('Language loading error:', err);
+                    alert(`Error loading language: ${err.message}`);
+                }
+            }
+
+            setLang(defaultLang, service);
+
+            langButtons.addEventListener('click', e => {
+                if (e.target.tagName === 'BUTTON') {
+                    const lang = e.target.dataset.lang;
+                    if (lang) {
+                        setLang(lang, service);
+                    }
+                }
+            });
+
+        })
+        .catch((e) => console.error("Module import failed", e));
+</script>
+
+
 <!-- <script src="/e-store/js/chatService.js?v=<?php echo time(); ?>"></script> -->
 <!-- <script src="/e-store/js/mathematics.js?v=<?php echo time(); ?>"></script> -->
-<script type="module" src="/newstore/js/langSwitcher.js?v=<?php echo time(); ?>"></script>

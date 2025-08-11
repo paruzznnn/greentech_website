@@ -85,7 +85,6 @@ export function exposeTogglePassword(target = window) {
   };
 }
 
-
 export function setupCookieModal() {
   function openModalCookie() {
     document.getElementById("cookie-modal").style.display = "flex";
