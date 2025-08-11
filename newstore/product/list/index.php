@@ -91,24 +91,32 @@
     <?php include '../../template/footer-bar.php'; ?>
 
     <script type="module">
-        import { initCardUI } from '../../js/product/productListRender.js?v=<?php echo time();?>';
+        import(`${pathConfig.BASE_WEB}js/product/productListRender.js?v=<?= time() ?>`)
+        .then(async ({ 
+            initCardUI
+        }) => {
 
-        initCardUI({
-            containerId: 'cardContainer',
-            // searchInputId: 'searchInput',
-            pageInfoId: 'pageInfo',
-            prevButtonId: 'prevBtn',
-            nextButtonId: 'nextBtn',
-            minPriceInputId: 'minPrice',
-            maxPriceInputId: 'maxPrice',
-            minPriceLabelId: 'minPriceLabel',
-            maxPriceLabelId: 'maxPriceLabel',
-            priceRangeSelectedId: 'priceRangeSelected',
-            // clearFiltersBtnId: 'clearFiltersBtn',
-            apiUrl: '../../service/product/product-data?action=getProductListItems&gategoryId=<?php echo (int) ($_GET['id'] ?? 0); ?>',
-            authToken: 'my_secure_token_123'
-        });
+            initCardUI({
+                containerId: 'cardContainer',
+                // searchInputId: 'searchInput',
+                pageInfoId: 'pageInfo',
+                prevButtonId: 'prevBtn',
+                nextButtonId: 'nextBtn',
+                minPriceInputId: 'minPrice',
+                maxPriceInputId: 'maxPrice',
+                minPriceLabelId: 'minPriceLabel',
+                maxPriceLabelId: 'maxPriceLabel',
+                priceRangeSelectedId: 'priceRangeSelected',
+                // clearFiltersBtnId: 'clearFiltersBtn',
+                apiUrl: pathConfig.BASE_WEB + 'service/product/product-data.php?action=getProductListItems&gategoryId=<?php echo (int) ($_GET['id'] ?? 0); ?>',
+                authToken: 'my_secure_token_123',
+                BASE_WEB: pathConfig.BASE_WEB
+            });
+            
+        })
+        .catch((e) => console.error("Module import failed", e));
     </script>
+
 </body>
 
 </html>
