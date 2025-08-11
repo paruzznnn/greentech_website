@@ -1,8 +1,14 @@
 <?php
-// PD
-// define('BASE_PATH', '/newstore/');
-// LC
-define('BASE_PATH', '/trandar_website/newstore/');
+switch ($_SERVER['REQUEST_SCHEME']) {
+    case 'http':
+        define('BASE_PATH', '/trandar_website/newstore/');
+        break;
+    case 'https':
+        define('BASE_PATH', '/newstore/');
+        break;
+    default:
+        break;
+}
 ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
