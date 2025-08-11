@@ -22,10 +22,20 @@ function connectDB($host, $user, $pass, $dbname) {
     return $conn;
 }
 
-// $GLOBALS['mysqli'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+// $GLOBALS['mysqli1'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+// $GLOBALS['mysqli2'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+function webBasePath() {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
 
-// $mysqli = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
-// $conn = connectDB($_ENV['DB2_HOST'], $_ENV['DB2_USER'], $_ENV['DB2_PASS'], $_ENV['DB2_NAME']);
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
+    $base_path = $scheme . '://' . $host . $path;
+    return $base_path;
+}
+
+$GLOBALS['BASE_WEB'] = webBasePath();
 
 function formatDateLocalized($dateString, $lang = 'th', $useBuddhistYear = true, $timezone = 'UTC') {
     
