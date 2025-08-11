@@ -1,0 +1,482 @@
+<header class="header-store1">
+  <div class="navbar-news">
+    <div class="container">
+      <!-- <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+        <div style="display: inline;">
+          <span style="padding: 0 50px;">
+            <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
+              Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 </a>
+          </span>
+        </div>
+      </marquee> -->
+    </div>
+  </div>
+  <nav class="pt-1">
+    <div class="container">
+      <div class="nav-store1">
+
+        <div class="nav-store1-box-logo">
+          <a href="/e-store/">
+            <img src="/e-store/trandar_logo.png" alt="Logo">
+          </a>
+        </div>
+
+        <div class="nav-store1-box-search">
+          <!-- <form style="margin: 0px;">
+            <div class="input-search-store1">
+              <i class="fa fa-search icon-left"></i>
+              <input type="text" id="input-search" class="input-search" placeholder="ค้นหา..." />
+              <button class="btn-inside">
+                <i class="bi bi-camera-fill"></i>
+                <span>ค้นหาสินค้า</span>
+              </button>
+            </div>
+          </form> -->
+        </div>
+
+        <div class="nav-store1-box-menu">
+          <div>
+            <button data-lang="" id="modal-auth-store1" type="button" class="nav-store1-btn btn-sm">
+              <i class="bi bi-person-circle"></i>
+              <span>เข้าสู่ระบบ / ลงทะเบียน</span>
+            </button>
+          </div>
+          <div>
+            <span id="menu-open-store1" style="font-size:20px;cursor:pointer">
+              <i class="bi bi-three-dots-vertical"></i>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+  <nav class="mt-2">
+    <div id="linkContainer" class="container"></div>
+  </nav>
+</header>
+
+<header class="header-store2">
+  <nav class="pt-3 pb-3">
+    <div class="container">
+      <div class="nav-store2">
+        <div id="menu-open-store2" class="nav-store2-box-menu">
+          <i class="bi bi-border-width"></i>
+        </div>
+        <div id="menu-close-store2" class="nav-store2-box-menu hidden">
+          <i class="fas fa-times"></i>
+        </div>
+        <div class="nav-store2-box-logo">
+          <a href="/e-store/">
+            <img src="/e-store/trandar_logo.png" alt="Logo">
+          </a>
+        </div>
+        <div class="nav-store2-box-menu">
+          <div id="menu1-open-store1">
+            <i class="bi bi-person-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div id="auth-modal" class="store-modal">
+  <div class="store-modal-content">
+
+    <span id="modal-auth-close-store1" class="store-close-modal">&times;</span>
+    <img src="/e-store/trandar_logo.png" alt="" class="store-modal-title" />
+
+    <div class="tab-navigation">
+      <button id="login-tab" class="tab-button active">
+        เข้าสู่ระบบ
+      </button>
+      <button id="register-tab" class="tab-button">
+        ลงทะเบียน
+      </button>
+    </div>
+
+    <!-- Tab Content: Login -->
+    <div id="login-content" class="tab-content active">
+      <form class="form-space-y">
+        <input type="text" name="action" value="checkLogin" hidden>
+        <div>
+          <label for="login-email" class="form-label">ชื่อผู้ใช้:</label>
+          <input type="text" id="login-email" name="login-email" class="form-input" placeholder="email@example.com" required>
+        </div>
+        <div>
+          <label for="login-password" class="form-label">รหัสผ่าน:</label>
+          <input type="password" id="login-password" name="login-password" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <div class="auth-remember">
+          <div>
+            <!-- <input class="form-check-input" type="checkbox" value="" id="accept-remember"> -->
+            <!-- <span>จดจำผู้ใช้งาน</span> -->
+            <i class="bi bi-lock"></i>
+            <span>ข้อมูลของคุณทั้งหมดจะถูกเข้ารหัส เพื่อความปลอดภัย</span>
+          </div>
+          <div>
+            <a href="/e-store/terms">ลืมรหัสผ่าน</a>
+          </div>
+        </div>
+
+        <button type="submit" class="form-button login-button">
+          <span>ดำเนินการต่อ</span>
+        </button>
+      </form>
+      <div class="space-login-social">ช่องทางอื่น</div>
+      <div class="box-login-social">
+        <button type="button" id="loginGoogleBtn" class="btn-login-social">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+          </svg>
+        </button>
+        <button type="button" id="loginLineBtn" class="btn-login-social">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+            <path fill="#00c300" d="M12.5,42h23c3.59,0,6.5-2.91,6.5-6.5v-23C42,8.91,39.09,6,35.5,6h-23C8.91,6,6,8.91,6,12.5v23C6,39.09,8.91,42,12.5,42z"></path>
+            <path fill="#fff" d="M37.113,22.417c0-5.865-5.88-10.637-13.107-10.637s-13.108,4.772-13.108,10.637c0,5.258,4.663,9.662,10.962,10.495c0.427,0.092,1.008,0.282,1.155,0.646c0.132,0.331,0.086,0.85,0.042,1.185c0,0-0.153,0.925-0.187,1.122c-0.057,0.331-0.263,1.296,1.135,0.707c1.399-0.589,7.548-4.445,10.298-7.611h-0.001C36.203,26.879,37.113,24.764,37.113,22.417z M18.875,25.907h-2.604c-0.379,0-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687c0.379,0,0.687,0.308,0.687,0.687v4.521h1.917c0.379,0,0.687,0.308,0.687,0.687C19.562,25.598,19.254,25.907,18.875,25.907z M21.568,25.219c0,0.379-0.308,0.688-0.687,0.688s-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687s0.687,0.308,0.687,0.687V25.219z M27.838,25.219c0,0.297-0.188,0.559-0.47,0.652c-0.071,0.024-0.145,0.036-0.218,0.036c-0.215,0-0.42-0.103-0.549-0.275l-2.669-3.635v3.222c0,0.379-0.308,0.688-0.688,0.688c-0.379,0-0.688-0.308-0.688-0.688V20.01c0-0.296,0.189-0.558,0.47-0.652c0.071-0.024,0.144-0.035,0.218-0.035c0.214,0,0.42,0.103,0.549,0.275l2.67,3.635V20.01c0-0.379,0.309-0.687,0.688-0.687c0.379,0,0.687,0.308,0.687,0.687V25.219z M32.052,21.927c0.379,0,0.688,0.308,0.688,0.688c0,0.379-0.308,0.687-0.688,0.687h-1.917v1.23h1.917c0.379,0,0.688,0.308,0.688,0.687c0,0.379-0.309,0.688-0.688,0.688h-2.604c-0.378,0-0.687-0.308-0.687-0.688v-2.603c0-0.001,0-0.001,0-0.001c0,0,0-0.001,0-0.001v-2.601c0-0.001,0-0.001,0-0.002c0-0.379,0.308-0.687,0.687-0.687h2.604c0.379,0,0.688,0.308,0.688,0.687s-0.308,0.687-0.688,0.687h-1.917v1.23H32.052z"></path>
+          </svg>
+        </button>
+        <button type="button" id="loginFacebookBtn" class="btn-login-social">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+            <linearGradient id="Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1" x1="9.993" x2="40.615" y1="9.993" y2="40.615" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#2aa4f4"></stop>
+              <stop offset="1" stop-color="#007ad9"></stop>
+            </linearGradient>
+            <path fill="url(#Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1)" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path>
+            <path fill="#fff" d="M26.707,29.301h5.176l0.813-5.258h-5.989v-2.874c0-2.184,0.714-4.121,2.757-4.121h3.283V12.46 c-0.577-0.078-1.797-0.248-4.102-0.248c-4.814,0-7.636,2.542-7.636,8.334v3.498H16.06v5.258h4.948v14.452 C21.988,43.9,22.981,44,24,44c0.921,0,1.82-0.084,2.707-0.204V29.301z"></path>
+          </svg>
+        </button>
+      </div>
+      <p class="auth-policy">
+        เมื่อเข้าสู่ระบบ ถือว่าคุณได้ยอมรับ
+        <a href="/e-store/terms">เงื่อนไขการใช้บริการ</a>
+        และรับทราบ
+        <a href="/e-store/privacy-policy">นโยบายความเป็นส่วนตัว</a>
+        ของ Trandar Store
+      </p>
+    </div>
+
+    <!-- Tab Content: Register -->
+    <div id="register-content" class="tab-content">
+      <form class="form-space-y">
+
+        <div>
+          <label for="register-username" class="form-label">ชื่อผู้ใช้:</label>
+          <input type="text" id="register-username" name="register-username" class="form-input" placeholder="ชื่อผู้ใช้ของคุณ" required>
+        </div>
+        <div>
+          <label for="register-email" class="form-label">อีเมล:</label>
+          <input type="email" id="register-email" name="register-email" class="form-input" placeholder="email@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-password" class="form-label">รหัสผ่าน:</label>
+          <div class="input-wrapper">
+            <input type="password" id="register-password" name="register-password"
+              class="form-input"
+              placeholder="••••••••" required>
+            <button type="button" onclick="togglePassword('register-password')"
+              class="toggle-btn">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="register-confirm-password" class="form-label">ยืนยันรหัสผ่าน:</label>
+          <div class="input-wrapper">
+            <input type="password" id="register-confirm-password" name="register-confirm-password"
+              class="form-input"
+              placeholder="••••••••" required>
+            <button type="button" onclick="togglePassword('register-confirm-password')"
+              class="toggle-btn">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+          <div id="matchMessage" class="message"></div>
+        </div>
+
+        <div id="pwdRules">
+          <ul>
+            <li id="rule-length" class="rule-fail">
+              <i class="far fa-circle"></i> At least <strong>8</strong> characters
+            </li>
+            <li id="rule-lower" class="rule-fail">
+              <i class="far fa-circle"></i> Lowercase (a‑z)
+            </li>
+            <li id="rule-upper" class="rule-fail">
+              <i class="far fa-circle"></i> Capital letters (A‑Z)
+            </li>
+            <li id="rule-digit" class="rule-fail">
+              <i class="far fa-circle"></i> Numbers (0‑9)
+            </li>
+            <li id="rule-special" class="rule-fail">
+              <i class="far fa-circle"></i> Special characters (!@#$…)
+            </li>
+          </ul>
+        </div>
+
+        <p class="auth-policy">
+          <input class="form-check-input" type="checkbox" value="" id="accept-policy">
+          <span>
+            การลงทะเบียนเข้าใช้งานหมายถึงฉันยอมรับ
+            <a href="/e-store/terms">เงื่อนไขการใช้งาน</a>และ
+            <a href="/e-store/privacy-policy">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
+          </span>
+        </p>
+
+        <!-- <div class="g-recaptcha" data-sitekey="6LeEp5YrAAAAAE9gUav_bHzqkYrPpC5CAttb_xXv"></div> -->
+
+        <button type="submit" class="form-button register-button">
+          ลงทะเบียน
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div class="notify-panel">
+
+  <div class="notify-item border-bottom">
+    <span class="notify-count" id="compareCount">0</span>
+    <div class="notify-icon-wrapper">
+      <a class="notify-icon-button">
+        <i class="bi bi-clipboard-heart"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="notify-item">
+    <span class="notify-count">0</span>
+    <div class="notify-icon-wrapper">
+      <a href="cart.php" class="notify-icon-button">
+        <i class="bi bi-cart3"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<aside id="sidenav-store1" class="sidenav">
+  <div class="login-box-store1">
+    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" class="avatar-store1">
+    <p>กรุณาเข้าสู่ระบบ</p>
+    <a href="javascript:void(0)" id="menu-close-store1" class="closebtn-store1">&times;</a>
+  </div>
+  <div>
+    <div id="langButtons">
+      <button data-lang="en" type="button" class="nav-store1-btn btn-sm">English</button>
+      <button data-lang="th" type="button" class="nav-store1-btn btn-sm">Thai</button>
+    </div>
+  </div>
+</aside>
+
+<aside id="sidenav-store2" class="sidenav">
+  <!-- <a href="javascript:void(0)" class="closebtn-store2" >&times;</a> -->
+  <div class="pt-2 ps-2 pe-2">
+    <!-- <form action="">
+      <div class="input-search-store2">
+        <i class="fa fa-search icon-left"></i>
+        <input type="text" placeholder="ค้นหา..." />
+        <button class="btn-inside">
+          <span>ค้าหาสินค้า</span>
+        </button>
+      </div>
+    </form> -->
+  </div>
+  <div class="pt-1">
+    <ul id="menuListContainer"></ul>
+  </div>
+  <div style="display: none;">
+    <div id="langButtons">
+      <button data-lang="en" type="button" class="nav-store2-btn btn-sm">English</button>
+      <button data-lang="th" type="button" class="nav-store2-btn btn-sm">Thai</button>
+    </div>
+  </div>
+</aside>
+<div id="overlay-store2"></div>
+
+<script type="module">
+  import { 
+    handleFormSubmit } from "/e-store/js/formHandler.js?v=<?php echo time()?>";
+  import { 
+    setupAuthModal, 
+    setupPasswordValidation, 
+    exposeTogglePassword
+  } from '/e-store/js/modalBuilder.js?v=<?php echo time()?>';
+
+  // === DOM Element Variables ===
+    const loginTab = document.getElementById("login-tab");
+    const registerTab = document.getElementById("register-tab");
+    const loginContent = document.getElementById("login-content");
+    const registerContent = document.getElementById("register-content");
+
+    const passwordInput = document.getElementById("register-password");
+    const confirmInput = document.getElementById("register-confirm-password");
+    const matchMessage = document.getElementById("matchMessage");
+
+    const rules = {
+      length: document.getElementById("rule-length"),
+      lower: document.getElementById("rule-lower"),
+      upper: document.getElementById("rule-upper"),
+      digit: document.getElementById("rule-digit"),
+      special: document.getElementById("rule-special"),
+    };
+
+    document.querySelector(".form-space-y")?.addEventListener("submit", handleFormSubmit);
+
+    setupAuthModal(loginTab, registerTab, loginContent, registerContent);
+    setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules);
+    exposeTogglePassword(window);
+    
+    import { buildLinkmenu, buildLinkmenuSlide } from '/e-store/js/menuBuilder.js?v=<?php echo time()?>';
+    import { resetPosition } from '/e-store/js/menuUtils.js?v=<?php echo time()?>';
+
+    function leftSlide() {
+      document.getElementById("sidenav-store2").classList.add("open");
+      document.getElementById("overlay-store2").classList.add("active");
+      document.getElementById("menu-open-store2").classList.add("hidden");
+      document.getElementById("menu-close-store2").classList.remove("hidden");
+    }
+
+    function leftSlideClose() {
+      document.getElementById("sidenav-store2").classList.remove("open");
+      document.getElementById("overlay-store2").classList.remove("active");
+      document.getElementById("menu-open-store2").classList.remove("hidden");
+      document.getElementById("menu-close-store2").classList.add("hidden");
+    }
+
+    function rightSlide() {
+      document.getElementById("sidenav-store1").classList.add("open");
+    }
+
+    function rightSlideClose() {
+      document.getElementById("sidenav-store1").classList.remove("open");
+    }
+
+    function checkDeviceSize() {
+      const width = window.innerWidth;
+      if (width > 480) {
+        leftSlideClose();
+      }
+      document.body.classList.remove("is-mobile", "is-tablet", "is-desktop");
+      if (width <= 480) {
+        document.body.classList.add("is-mobile");
+      } else if (width <= 768) {
+        document.body.classList.add("is-tablet");
+      } else {
+        document.body.classList.add("is-desktop");
+      }
+    }
+
+function handleResize() {
+  checkDeviceSize();
+  document.querySelectorAll(".toggle-box-store1").forEach(box => {
+    box.classList.remove("show");
+    resetPosition(box);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("menu-open-store1")?.addEventListener("click", rightSlide);
+  document.getElementById("menu1-open-store1")?.addEventListener("click", rightSlide);
+  document.getElementById("menu-close-store1")?.addEventListener("click", rightSlideClose);
+
+  document.getElementById("menu-open-store2")?.addEventListener("click", leftSlide);
+  document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
+  document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
+
+  buildLinkmenu();
+  buildLinkmenuSlide();
+
+  checkDeviceSize();
+
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("load", checkDeviceSize);
+});
+
+
+</script>
+
+<script>
+  // ---------- wait DOM ---------- //
+  document.addEventListener("DOMContentLoaded", () => {
+    function generateState(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+    function randomString(len = 64) {
+      const bytes = new Uint8Array(len);
+      crypto.getRandomValues(bytes);
+      return btoa(String.fromCharCode(...bytes))
+        .replace(/[\+\/=]/g, '') // base64url
+        .substring(0, len);
+    }
+    // LINE Login
+    document.getElementById('loginLineBtn')?.addEventListener('click', function() {
+      const clientId = '2007612199';
+      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/line_auth.php');
+      const state = generateState(8);
+      const scope = 'profile openid';
+
+      const authUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${encodeURIComponent(scope)}`;
+      window.location.href = authUrl;
+    });
+    // Facebook Login (for page permissions)
+    document.getElementById('loginFacebookBtn')?.addEventListener('click', function() {
+
+      const clientId = '2097721124030477';
+      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/facebook_auth.php');
+      const state = generateState(8);
+      const scope = 'email,public_profile';
+      const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+      window.location.href = facebookAuthUrl;
+
+      // const clientId = '699793683081119';
+      // const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/facebook_page.php');
+      // const state = generateState(8);
+      // const scope = 'email,public_profile,pages_show_list,pages_read_engagement,pages_manage_posts,pages_messaging,pages_manage_metadata';
+      // const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+      // window.location.href = facebookAuthUrl;
+    });
+    // Google Login
+    document.getElementById('loginGoogleBtn')?.addEventListener('click', function() {
+      const clientId = '262467068023-qhh35u6a7gkiqvdndgl4ldr2l6nqcdgh.apps.googleusercontent.com';
+      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/google_auth.php');
+      const state = randomString(12);
+      const scope = encodeURIComponent('https://www.googleapis.com/auth/drive');
+
+      const authUrl =
+        `https://accounts.google.com/o/oauth2/v2/auth` +
+        `?response_type=code` +
+        `&client_id=${clientId}` +
+        `&redirect_uri=${redirectUri}` +
+        `&scope=${scope}` +
+        `&state=${state}` +
+        `&access_type=offline`;
+
+      window.location.href = authUrl;
+    });
+  });
+</script>
+
+<script>
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  fetch('/e-store/time_zone/set-timezone', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'tz=' + encodeURIComponent(timezone)
+  });
+</script>
