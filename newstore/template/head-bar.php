@@ -16,8 +16,8 @@
       <div class="nav-store1">
 
         <div class="nav-store1-box-logo">
-          <a href="/trandar_website/newstore/">
-            <img src="/trandar_website/newstore/trandar_logo.png" alt="Logo">
+          <a href="<?php echo $BASE_WEB?>">
+            <img src="<?php echo $BASE_WEB?>trandar_logo.png" alt="Logo">
           </a>
         </div>
 
@@ -67,8 +67,8 @@
           <i class="fas fa-times"></i>
         </div>
         <div class="nav-store2-box-logo">
-          <a href="/trandar_website/newstore/">
-            <img src="/trandar_website/newstore/trandar_logo.png" alt="Logo">
+          <a href="<?php echo $BASE_WEB?>">
+            <img src="<?php echo $BASE_WEB?>trandar_logo.png" alt="Logo">
           </a>
         </div>
         <div class="nav-store2-box-menu">
@@ -85,7 +85,7 @@
   <div class="store-modal-content">
 
     <span id="modal-auth-close-store1" class="store-close-modal">&times;</span>
-    <img src="/trandar_website/newstore/trandar_logo.png" alt="" class="store-modal-title" />
+    <img src="<?php echo $BASE_WEB?>trandar_logo.png" alt="" class="store-modal-title" />
 
     <div class="tab-navigation">
       <button id="login-tab" class="tab-button active">
@@ -117,7 +117,7 @@
             <span>ข้อมูลของคุณทั้งหมดจะถูกเข้ารหัส เพื่อความปลอดภัย</span>
           </div>
           <div>
-            <a href="/trandar_website/newstore/terms">ลืมรหัสผ่าน</a>
+            <a href="/newstore/terms.php">ลืมรหัสผ่าน</a>
           </div>
         </div>
 
@@ -154,9 +154,9 @@
       </div>
       <p class="auth-policy">
         เมื่อเข้าสู่ระบบ ถือว่าคุณได้ยอมรับ
-        <a href="/trandar_website/newstore/terms">เงื่อนไขการใช้บริการ</a>
+        <a href="/newstore/terms.php">เงื่อนไขการใช้บริการ</a>
         และรับทราบ
-        <a href="/trandar_website/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>
+        <a href="/newstore/privacy-policy.php">นโยบายความเป็นส่วนตัว</a>
         ของ Trandar Store
       </p>
     </div>
@@ -225,8 +225,8 @@
           <input class="form-check-input" type="checkbox" value="" id="accept-policy">
           <span>
             การลงทะเบียนเข้าใช้งานหมายถึงฉันยอมรับ
-            <a href="/trandar_website/newstore/terms">เงื่อนไขการใช้งาน</a>และ
-            <a href="/trandar_website/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
+            <a href="/newstore/terms.php">เงื่อนไขการใช้งาน</a>และ
+            <a href="/newstore/privacy-policy.php">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
           </span>
         </p>
 
@@ -302,16 +302,22 @@
 </aside>
 <div id="overlay-store2"></div>
 
-<script type="module">
-  import { 
-    handleFormSubmit } from "/trandar_website/newstore/js/formHandler.js?v=<?php echo time()?>";
-  import { 
-    setupAuthModal, 
-    setupPasswordValidation, 
-    exposeTogglePassword
-  } from '/trandar_website/newstore/js/modalBuilder.js?v=<?php echo time()?>';
 
-  // === DOM Element Variables ===
+<script type="module">
+  const base = pathConfig.BASE_WEB;
+  const timestamp = <?= time() ?>;
+
+  Promise.all([
+    import(`${base}js/formHandler.js?v=${timestamp}`),
+    import(`${base}js/modalBuilder.js?v=${timestamp}`),
+    import(`${base}js/menuBuilder.js?v=${timestamp}`)
+  ])
+  .then( async ([formHandler, modalBuilder, menuBuilder]) => {
+    const { handleFormSubmit } = formHandler;
+    const { setupAuthModal, setupPasswordValidation, exposeTogglePassword } = modalBuilder;
+    const { fetchHeader, buildLinkmenu, buildLinkmenuSlide, resetPosition } = menuBuilder;
+
+    // ============== DOM Elements ========================
     const loginTab = document.getElementById("login-tab");
     const registerTab = document.getElementById("register-tab");
     const loginContent = document.getElementById("login-content");
@@ -329,43 +335,37 @@
       special: document.getElementById("rule-special"),
     };
 
-    document.querySelector(".form-space-y")?.addEventListener("submit", handleFormSubmit);
+    // ==================== Initialize Features ================
+    if (loginTab && registerTab && loginContent && registerContent) {
+      setupAuthModal(loginTab, registerTab, loginContent, registerContent);
+    }
 
-    setupAuthModal(loginTab, registerTab, loginContent, registerContent);
-    setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules);
+    if (passwordInput && confirmInput && matchMessage) {
+      setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules);
+    }
+
     exposeTogglePassword(window);
-    
-    import { buildLinkmenu, buildLinkmenuSlide } from '/trandar_website/newstore/js/menuBuilder.js?v=<?php echo time()?>';
-    import { resetPosition } from '/trandar_website/newstore/js/menuUtils.js?v=<?php echo time()?>';
 
-    function leftSlide() {
-      document.getElementById("sidenav-store2").classList.add("open");
-      document.getElementById("overlay-store2").classList.add("active");
-      document.getElementById("menu-open-store2").classList.add("hidden");
-      document.getElementById("menu-close-store2").classList.remove("hidden");
-    }
+    const form = document.querySelector(".form-space-y");
+    form?.addEventListener("submit", handleFormSubmit);
 
-    function leftSlideClose() {
-      document.getElementById("sidenav-store2").classList.remove("open");
-      document.getElementById("overlay-store2").classList.remove("active");
-      document.getElementById("menu-open-store2").classList.remove("hidden");
-      document.getElementById("menu-close-store2").classList.add("hidden");
-    }
+    //====================== Build Menu ==========================
+    const service = pathConfig.BASE_WEB + 'service/header-data.php?';
+    const data = await fetchHeader("getMenuHeaderItems", service);
+    const contentArray = await fetchHeader("getMenuHeaderBox", service);
+    const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
-    function rightSlide() {
-      document.getElementById("sidenav-store1").classList.add("open");
-    }
+    buildLinkmenu(data, contentArray);
+    buildLinkmenuSlide(menuData);
 
-    function rightSlideClose() {
-      document.getElementById("sidenav-store1").classList.remove("open");
-    }
-
-    function checkDeviceSize() {
+    // ============= Responsive ==================
+    const checkDeviceSize = () => {
       const width = window.innerWidth;
-      if (width > 480) {
-        leftSlideClose();
-      }
+
+      if (width > 480) leftSlideClose();
+
       document.body.classList.remove("is-mobile", "is-tablet", "is-desktop");
+
       if (width <= 480) {
         document.body.classList.add("is-mobile");
       } else if (width <= 768) {
@@ -373,38 +373,60 @@
       } else {
         document.body.classList.add("is-desktop");
       }
-    }
+    };
 
-function handleResize() {
-  checkDeviceSize();
-  document.querySelectorAll(".toggle-box-store1").forEach(box => {
-    box.classList.remove("show");
-    resetPosition(box);
+    // =============== Menu Slide Functions =======================
+    const leftSlide = () => {
+      document.getElementById("sidenav-store2")?.classList.add("open");
+      document.getElementById("overlay-store2")?.classList.add("active");
+      document.getElementById("menu-open-store2")?.classList.add("hidden");
+      document.getElementById("menu-close-store2")?.classList.remove("hidden");
+    };
+
+    const leftSlideClose = () => {
+      document.getElementById("sidenav-store2")?.classList.remove("open");
+      document.getElementById("overlay-store2")?.classList.remove("active");
+      document.getElementById("menu-open-store2")?.classList.remove("hidden");
+      document.getElementById("menu-close-store2")?.classList.add("hidden");
+    };
+
+    const rightSlide = () => {
+      document.getElementById("sidenav-store1")?.classList.add("open");
+    };
+
+    const rightSlideClose = () => {
+      document.getElementById("sidenav-store1")?.classList.remove("open");
+    };
+
+    // ============ Right menu =================
+    document.getElementById("menu-open-store1")?.addEventListener("click", rightSlide);
+    document.getElementById("menu1-open-store1")?.addEventListener("click", rightSlide);
+    document.getElementById("menu-close-store1")?.addEventListener("click", rightSlideClose);
+
+    // ============ Left menu ===================
+    document.getElementById("menu-open-store2")?.addEventListener("click", leftSlide);
+    document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
+    document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
+
+    checkDeviceSize();
+    const handleResize = () => {
+      checkDeviceSize();
+      document.querySelectorAll(".toggle-box-store1").forEach(box => {
+        box.classList.remove("show");
+        resetPosition(box);
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+  })
+  .catch((e) => {
+    console.error("One or more module imports failed", e);
   });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("menu-open-store1")?.addEventListener("click", rightSlide);
-  document.getElementById("menu1-open-store1")?.addEventListener("click", rightSlide);
-  document.getElementById("menu-close-store1")?.addEventListener("click", rightSlideClose);
-
-  document.getElementById("menu-open-store2")?.addEventListener("click", leftSlide);
-  document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
-  document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
-
-  buildLinkmenu();
-  buildLinkmenuSlide();
-
-  checkDeviceSize();
-
-  window.addEventListener("resize", handleResize);
-  window.addEventListener("load", checkDeviceSize);
-});
-
-
 </script>
 
 <script>
+
   // ---------- wait DOM ---------- //
   document.addEventListener("DOMContentLoaded", () => {
     function generateState(length) {
@@ -468,11 +490,10 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = authUrl;
     });
   });
-</script>
 
-<script>
+  //================= SET TIME ZONE ================================
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  fetch('/trandar_website/newstore/time_zone/set-timezone', {
+  fetch(`${pathConfig.BASE_WEB}/time_zone/set-timezone.php`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

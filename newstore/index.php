@@ -17,54 +17,52 @@
   <main>
     <div id="sections_root_store"></div>
   </main>
-  <?php include 'template/footer-bar.php'; ?>
+  <?php //include 'template/footer-bar.php'; ?>
 
   <script type="module">
+    import(`${pathConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
+      .then(async ({ 
+        fetchIndexData, 
+        renderSections, 
+        renderIntroduce, 
+        renderBanners, 
+        renderCarouselSM, 
+        renderCarouselMD, 
+        renderCarouselLG 
+      }) => {
 
-    // console.log(window.pathConfig.BASE_WEB);
+        const service = pathConfig.BASE_WEB + 'service/index-data.php?';
+        const sections = await fetchIndexData("getSectionItems", service);
+        sections.data.sort((a, b) => a.sort - b.sort);
+        renderSections("#sections_root_store", sections.data);
 
-    import {
-      fetchIndexData,
-      renderSections,
-      renderIntroduce,
-      renderBanners,
-      renderCarouselSM,
-      renderCarouselMD,
-      renderCarouselLG
-    } from '/trandar_website/newstore/js/storeRender.js?v=<?php echo time()?>';
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const sections = await fetchIndexData("getSectionItems");
-      sections.data.sort((a, b) => a.sort - b.sort);
-      renderSections("#sections_root_store", sections.data);
-
-      for (const section of sections.data) {
-        switch (section.type) {
-          case "crssm":
-            const popularItems = await fetchIndexData("getPopularItems");
-            renderCarouselSM("#" + section.carouselId, popularItems.data);
-            break;
-          case "crsmd":
-            const productItems = await fetchIndexData("getProductItems");
-            renderCarouselMD("#" + section.carouselId, productItems.data);
-            break;
-          case "crslg":
-            const newsItems = await fetchIndexData("getNewsItems");
-            renderCarouselLG("#" + section.carouselId, newsItems.data);
-            break;
-          case "bbn":
-            const banners = await fetchIndexData("getBannersItems");
-            renderBanners("#" + section.carouselId, banners.data);
-            break;
-          case "intd":
-            const introItems = await fetchIndexData("getIntroItems");
-            renderIntroduce("#" + section.carouselId, introItems.data);
-            break;
+        for (const section of sections.data) {
+            switch (section.type) {
+              case "crssm":
+                const popularItems = await fetchIndexData("getPopularItems", service);
+                renderCarouselSM("#" + section.carouselId, popularItems.data);
+                break;
+              case "crsmd":
+                const productItems = await fetchIndexData("getProductItems", service);
+                renderCarouselMD("#" + section.carouselId, productItems.data);
+                break;
+              case "crslg":
+                const newsItems = await fetchIndexData("getNewsItems", service);
+                renderCarouselLG("#" + section.carouselId, newsItems.data);
+                break;
+              case "bbn":
+                const banners = await fetchIndexData("getBannersItems", service);
+                renderBanners("#" + section.carouselId, banners.data);
+                break;
+              case "intd":
+                const introItems = await fetchIndexData("getIntroItems", service);
+                renderIntroduce("#" + section.carouselId, introItems.data);
+                break;
+            }
         }
-      }
-    });
-
-
+        
+      })
+      .catch((e) => console.error("Module import failed", e));
   </script>
 
 </body>

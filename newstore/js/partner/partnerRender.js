@@ -2,7 +2,7 @@
 export async function fetchPartnerData(req) {
     try {
         const params = new URLSearchParams({ action: req });
-        const url = '/trandar_website/newstore/service/partner/partner-data?' + params.toString();
+        const url = '/newstore/service/partner/partner-data.php?' + params.toString();
 
         const response = await fetch(url, {
             method: 'GET',
