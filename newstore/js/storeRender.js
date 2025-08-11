@@ -2,7 +2,7 @@
 export async function fetchIndexData(req) {
   try {
     const params = new URLSearchParams({ action: req });
-    const url = '/newstore/service/index-data?' + params.toString();
+    const url = '/newstore/service/index-data.php?' + params.toString();
 
     const response = await fetch(url, {
       method: 'GET',

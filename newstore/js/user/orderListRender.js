@@ -1,7 +1,7 @@
 export async function fetchOrders(req) {
     try {
         const params = new URLSearchParams({ action: req });
-        const url = '/newstore/service/user/user-data?' + params.toString();
+        const url = '/newstore/service/user/user-data.php?' + params.toString();
 
         const response = await fetch(url, {
             method: 'GET',
