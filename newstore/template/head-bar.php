@@ -444,6 +444,7 @@
         .replace(/[\+\/=]/g, '') // base64url
         .substring(0, len);
     }
+
     // LINE Login
     document.getElementById('loginLineBtn')?.addEventListener('click', function() {
       const clientId = '2007612199';
@@ -454,6 +455,7 @@
       const authUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${encodeURIComponent(scope)}`;
       window.location.href = authUrl;
     });
+
     // Facebook Login (for page permissions)
     document.getElementById('loginFacebookBtn')?.addEventListener('click', function() {
 
@@ -471,6 +473,7 @@
       // const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
       // window.location.href = facebookAuthUrl;
     });
+
     // Google Login
     document.getElementById('loginGoogleBtn')?.addEventListener('click', function() {
       const clientId = '262467068023-qhh35u6a7gkiqvdndgl4ldr2l6nqcdgh.apps.googleusercontent.com';
@@ -489,6 +492,7 @@
 
       window.location.href = authUrl;
     });
+    
   });
 
   //================= SET TIME ZONE ================================
