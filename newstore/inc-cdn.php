@@ -1,5 +1,5 @@
 <?php
-define('BASE_PATH', '/e-store/');
+define('BASE_PATH', '/trandar_website/newstore/');
 ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

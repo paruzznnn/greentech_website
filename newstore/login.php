@@ -1,4 +1,4 @@
 <?php
-header('Location: /e-store/'); 
+header('Location: /trandar_website/newstore/'); 
 exit;
 ?>

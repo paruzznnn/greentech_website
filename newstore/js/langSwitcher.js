@@ -1,6 +1,6 @@
 
 (async () => {
-    const { loadLanguage, applyTranslations } = await import(`/e-store/js/language.js`);
+    const { loadLanguage, applyTranslations } = await import(`/trandar_website/newstore/js/language.js`);
     const langButtons = document.getElementById('langButtons');
     const defaultLang = localStorage.getItem('lang') || 'en';
 

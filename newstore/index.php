@@ -31,7 +31,7 @@
       renderCarouselSM,
       renderCarouselMD,
       renderCarouselLG
-    } from '/e-store/js/storeRender.js?v=<?php echo time()?>';
+    } from '/trandar_website/newstore/js/storeRender.js?v=<?php echo time()?>';
 
     document.addEventListener("DOMContentLoaded", async () => {
       const sections = await fetchIndexData("getSectionItems");
