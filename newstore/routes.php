@@ -74,7 +74,7 @@ switch ($ROUTE['controller']) {
         $GLOBALS['BASE_WEB'] = getBasePath(); 
 
         echo "<script>
-            window.pathConfig = {
+            var pathConfig = {
                 BASE_WEB: " . json_encode($BASE_WEB) . "
             };
         </script>";

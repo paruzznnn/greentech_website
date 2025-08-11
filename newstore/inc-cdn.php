@@ -1,5 +1,8 @@
 <?php
-define('BASE_PATH', '/newstore/');
+// PD
+// define('BASE_PATH', '/newstore/');
+// LC
+define('BASE_PATH', '/trandar_website/newstore/');
 ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,8 +1,9 @@
 // ---------- API -----------------------------
-export async function fetchIndexData(req) {
+export async function fetchIndexData(req, call) {
   try {
+
     const params = new URLSearchParams({ action: req });
-    const url = '/newstore/service/index-data.php?' + params.toString();
+    const url = call + params.toString();
 
     const response = await fetch(url, {
       method: 'GET',
