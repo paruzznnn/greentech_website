@@ -2,13 +2,18 @@
 @session_start();
 require_once __DIR__ . '/cookie/cookie_utils.php';
 
-function getBasePath()
-{
-    return dirname($_SERVER['SCRIPT_NAME']) . '/';
+function getBasePath() {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
+    $base_path = $scheme . '://' . $host . $path;
+    return $base_path;
 }
 
-function getRelativePath()
-{
+function getRelativePath() {
     $base = getBasePath();
     $uri = $_SERVER['REQUEST_URI'];
     if (strpos($uri, $base) === 0) {
@@ -17,8 +22,7 @@ function getRelativePath()
     return $uri;
 }
 
-function parseRoute($RELATIVEPath)
-{
+function parseRoute($RELATIVEPath) {
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
 
@@ -29,8 +33,7 @@ function parseRoute($RELATIVEPath)
     ];
 }
 
-function buildUrl($path = '', $query = [])
-{
+function buildUrl($path = '', $query = []) {
     $base = getBasePath();
     $url = rtrim($base, '/') . '/' . ltrim($path, '/');
     if (!empty($query)) {
@@ -39,16 +42,14 @@ function buildUrl($path = '', $query = [])
     return $url;
 }
 
-function requireLogin()
-{
+function requireLogin() {
     if (!isset($_SESSION['user'])) {
         header("Location: " . buildUrl('login'));
         exit;
     }
 }
 
-function redirectTo($path)
-{
+function redirectTo($path) {
     header("Location: " . buildUrl($path));
     exit;
 }
@@ -70,22 +71,19 @@ switch ($ROUTE['controller']) {
     case 'user':
         break;
     default:
-
-if (checkAutoLoginCookie() !== false) {
-    // echo "Welcome back, user ID: " . checkAutoLoginCookie();
-} else {
-    // session_destroy();
-    // echo "Please login.";
-}
-$GLOBALS['BASE_WEB'] = getBasePath();
-
-echo "
-<script>
-    var pathConfig = {
-        BASE_WEB: " . json_encode($BASE_WEB) . "
-    };
-</script>
-";
-
+            if (checkAutoLoginCookie() !== false) {
+                // echo "Welcome back, user ID: " . checkAutoLoginCookie();
+            } else {
+                // session_destroy();
+                // echo "Please login.";
+            }
+            $GLOBALS['BASE_WEB'] = getBasePath();
+            echo "
+            <script>
+                var pathConfig = {
+                    BASE_WEB: " . json_encode($BASE_WEB) . "
+                };
+            </script>
+            ";
         break;
 }
