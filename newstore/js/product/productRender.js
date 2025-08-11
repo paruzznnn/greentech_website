@@ -27,7 +27,7 @@ export async function initCardUI({
             `;
 
             div.querySelector('.search-card-product').addEventListener('click', () => {
-                window.location.href = `/e-store/product/list/?id=${card.id}`;
+                window.location.href = `/trandar_website/newstore/product/list/?id=${card.id}`;
             });
 
             container.appendChild(div);
