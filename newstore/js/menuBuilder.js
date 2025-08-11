@@ -4,7 +4,7 @@ import { handleToggleHover } from '/newstore/js/menuUtils.js';
 async function fetchHeader(req) {
   try {
     const params = new URLSearchParams({ action: req });
-    const url = '/newstore/service/header-data?' + params.toString();
+    const url = '/newstore/service/header-data.php?' + params.toString();
     const response = await fetch(url, {
       method: 'GET',
       headers: {

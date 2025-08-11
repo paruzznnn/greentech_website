@@ -14,7 +14,7 @@ export function handleFormSubmit(event) {
         data[key] = value;
     });
 
-    fetch("/newstore/auth/check-login", {
+    fetch("/newstore/auth/check-login.php", {
         method: "POST",
         headers: {
             'Authorization': 'Bearer my_secure_token_123',

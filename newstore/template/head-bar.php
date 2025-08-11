@@ -117,7 +117,7 @@
             <span>ข้อมูลของคุณทั้งหมดจะถูกเข้ารหัส เพื่อความปลอดภัย</span>
           </div>
           <div>
-            <a href="/newstore/terms">ลืมรหัสผ่าน</a>
+            <a href="/newstore/terms.php">ลืมรหัสผ่าน</a>
           </div>
         </div>
 
@@ -154,9 +154,9 @@
       </div>
       <p class="auth-policy">
         เมื่อเข้าสู่ระบบ ถือว่าคุณได้ยอมรับ
-        <a href="/newstore/terms">เงื่อนไขการใช้บริการ</a>
+        <a href="/newstore/terms.php">เงื่อนไขการใช้บริการ</a>
         และรับทราบ
-        <a href="/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>
+        <a href="/newstore/privacy-policy.php">นโยบายความเป็นส่วนตัว</a>
         ของ Trandar Store
       </p>
     </div>
@@ -225,8 +225,8 @@
           <input class="form-check-input" type="checkbox" value="" id="accept-policy">
           <span>
             การลงทะเบียนเข้าใช้งานหมายถึงฉันยอมรับ
-            <a href="/newstore/terms">เงื่อนไขการใช้งาน</a>และ
-            <a href="/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
+            <a href="/newstore/terms.php">เงื่อนไขการใช้งาน</a>และ
+            <a href="/newstore/privacy-policy.php">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
           </span>
         </p>
 
@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  fetch('/newstore/time_zone/set-timezone', {
+  fetch('/newstore/time_zone/set-timezone.php', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
