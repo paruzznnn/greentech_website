@@ -3,7 +3,6 @@
 require_once __DIR__ . '/cookie/cookie_utils.php';
 
 function getBasePath() {
-
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
 
@@ -11,7 +10,6 @@ function getBasePath() {
     $host = $_SERVER['HTTP_HOST'];
     $path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
     $base_path = $scheme . '://' . $host . $path;
-
     return $base_path;
 }
 
