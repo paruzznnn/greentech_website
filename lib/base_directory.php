@@ -25,7 +25,9 @@ $base_Path = $scheme . '://' . $host . $port . $newPath;
 $base_PathAdmin = $scheme . '://' . $host . $port . $fixedPath;
 
 // ตั้งค่าให้เป็น global
+$GLOBALS['new_path'] = $newPath;
 $GLOBALS['base_path'] = $base_Path;
 $GLOBALS['base_path_admin'] = $base_PathAdmin;
+$GLOBALS['path_admin'] = $fixedPath;
 $GLOBALS['isFile'] = '.php';
 ?>

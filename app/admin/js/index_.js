@@ -2,7 +2,8 @@
 /****nationLanguages**** */
 
 function nationLanguages() {
-    $.getJSON('/api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
+    let new_path = $('#new_path').val();
+    $.getJSON(new_path + 'api/languages/nation.json' + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
@@ -40,7 +41,8 @@ function updateSelectedLanguageFlag() {
 }
 
 function changeLanguage(lang) {
-    fetch('/api/languages/' + lang + '.json')
+    let new_path = $('#new_path').val();
+    fetch(new_path + 'api/languages/' + lang + '.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -81,16 +83,13 @@ const buildTabSidebar = () => {
     let sidebarItems = [];
 
     let currentPath = window.location.pathname;
-
+    let new_path = $('#new_path').val();
     // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
-    let sidebarPath = (
-    currentPath.includes('dashboard.php') || 
-    currentPath.includes('profile.php')
-) 
-        ? '/app/admin/actions/check_sidebar.php'
-        : '../actions/check_sidebar.php';
-
-
+    if (currentPath.includes('dashboard.php') || currentPath.includes('profile.php')) {
+        sidebarPath = new_path + 'app/admin/actions/check_sidebar.php';
+    } else {
+        sidebarPath = '../actions/check_sidebar.php'
+    }
     console.log("✅ Loading sidebar from:", sidebarPath);
     $.ajax({
         url: sidebarPath,

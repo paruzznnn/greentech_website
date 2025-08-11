@@ -114,7 +114,7 @@
                                     </a>
                                 </div>
 
-                                <table id="td_list_Blog" class="table table-hover" style="width:100%;">
+                                <table id="td_list_blog" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

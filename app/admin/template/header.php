@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/base_directory.php';
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -32,7 +33,7 @@ if (!isset($base_path_admin)) {
       <span class="toggle-button" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </span>
-      <a href="#"><img class="logo" src="/public/img/LOGOTRAND.png" alt=""></a>
+      <a href="#"><img class="logo" src="<?php echo $new_path; ?>public/img/LOGOTRAND.png" alt=""></a>
 
     </div>
 
@@ -47,10 +48,10 @@ if (!isset($base_path_admin)) {
 
       <!-- 📦 Origami Dropdown -->
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
-        <img src="/public/img/origami_app.png" height="25" style="cursor:pointer;">
+        <img src="<?php echo $new_path; ?>public/img/origami_app.png" height="25" style="cursor:pointer;">
         <div id="origamiDropdownMenu" class="dropdown-box hidden">
           <a href="https://www.origami.life">
-            <img src="/public/img/2_20180425103337.ico" height="40"><br>
+            <img src="<?php echo $new_path; ?>public/img/2_20180425103337.ico" height="40"><br>
             <span>Origami</span>
           </a>
           
@@ -65,15 +66,18 @@ if (!isset($base_path_admin)) {
         
       <!-- 🟣 Profile Dropdown -->
       <div class="profile-container dropdown-parent" onclick="toggleDropdown('globalProfileDropdown', event)">
-        <img src="/public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
+        <img src="<?php echo $new_path; ?>public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
         <div id="globalProfileDropdown" class="dropdown-box hidden">
-          <a href="/app/admin/profile.php">Profile</a>
-          <a href="/app/admin/logout.php">Logout</a>
+          <a href="<?php echo $path_admin; ?>profile.php">Profile</a>
+          <a href="<?php echo $path_admin; ?>logout.php">Logout</a>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<input type="hidden" name="new_path" id="new_path" value="<?php echo $new_path; ?>">
+<input type="hidden" name="path_admin" id="path_admin" value="<?php echo $path_admin; ?>">
 
 <div id="showTabSidebar" class="row row-tab"></div>
 
@@ -385,5 +389,45 @@ function switchLanguage() {
   border: none;
   padding: 10px 15px;
 } */
+    /* ภาษา */
+    .language-select-container {
+        position: relative;
+        display: inline-block;
+    }
 
+    .flag-icon {
+        width: 24px;
+        height: auto;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+    }
+
+    .flag-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1003;
+        /* แก้ไขค่า z-index เพื่อให้แสดงผลทับเมนูหลัก */
+        border-radius: 4px;
+        padding: 5px 0;
+    }
+
+    .flag-dropdown a {
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+    }
+
+    .flag-dropdown a:hover {
+        background-color: #f1f1f1;
+    }
 </style>

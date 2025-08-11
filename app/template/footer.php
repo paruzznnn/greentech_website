@@ -75,13 +75,13 @@ $stmt_footer->close();
         <div class="mt-4">
             <div id="auth-buttons">
                 <?php foreach ($menuItems as $item): // โค้ดส่วนนี้คงเดิม ?>
-                    <a type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
+                    <aa type="button" href="<?php echo $item['link']; ?>" id="<?php echo $item['modal_id'] ?>">
                         <i class="<?php echo $item['icon']; ?>"></i>
                         <span data-translate="<?php echo $item['translate']; ?>" lang="th">
                             <?php echo $item['text']; ?>
                         </span>
-                    </a>
-                <?php endforeach; ?>
+                    </aa>
+                <?php endforeach; ?>    
             </div>
         </div>
     </div>
@@ -218,4 +218,8 @@ $stmt_footer->close();
             text-align: center; /* Center align text on mobile */
         }
     }
+    aa {
+    color: #4350e4ff;;
+    text-decoration: underline;
+}
 </style>

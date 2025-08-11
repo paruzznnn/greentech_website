@@ -2,15 +2,14 @@
 $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
-
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
 // --- MODIFIED: Ensure totalQuery also respects 'del' status and valid documents ---
-$totalQuery = "SELECT COUNT(DISTINCT dn.project_id) as total 
+$totalQuery = "SELECT COUNT(DISTINCT dn.project_id) as total
                FROM dn_project dn
                LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
-                                           AND dnc.del = '0' 
-                                           AND dnc.status = '1' 
+                                           AND dnc.del = '0'
+                                           AND dnc.status = '1'
                WHERE dn.del = '0'"; // Filter projects that are not deleted
 if ($searchQuery) {
     $totalQuery .= " AND dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
@@ -22,19 +21,21 @@ $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
 // --- MODIFIED: Main SQL query to correctly handle filtering and aggregation ---
-$sql = "SELECT 
-            dn.project_id, 
-            dn.subject_project, 
+$sql = "SELECT
+            dn.project_id,
+            dn.subject_project,
             dn.description_project,
-            dn.content_project, 
-            dn.date_create, 
+            dn.content_project,
+            dn.date_create,
             GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
             GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
-        FROM 
+        FROM
             dn_project dn
-        LEFT JOIN 
+        LEFT JOIN
             dn_project_doc dnc ON dn.project_id = dnc.project_id
-        WHERE 
+                                AND dnc.del = '0'
+                                AND dnc.status = '1'
+        WHERE
             dn.del = '0'"; // Only select projects where del is 0
 
 if ($searchQuery) {
@@ -43,31 +44,18 @@ if ($searchQuery) {
     ";
 }
 
-// Add a subquery or a HAVING clause to ensure at least one valid document exists
-// for projects if you truly want to only show projects that have active, non-deleted documents.
-// However, if a project can exist without documents or with only deleted documents,
-// and you still want to show it, the current LEFT JOIN + WHERE dn.del = '0' is fine,
-// but the dnc.file_name and dnc.api_path will be NULL if no valid documents are found.
-// The original problem description suggests that "No project found" is the issue,
-// implying projects that *should* be there (del=0) are not.
-
-// To ensure that GROUP_CONCAT only includes non-deleted and active documents,
-// the conditions for dnc should be in the JOIN clause itself for LEFT JOIN.
-// If you only want to show projects that *have* at least one valid document,
-// you would need a subquery or an INNER JOIN on a subquery of dnc.
-// For now, let's stick to LEFT JOIN and ensure the WHERE clause only applies to dn.
-// The GROUP_CONCAT will automatically exclude rows from dnc that don't meet its JOIN conditions.
-
-$sql .= " 
-GROUP BY dn.project_id 
+$sql .= "
+GROUP BY dn.project_id
 ORDER BY dn.date_create DESC
 LIMIT $perPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
+
 $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+
         $content = $row['content_project'];
 
         $iframeSrc = null;
@@ -91,7 +79,6 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
-    // This 'No project found.' will now correctly reflect if no projects match the criteria.
     echo "No project found.";
 }
 ?>
@@ -115,11 +102,11 @@ if ($result->num_rows > 0) {
 
         <div class="box-news">
             <div class="box-image">
-                <?php 
+                <?php
                     $encodedId = urlencode(base64_encode($box['id']));
                 ?>
                 <a href="project_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
-                    
+
                     <?php
                     // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
                     if(!empty($box['iframe'])){
@@ -128,10 +115,10 @@ if ($result->num_rows > 0) {
                         echo '<img src="' . $box['image'] . '" alt="Image for ' . htmlspecialchars($box['title']) . '">';
                     } else {
                         // Optionally, display a default placeholder image or leave empty
-                        echo '<img src="path/to/default/placeholder.jpg" alt="No image available">'; 
+                        echo '<img src="path/to/default/project_placeholder.jpg" alt="No image available">';
                     }
                     ?>
-                    
+
                 </a>
             </div>
             <div class="box-content">
@@ -161,8 +148,8 @@ if ($result->num_rows > 0) {
     <?php endif; ?>
 </div>
 
-<!-- แสดงฟอร์มด้านล่างนี้ -->
-<!-- <h3>ใส่ความคิดเห็น</h3>
+<!-- แสดงฟอร์มด้านล่างนี้
+<h3>ใส่ความคิดเห็น</h3>
 <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
 <form id="commentForm" style="max-width: 600px;">
     <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"

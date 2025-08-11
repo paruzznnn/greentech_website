@@ -4,6 +4,15 @@ body {
     scroll-behavior: smooth;
 }
 
+/* --- สไตล์ที่ปรับปรุงใหม่สำหรับกล่องข่าวสาร What's New --- */
+
+/* เพิ่ม responsive design สำหรับ card-fancy */
+@media (max-width: 768px) {
+    .card-fancy {
+        margin-bottom: 15px; /* เพิ่มระยะห่างระหว่างกล่องบนมือถือ */
+    }
+}
+
 /* --- Header Top Section --- */
 .header-top {
     overflow: hidden;
@@ -26,13 +35,13 @@ body {
 }
 
 .header-top a:hover {
-    color: #ff9800;
+    color: white;
 }
 
 .header-top img.logo {
-    width: auto;
+    /* width: auto; */
     max-width: 150px; /* จำกัดขนาดโลโก้ */
-    height: auto;
+    /* height: auto; */
     object-fit: contain;
     display: block;
 }
@@ -59,7 +68,7 @@ body {
     padding: 8px 15px;
     font-size: 14px;
     background: #ffffffff;
-    color: black;
+    color: #555;
     border-radius: 4px;
     white-space: nowrap; /* ป้องกันขึ้นบรรทัดใหม่ */
     box-sizing: border-box; /* สำคัญเพื่อให้ padding ไม่ดันกว้างเกินไป */
@@ -71,7 +80,7 @@ body {
     display: inline-block;
     white-space: nowrap;
     background: #ffa719;
-    color: black;
+    color: #555;
     border-radius: 4px;
     box-sizing: border-box;
 }
@@ -80,6 +89,7 @@ body {
     width: 100px;
     padding: 6px;
     font-size: 15px;
+    color: #555;
     border: none;
     border-radius: 4px;
     background-color: #fafafa;
@@ -193,7 +203,7 @@ body {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #f28b1f;
+    background-color: #ff9900;
     color: white;
     padding: 15px 40px 20px 10px;
     font-weight: bold;
@@ -256,11 +266,17 @@ body {
 }
 
 
-/* --- Other Sections (Maintained as provided) --- */
+
+    /* --- Other Sections (Maintained as provided) --- */
 .content-sticky {
     padding-bottom: 60px;
     background-color: #ffffff;
+    
+    /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
+    display: flex;
+    justify-content: center;
 }
+
 
 .box-section {
     margin: 20px 0px;
@@ -269,7 +285,7 @@ body {
 
 .box-content {
     background-color: #ffffff;
-    padding: 40px 20px 20px 20px;
+    padding: 0px 0px 80px 0px;
     border-radius: 8px;
     color: #555;
 }
@@ -752,11 +768,11 @@ body {
 }
 
 .line-ref {
-    border-left: 5px solid #f46e20;
+    /* border-left: 5px solid #f46e20; */
     padding-left: 10px;
 }
 .line-ref1 {
-    border-left: 5px solid #f46e20;
+    /* border-left: 5px solid #f46e20; */
     padding-left: 10px;
     margin-top: 50px;
     line-height: 1.2;

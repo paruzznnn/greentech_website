@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
+// เปลี่ยน LIMIT เพื่อให้ดึงบทความมาแสดงได้มากขึ้น
 $sql = "SELECT 
             dn.Blog_id, 
             dn.subject_Blog, 
@@ -20,14 +21,13 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.Blog_id 
         ORDER BY dn.date_create DESC
-        LIMIT 5";
+        LIMIT 100"; // ดึงข้อมูลมามากขึ้นเพื่อรองรับการเลื่อน
 
 $result = $conn->query($sql);
 $boxesBlog = [];
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
         $content = $row['content_Blog'];
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
@@ -50,140 +50,211 @@ if ($result->num_rows > 0) {
 ?>
 
 <style>
-.Blog-wrapper-container {
-    position: relative;
-    max-width: 960px;
-    margin: auto;
-    overflow: hidden;
-    padding: 0 40px;
-}
+    /* --- สไตล์สำหรับส่วนบทความที่ปรับปรุงใหม่ --- */
+    .blog-wrapper-container {
+        position: relative;
+        max-width: 100%;
+        margin: auto;
+        /* padding: 0 4rem; ปรับ padding ให้มีพื้นที่ด้านข้างเท่ากับ gap เพื่อให้กล่องแรกและกล่องสุดท้ายไม่ติดขอบ */
+    }
+    
+    .blog-scroll {
+        display: flex;
+        gap: 1rem;
+        scroll-behavior: smooth;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-top: 10px;
+        /* margin: 0 -4rem; ลบ margin -4rem ออกจากโค้ดเดิม */
+    }
 
-.Blog-scroll {
-    display: flex;
-    gap: 1rem;
-    scroll-behavior: smooth;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-    scrollbar-width: none;
-}
-.Blog-scroll::-webkit-scrollbar {
-    display: none;
-}
+    .blog-scroll::-webkit-scrollbar {
+        display: none;
+    }
 
-.Blog-card {
-    flex: 0 0 300px;
-    max-width: 300px;
-}
+    .blog-card {
+        /* ปรับขนาดให้แสดง 5 กล่องพอดีหน้าจอ */
+        flex: 0 0 calc(20% - 1.6rem); /* 100%/5 = 20% และลบ gap ออก 4/5 ของ 2rem คือ 1.6rem */
+        height: auto;
+        min-width: 200px;
+    }
 
-/* ✅ แก้ card ไม่ fix ความสูง */
-.card {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
+    .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: none;
+        border-radius: 6px;
+        overflow: hidden; 
+        background-color: #fff;
+        transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
 
-/* ✅ wrapper สำหรับรูปภาพ */
-.card-image-wrapper {
-    height: 200px;
-    overflow: hidden;
-}
-.card-img-top {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
 
-/* ✅ ปล่อย card-body ยืดหยุ่น */
-.card-body {
-    padding: 10px;
-}
+    .card-image-wrapper {
+        padding-top: 100%;
+        position: relative;
+        border-radius: 6px;
+    }
+    
+    .card-img-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
 
-/* ✅ ปุ่มเลื่อน */
-.scroll-btn {
-    position: absolute;
-    top: 40%;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    line-height: 30px;
-    cursor: pointer;
-    z-index: 5;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-}
-.scroll-btn.left {
-    left: 5px;
-}
-.scroll-btn.right {
-    right: 5px;
-}
+    .card-body {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-grow: 1;
+        min-height: 100px;
+    }
+
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #555;
+        font-size: 1.1rem;
+        line-height: 1.3em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #777;
+        font-size: 0.9rem;
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    /* สไตล์ปุ่มเลื่อน */
+    .scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #77777738;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+        z-index: 5;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .scroll-btn:hover {
+        background-color: #77777738;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .scroll-btn.left {
+        left: -50px;
+    }
+
+    .scroll-btn.right {
+        right: -50px;
+    }
+
+    /* ปรับจำนวนคอลัมน์ตามขนาดหน้าจอ */
+    @media (max-width: 1600px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 8rem) / 5); /* แสดง 5 กล่อง */
+        }
+    }
+    @media (max-width: 1400px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 6rem) / 4); /* แสดง 4 กล่อง */
+        }
+    }
+    @media (max-width: 1200px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 4rem) / 3); /* แสดง 3 กล่อง */
+        }
+    }
+    @media (max-width: 992px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 2rem) / 2); /* แสดง 2 กล่อง */
+        }
+    }
+    @media (max-width: 768px) {
+        .blog-card {
+            flex: 0 0 calc((100% - 2rem) / 2);
+        }
+    }
+    @media (max-width: 576px) {
+        .blog-card {
+            flex: 0 0 90%;
+        }
+    }
 </style>
-
-
 
 <script>
 function scrollBlog(direction) {
-    const box = document.getElementById('Blog-scroll-box');
-    const scrollAmount = 320; // 300px ความกว้าง + 20px ช่องว่าง
+    const box = document.getElementById('blog-scroll-box');
+    const cardWidth = document.querySelector('.blog-card').offsetWidth;
+    const gap = 32; // 2rem
+    
     if (direction === 'left') {
-        box.scrollLeft -= scrollAmount;
+        box.scrollLeft -= cardWidth + gap;
     } else {
-        box.scrollLeft += scrollAmount;
+        box.scrollLeft += cardWidth + gap;
     }
 }
-function scrollBlog(direction) {
-    const box = document.getElementById('Blog-scroll-box');
-    const scrollAmount = 320; // 300px + 20px gap
-    if (direction === 'left') {
-        box.scrollLeft -= scrollAmount;
-    } else {
-        box.scrollLeft += scrollAmount;
-    }
-}
-
-// ✅ ฟังก์ชัน auto scroll แบบวนลูป
-function startAutoScroll() {
-    const box = document.getElementById('Blog-scroll-box');
-    const scrollAmount = 400;
-    const scrollMax = box.scrollWidth - box.clientWidth;
-
-    setInterval(() => {
-        // ถ้าเลื่อนไปจนสุด → กลับไปเริ่ม
-        if (box.scrollLeft >= scrollMax) {
-            box.scrollLeft = 0;
-        } else {
-            box.scrollLeft += scrollAmount;
-        }
-    }, 3000); // ทุก 3 วินาที
-}
-
-// ✅ เริ่ม auto scroll ทันทีเมื่อโหลดหน้า
-window.addEventListener('DOMContentLoaded', startAutoScroll);
 </script>
-<div class="container py-4">
-    <div class="row">
-        <?php foreach (array_slice($boxesBlog, 0, 4) as $box): ?>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100">
+
+<div class="blog-wrapper-container">
+    <?php if (count($boxesBlog) > 5): ?>
+        <div class="scroll-btn left" onclick="scrollBlog('left')">&#10094;</div>
+        <div class="scroll-btn right" onclick="scrollBlog('right')">&#10095;</div>
+    <?php endif; ?>
+
+    <div style="overflow: hidden;">
+        <div class="blog-scroll" id="blog-scroll-box">
+            <?php foreach ($boxesBlog as $box): ?>
+                <div class="blog-card">
                     <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
-                        <?php if (empty($box['image'])): ?>
-                            <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="180px" class="note-video-clip"></iframe>
-                        <?php else: ?>
-                            <img src="<?= $box['image'] ?>" class="card-img-top" alt="ข่าว <?= htmlspecialchars($box['title']) ?>" style="height: 180px; object-fit: cover;">
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <h6 class="card-title"><?= htmlspecialchars($box['title']) ?></h6>
-                            <p class="card-text"><?= htmlspecialchars($box['description']) ?></p>
+                        <div class="card">
+                            <?php if(empty($box['image'])): ?>
+                                <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
+                            <?php else: ?>
+                                <div class="card-image-wrapper">
+                                    <img src="<?= $box['image'] ?>" class="card-img-top" alt="บทความ <?= htmlspecialchars($box['title']) ?>">
+                                </div>
+                            <?php endif; ?>
+                            <div class="card-body">
+                                <h6 class="card-title"><?= htmlspecialchars($box['title']) ?></h6>
+                                <p class="card-text"><?= htmlspecialchars($box['description']) ?></p>
+                            </div>
                         </div>
                     </a>
                 </div>
-            </div>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
-
