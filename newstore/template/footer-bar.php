@@ -93,7 +93,7 @@
 <script type="module">
     import {
         setupCookieModal
-    } from '/e-store/js/modalBuilder.js?v=<?php echo time() ?>';
+    } from '/trandar_website/newstore/js/modalBuilder.js?v=<?php echo time() ?>';
 
     setupCookieModal();
 
@@ -194,4 +194,4 @@
 
 <!-- <script src="/e-store/js/chatService.js?v=<?php echo time(); ?>"></script> -->
 <!-- <script src="/e-store/js/mathematics.js?v=<?php echo time(); ?>"></script> -->
-<script type="module" src="/e-store/js/langSwitcher.js?v=<?php echo time(); ?>"></script>
+<script type="module" src="/trandar_website/newstore/js/langSwitcher.js?v=<?php echo time(); ?>"></script>

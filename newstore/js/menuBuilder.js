@@ -1,10 +1,10 @@
 
-import { handleToggleHover } from '/e-store/js/menuUtils.js';
+import { handleToggleHover } from '/trandar_website/newstore/js/menuUtils.js';
 
 async function fetchHeader(req) {
   try {
     const params = new URLSearchParams({ action: req });
-    const url = '/e-store/service/header-data?' + params.toString();
+    const url = '/trandar_website/newstore/service/header-data?' + params.toString();
     const response = await fetch(url, {
       method: 'GET',
       headers: {

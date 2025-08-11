@@ -2,7 +2,7 @@
 export async function fetchProductData(req) {
     try {
         const params = new URLSearchParams({ action: req });
-        const url = '/e-store/service/product/product-data?' + params.toString();
+        const url = '/trandar_website/newstore/service/product/product-data?' + params.toString();
 
         const response = await fetch(url, {
             method: 'GET',
