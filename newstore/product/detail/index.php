@@ -28,18 +28,17 @@
     <?php include '../../template/footer-bar.php'; ?>
 
     <script type="module">
-        // console.log('AppConfig BASE_WEB', AppConfig.BASE_WEB);
-        import {
+        import(`${pathConfig.BASE_WEB}js/product/productDetailRender.js?v=<?= time() ?>`)
+        .then(async ({ 
             fetchProductData,
             createProductDetailHTML,
             initProductDetailLogic,
             createProductSimilarHTML
-        } from '../../js/product/productDetailRender.js?v=<?php echo time(); ?>';
+        }) => {
 
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            const productDeatilItems = await fetchProductData("getProductDetailItems");
-            const productSimilarItems = await fetchProductData("getProductSimilarItems");
+            const service = pathConfig.BASE_WEB + 'service/product/product-data.php?';
+            const productDeatilItems = await fetchProductData("getProductDetailItems", service);
+            const productSimilarItems = await fetchProductData("getProductSimilarItems", service);
 
             if(productDeatilItems.data){
                 createProductDetailHTML("#product-detail-container-vibrant", productDeatilItems.data);
@@ -50,7 +49,8 @@
                 createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
             }
             
-        });
+        })
+        .catch((e) => console.error("Module import failed", e));
     </script>
 
 </body>

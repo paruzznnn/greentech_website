@@ -355,8 +355,14 @@
     const contentArray = await fetchHeader("getMenuHeaderBox", service);
     const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
-    buildLinkmenu(data, contentArray);
-    buildLinkmenuSlide(menuData);
+    if(data || contentArray){
+      buildLinkmenu(data, contentArray);
+    }
+    
+    if(menuData){
+      buildLinkmenuSlide(menuData);
+    }
+    
 
     // ============= Responsive ==================
     const checkDeviceSize = () => {

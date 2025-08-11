@@ -1,9 +1,9 @@
 export async function initCardUI({
     containerId,
     apiUrl,
-    authToken = ''
-}) 
-{
+    authToken = '',
+    BASE_WEB
+}) {
     let allCards = [];
 
     const container = document.getElementById(containerId);
@@ -27,7 +27,7 @@ export async function initCardUI({
             `;
 
             div.querySelector('.search-card-product').addEventListener('click', () => {
-                window.location.href = `/newstore/product/list/?id=${card.id}`;
+                window.location.href = `${BASE_WEB}product/list/?id=${card.id}`;
             });
 
             container.appendChild(div);
@@ -63,4 +63,97 @@ export async function initCardUI({
     }
 
     await fetchCards();
+}
+
+export async function fetchCategoryData(req, call) {
+    try {
+        const params = new URLSearchParams({ action: req });
+        const url = call + params.toString();
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
+    }
+}
+
+export function buildCategoryMenu(parentSelector, menuItems) {
+
+    let html = '';
+
+    for (const item of menuItems) {
+
+        let iconHtml = '';
+        if (item.icon && item.icon.trim() !== '') {
+            iconHtml = '<span class="icon">' + item.icon + '</span> ';
+        }
+
+        let hasChildren = false;
+        if (item.children && item.children.length > 0) {
+            hasChildren = true;
+        }
+
+        let className = 'menu-item';
+        if (hasChildren) {
+            className += ' has-children';
+        }
+
+        html += '<li class="' + className + '">';
+
+        if (item.label && item.label.trim() !== '') {
+            html += '<a href="' + (item.href ? item.href : '#') + '" class="menu-link">';
+            html += item.label + ' ' + iconHtml;
+            html += '</a>';
+        } else {
+            if (iconHtml !== '') {
+                html += '<span class="menu-link">' + iconHtml + '</span>';
+            }
+        }
+
+        if (hasChildren) {
+            html += '<ul class="submenu">';
+            for (const child of item.children) {
+                let childIconHtml = '';
+                if (child.icon && child.icon.trim() !== '') {
+                    childIconHtml = '<span class="icon">' + child.icon + '</span> ';
+                }
+                html += '<li>';
+                html += '<a href="' + (child.href ? child.href : '#') + '">' + childIconHtml + child.label + '</a>';
+                html += '</li>';
+            }
+            html += '</ul>';
+        }
+
+        html += '</li>';
+    }
+
+    document.querySelector(parentSelector).innerHTML = html;
+
+    // เพิ่ม event สำหรับเปิดปิด submenu
+    // const menuItemsWithChildren = document.querySelectorAll(parentSelector + ' .has-children > .menu-link');
+    // menuItemsWithChildren.forEach(link => {
+    //     link.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         const submenu = this.nextElementSibling;
+    //         if (submenu) {
+    //             if (submenu.classList.contains('open')) {
+    //                 submenu.classList.remove('open');
+    //             } else {
+    //                 submenu.classList.add('open');
+    //             }
+    //         }
+    //     });
+    // });
 }

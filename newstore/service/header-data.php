@@ -35,6 +35,7 @@ if ($token !== $validToken) {
 /*------------------------------------------*/
 
 /*---------ACTION DATA -------------*/
+
 $action = $_GET['action'];
 if($action == 'getMenuHeaderItems'){
 
@@ -43,7 +44,7 @@ if($action == 'getMenuHeaderItems'){
             'icon' => '',
             'label' => 'สินค้าแทรนดาร์ อะคูสติก',
             'id' => 'box1',
-            'path' => '/newstore/product/',
+            'path' => $BASE_WEB . 'product/',
             'hasToggle' => true
         ]
     ];
@@ -104,17 +105,17 @@ else if($action == 'getMenuHeaderSideItems'){
                 [
                     'icon' => '<i class="bi bi-house-door"></i>',
                     'label' => 'หน้าแรก',
-                    'href' => '/newstore/'
+                    'href' => $BASE_WEB
                 ],
                 [
                     'icon' => '<i class="bi bi-tag"></i>',
                     'label' => 'สินค้าอะคูสติก',
-                    'href' => '/newstore/search/product/'
+                    'href' => $BASE_WEB . 'search/product/'
                 ],
                 [
                     'icon' => '',
                     'label' => 'สถาปนิก ช่าง ผู้รับเหมา',
-                    'href' => '/newstore/search/product/'
+                    'href' => $BASE_WEB . 'search/product/'
                 ]
             ]
         ],
