@@ -1,14 +1,12 @@
 <?php
-switch ($_SERVER['REQUEST_SCHEME']) {
-    case 'http':
-        define('BASE_PATH', '/trandar_website/newstore/');
-        break;
-    case 'https':
-        define('BASE_PATH', '/newstore/');
-        break;
-    default:
-        break;
-}
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+
+$scheme = $isHttps ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'];
+$path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
+
+define('BASE_PATH', $scheme . '://' . $host . $path);
 ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
