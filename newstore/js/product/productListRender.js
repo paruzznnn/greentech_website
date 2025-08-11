@@ -13,7 +13,8 @@ export async function initCardUI({
     cardsPerPage = 6,
     maxPrice = 10000,
     apiUrl,
-    authToken = ''
+    authToken = '',
+    BASE_WEB
 }) {
     let currentPage = 1;
     let allCards = [];
@@ -83,7 +84,7 @@ export async function initCardUI({
             col.className = 'col-md-12 col-sm-6 mb-4';
             col.innerHTML = `
             <div class="search-card-product-list">
-            <a href="/newstore/product/detail/?id=" class="product-image">
+            <a href="${BASE_WEB}product/detail/?id=" class="product-image">
                 <img src="${card.img}" alt="${card.title}">
             </a>
             <div class="product-info">

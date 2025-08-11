@@ -41,7 +41,7 @@
 
             initCardUI({
             containerId: 'card-container',
-            apiUrl: '../service/product/product-data.php?action=getProductItems',
+            apiUrl: pathConfig.BASE_WEB + 'service/product/product-data.php?action=getProductItems',
             authToken: 'my_secure_token_123',
             BASE_WEB: pathConfig.BASE_WEB
             });

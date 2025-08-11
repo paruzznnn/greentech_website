@@ -1,8 +1,8 @@
 // ---------- API PRODUCT -----------------------------
-export async function fetchProductData(req) {
+export async function fetchProductData(req, call) {
     try {
         const params = new URLSearchParams({ action: req });
-        const url = '/newstore/service/product/product-data.php?' + params.toString();
+        const url = call + params.toString();
 
         const response = await fetch(url, {
             method: 'GET',
