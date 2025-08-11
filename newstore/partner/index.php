@@ -54,7 +54,7 @@
         import { 
             initTabs,
             fetchPartnerData
-        } from '/trandar_website/newstore/js/partner/partnerRender.js?v=<?php echo time()?>';
+        } from '/newstore/js/partner/partnerRender.js?v=<?php echo time()?>';
 
 
         document.addEventListener('DOMContentLoaded', async () => {

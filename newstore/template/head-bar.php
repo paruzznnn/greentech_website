@@ -16,8 +16,8 @@
       <div class="nav-store1">
 
         <div class="nav-store1-box-logo">
-          <a href="/trandar_website/newstore/">
-            <img src="/trandar_website/newstore/trandar_logo.png" alt="Logo">
+          <a href="/newstore/">
+            <img src="/newstore/trandar_logo.png" alt="Logo">
           </a>
         </div>
 
@@ -67,8 +67,8 @@
           <i class="fas fa-times"></i>
         </div>
         <div class="nav-store2-box-logo">
-          <a href="/trandar_website/newstore/">
-            <img src="/trandar_website/newstore/trandar_logo.png" alt="Logo">
+          <a href="/newstore/">
+            <img src="/newstore/trandar_logo.png" alt="Logo">
           </a>
         </div>
         <div class="nav-store2-box-menu">
@@ -85,7 +85,7 @@
   <div class="store-modal-content">
 
     <span id="modal-auth-close-store1" class="store-close-modal">&times;</span>
-    <img src="/trandar_website/newstore/trandar_logo.png" alt="" class="store-modal-title" />
+    <img src="/newstore/trandar_logo.png" alt="" class="store-modal-title" />
 
     <div class="tab-navigation">
       <button id="login-tab" class="tab-button active">
@@ -117,7 +117,7 @@
             <span>ข้อมูลของคุณทั้งหมดจะถูกเข้ารหัส เพื่อความปลอดภัย</span>
           </div>
           <div>
-            <a href="/trandar_website/newstore/terms">ลืมรหัสผ่าน</a>
+            <a href="/newstore/terms">ลืมรหัสผ่าน</a>
           </div>
         </div>
 
@@ -154,9 +154,9 @@
       </div>
       <p class="auth-policy">
         เมื่อเข้าสู่ระบบ ถือว่าคุณได้ยอมรับ
-        <a href="/trandar_website/newstore/terms">เงื่อนไขการใช้บริการ</a>
+        <a href="/newstore/terms">เงื่อนไขการใช้บริการ</a>
         และรับทราบ
-        <a href="/trandar_website/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>
+        <a href="/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>
         ของ Trandar Store
       </p>
     </div>
@@ -225,8 +225,8 @@
           <input class="form-check-input" type="checkbox" value="" id="accept-policy">
           <span>
             การลงทะเบียนเข้าใช้งานหมายถึงฉันยอมรับ
-            <a href="/trandar_website/newstore/terms">เงื่อนไขการใช้งาน</a>และ
-            <a href="/trandar_website/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
+            <a href="/newstore/terms">เงื่อนไขการใช้งาน</a>และ
+            <a href="/newstore/privacy-policy">นโยบายความเป็นส่วนตัว</a>ของ Trandar Store
           </span>
         </p>
 
@@ -304,12 +304,12 @@
 
 <script type="module">
   import { 
-    handleFormSubmit } from "/trandar_website/newstore/js/formHandler.js?v=<?php echo time()?>";
+    handleFormSubmit } from "/newstore/js/formHandler.js?v=<?php echo time()?>";
   import { 
     setupAuthModal, 
     setupPasswordValidation, 
     exposeTogglePassword
-  } from '/trandar_website/newstore/js/modalBuilder.js?v=<?php echo time()?>';
+  } from '/newstore/js/modalBuilder.js?v=<?php echo time()?>';
 
   // === DOM Element Variables ===
     const loginTab = document.getElementById("login-tab");
@@ -335,8 +335,8 @@
     setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules);
     exposeTogglePassword(window);
     
-    import { buildLinkmenu, buildLinkmenuSlide } from '/trandar_website/newstore/js/menuBuilder.js?v=<?php echo time()?>';
-    import { resetPosition } from '/trandar_website/newstore/js/menuUtils.js?v=<?php echo time()?>';
+    import { buildLinkmenu, buildLinkmenuSlide } from '/newstore/js/menuBuilder.js?v=<?php echo time()?>';
+    import { resetPosition } from '/newstore/js/menuUtils.js?v=<?php echo time()?>';
 
     function leftSlide() {
       document.getElementById("sidenav-store2").classList.add("open");
@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  fetch('/trandar_website/newstore/time_zone/set-timezone', {
+  fetch('/newstore/time_zone/set-timezone', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

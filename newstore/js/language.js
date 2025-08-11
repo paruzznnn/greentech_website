@@ -3,7 +3,7 @@ const cache = {};
 export async function loadLanguage(lang) {
   const version = Date.now(); 
   if (!cache[lang]) {
-    const res = await fetch(`/trandar_website/newstore/locales/${lang}.json?v=${version}`);
+    const res = await fetch(`/newstore/locales/${lang}.json?v=${version}`);
     if (!res.ok) {
       throw new Error(`Failed to load: locales/${lang}.json`);
     }

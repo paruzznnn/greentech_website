@@ -14,7 +14,7 @@ export function handleFormSubmit(event) {
         data[key] = value;
     });
 
-    fetch("/trandar_website/newstore/auth/check-login", {
+    fetch("/newstore/auth/check-login", {
         method: "POST",
         headers: {
             'Authorization': 'Bearer my_secure_token_123',
@@ -26,7 +26,7 @@ export function handleFormSubmit(event) {
     .then((response) => {
 
         if(response.status){
-            redirectPostForm('/trandar_website/newstore/user/', { username: 'admin', password: '1234' });
+            redirectPostForm('/newstore/user/', { username: 'admin', password: '1234' });
         }
     })
     .catch((error) => {
