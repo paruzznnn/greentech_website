@@ -34,7 +34,7 @@
         import { initCardUI } from '../js/product/productRender.js?v=<?php echo time();?>';
         initCardUI({
         containerId: 'card-container',
-        apiUrl: '../service/product/product-data?action=getProductItems',
+        apiUrl: '../service/product/product-data.php?action=getProductItems',
         authToken: 'my_secure_token_123'
         });
     </script>
