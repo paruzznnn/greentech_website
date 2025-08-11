@@ -17,7 +17,7 @@
   <main>
     <div id="sections_root_store"></div>
   </main>
-  <?php //include 'template/footer-bar.php'; ?>
+  <?php include 'template/footer-bar.php'; ?>
 
   <script type="module">
     import(`${pathConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
