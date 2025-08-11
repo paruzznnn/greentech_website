@@ -1,0 +1,56 @@
+[
+    {
+        "message": "hi",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T00:40:37+07:00"
+    },
+    {
+        "message": "hi",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T00:43:04+07:00"
+    },
+    {
+        "message": "hi",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T00:44:19+07:00"
+    },
+    {
+        "message": "ถามเรื่องสินค้า",
+        "userId": "guest_1753465912037",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T00:51:52+07:00"
+    },
+    {
+        "message": "ช่วยอะไรฉันได้บ้าง",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T00:52:06+07:00"
+    },
+    {
+        "message": "ทดสอบ",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-26T08:07:30+07:00"
+    },
+    {
+        "message": "hi",
+        "userId": "guest_1753465237909",
+        "channel": "customChat",
+        "timestamp": "2025-07-27T00:02:09+07:00"
+    },
+    {
+        "message": "สวัสดี",
+        "userId": "guest_1753774497826",
+        "channel": "customChat",
+        "timestamp": "2025-07-29T14:35:44+07:00"
+    },
+    {
+        "message": "hi",
+        "userId": "guest_1753774497826",
+        "channel": "customChat",
+        "timestamp": "2025-07-30T17:29:31+07:00"
+    }
+]
