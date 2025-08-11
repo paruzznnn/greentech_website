@@ -1,10 +1,8 @@
 
-import { handleToggleHover } from '/newstore/js/menuUtils.js';
-
-async function fetchHeader(req) {
+export async function fetchHeader(req, call) {
   try {
     const params = new URLSearchParams({ action: req });
-    const url = '/newstore/service/header-data.php?' + params.toString();
+    const url = call + params.toString();
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -74,9 +72,7 @@ function generateItemHTML(item, contentArray) {
   }
 }
 
-export async function buildLinkmenu() {
-  const data = await fetchHeader("getMenuHeaderItems");
-  const contentArray = await fetchHeader("getMenuHeaderBox");
+export function buildLinkmenu(data, contentArray) {
   const container = document.getElementById("linkContainer");
   if (!container) return;
 
@@ -100,8 +96,7 @@ export async function buildLinkmenu() {
   handleToggleHover();
 }
 
-export async function buildLinkmenuSlide() {
-  const menuData = await fetchHeader("getMenuHeaderSideItems");
+export function buildLinkmenuSlide(menuData) {
   const container = document.getElementById("menuListContainer");
   if (!container) return;
   container.innerHTML = "";
@@ -126,5 +121,45 @@ export async function buildLinkmenuSlide() {
     });
 
     container.appendChild(ul);
+  });
+}
+
+export function adjustPosition(box) {
+  const rect = box.getBoundingClientRect();
+  const vw = window.innerWidth;
+  if (rect.right > vw) box.style.left = `${box.offsetLeft - (rect.right - vw) - 10}px`;
+  if (rect.left < 0) box.style.left = "10px";
+}
+
+export function resetPosition(box) {
+  box.style.left = "";
+  box.style.right = "";
+}
+
+export function handleToggleHover() {
+  document.querySelectorAll(".toggle-btn-store1").forEach(btn => {
+    const id = btn.getAttribute("data-id");
+    const box = document.getElementById(id);
+    let hideTimeout;
+
+    const show = () => {
+      clearTimeout(hideTimeout);
+      box.classList.add("show");
+      adjustPosition(box);
+    };
+
+    const hide = () => {
+      hideTimeout = setTimeout(() => {
+        if (!box.matches(":hover") && !btn.matches(":hover")) {
+          box.classList.remove("show");
+          resetPosition(box);
+        }
+      }, 100);
+    };
+
+    btn.addEventListener("mouseenter", show);
+    btn.addEventListener("mouseleave", hide);
+    box.addEventListener("mouseenter", show);
+    box.addEventListener("mouseleave", hide);
   });
 }
