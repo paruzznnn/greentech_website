@@ -43,7 +43,7 @@ if($action == 'getMenuHeaderItems'){
             'icon' => '',
             'label' => 'สินค้าแทรนดาร์ อะคูสติก',
             'id' => 'box1',
-            'path' => '/trandar_website/newstore/product/',
+            'path' => '/newstore/product/',
             'hasToggle' => true
         ]
     ];
@@ -104,17 +104,17 @@ else if($action == 'getMenuHeaderSideItems'){
                 [
                     'icon' => '<i class="bi bi-house-door"></i>',
                     'label' => 'หน้าแรก',
-                    'href' => '/trandar_website/newstore/'
+                    'href' => '/newstore/'
                 ],
                 [
                     'icon' => '<i class="bi bi-tag"></i>',
                     'label' => 'สินค้าอะคูสติก',
-                    'href' => '/trandar_website/newstore/search/product/'
+                    'href' => '/newstore/search/product/'
                 ],
                 [
                     'icon' => '',
                     'label' => 'สถาปนิก ช่าง ผู้รับเหมา',
-                    'href' => '/trandar_website/newstore/search/product/'
+                    'href' => '/newstore/search/product/'
                 ]
             ]
         ],
