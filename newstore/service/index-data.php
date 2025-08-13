@@ -261,7 +261,22 @@ if ($action == 'getSectionItems') {
     ];
 
     http_response_code(200);
+
+
+    $memberId = 0;
+    if(!empty($_SESSION['user'])){
+        switch ($_SESSION['user']['role']) {
+            case 'user':
+                $memberId = $_SESSION['user']['id'];
+                break;
+            default:
+                $memberId = 0;
+                break;
+        }
+    }
+
     $response = [
+        "member" => $memberId,
         "data" => $data
     ];
 
