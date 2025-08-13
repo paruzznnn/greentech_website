@@ -1,5 +1,6 @@
 <?php
 require_once '../../server/connect_sqli.php';
+require_once '../../server/select_sqli.php';
 header('Content-Type: application/json');
 
 
@@ -29,181 +30,139 @@ if ($token !== $validToken) {
 $action = $_GET['action'];
 if ($action == 'getProductItems') {
 
-    $data = [
+    $conditions = [
         [
-            "id" => 1,
-            "image" => "https://www.trandar.com//public/shop_img/687dde881194f_Sound_Insulation.png",
-            "category" => "ฝ้าเพดานอะคูสติก",
-            "category_id" => 1
-        ],
-        [
-            "id" => 2,
-            "image" => "https://www.trandar.com//public/shop_img/687de7a795a01_hitech_roof_option1_PNG.png",
-            "category" => "ฉนวนกันเสียง",
-            "category_id" => 3
-        ],
-        [
-            "id" => 3,
-            "image" => "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg",
-            "category" => "ฝ้าทีบาร์",
-            "category_id" => 3
-        ],
-        [
-            "id" => 4,
-            "image" => "https://www.trandar.com//public/shop_img/687a21f2467de_Ecophon_Focus_F.jpg",
-            "category" => "ผนังเบา",
-            "category_id" => 1
-        ],
-        [
-            "id" => 5,
-            "image" => "https://www.trandar.com//public/shop_img/687dde881193e_render_HITECWALL_Png_2366.png",
-            "category" => "ฝ้าดรอป",
-            "category_id" => 1
-        ],
-        [
-            "id" => 6,
-            "image" => "https://www.trandar.com//public/shop_img/687dfa2242238_System_Cline___sound_board__wall_angel.jpg",
-            "category" => "โครงคร่าว",
-            "category_id" => 2
-        ],
-        [
-            "id" => 7,
-            "image" => "https://www.trandar.com//public/shop_img/687e1de85a67c_trandar_Paint_new_label.jpg",
-            "category" => "อุปกรณ์ติดตั้ง",
-            "category_id" => 2
+            'column' => 'comp_id', 
+            'operator' => '=', 
+            'value' => '2'
         ]
     ];
 
-    http_response_code(200);
+    $items = selectData(
+        $conn_cloudpanel, 
+        'ecm_product', 
+        $conditions, 
+        'id, pic_icon, category_name, category_id', 
+        'id DESC'
+    );
+
+    $data = [];
+    $seen_category_ids = [];
+    foreach ($items as $item) {
+        if (in_array($item['category_id'], $seen_category_ids)) {
+            continue; // check duplicate
+        }
+        $data[] = [
+            'id' => $item['id'],
+            'image' => $item['pic_icon'],
+            'category' => $item['category_name'],
+            'category_id' => $item['category_id']
+        ];
+        //keep category_id 
+        $seen_category_ids[] = $item['category_id'];
+    }
+
     $response = [
         "data" => $data
     ];
 
+    http_response_code(200);
     echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 } else if ($action == 'getProductListItems') {
 
-    $data = [
+    $conditions = [
         [
-            "id" => 1,
-            "title" => "Smartphone",
-            "description" => "Android Phone",
-            "image" => "https://www.trandar.com//public/shop_img/687dde881194f_Sound_Insulation.png",
-            "category" => "electronics",
-            "category_id" => 1,
-            "price" => 4500,
-            "color" => "Red",
-            "size" => "M",
-            "material" => "Plastic"
-        ],
-        [
-            "id" => 2,
-            "title" => "Tablet",
-            "description" => "10-inch screen",
-            "image" => "https://www.trandar.com//public/shop_img/687de7a795a01_hitech_roof_option1_PNG.png",
-            "category" => "electronics",
-            "category_id" => 1,
-            "price" => 7000,
-            "color" => "Blue",
-            "size" => "L",
-            "material" => "Plastic"
-        ],
-        [
-            "id" => 3,
-            "title" => "Book",
-            "description" => "Tech Book",
-            "image" => "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg",
-            "category" => "books",
-            "category_id" => 3,
-            "price" => 1200,
-            "color" => "Green",
-            "size" => "S",
-            "material" => "Cotton"
-        ],
-        [
-            "id" => 4,
-            "title" => "T-shirt",
-            "description" => "Cool Fashion",
-            "image" => "https://www.trandar.com//public/shop_img/687a21f2467de_Ecophon_Focus_F.jpg",
-            "category" => "fashion",
-            "category_id" => 3,
-            "price" => 800,
-            "color" => "Red",
-            "size" => "M",
-            "material" => "Cotton"
-        ],
-        [
-            "id" => 5,
-            "title" => "Laptop",
-            "description" => "High Performance",
-            "image" => "https://www.trandar.com//public/shop_img/687dde881193e_render_HITECWALL_Png_2366.png",
-            "category" => "electronics",
-            "category_id" => 2,
-            "color" => "Blue",
-            "size" => "L",
-            "material" => "Plastic"
-        ],
-        [
-            "id" => 6,
-            "title" => "Shoes",
-            "description" => "Running shoes",
-            "image" => "https://www.trandar.com//public/shop_img/687dfa2242238_System_Cline___sound_board__wall_angel.jpg",
-            "category" => "fashion",
-            "category_id" => 2,
-            "price" => 3200,
-            "color" => "Green",
-            "size" => "S",
-            "material" => "Leather"
-        ],
-        [
-            "id" => 7,
-            "title" => "TV",
-            "description" => "Smart TV 4K",
-            "image" => "https://www.trandar.com//public/shop_img/687e1de85a67c_trandar_Paint_new_label.jpg",
-            "category" => "electronics",
-            "category_id" => 1,
-            "price" => 9500,
-            "color" => "Red",
-            "size" => "M",
-            "material" => "Plastic"
+            'column' => 'comp_id', 
+            'operator' => '=', 
+            'value' => '2'
         ]
     ];
 
-    http_response_code(200);
+    $items = selectData(
+        $conn_cloudpanel, 
+        'ecm_product', 
+        $conditions, 
+        '*', 
+        'id DESC'
+    );
+
+    $data = [];
+    foreach ($items as $item) {
+        $cost = explode(",",$item['cost']);
+        $data[] = [
+            'id' => $item['id'],
+            'title' => $item['code'],
+            "description" => $item['description'],
+            'image' => $item['pic_icon'],
+            'category' => $item['category_name'],
+            'category_id' => $item['category_id'],
+            'price' => $cost[0],
+            'color' => "",
+            'size' => "",
+            'material' => "",
+        ];
+    }
+
     $response = [
         "data" => $data
     ];
 
+    http_response_code(200);
     echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 } else if ($action == 'getProductDetailItems') {
 
-    $data = [
-        "icon" => "",
-        "title" => "Trandar Zoundboard 10 mm.",
-        "category" => "หมวดหมู่: ฝ้าเพดานอะคูสติก",
-        "description" => "แผ่นกันเสียง Trandar Zoundboard ...",
-        "features" => [
-            "มีค่าการกันเสียง 33 dB (STC 33) มีความหนาเพียง 10 มม. หากติดตั้งด้วยระบบ",
-            "TSIS จะมีค่าการกันเสียงถึง 56 dB ...",
-            "ลดขนาดระบบผนัง ช่วยเพิ่มพื้นที่ห้องให้มากขึ้น",
-        ],
-        "images" => [
-            "https://www.trandar.com//public/shop_img/6878c8c678fea_photo_2025-07-17_16-55-32.jpg",
-            "https://www.trandar.com//public/shop_img/687a325d8bbab_Zound_Borad_223.png",
-            "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png"
-        ],
-        "currentPrice" => 450,
-        "oldPrice" => 599,
-        "discountPercent" => 25,
+    $conditions = [
+        [
+            'column' => 'comp_id', 
+            'operator' => '=', 
+            'value' => '2'
+        ]
     ];
 
-    http_response_code(200);
+    $items = selectData(
+        $conn_cloudpanel, 
+        'ecm_product', 
+        $conditions, 
+        '*', 
+        'id DESC'
+    );
+
+    $data = [];
+    foreach ($items as $item) {
+        $cost = explode(",",$item['cost']);
+        $data[] = [
+            // 'id' => $item['id'],
+            'icon' => "",
+            'title' => $item['code'],
+            'category' => $item['category_name'],
+            'description' => $item['description'],
+            'features' => [
+                "มีค่าการกันเสียง 33 dB (STC 33) มีความหนาเพียง 10 มม. หากติดตั้งด้วยระบบ",
+                "TSIS จะมีค่าการกันเสียงถึง 56 dB",
+                "ลดขนาดระบบผนัง ช่วยเพิ่มพื้นที่ห้องให้มากขึ้น",
+            ],
+            'images' => [
+                "https://www.trandar.com//public/shop_img/6878c8c678fea_photo_2025-07-17_16-55-32.jpg",
+                "https://www.trandar.com//public/shop_img/687a325d8bbab_Zound_Borad_223.png",
+                "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png",
+            ],
+            'currentPrice' => 450,
+            'oldPrice' => 599,
+            'discountPercent' => 25,
+        ];
+    }
+
     $response = [
         "data" => $data
     ];
 
+    http_response_code(200);
     echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 
 } else if($action == 'getProductSimilarItems') {
