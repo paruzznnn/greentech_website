@@ -246,6 +246,52 @@
     <?php include '../template/footer-bar.php'; ?>
 
     <script type="module">
+        const base = pathConfig.BASE_WEB;
+        const timestamp = <?= time() ?>;
+        Promise.all([
+                import(`${base}js/user/menuBuilder.js?v=${timestamp}`),
+                import(`${base}js/user/orderListRender.js?v=${timestamp}`),
+                import(`${base}js/user/wishlistRender.js?v=${timestamp}`),
+                import(`${base}js/user/cartRender.js?v=${timestamp}`)
+            ])
+            .then(async ([menuBuilder, orderListRender, wishlistRender, cartRender]) => {
+
+                const { setupTabs } = menuBuilder;
+                const { fetchOrders, displayOrders, displayTabOrders } = orderListRender;
+                const { LikedProducts } = wishlistRender;
+                const { ShoppingCart } = cartRender;
+
+                window.ShoppingCart = ShoppingCart;
+                const service = base + 'service/user/user-data.php?';
+
+                setupTabs();
+                displayTabOrders('tab-order-list');
+                let orders = await fetchOrders("getOrdersItems", service);
+                const tabButtonsHandler = () => {
+                    const tabButtons = document.querySelectorAll('.tab-button');
+                    tabButtons.forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            tabButtons.forEach(btn => btn.classList.remove('active'));
+                            event.currentTarget.classList.add('active');
+                            const selectedStatus = event.currentTarget.dataset.status;
+                            displayOrders(selectedStatus, 'orders-list', orders);
+                        });
+                    });
+                };
+                tabButtonsHandler();
+                displayOrders('All', 'orders-list', orders);
+                ShoppingCart.init();
+                LikedProducts.init();
+                LikedProducts.renderProducts(ShoppingCart);
+
+
+            })
+            .catch((e) => {
+                console.error("One or more module imports failed", e);
+            });
+    </script>
+
+    <!-- <script type="module">
         import {
             setupTabs
         } from '../js/user/menuBuilder.js?v=<?php echo time() ?>';
@@ -283,7 +329,8 @@
             LikedProducts.init();
             LikedProducts.renderProducts(ShoppingCart);
         });
-    </script>
+    </script> -->
+
     <script type="module">
         import {
             showNotification,
@@ -293,6 +340,7 @@
             setupProfileImageUpload();
         });
     </script>
+
     <script type="module">
         import {
             createAddressCard
@@ -304,7 +352,6 @@
     </script>
 
     <script>
-        
         const initialMyCouponsData = [{
                 id: 'user_cpn_001',
                 name: 'ส่วนลด 15%',
@@ -510,8 +557,7 @@
     </script>
 
     <script>
-        const reviews = [
-            {
+        const reviews = [{
                 productName: "Trandar AMF Mercure แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว",
                 rating: 5,
                 reviewText: "สินค้าดี แข็งแรง พนักงานบริการดี",
@@ -596,7 +642,6 @@
         }
         window.onload = renderReviews;
     </script>
-
 
 </body>
 

@@ -153,7 +153,7 @@ if ($action == 'getSectionItems') {
 
     $data = [
         [
-            "path" => "/newstore/product",
+            "path" => $BASE_WEB . "product",
             "image" => "https://www.trandar.com//public/img/687f610c3a362.jpg",
             "title" => "BEST ACOUSTIC CONSULTANT",
             "description" => "Inspiration ของ แทรนดาร์ อะคูสติก

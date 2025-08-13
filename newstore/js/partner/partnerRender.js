@@ -1,8 +1,8 @@
 // ---------- API PARTNER -----------------------------
-export async function fetchPartnerData(req) {
+export async function fetchPartnerData(req, call) {
     try {
         const params = new URLSearchParams({ action: req });
-        const url = '/newstore/service/partner/partner-data.php?' + params.toString();
+        const url = call + params.toString();
 
         const response = await fetch(url, {
             method: 'GET',

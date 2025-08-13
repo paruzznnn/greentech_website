@@ -1,4 +1,4 @@
 <?php
-header('Location: /newstore/'); 
+// header('Location: '); 
 exit;
 ?>

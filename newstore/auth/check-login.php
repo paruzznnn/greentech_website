@@ -39,10 +39,10 @@ if ($action == "checkLogin") {
 
 
     //SETING COOKIE
-    // $userId = 1;
-    // $jwtData = generateJWT($userId);
-    // $cookiePrefs = getCookieSettings();
-    // setAutoCookie($cookiePrefs, $jwtData);
+    $userId = 1;
+    $jwtData = generateJWT($userId);
+    $cookiePrefs = getCookieSettings();
+    setAutoCookie($cookiePrefs, $jwtData);
 
     $_SESSION['user'] = [
         'id' => 1,

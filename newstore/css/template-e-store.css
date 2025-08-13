@@ -224,7 +224,7 @@ h5 {
 }
 
 .notify-panel {
-  display: none !important;
+  /* display: none !important; */
   position: fixed;
   top: 40%;
   right: 10px;
