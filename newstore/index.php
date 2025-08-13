@@ -44,7 +44,13 @@
                 break;
               case "crsmd":
                 const productItems = await fetchIndexData("getProductItems", service);
-                renderCarouselMD("#" + section.carouselId, productItems.data);
+
+                const configData = {
+                  BASE_WEB: pathConfig.BASE_WEB,
+                  user: productItems.member
+                }
+
+                renderCarouselMD("#" + section.carouselId, productItems.data, configData);
                 break;
               case "crslg":
                 const newsItems = await fetchIndexData("getNewsItems", service);

@@ -35,17 +35,19 @@
         </div>
 
         <div class="nav-store1-box-menu">
-          <div>
-            <button data-lang="" id="modal-auth-store1" type="button" class="nav-store1-btn btn-sm">
-              <i class="bi bi-person-circle"></i>
-              <span>เข้าสู่ระบบ / ลงทะเบียน</span>
-            </button>
-          </div>
-          <div>
-            <span id="menu-open-store1" style="font-size:20px;cursor:pointer">
-              <i class="bi bi-three-dots-vertical"></i>
-            </span>
-          </div>
+          <?php if(empty($_SESSION['user'])) { ?>
+            <div>
+                <button data-lang="" id="modal-auth-store1" type="button" class="nav-store1-btn btn-sm">
+                  <i class="bi bi-person-circle"></i>
+                  <span>เข้าสู่ระบบ / ลงทะเบียน</span>
+                </button>
+            </div>
+            <div>
+              <span id="menu-open-store1" style="font-size:20px;cursor:pointer">
+                <i class="bi bi-three-dots-vertical"></i>
+              </span>
+            </div>
+          <?php } ?>
         </div>
 
       </div>
@@ -243,6 +245,15 @@
 
 <?php if(!empty($_SESSION['user']) && $_SESSION['user']['role'] == "user") { ?>
 <div id="box-notify-panel" class="notify-panel">
+
+  <div class="notify-item border-bottom">
+    <div class="notify-icon-wrapper">
+      <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
+        <i class="bi bi-person"></i>
+      </a>
+    </div>
+  </div>
+
   <div class="notify-item border-bottom">
     <span id="wishlistCount" class="notify-count">0</span>
     <div class="notify-icon-wrapper">
@@ -260,6 +271,7 @@
       </a>
     </div>
   </div>
+
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {

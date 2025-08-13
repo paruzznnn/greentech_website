@@ -1,3 +1,5 @@
+import { redirectGet } from "./formHandler.js";
+
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
   try {
@@ -340,7 +342,7 @@ export function renderCarouselSM(selector, items) {
 }
 
 // ---------- RENDER CAROUSEL MEDIUM ----------
-export function renderCarouselMD(selector, items) {
+export function renderCarouselMD(selector, items, config) {
   const container = document.querySelector(selector);
   items.forEach((item) => {
     const badgesWithIcon = item.productBadges
@@ -349,11 +351,6 @@ export function renderCarouselMD(selector, items) {
 
     // <a href="#"><i class="fa fa-share-alt"></i> Share</a>
     // <a href="#"><i class="fas fa-copy"></i> Copy URL</a>
-
-    // <div class="e-store-tooltip left"><i class="bi bi-file-text"></i>
-    //   <span class="e-store-tooltiptext">ขอใบเสนอราคา</span>
-    // </div>
-
     // /e-store/partner/?id=${1}
 
     const div = document.createElement("div");
@@ -410,7 +407,10 @@ export function renderCarouselMD(selector, items) {
                 </span>
               </div>
               <div class="box-card-footer-action">
-                <span class=""><i class="bi bi-heart"></i></span>
+                <div class="e-store-tooltip left btn-view-detail">
+                  <i class="bi bi-file-text"></i>
+                  <span class="e-store-tooltiptext">รายละเอียดเพิ่มเติม</span>
+                </div>
                 <span class="btn-add-wishlist"><i class="bi bi-heart"></i></span>
                 <span class="btn-add-cart"><i class="bi bi-cart3"></i></span>
               </div>
@@ -424,19 +424,33 @@ export function renderCarouselMD(selector, items) {
   });
 
   container.addEventListener("click", (e) => {
+
     if (e.target.closest(".btn-add-wishlist")) {
-      const itemDiv = e.target.closest(".item");
-      const productId = itemDiv.dataset.productId;
-      const product = items.find((i) => i.productId === productId);
-      if (product) addWishlist(product);
+      if(config.user){
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addWishlist(product);
+      }else{
+        document.getElementById("auth-modal").style.display = "flex";
+      }
     }
 
     if (e.target.closest(".btn-add-cart")) {
-      const itemDiv = e.target.closest(".item");
-      const productId = itemDiv.dataset.productId;
-      const product = items.find((i) => i.productId === productId);
-      if (product) addCart(product);
+      if(config.user){
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addCart(product);
+      }else{
+        document.getElementById("auth-modal").style.display = "flex";
+      }
     }
+
+    if (e.target.closest(".btn-view-detail")) {
+      redirectGet(`${config.BASE_WEB}product/detail/`, { q: 'keyword', page: 2 }, '_blank');
+    }
+
   });
 
   $(selector).owlCarousel({

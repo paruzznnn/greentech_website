@@ -49,7 +49,7 @@ export function handleFormSubmit(event) {
 
 }
 
-function redirectGet(url, params = {}, target = '_self') {
+export function redirectGet(url, params = {}, target = '_self') {
   const query = new URLSearchParams(params).toString();
   const fullURL = query ? `${url}?${query}` : url;
 
@@ -60,8 +60,7 @@ function redirectGet(url, params = {}, target = '_self') {
   }
 }
 
-// function redirectPostForm(url, params = {}, target = '_self') {
-function redirectPostForm(url, params = {}, target = '_self') {
+export function redirectPostForm(url, params = {}, target = '_self') {
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = url;
@@ -81,7 +80,7 @@ function redirectPostForm(url, params = {}, target = '_self') {
   document.body.removeChild(form);
 }
 
-function redirectGetForm(url, params = {}, target = '_self') {
+export function redirectGetForm(url, params = {}, target = '_self') {
   const form = document.createElement('form');
   form.method = 'GET';
   form.action = url;
@@ -101,11 +100,11 @@ function redirectGetForm(url, params = {}, target = '_self') {
   document.body.removeChild(form);
 }
 
-// // GET แบบ query string
+// // Exsample GET query string
 // redirectGet('/search', { q: 'keyword', page: 2 });
 
-// // POST form ส่งข้อมูล login
+// // Exsample POST form 
 // redirectPostForm('/login', { username: 'admin', password: '1234' });
 
-// // GET ผ่าน form (เหมือนกดลิงก์แบบฟอร์ม)
+// // Exsample GET form 
 // redirectGetForm('/download', { file: 'report.pdf' }, '_blank');

@@ -30,7 +30,7 @@ function webBasePath() {
 
     $scheme = $isHttps ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
-    $path = $isHttps ? '/freyr/' : '/freyr/';
+    $path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
     $base_path = $scheme . '://' . $host . $path;
     return $base_path;
 }
