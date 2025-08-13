@@ -49,18 +49,17 @@
     </main>
     <?php include '../template/footer-bar.php'; ?>
 
-    <script type="module">
-
-        import { 
-            initTabs,
+     <script type="module">
+        import(`${pathConfig.BASE_WEB}js/partner/partnerRender.js?v=<?= time() ?>`)
+        .then(async ({ 
+            initTabs, 
             fetchPartnerData
-        } from '/newstore/js/partner/partnerRender.js?v=<?php echo time()?>';
+        }) => {
 
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const tabs = await fetchPartnerData("getPartnerTabItems");
-            const menuData = await fetchPartnerData("getPartnerMenuItems");
-            const menuItems = await fetchPartnerData("getPartnerMenuArticleItems");
+            const service = pathConfig.BASE_WEB + 'service/partner/partner-data.php?';
+            const tabs = await fetchPartnerData("getPartnerTabItems", service);
+            const menuData = await fetchPartnerData("getPartnerMenuItems", service);
+            const menuItems = await fetchPartnerData("getPartnerMenuArticleItems", service);
 
             const tabButtonsContainer = document.getElementById('tab-buttons');
             const tabContentsContainer = document.getElementById('tab-contents');
@@ -75,10 +74,10 @@
                 parentSelector: '#articleMenu', 
                 menuItems
             });
-
-        });
-
-    </script>
+ 
+        })
+        .catch((e) => console.error("Module import failed", e));
+  </script>
 
 </body>
 

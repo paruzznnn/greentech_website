@@ -2,8 +2,11 @@ export function handleFormSubmit(event) {
     event.preventDefault();
 
     const form = event.target;
+    const fromUrl = form.dataset.url;
+    const fromRedirect = form.dataset.redir;
+    const fromType = form.dataset.type;
     const formData = new FormData(form);
-
+    
     if (!form.checkValidity()) {
         alert("Please fill out the information completely.");
         return;
@@ -14,7 +17,7 @@ export function handleFormSubmit(event) {
         data[key] = value;
     });
 
-    fetch("/newstore/auth/check-login.php", {
+    fetch(fromUrl, {
         method: "POST",
         headers: {
             'Authorization': 'Bearer my_secure_token_123',
@@ -26,7 +29,18 @@ export function handleFormSubmit(event) {
     .then((response) => {
 
         if(response.status){
-            redirectPostForm('/newstore/user/', { username: 'admin', password: '1234' });
+
+          switch (fromType) {
+            case "register":
+              
+              break;
+            case "login":
+              redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
+              break;
+            default:
+              break;
+          }
+           
         }
     })
     .catch((error) => {
@@ -46,6 +60,7 @@ function redirectGet(url, params = {}, target = '_self') {
   }
 }
 
+// function redirectPostForm(url, params = {}, target = '_self') {
 function redirectPostForm(url, params = {}, target = '_self') {
   const form = document.createElement('form');
   form.method = 'POST';
