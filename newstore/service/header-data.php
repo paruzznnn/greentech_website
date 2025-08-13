@@ -40,12 +40,19 @@ $action = $_GET['action'];
 if($action == 'getMenuHeaderItems'){
 
     $data = [
+        // [
+        //     'icon' => '',
+        //     'label' => 'สินค้าแทรนดาร์ อะคูสติก',
+        //     'id' => 'box1',
+        //     'path' => $BASE_WEB . 'product/',
+        //     'hasToggle' => true
+        // ],
         [
             'icon' => '',
             'label' => 'สินค้าแทรนดาร์ อะคูสติก',
-            'id' => 'box1',
+            'id' => '',
             'path' => $BASE_WEB . 'product/',
-            'hasToggle' => true
+            'hasToggle' => false
         ]
     ];
 
