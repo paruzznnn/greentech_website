@@ -1,17 +1,66 @@
 <?php
 //=============== selectData ========================
-function selectData(mysqli $conn, string $table_name, array $conditions = [], string $columns = '*')
-{
+function selectData(
+    mysqli $conn,
+    string $table_name,
+    array $conditions = [],
+    string $columns = '*',
+    string $order_by = '',
+    string $limit = '',
+    string $group_by = ''
+) {
     $sql = "SELECT $columns FROM `$table_name`";
     $values = [];
 
     if (!empty($conditions)) {
         $where_clauses = [];
-        foreach ($conditions as $column => $value) {
-            $where_clauses[] = "`$column` = ?";
-            $values[] = $value;
+        foreach ($conditions as $index => $condition) {
+            if (!isset($condition['column'], $condition['operator'], $condition['value'])) {
+                continue;
+            }
+
+            $logic = ($index > 0 && isset($condition['logic'])) ? strtoupper($condition['logic']) : 'AND';
+            $column = $condition['column'];
+            $operator = strtoupper($condition['operator']);
+            $value = $condition['value'];
+
+            if (!in_array($operator, ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'IN'])) {
+                continue;
+            }
+
+            if ($operator === 'IN' && is_array($value)) {
+                $placeholders = implode(',', array_fill(0, count($value), '?'));
+                $where_clause = "`$column` IN ($placeholders)";
+                foreach ($value as $v) {
+                    $values[] = $v;
+                }
+            } else {
+                $where_clause = "`$column` $operator ?";
+                $values[] = $value;
+            }
+
+            if ($index > 0) {
+                $where_clauses[] = "$logic $where_clause";
+            } else {
+                $where_clauses[] = $where_clause;
+            }
         }
-        $sql .= " WHERE " . implode(" AND ", $where_clauses);
+
+        if (!empty($where_clauses)) {
+            $sql .= " WHERE " . implode(' ', $where_clauses);
+        }
+    }
+
+    if (!empty($group_by)) {
+        $sql .= " GROUP BY $group_by";
+    }
+
+    if (!empty($order_by)) {
+        $sql .= " ORDER BY $order_by";
+    }
+
+    if (!empty($limit)) {
+        $sql .= " LIMIT $limit";
     }
 
     $stmt = $conn->prepare($sql);
@@ -47,19 +96,15 @@ function selectData(mysqli $conn, string $table_name, array $conditions = [], st
     return $data;
 }
 
-// เรียกดูข้อมูลทั้งหมดในตาราง users
-// $all_users = selectData($conn, 'users');
-// echo "<h3>All Users:</h3>";
-// foreach ($all_users as $user) {
-//     echo $user['name'] . ' - ' . $user['email'] . '<br>';
-// }
 
-// เรียกดูข้อมูลเฉพาะคนที่มีอีเมลตรงกับเงื่อนไข
-// $filtered_users = selectData($conn, 'users', ['email' => 'jane.doe@example.com']);
-// echo "<h3>Filtered User:</h3>";
-// foreach ($filtered_users as $user) {
-//     echo $user['name'] . ' - ' . $user['email'] . '<br>';
-// }
+// $conditions = [
+//     ['column' => 'status', 'operator' => '=', 'value' => 'active'],
+//     ['column' => 'age', 'operator' => '>=', 'value' => 18, 'logic' => 'AND'],
+//     ['column' => 'name', 'operator' => 'LIKE', 'value' => '%john%', 'logic' => 'OR']
+// ];
+
+// $data = selectData($conn, 'users', $conditions, '*', 'id DESC', '10');
+
 
 //=============== selectComplexData ========================
 function selectComplexData(

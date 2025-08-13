@@ -39,12 +39,12 @@
             const service = pathConfig.BASE_WEB + 'service/product/product-data.php?';
             const productDeatilItems = await fetchProductData("getProductDetailItems", service);
             const productSimilarItems = await fetchProductData("getProductSimilarItems", service);
-
             if(productDeatilItems.data){
-                createProductDetailHTML("#product-detail-container-vibrant", productDeatilItems.data);
-                initProductDetailLogic("#product-detail-container-vibrant", productDeatilItems.data.images);
+                productDeatilItems.data.forEach((item, index) => {
+                    createProductDetailHTML("#product-detail-container-vibrant", item);
+                    initProductDetailLogic("#product-detail-container-vibrant", item.images);
+                });
             }
-
             if(productSimilarItems.data){
                 createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
             }
