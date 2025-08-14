@@ -1,7 +1,12 @@
 // ---------- API PRODUCT -----------------------------
-export async function fetchProductData(req, call) {
+export async function fetchProductData(req, call, obj) {
+
     try {
-        const params = new URLSearchParams({ action: req });
+        const params = new URLSearchParams({ 
+            action: req,
+            product_id: obj.productId
+        });
+
         const url = call + params.toString();
 
         const response = await fetch(url, {
@@ -34,14 +39,12 @@ export function createProductDetailHTML(selector, data) {
     }
 
     const thumbnails = data.images.map((img, index) => `
-    <img src="${img}" class="product-detail-thumbnail-img ${index === 0 ? "active" : ""}" alt="Thumb ${index + 1}"
-    onerror="this.onerror=null;this.src='https://placehold.co/80x80/e0e0e0/888888?text=No+Image';">
+    <img src="${img}" class="product-detail-thumbnail-img ${index === 0 ? "active" : ""}" alt="Thumb ${index + 1}">
     `).join("");
 
     const carouselItems = data.images.map(img => `
     <div class="product-detail-carousel-item">
-        <img src="${img}" alt="Product Image"
-        onerror="this.onerror=null;this.src='https://placehold.co/600x400/e0e0e0/888888?text=No+Image';">
+        <img src="${img}" alt="Product Image">
         </div>
     `).join("");
 
@@ -55,53 +58,66 @@ export function createProductDetailHTML(selector, data) {
     </li>
     `).join("");
 
+    // <span class="product-detail-current-price">฿${data.currentPrice || "-"}</span>
+    // <span class="product-detail-old-price">฿${data.oldPrice || "-"}</span>
+    // <span class="product-detail-discount-badge">ลด ${data.discountPercent || 0}%</span>
+
     let div = `
     <div class="product-detail-card">
         <div class="product-detail-image-gallery">
-        <div class="product-detail-main-image-carousel">
-            <div class="product-detail-carousel-inner">${carouselItems}</div>`;
+            <div class="product-detail-main-image-carousel">
+                <div class="product-detail-carousel-inner">${carouselItems}</div>`;
 
-            if(data.images.length > 1){
-                div += `
-                <button class="product-detail-carousel-control product-detail-control-left" id="carouselPrevVibrant"><i class="fas fa-angle-left"></i></button>
-                <button class="product-detail-carousel-control product-detail-control-right" id="carouselNextVibrant"><i class="fas fa-angle-right"></i></button>
-                `;
-            }
+                if(data.images.length > 1){
+                    div += `
+                    <button class="product-detail-carousel-control product-detail-control-left" id="carouselPrevVibrant"><i class="fas fa-angle-left"></i></button>
+                    <button class="product-detail-carousel-control product-detail-control-right" id="carouselNextVibrant"><i class="fas fa-angle-right"></i></button>
+                    `;
+                }
 
-            div += `<div class="product-detail-carousel-indicators">${indicators}</div>
+                div += `<div class="product-detail-carousel-indicators">${indicators}</div>
+            </div>
+            <div class="product-detail-thumbnail-strip-wrapper">`;
+
+                if(data.images.length > 1){
+                    div += `<button class="product-detail-thumbnail-scroll-button" id="thumbPrevVibrant"><i class="fas fa-angle-left"></i></button>`;
+                }
+
+                div += `<div class="product-detail-thumbnail-strip">
+                <div class="product-detail-thumbnail-list">${thumbnails}</div>
+                </div>`;
+
+                if(data.images.length > 1){
+                    div += `<button class="product-detail-thumbnail-scroll-button" id="thumbNextVibrant"><i class="fas fa-angle-right"></i></button>`;
+                }
+
+            div += `
+            </div>
         </div>
-        <div class="product-detail-thumbnail-strip-wrapper">`;
-
-
-            if(data.images.length > 1){
-                div += `<button class="product-detail-thumbnail-scroll-button" id="thumbPrevVibrant"><i class="fas fa-angle-left"></i></button>`;
-            }
-
-            div += `<div class="product-detail-thumbnail-strip">
-            <div class="product-detail-thumbnail-list">${thumbnails}</div>
-            </div>`;
-
-            if(data.images.length > 1){
-                div += `<button class="product-detail-thumbnail-scroll-button" id="thumbNextVibrant"><i class="fas fa-angle-right"></i></button>`;
-            }
-
-        div += `
-        </div>
-        </div>
-
         <div class="product-detail-info-section">
-        <div>
-            <h2 class="product-detail-title">${data.icon || ""} ${data.title || "ไม่พบชื่อสินค้า"}</h2>
-            <p class="product-detail-category">${data.category || ""}</p>
-            <div class="product-detail-price-section">
-            <div class="product-detail-price-display">
-                <span class="product-detail-current-price">฿${data.currentPrice || "-"}</span>
-                <span class="product-detail-old-price">฿${data.oldPrice || "-"}</span>
-                <span class="product-detail-discount-badge">ลด ${data.discountPercent || 0}%</span>
-            </div>
-            <button class="product-detail-add-to-cart-button">เพิ่มลงตะกร้า</button>
-            </div>
-        </div>
+            
+                <h2 class="product-detail-title">${data.icon || ""} ${data.title || "ไม่พบชื่อสินค้า"}</h2>
+                <p class="product-detail-category">${data.category || ""}</p>
+                <div class="product-detail-price-display">
+                    
+                </div>
+                <div class="product-detail-price-section">
+                    <div class="product-detail-quantity-control">
+                        <button type="button" data-id="" data-action="decrease">-</button>
+                        <input type="number" id="quantity-input" value="" min="1" data-id="" class="quantity-input">
+                        <button type="button" data-id="" data-action="increase">+</button>
+                    </div>
+                    <div class="product-detail-button-diisplay">
+                        <button class="product-detail-button btn-add-cart">
+                            <i class="bi bi-cart3"></i>
+                            <span>เพิ่มลงตะกร้า</span>
+                        </button>
+                        <button class="product-detail-button btn-add-order">
+                            <span>ซื้อสินค้า</span>
+                        </button>
+                    </div>
+                </div>
+            
         </div>
     </div>
 
@@ -118,12 +134,59 @@ export function createProductDetailHTML(selector, data) {
         <ul class="product-detail-features-list">${features}</ul>
         </div>
         <div id="tab-content-review" class="product-detail-tab-content">
-        555
+        
         </div>
     </div>
     `;
 
     container.innerHTML = div;
+
+    container.addEventListener('click', (e) => {
+        const target = e.target;
+
+        console.log('target', target);
+        
+
+        // const productId = target.dataset.id;
+        const action = target.dataset.action;
+
+        if (action === 'decrease') {
+            // this.updateQuantity(productId, -1);
+        } else if (action === 'increase') {
+            // this.updateQuantity(productId, 1);
+        }
+    });
+
+    container.addEventListener('change', (e) => {
+        const target = e.target;
+        console.log('e', e);
+        console.log('target', target);
+        
+
+        // if (e.target.classList.contains('quantity-input')) {
+        //     const productId = e.target.dataset.id;
+        //     // const newQuantity = parseInt(e.target.value);
+        //     // const currentItem = this.cartItems.find(item => item.id === productId);
+        //     // if (currentItem) {
+        //     //     this.updateQuantity(productId, newQuantity - currentItem.quantity);
+        //     // }
+        // }
+    });
+
+    function updateQuantity(productId, change) {
+        // const item = this.cartItems.find(item => item.id === productId);
+        // if (item) {
+        //     const newQuantity = item.quantity + change;
+        //     if (newQuantity >= 1) {
+        //         item.quantity = newQuantity;
+        //     } else if (newQuantity === 0) {
+        //         this.removeItem(productId);
+        //         return;
+        //     }
+        //     this.saveCart();
+        //     this.renderCart();
+        // }
+    }
 }
 
 // ---------- INIT PRODUCT -----------------------------

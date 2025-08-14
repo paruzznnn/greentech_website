@@ -1,4 +1,4 @@
-import { redirectGet } from "./formHandler.js";
+import { redirectGet } from './formHandler.js';
 
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
@@ -282,6 +282,58 @@ function setupCarousel(container) {
   startAutoPlay();
 }
 
+function addCart(product) {
+  const existingCart =
+    JSON.parse(localStorage.getItem("userShoppingCart")) || [];
+  const productIndex = existingCart.findIndex(
+    (item) => item.id === product.productId
+  );
+  if (productIndex !== -1) {
+    // existingCart[productIndex].quantity += 1;
+    alert("เพิ่มลงตะกร้าแล้ว");
+  } else {
+    existingCart.push({
+      id: product.productId,
+      name: product.productName,
+      price: product.productPrice,
+      quantity: 1,
+      imageUrl: product.image,
+    });
+    alert("เพิ่มลงตะกร้าเรียบร้อย");
+  }
+  localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
+}
+
+function addWishlist(product) {
+  const existingWishlist =
+    JSON.parse(localStorage.getItem("userLikedProducts")) || [];
+  const productIndex = existingWishlist.findIndex(
+    (item) => item.id === product.productId
+  );
+  if (productIndex !== -1) {
+    alert("กดถูกใจไว้แล้ว");
+  } else {
+    existingWishlist.push({
+      id: product.productId,
+      name: product.productName,
+      price: product.productPrice,
+      imageUrl: product.image,
+    });
+    alert("เพิ่มการถูกใจเรียบร้อย");
+  }
+
+  localStorage.setItem("userLikedProducts", JSON.stringify(existingWishlist));
+}
+
+function formatPrice(currency, price) {
+  return Number(price).toLocaleString("th-TH", {
+    style: "currency",
+    currency: currency || "THB",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 // ---------- RENDER INTRODUCE ----------------
 
 // ---------- RENDER BANNERS ------------------
@@ -361,7 +413,9 @@ export function renderCarouselMD(selector, items, config) {
         <div class="store-card-row">
           <div class="store-card-header">
             <div class="box-card-header">
-              <img class="store-card-logo" src="${item.compLogo}" alt="">
+              <div>
+                <img class="store-card-logo" src="${item.compLogo}" alt="">
+              </div>
               <div>
                 <strong>${item.compName}</strong>
                 <span>
@@ -379,7 +433,9 @@ export function renderCarouselMD(selector, items, config) {
               </div>
             </div>
           </div>
-          <img src="${item.image}" alt="" class="store-card-image" />
+          <div class="img-view-detail">
+            <img src="${item.image}" alt="" class="store-card-image" />
+          </div>
           <div class="store-card-body">
             <div>
               <span style="font-size: 12px;"><i class="bi bi-layers"></i><span>
@@ -403,7 +459,7 @@ export function renderCarouselMD(selector, items, config) {
             <div class="box-card-footer">
               <div>
                 <span style="color: #ff9902; font-weight: bold; font-size: 1.2rem;">
-                  ${formatPrice(item.productPrice)}
+                  ${formatPrice(item.productCurrency, item.productPrice)}
                 </span>
               </div>
               <div class="box-card-footer-action">
@@ -426,35 +482,43 @@ export function renderCarouselMD(selector, items, config) {
   container.addEventListener("click", (e) => {
 
     if (e.target.closest(".btn-add-wishlist")) {
-      if(config.user){
+      if (config.user) {
         const itemDiv = e.target.closest(".item");
         const productId = itemDiv.dataset.productId;
         const product = items.find((i) => i.productId === productId);
         if (product) addWishlist(product);
-      }else{
+      } else {
         document.getElementById("auth-modal").style.display = "flex";
       }
     }
 
-    if (e.target.closest(".btn-add-cart")) {
-      if(config.user){
+    else if (e.target.closest(".btn-add-cart")) {
+      if (config.user) {
         const itemDiv = e.target.closest(".item");
         const productId = itemDiv.dataset.productId;
         const product = items.find((i) => i.productId === productId);
         if (product) addCart(product);
-      }else{
+      } else {
         document.getElementById("auth-modal").style.display = "flex";
       }
     }
 
-    if (e.target.closest(".btn-view-detail")) {
-      redirectGet(`${config.BASE_WEB}product/detail/`, { q: 'keyword', page: 2 }, '_blank');
+    else if (e.target.closest(".btn-view-detail")) {
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+    }
+
+    else if (e.target.closest(".img-view-detail")) {
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
     }
 
   });
 
   $(selector).owlCarousel({
-    loop: true,
+    loop: false,
     margin: 10,
     nav: false,
     dots: false,
@@ -496,54 +560,3 @@ export function renderCarouselLG(selector, items) {
   });
 }
 
-function addCart(product) {
-  const existingCart =
-    JSON.parse(localStorage.getItem("userShoppingCart")) || [];
-  const productIndex = existingCart.findIndex(
-    (item) => item.id === product.productId
-  );
-  if (productIndex !== -1) {
-    // existingCart[productIndex].quantity += 1;
-    alert("เพิ่มลงตะกร้าแล้ว");
-  } else {
-    existingCart.push({
-      id: product.productId,
-      name: product.productName,
-      price: product.productPrice,
-      quantity: 1,
-      imageUrl: product.image,
-    });
-    alert("เพิ่มลงตะกร้าเรียบร้อย");
-  }
-  localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
-}
-
-function addWishlist(product) {
-  const existingWishlist =
-    JSON.parse(localStorage.getItem("userLikedProducts")) || [];
-  const productIndex = existingWishlist.findIndex(
-    (item) => item.id === product.productId
-  );
-  if (productIndex !== -1) {
-    alert("กดถูกใจไว้แล้ว");
-  } else {
-    existingWishlist.push({
-      id: product.productId,
-      name: product.productName,
-      price: product.productPrice,
-      imageUrl: product.image,
-    });
-    alert("เพิ่มการถูกใจเรียบร้อย");
-  }
-
-  localStorage.setItem("userLikedProducts", JSON.stringify(existingWishlist));
-}
-
-function formatPrice(price) {
-  return Number(price).toLocaleString("th-TH", {
-    style: "currency",
-    currency: "THB",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}

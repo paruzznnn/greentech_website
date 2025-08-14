@@ -70,14 +70,14 @@ export const ShoppingCart = {
                     <h3 class="item-name">${item.name}</h3>
                     <span class="remove-item-button" data-id="${item.id}">ลบ</span>
                 </div>
-                <p class="item-price">฿${item.price.toFixed(2)}</p>
+                <p class="item-price">฿${item.price}</p>
                 <div class="quantity-control">
                     <button type="button" data-id="${item.id}" data-action="decrease">-</button>
                     <input type="number" value="${item.quantity}" min="1" data-id="${item.id}" class="quantity-input">
                     <button type="button" data-id="${item.id}" data-action="increase">+</button>
                 </div>
                 <div class="item-total-price">
-                    ฿${(item.price * item.quantity).toFixed(2)}
+                    ฿${(item.price * item.quantity)}
                 </div>
             </div>
         `;
