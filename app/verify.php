@@ -14,6 +14,7 @@
         exit;
     }
     $token     = trim($data['token']     ?? '');
+    $app     = trim($data['app']     ?? '');
     $code     = trim($data['code']     ?? '');
     $firstname = trim($data['firstname'] ?? '');
     $lastname  = trim($data['lastname']  ?? '');
@@ -83,6 +84,7 @@
     $_SESSION['role_id']  = $role_id;
     $_SESSION['logged_in']  = true;
     $_SESSION['token']  = $token;
+    $_SESSION['app']  = $app;
     header("Location: admin/dashboard.php");
     exit;
 ?>
