@@ -78,13 +78,14 @@ switch ($ROUTE['controller']) {
     case 'user':
 
         $GLOBALS['BASE_WEB'] = getBasePath();
-            echo "
-            <script>
-                var pathConfig = {
-                    BASE_WEB: " . json_encode($BASE_WEB) . "
-                };
-            </script>
-            ";
+        echo "
+        <script>
+            var pathConfig = {
+                BASE_WEB: " . json_encode($BASE_WEB) . "
+            };
+        </script>
+        ";
+
         break;
     default:
 
@@ -92,19 +93,20 @@ switch ($ROUTE['controller']) {
         // print_r($_SESSION);
         // echo '</pre>';
 
-            // if (!empty($_SESSION['user'])) {
-            //     echo "Welcome back, user ID: " . checkAutoLoginCookie();
-            // } else {
-                // session_destroy();
-            // }
+        // if (!empty($_SESSION['user'])) {
+        //     echo "Welcome back, user ID: " . checkAutoLoginCookie();
+        // } else {
+            // session_destroy();
+        // }
 
-            $GLOBALS['BASE_WEB'] = getBasePath();
-            echo "
-            <script>
-                var pathConfig = {
-                    BASE_WEB: " . json_encode($BASE_WEB) . "
-                };
-            </script>
-            ";
+        $GLOBALS['BASE_WEB'] = getBasePath();
+        echo "
+        <script>
+            var pathConfig = {
+                BASE_WEB: " . json_encode($BASE_WEB) . "
+            };
+        </script>
+        ";
+
         break;
 }

@@ -1,4 +1,9 @@
 <?php include '../../routes.php'; ?>
+<?php
+echo '<pre>';
+print_r($_GET);
+echo '</pre>';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +25,7 @@
             <section id="sections_products_deatil" class="section-space-search">
                 <div class="container">
                     <div id="product-detail-container-vibrant"></div>
-                    <div id="product-similar-container" class="owl-carousel owl-theme"></div>
+                    <!-- <div id="product-similar-container" class="owl-carousel owl-theme"></div> -->
                 </div>
             </section>
         </div>
@@ -36,18 +41,22 @@
             createProductSimilarHTML
         }) => {
 
+            let reqProduct = {
+                productId: <?php echo json_encode($_GET['id']); ?>
+            };
+
             const service = pathConfig.BASE_WEB + 'service/product/product-data.php?';
-            const productDeatilItems = await fetchProductData("getProductDetailItems", service);
-            const productSimilarItems = await fetchProductData("getProductSimilarItems", service);
+            const productDeatilItems = await fetchProductData("getProductDetailItems", service, reqProduct);
+            // const productSimilarItems = await fetchProductData("getProductSimilarItems", service, reqProduct);
             if(productDeatilItems.data){
                 productDeatilItems.data.forEach((item, index) => {
                     createProductDetailHTML("#product-detail-container-vibrant", item);
                     initProductDetailLogic("#product-detail-container-vibrant", item.images);
                 });
             }
-            if(productSimilarItems.data){
-                createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
-            }
+            // if(productSimilarItems.data){
+                // createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
+            // }
             
         })
         .catch((e) => console.error("Module import failed", e));

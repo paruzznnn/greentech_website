@@ -22,29 +22,13 @@ function connectDB($host, $user, $pass, $dbname) {
     return $conn;
 }
 
-// $server_name = $_SERVER['SERVER_NAME'];
-// $dbHost = "localhost";
-// $dbName = "store_db";
-// if ($server_name === 'localhost' || $server_name === '127.0.0.1') {
-//     // Localhost configuration
-//     $dbUser = "root";
-//     $dbPass = "";
-//     $host = $dbHost;
-//     $username = $dbUser;
-//     $password = $dbPass;
-//     $database = $dbName;
-// } else {
-//     // Production configuration
-//     $dbUser = "tdi2025admin";
-//     $dbPass = "wD20#20dW";
-//     $host = $dbHost;
-//     $username = $dbUser;
-//     $password = $dbPass;
-//     $database = $dbName;
-// }
 
+$server_name = $_SERVER['SERVER_NAME'];
+if($server_name === 'localhost' || $server_name === '127.0.0.1'){
 $GLOBALS['conn_cloudpanel'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
-// $GLOBALS['mysqli2'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+}else{
+$GLOBALS['conn_cloudpanel'] = connectDB($_ENV['DB_HOST_PD'], $_ENV['DB_USER_PD'], "wD20#20dW", $_ENV['DB_NAME_PD']);
+}
 
 function webBasePath() {
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')

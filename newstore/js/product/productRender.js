@@ -1,3 +1,5 @@
+import { redirectGet } from '../formHandler.js';
+
 export async function initCardUI({
     containerId,
     apiUrl,
@@ -5,31 +7,24 @@ export async function initCardUI({
     BASE_WEB
 }) {
     let allCards = [];
-
     const container = document.getElementById(containerId);
     function renderCards() {
         container.innerHTML = '';
-
         if (allCards.length === 0) {
             container.innerHTML = `<p class="col-span-4 text-center text-gray-500">No results found</p>`;
             return;
         }
-
         allCards.forEach(card => {
             const div = document.createElement('div');
             div.className = 'col-md-6 col-sm-6 pb-3';
-
             div.innerHTML = `
                 <div class="search-card-product" style="cursor: pointer;">
                     <img src="${card.img}" alt="">
                     <div class="overlay-text">${card.title}</div>
-                </div>
-            `;
-
+                </div>`;
             div.querySelector('.search-card-product').addEventListener('click', () => {
-                window.location.href = `${BASE_WEB}product/list/?id=${card.id}`;
+                window.location.href = `${BASE_WEB}product/list/?categoryid=${card.id}`;
             });
-
             container.appendChild(div);
         });
     }
@@ -48,6 +43,9 @@ export async function initCardUI({
 
             const res = await response.json();
             const data = res.data;
+
+            console.log('data', data);
+            
 
             allCards = data.map(item => ({
                 id: item.category_id || '',

@@ -28,6 +28,10 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
+// echo '<pre>';
+// print_r($_GET);
+// echo '</pre>';
+// exit;
 if ($action == 'getProductItems') {
 
     $conditions = [
@@ -115,11 +119,18 @@ if ($action == 'getProductItems') {
     exit;
 } else if ($action == 'getProductDetailItems') {
 
+    $product_id = $_GET['product_id'];
+
     $conditions = [
         [
             'column' => 'comp_id', 
             'operator' => '=', 
             'value' => '2'
+        ],
+        [
+            'column' => 'material_id', 
+            'operator' => '=', 
+            'value' => $product_id
         ]
     ];
 
@@ -135,24 +146,20 @@ if ($action == 'getProductItems') {
     foreach ($items as $item) {
         $cost = explode(",",$item['cost']);
         $data[] = [
-            // 'id' => $item['id'],
+            'id' => $item['id'],
+            'productId' => $item['material_id'],
             'icon' => "",
             'title' => $item['code'],
             'category' => $item['category_name'],
             'description' => $item['description'],
-            'features' => [
-                "มีค่าการกันเสียง 33 dB (STC 33) มีความหนาเพียง 10 มม. หากติดตั้งด้วยระบบ",
-                "TSIS จะมีค่าการกันเสียงถึง 56 dB",
-                "ลดขนาดระบบผนัง ช่วยเพิ่มพื้นที่ห้องให้มากขึ้น",
-            ],
+            'features' => [],
             'images' => [
-                "https://www.trandar.com//public/shop_img/6878c8c678fea_photo_2025-07-17_16-55-32.jpg",
-                "https://www.trandar.com//public/shop_img/687a325d8bbab_Zound_Borad_223.png",
-                "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png",
+                $item['pic_icon']
             ],
-            'currentPrice' => 450,
-            'oldPrice' => 599,
-            'discountPercent' => 25,
+            'currentPrice' => $cost[0],
+            'oldPrice' => 0,
+            'discountPercent' => 0,
+            ''
         ];
     }
 

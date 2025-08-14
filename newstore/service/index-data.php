@@ -1,5 +1,6 @@
 <?php
 require_once '../server/connect_sqli.php';
+require_once '../server/select_sqli.php';
 header('Content-Type: application/json');
 
 /* ---------------POST NEED USE ------------------
@@ -40,16 +41,16 @@ $action = $_GET['action'];
 if ($action == 'getSectionItems') {
 
     $data = [
-        [
-            "id" => "section_popular",
-            "class" => "section-space",
-            "title" => "การค้นหายอดนิยม",
-            "carouselId" => "carousel_popular",
-            "isSlide" => true,
-            "type" => "crssm",
-            "sort" => 2,
-            "req" => "getPopularItems"
-        ],
+        // [
+        //     "id" => "section_popular",
+        //     "class" => "section-space",
+        //     "title" => "การค้นหายอดนิยม",
+        //     "carouselId" => "carousel_popular",
+        //     "isSlide" => true,
+        //     "type" => "crssm",
+        //     "sort" => 2,
+        //     "req" => "getPopularItems"
+        // ],
         [
             "id" => "section_baner",
             "class" => "section-space",
@@ -172,96 +173,47 @@ if ($action == 'getSectionItems') {
     exit;
 } else if ($action == 'getProductItems') {
 
-    $data = [
+    $conditions = [
         [
-            "productId" => '1',
-            "compName" => "Trandar",
-            "compLogo" => "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
-            "compId" => '2',
-            "image" => "https://www.trandar.com//public/shop_img/688adc2b36a57_Solo___-Rectangle__1_.jpg",
-            "categoryId" => '1',
-            "category" => "Trandar Acoustics Mineral Fiber",
-            "productName" => "Trandar Mineral Fiber AMF",
-            "productDetail" => "
-            ฝ้าเพดาน Mineral Fiber AMF คือฝ้าอะคูสติกคุณภาพสูงจากประเทศเยอรมนี 
-            ที่ผลิตจากวัสดุแร่ใยธรรมชาติ (Mineral Fiber) โดยเน้นคุณสมบัติทั้งด้าน การดูดซับเสียง, ความปลอดภัยจากไฟ, สุขอนามัย, 
-            และ ความคุ้มค่าในการใช้งาน ซึ่งทำให้แบรนด์ AMF ได้รับความนิยมในระดับสากล และใช้งานอย่างแพร่หลายในอาคารหลากหลายประเภท 
-            เช่น สำนักงาน, โรงเรียน, โรงพยาบาล, ห้องประชุม ไปจนถึงโถงต้อนรับ
-            ",
-            "productPrice" => 10000,
-            "productBadges" => [
-                "ร้านแนะนำ",
-                "ขายดี",
-                "ขายแล้ว 100 ชิ้น",
-                "ส่งไว",
-                "บริการดี"
-            ],
-            "dateCreated" => formatDateLocalized($dateNow, 'th', true, $_SESSION['user_timezone'])
-        ],
-        [
-            "productId" => '2',
-            "compName" => "Trandar",
-            "compLogo" => "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
-            "compId" => '2',
-            "image" => "https://www.trandar.com//public/shop_img/688adc18858b1_Solo____Circle__1_.jpg",
-            "categoryId" => '1',
-            "category" => "Trandar Acoustics Mineral Fiber",
-            "productName" => "Trandar AMF Mercure",
-            "productDetail" => "
-            ลวดลายละเอียดมากจนเกือบดูเรียบเนียน มีความต่อเนื่องของพื้นผิวสูง มีรูพรุนเล้กน้อยกระจายตัวแบบเป็นระเบียบ 
-            ทำให้รู้สึกหรูหรา ให้ความรู้สึก เรียบแต่มีมิติ เหมาะสำหรับติดตั้งใน: อาคารสำนักงาน ห้างธรรพลินค้า โรงแรม โรงพยาบาลสถาบันการศึกษา เป็นต้น
-            ",
-            "productPrice" => 1990,
-            "productBadges" => [
-                "ร้านแนะนำ",
-                "ส่งไว",
-                "บริการดี"
-            ],
-            "dateCreated" => formatDateLocalized($dateNow, 'th', true, $_SESSION['user_timezone'])
-        ],
-        [
-            "productId" => '3',
-            "compName" => "Trandar",
-            "compLogo" => "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
-            "compId" => '2',
-            "image" => "https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg",
-            "categoryId" => '1',
-            "category" => "Trandar Acoustics Mineral Fiber",
-            "productName" => "Trandar AMF Fine Fresko",
-            "productDetail" => "
-            เป็นรุ่นที่มีพื้นผิวละเอียดแบบพิเศษคล้ายการฉาบปูนเรียบแบบให้ความรู้สึก ละเมียด และ “เป็นธรรมชาติ” มากกว่าฝ้าทั่วไป
-            เหมาะสำหรับติดตั้งใน: อาคารสำนักงาน ห้างธรรพลินค้า โรงแรม โรงพยาบาลสถาบันการศึกษา เป็นต้น
-            ",
-            "productPrice" => 1998,
-            "productBadges" => [
-                "ร้านแนะนำ",
-            ],
-            "dateCreated" => formatDateLocalized($dateNow, 'th', true, $_SESSION['user_timezone'])
-        ],
-        [
-            "productId" => '4',
-            "compName" => "Trandar",
-            "compLogo" => "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
-            "compId" => '2',
-            "image" => "https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg",
-            "categoryId" => '1',
-            "category" => "Trandar Acoustics Mineral Fiber",
-            "productName" => "Trandar AMF Star",
-            "productDetail" => "
-            พื้นผิวแบบละเอียดมีลวดลายจุดเล็กๆ กระจายอย่างสม่ำเสมอ ไม่แน่นหรือหยาบเกินไป ทำให้ดูเรียบสะอาดตา ให้ความรู้สึกเบา สบายตา
-            เหมาะสำหรับติดตั้งใน : อาคารสำนักงาน ห้างธรรพลินค้า โรงแรม โรงพยาบาลสถาบันการศึกษา เป็นต้น
-            ",
-            "productPrice" => 1999,
-            "productBadges" => [
-                "ส่งไว",
-                "บริการดี"
-            ],
-            "dateCreated" => formatDateLocalized($dateNow, 'th', true, $_SESSION['user_timezone'])
+            'column' => 'comp_id', 
+            'operator' => '=', 
+            'value' => '2'
         ]
     ];
 
-    http_response_code(200);
+    $items = selectData(
+        $conn_cloudpanel, 
+        'ecm_product', 
+        $conditions, 
+        '*', 
+        'id DESC'
+    );
 
+    $data = [];
+    foreach ($items as $item) {
+        $cost = explode(",",$item['cost']);
+        $currency = explode(",",$item['currency']);
+        $data[] = [
+            'id' => $item['id'],
+            'productId' => $item['material_id'],
+            'compName' => "Trandar",
+            'compLogo' => "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
+            'compId' => $item['comp_id'],
+            'image' => $item['pic_icon'],
+            'categoryId' => $item['category_id'],
+            'category' => $item['category_name'],
+            'productName' => $item['code'],
+            'productDetail' => $item['description'],
+            'productPrice' => $cost[0],
+            'productCurrency' => $currency[0],
+            'productBadges' => [
+                "ร้านแนะนำ",
+                "ส่งไว",
+                "บริการดี"
+            ],
+            'dateCreated' => formatDateLocalized($dateNow, 'th', true, $_SESSION['user_timezone']),
+        ];
+    }
 
     $memberId = 0;
     if(!empty($_SESSION['user'])){
@@ -280,7 +232,9 @@ if ($action == 'getSectionItems') {
         "data" => $data
     ];
 
+    http_response_code(200);
     echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 } else if ($action == 'getNewsItems') {
 
@@ -403,6 +357,7 @@ if ($action == 'getSectionItems') {
         "error" => "Unauthorized"
     ]);
     exit;
+
 }
 
 
