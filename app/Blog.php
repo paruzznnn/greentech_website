@@ -70,12 +70,12 @@ global $conn;
     <?php include 'template/navbar_slide.php' ?>
 
     <div class="content-sticky" id="">
-        <div class="container">
+        <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="row">
 
                     <div class="">
-                        <h2 style="font-size: 28px; font-weight: bold;">Blog</h2>
+                        <h2 style="font-size: 28px; font-weight: bold;" data-translate="blog" lang="th">Blog</h2>
                         <?php include 'template/Blog/content.php' ?>
                     </div>
 

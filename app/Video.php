@@ -133,7 +133,7 @@ if (!$result) {
 <body>
    
      
-     <div class="container">
+     <div class="container" style="max-width: 90%;">
         <div class="row align-items-center" style="padding: 40px 0;">
             <div class="col-md-6">
                 <h2 style="font-size: 28px; font-weight: bold; margin: 0;">คลังวิดีโอทั้งหมด</h2>

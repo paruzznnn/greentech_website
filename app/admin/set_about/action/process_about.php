@@ -67,13 +67,17 @@ try {
 
     // Action: Add new content block
     elseif ($action == 'add_new_block') {
-        $type = $_POST['type'] ?? '';
-        $content = $_POST['content'] ?? '';
-        $author = $_POST['author'] ?? '';
-        $position = $_POST['position'] ?? '';
+        $type_th = $_POST['type_th'] ?? '';
+        $content_th = $_POST['content_th'] ?? '';
+        $author_th = $_POST['author_th'] ?? '';
+        $position_th = $_POST['position_th'] ?? '';
+        
+        $type_en = $_POST['type_en'] ?? ''; // English is optional
+        $content_en = $_POST['content_en'] ?? ''; // English is optional
+        
         $image_url = null;
 
-        if (!empty($content)) {
+        if (!empty($content_th) || !empty($content_en)) {
             // Handle image file if uploaded
             if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
                 $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
@@ -86,8 +90,8 @@ try {
                 }
             }
             
-            $stmt = $conn->prepare("INSERT INTO about_content (type, content, image_url, author, position) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss", $type, $content, $image_url, $author, $position);
+            $stmt = $conn->prepare("INSERT INTO about_content (type, content, type_en, content_en, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssss", $type_th, $content_th, $type_en, $content_en, $image_url, $author_th, $position_th);
 
             if ($stmt->execute()) {
                 $response = ['status' => 'success', 'message' => 'เพิ่มเนื้อหาใหม่เรียบร้อย'];
@@ -96,21 +100,23 @@ try {
             }
             $stmt->close();
         } else {
-            $response['message'] = 'กรุณากรอกเนื้อหา';
+            $response['message'] = 'กรุณากรอกเนื้อหาอย่างน้อยหนึ่งภาษา';
         }
     }
 
     // Action: Save all content blocks
     elseif ($action == 'save_all_blocks') {
         $ids = $_POST['ids'] ?? [];
-        $types = $_POST['types'] ?? [];
-        $contents = $_POST['contents'] ?? [];
+        $types_th = $_POST['types_th'] ?? [];
+        $contents_th = $_POST['contents_th'] ?? [];
         $authors = $_POST['authors'] ?? [];
         $positions = $_POST['positions'] ?? [];
         $images_old = $_POST['images_old'] ?? [];
-
+        
+        $types_en = $_POST['types_en'] ?? [];
+        $contents_en = $_POST['contents_en'] ?? [];
+        
         $uploaded_files = $_FILES['image_files'] ?? null;
-        $image_urls_new = [];
         
         $hasError = false;
         $errorMessage = '';
@@ -137,10 +143,15 @@ try {
                 }
             }
 
-            $stmt = $conn->prepare("UPDATE about_content SET type=?, content=?, image_url=?, author=?, position=? WHERE id=?");
-            $stmt->bind_param("sssssi",
-                $types[$i],
-                $contents[$i],
+            $type_en_val = $types_en[$i] ?? '';
+            $content_en_val = $contents_en[$i] ?? '';
+            
+            $stmt = $conn->prepare("UPDATE about_content SET type=?, content=?, type_en=?, content_en=?, image_url=?, author=?, position=? WHERE id=?");
+            $stmt->bind_param("sssssssi",
+                $types_th[$i],
+                $contents_th[$i],
+                $type_en_val,
+                $content_en_val,
                 $current_image_url,
                 $authors[$i],
                 $positions[$i],
@@ -161,10 +172,23 @@ try {
             $response = ['status' => 'success', 'message' => 'บันทึกการแก้ไขทั้งหมดเรียบร้อย'];
         }
     }
-
-    // Action: Delete block (should be handled by delete_about_block.php, but can be added here)
-    // The existing delete_about_block.php seems to be an independent file. Keep it that way for simplicity.
-    // If you prefer to handle everything in one file, you would add an 'action' here.
+    
+    // Action: Delete block
+    elseif ($action == 'delete_block') {
+        $id = $_POST['id'] ?? 0;
+        if ($id > 0) {
+            $stmt = $conn->prepare("DELETE FROM about_content WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                $response = ['status' => 'success', 'message' => 'ลบข้อมูลเรียบร้อยแล้ว'];
+            } else {
+                throw new Exception("Failed to delete from database: " . $stmt->error);
+            }
+            $stmt->close();
+        } else {
+            $response['message'] = 'ID ไม่ถูกต้อง';
+        }
+    }
 
 } catch (Exception $e) {
     $response['status'] = 'error';

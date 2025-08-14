@@ -55,18 +55,12 @@ $decodedId = $_POST['shop_id'];
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 
     <style>
-            .note-editable {
-            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
+        .note-editable {
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
-            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
-            /* min-height: 600px; */
-            /* max-height: 600px; */
-            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
-            /* font-family: sans-serif */
             color: #424242;
         }
 
@@ -100,6 +94,15 @@ $decodedId = $_POST['shop_id'];
             z-index: 1 !important;
         }
 
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+        
+        .flag-icon {
+            width: 4px; /* ปรับขนาดธงให้เล็กลง */
+            margin-right: 8px;
+        }
     </style>
 </head>
 
@@ -113,6 +116,7 @@ $decodedId = $_POST['shop_id'];
                     <h4 class="line-ref mb-3">
                         <i class="far fa-newspaper"></i> Edit shop
                     </h4>
+
                     <?php
 // ดึงข้อมูลหลักของ shop และดึงข้อมูลรูปภาพแยกออกมา
 $stmt = $conn->prepare("
@@ -122,7 +126,10 @@ $stmt = $conn->prepare("
         dn.description_shop,
         dn.content_shop,
         dn.date_create,
-        dn.group_id
+        dn.group_id,
+        dn.subject_shop_en,
+        dn.description_shop_en,
+        dn.content_shop_en
     FROM dn_shop dn
     WHERE dn.shop_id = ?
 ");
@@ -137,11 +144,12 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
-    $content = $row['content_shop'];
+    $content_th = $row['content_shop'];
+    $content_en = $row['content_shop_en'];
     $current_group_id = $row['group_id'];
 
     // ดึงข้อมูลรูปภาพทั้งหมดที่เกี่ยวข้องกับ shop_id นี้
-      $stmt_pics = $conn->prepare("SELECT file_name, api_path, status FROM dn_shop_doc WHERE shop_id = ? AND del = 0 ORDER BY status DESC, id ASC");
+    $stmt_pics = $conn->prepare("SELECT file_name, api_path, status FROM dn_shop_doc WHERE shop_id = ? AND del = 0 ORDER BY status DESC, id ASC");
     if ($stmt_pics === false) {
         die('❌ SQL Prepare for images failed: ' . $conn->error);
     }
@@ -161,24 +169,37 @@ if ($result->num_rows > 0) {
     }
     $stmt_pics->close();
 
-    // แทนที่ src ของรูปภาพใน content ด้วย api_path ที่ถูกต้องจาก $pic_data
-    // ใช้ DOMDocument เพื่อ parsing HTML อย่างปลอดภัยและแม่นยำ
-    $dom = new DOMDocument();
-    // ปิด error warnings สำหรับ HTML ไม่สมบูรณ์
+    // แทนที่ src ของรูปภาพใน content ภาษาไทยด้วย api_path ที่ถูกต้องจาก $pic_data
+    $dom_th = new DOMDocument();
     libxml_use_internal_errors(true);
-    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $source_th = !empty($content_th) ? mb_convert_encoding($content_th, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+    $dom_th->loadHTML($source_th, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     libxml_clear_errors();
-
-    $images = $dom->getElementsByTagName('img');
-    foreach ($images as $img) {
+    $images_th = $dom_th->getElementsByTagName('img');
+    foreach ($images_th as $img) {
         $data_filename = $img->getAttribute('data-filename');
         if (!empty($data_filename) && isset($pic_data[$data_filename])) {
             $img->setAttribute('src', $pic_data[$data_filename]);
         }
     }
-    $content_with_correct_paths = $dom->saveHTML();
+    $content_th_with_correct_paths = $dom_th->saveHTML();
 
-    // เตรียม options สำหรับกลุ่มแม่
+    // แทนที่ src ของรูปภาพใน content ภาษาอังกฤษด้วย api_path ที่ถูกต้องจาก $pic_data
+    $dom_en = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $source_en = !empty($content_en) ? mb_convert_encoding($content_en, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+    $dom_en->loadHTML($source_en, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    $images_en = $dom_en->getElementsByTagName('img');
+    foreach ($images_en as $img) {
+        $data_filename = $img->getAttribute('data-filename');
+        if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+            $img->setAttribute('src', $pic_data[$data_filename]);
+        }
+    }
+    $content_en_with_correct_paths = $dom_en->saveHTML();
+
+    // ดึงข้อมูลกลุ่มทั้งหมดเพื่อใช้ในการแสดงผล
     $mainGroupQuery = $conn->query("SELECT group_id, group_name FROM dn_shop_groups WHERE parent_group_id IS NULL ORDER BY group_name ASC");
     $mainGroupOptions = '';
     while ($group = $mainGroupQuery->fetch_assoc()) {
@@ -207,8 +228,14 @@ if ($result->num_rows > 0) {
     echo "
     <form id='formshop_edit' enctype='multipart/form-data'>
         <input type='hidden' class='form-control' id='shop_id' name='shop_id' value='" . htmlspecialchars($row['shop_id']) . "'>
-        <div class='row'>
-            <div class='col-md-4'>
+        <div class='row' style='flex-direction: column;'>
+        
+            <div class=''>
+                <div style='margin: 10px; text-align: end;'>
+                    <button type='button' id='backToShopList' class='btn btn-secondary'> 
+                        <i class='fas fa-arrow-left'></i> Back 
+                    </button>
+                </div>
                 <div style='margin: 10px;'>
                     <label><span>Cover photo</span>:</label>
                     <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
@@ -218,14 +245,6 @@ if ($result->num_rows > 0) {
                 </div>
                 <div style='margin: 10px;'>
                     <input type='file' class='form-control' id='fileInput' name='fileInput'> </div>
-                <div style='margin: 10px;'>
-                    <label><span>Subject</span>:</label>
-                    <input type='text' class='form-control' id='shop_subject' name='shop_subject' value='" . htmlspecialchars($row['subject_shop']) . "'>
-                </div>
-                <div style='margin: 10px;'>
-                    <label><span>Description</span>:</label>
-                    <textarea class='form-control' id='shop_description' name='shop_description'>" . htmlspecialchars($row['description_shop']) . "</textarea>
-                </div>
                 <div style='margin: 10px;'>
                     <label><span>กลุ่มแม่</span>:</label>
                     <select id='main_group_select' class='form-control'>
@@ -241,22 +260,73 @@ if ($result->num_rows > 0) {
                         <option value=''>-- เลือกกลุ่มย่อย --</option>
                     </select>
                 </div>
+                
+                
+            </div>
+            <div class=''>
+                
+
+                <div class='card mb-4'>
+                    <div class='card-header p-0'>
+                        <ul class='nav nav-tabs' id='languageTabs' role='tablist'>
+                            <li class='nav-item' role='presentation'>
+                                <button class='nav-link active' id='th-tab' data-bs-toggle='tab' data-bs-target='#th' type='button' role='tab' aria-controls='th' aria-selected='true'>
+                                    <img src='https://flagcdn.com/w320/th.png' alt='Thai Flag' class='flag-icon' style=' width: 36px; 
+            margin-right: 8px;'>Thai
+                                </button>
+                            </li>
+                            <li class='nav-item' role='presentation'>
+                                <button class='nav-link' id='en-tab' data-bs-toggle='tab' data-bs-target='#en' type='button' role='tab' aria-controls='en' aria-selected='false'>
+                                    <img src='https://flagcdn.com/w320/gb.png' alt='English Flag' class='flag-icon' style=' width: 36px; 
+            margin-right: 8px;'>English
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class='card-body'>
+                        <div class='tab-content' id='languageTabsContent'>
+                            <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
+                                <div style='margin: 10px;'>
+                                    <label><span>Subject (TH)</span>:</label>
+                                    <input type='text' class='form-control' id='shop_subject' name='shop_subject' value='" . htmlspecialchars($row['subject_shop']) . "'>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Description (TH)</span>:</label>
+                                    <textarea class='form-control' id='shop_description' name='shop_description'>" . htmlspecialchars($row['description_shop']) . "</textarea>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Content (TH)</span>:</label>
+                                    <textarea class='form-control summernote' id='summernote_update' name='shop_content'>" . $content_th_with_correct_paths . "</textarea>
+                                </div>
+                            </div>
+                            <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
+                                <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+                                    <button type='button' class='btn btn-info' id='copyFromThai'>
+                                        <i class='fas fa-copy'></i> Copy from Thai
+                                    </button>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Subject (EN)</span>:</label>
+                                    <input type='text' class='form-control' id='shop_subject_en' name='shop_subject_en' value='" . htmlspecialchars($row['subject_shop_en']) . "'>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Description (EN)</span>:</label>
+                                    <textarea class='form-control' id='shop_description_en' name='shop_description_en'>" . htmlspecialchars($row['description_shop_en']) . "</textarea>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Content (EN)</span>:</label>
+                                    <textarea class='form-control summernote' id='summernote_update_en' name='shop_content_en'>" . $content_en_with_correct_paths . "</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
                 <div style='margin: 10px; text-align: end;'>
                     <button type='button' id='submitEditshop' class='btn btn-success'>
                         <i class='fas fa-save'></i> Save shop
                     </button>
-                </div>
-               
-            </div>
-            <div class='col-md-8'>
-             <div style='margin: 10px; text-align: end;'>
-                <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                    <i class='fas fa-arrow-left'></i> Back 
-                </button>
-            </div>
-                <div style='margin: 10px;'>
-                    <label><span>Content</span>:</label>
-                    <textarea class='form-control summernote' id='summernote_update' name='shop_content'>" . htmlspecialchars($content_with_correct_paths) . "</textarea>
                 </div>
             </div>
         </div>
@@ -268,13 +338,8 @@ if ($result->num_rows > 0) {
             var subGroupSelected = " . json_encode($subGroupSelected) . ";
 
             if (mainGroupSelected) {
-                $('#main_group_select').val(mainGroupSelected).trigger('change');
-                // setTimeout to allow AJAX to complete and populate sub-group options
-                setTimeout(function() {
-                    if (subGroupSelected) {
-                        $('#sub_group_select').val(subGroupSelected);
-                    }
-                }, 500); // อาจจะต้องปรับเวลาให้เหมาะสม
+                $('#main_group_select').val(mainGroupSelected);
+                $('#main_group_select').trigger('change');
             }
         });
     </script>
@@ -286,48 +351,109 @@ $stmt->close();
 ?>
 
 <script>
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const container = document.getElementById('previewContainer');
-    container.innerHTML = ''; // clear preview
-    const files = e.target.files;
-    if (files.length > 0) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const img = document.createElement('img');
-                img.src = evt.target.result;
-                img.style.maxWidth = '100%';
-                img.style.marginBottom = '10px';
-                container.appendChild(img);
-            };
-            reader.readAsDataURL(file);
+    $(document).ready(function() {
+        // Initial load for TH content
+        $('#summernote_update').summernote({
+            height: 600,
+            callbacks: {
+                onImageUpload: function(files) {
+                    uploadFile(files[0], $(this));
+                },
+                onMediaDelete: function(target) {
+                    deleteFile(target);
+                }
+            }
         });
-    }
-});
-$('#main_group_select').on('change', function() {
-    var mainGroupId = $(this).val();
-    if (!mainGroupId) {
-        $('#sub_group_select').html('<option value="">-- เลือกกลุ่มย่อย --</option>');
-        return;
-    }
 
-    $.ajax({
-        url: 'actions/get_sub_groups.php',
-        type: 'POST',
-        data: { main_group_id: mainGroupId },
-        success: function(response) {
-            $('#sub_group_select').html(response);
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX Error:", status, error);
-            $('#sub_group_select').html('<option value="">-- เกิดข้อผิดพลาด --</option>');
+        // Event listener for tab switch
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            var target = $(e.target).attr("data-bs-target"); // activated tab
+            if (target === '#en') {
+                if ($('#summernote_update_en').data('summernote')) {
+                    $('#summernote_update_en').summernote('destroy');
+                }
+                $('#summernote_update_en').summernote({
+                    height: 600,
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            uploadFile(files[0], $(this));
+                        },
+                        onMediaDelete: function(target) {
+                            deleteFile(target);
+                        }
+                    }
+                });
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            const files = e.target.files;
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const img = document.createElement('img');
+                        img.src = evt.target.result;
+                        img.style.maxWidth = '100%';
+                        img.style.marginBottom = '10px';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+        
+        var subGroupSelected = <?php echo json_encode($subGroupSelected); ?>;
+
+        $('#main_group_select').on('change', function() {
+            var mainGroupId = $(this).val();
+            if (!mainGroupId) {
+                $('#sub_group_select').html('<option value="">-- เลือกกลุ่มย่อย --</option>');
+                return;
+            }
+
+            $.ajax({
+                url: 'actions/get_sub_groups.php',
+                type: 'POST',
+                data: { main_group_id: mainGroupId },
+                success: function(response) {
+                    $('#sub_group_select').html(response);
+                    // เมื่อโหลดกลุ่มย่อยเสร็จ ให้เลือกค่าที่ถูกต้อง
+                    if (subGroupSelected) {
+                        $('#sub_group_select').val(subGroupSelected);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    $('#sub_group_select').html('<option value="">-- เกิดข้อผิดพลาด --</option>');
+                }
+            });
+        });
+
+        // Initial trigger to load sub-groups if main group is already selected
+        var mainGroupSelected = <?php echo json_encode($mainGroupSelected); ?>;
+        if (mainGroupSelected) {
+            $('#main_group_select').val(mainGroupSelected).trigger('change');
         }
-    });
-});
 
+        // --- เพิ่มโค้ดสำหรับปุ่ม Copy from Thai ---
+        $('#copyFromThai').on('click', function() {
+            // ดึงค่าจากฟิลด์ภาษาไทย
+            var subjectThai = $('#shop_subject').val();
+            var descriptionThai = $('#shop_description').val();
+            var contentThai = $('#summernote_update').summernote('code');
+
+            // กำหนดค่าให้ฟิลด์ภาษาอังกฤษ
+            $('#shop_subject_en').val(subjectThai);
+            $('#shop_description_en').val(descriptionThai);
+            $('#summernote_update_en').summernote('code', contentThai);
+        });
+        // --- สิ้นสุดโค้ดสำหรับปุ่ม Copy from Thai ---
+    });
 </script>
 
-                </div>
             </div>
         </div>
     </div>

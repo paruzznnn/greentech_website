@@ -3,6 +3,30 @@
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
+// แก้ไข URL ให้รวมพารามิเตอร์ lang
+function generateLink($link, $params = []) {
+    global $isFile;
+    $url = $link . $isFile;
+    
+    // ดึงพารามิเตอร์ที่มีอยู่แล้วใน URL
+    $existingParams = $_GET;
+    
+    // รวมพารามิเตอร์ใหม่เข้ากับพารามิเตอร์เดิม
+    $newParams = array_merge($existingParams, $params);
+    
+    // ลบพารามิเตอร์ที่ไม่มีค่าออก
+    $newParams = array_filter($newParams);
+    
+    // สร้าง query string ใหม่
+    $queryString = http_build_query($newParams);
+    
+    if (!empty($queryString)) {
+        $url .= '?' . $queryString;
+    }
+    
+    return $url;
+}
+
 $menuItems = [
     //
     [
@@ -216,6 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 .language-select-container {
     position: relative;
     display: inline-block;
+    z-index: 1001; /* เพิ่ม z-index ให้สูงขึ้น */
 }
 .flag-icon {
     width: 24px;
@@ -546,26 +571,39 @@ a {
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
             </a>
         </div>
-    </div>
-    <div>
+
+         <div>
         <select id="language-select" class="language-select"></select>
     </div>
-    <div class="header-social-links">
-        <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
-            <i class="fab fa-facebook-square"></i>
-        </a>
-        <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
-            <i class="fab fa-youtube"></i>
-        </a>
-        <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://lin.ee/yoSCNwF" target="_blank">
-            <i class="fab fa-line"></i>
-        </a>
-        <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
-            <i class="fab fa-tiktok"></i>
-        </a>
+        <!-- <div class="language-select-container">
+            <img id="current-flag-desktop" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
+                onclick="toggleFlagDropdown('desktop')">
+            <div id="flag-dropdown-desktop" class="flag-dropdown">
+                <a href="?<?php if(isset($_GET['id'])) echo 'id=' . urlencode($_GET['id']) . '&'; ?>lang=th">
+                    <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
+                </a>
+                <a href="?<?php if(isset($_GET['id'])) echo 'id=' . urlencode($_GET['id']) . '&'; ?>lang=en">
+                    <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
+                </a>
+            </div>
+        </div> -->
+        <div class="header-social-links">
+            <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+                <i class="fab fa-facebook-square"></i>
+            </a>
+            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://lin.ee/yoSCNwF" target="_blank">
+                <i class="fab fa-line"></i>
+            </a>
+            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+                <i class="fab fa-tiktok"></i>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -604,10 +642,10 @@ a {
                     <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
                         onclick="toggleFlagDropdown('mobile')">
                     <div id="flag-dropdown-mobile" class="flag-dropdown">
-                        <a href="#" data-lang="th">
+                        <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>">
                             <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
                         </a>
-                        <a href="#" data-lang="en">
+                        <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>">
                             <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
                         </a>
                     </div>
@@ -633,36 +671,6 @@ a {
         </div>
     </div>
 </div>
-
-<!-- <div class="navbar-desktop">
-    <div class="desktop-menu-container">
-        <?php foreach ($navbarItems as $item): ?>
-            <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
-                <div class="desktop-menu-item">
-                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                        <?php echo $item['text']; ?>
-                    </span>
-                    <div class="desktop-dropdown-content">
-                        <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
-                            <a href="<?php echo $dropdownItem['link']; ?>">
-                                <i class="<?php echo $dropdownItem['icon']; ?>"></i>
-                                <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
-                                    <?php echo $dropdownItem['text']; ?>
-                                </span>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php else: ?>
-                <a href="<?php echo $item['link']; ?>" class="desktop-menu-item">
-                    <span data-translate="<?php echo $item['translate']; ?>" lang="th">
-                        <?php echo $item['text']; ?>
-                    </span>
-                </a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-</div> -->
 
 <div class="mobile-slide-out-menu" id="mobileMenu">
     <a href="javascript:void(0)" class="close-btn" onclick="toggleMobileNav()">×</a>
@@ -836,6 +844,58 @@ a {
         }
     });
 
+    // โค้ด JavaScript ที่แก้ไขเพื่อจัดการ dropdown ของธง
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentFlagDesktop = document.getElementById('current-flag-desktop');
+        const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+        const currentFlagMobile = document.getElementById('current-flag-mobile');
+        const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+
+        // ฟังก์ชันสำหรับอัปเดตธงและ URL เมื่อมีการเลือกภาษา
+        function updateFlagAndLanguage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const lang = urlParams.get('lang') || 'th';
+            const flagUrl = (lang === 'en') ? 'https://flagcdn.com/us.svg' : 'https://flagcdn.com/th.svg';
+            if (currentFlagDesktop) {
+                currentFlagDesktop.src = flagUrl;
+            }
+            if (currentFlagMobile) {
+                currentFlagMobile.src = flagUrl;
+            }
+        }
+        updateFlagAndLanguage();
+
+        // ฟังก์ชันสำหรับสลับการแสดงผล dropdown
+        window.toggleFlagDropdown = function(type) {
+            if (type === 'desktop') {
+                const isDropdownOpen = flagDropdownDesktop.style.display === 'block';
+                flagDropdownDesktop.style.display = isDropdownOpen ? 'none' : 'block';
+                // ปิด mobile dropdown ถ้าเปิดอยู่
+                if (flagDropdownMobile) {
+                    flagDropdownMobile.style.display = 'none';
+                }
+            } else if (type === 'mobile') {
+                const isDropdownOpen = flagDropdownMobile.style.display === 'block';
+                flagDropdownMobile.style.display = isDropdownOpen ? 'none' : 'block';
+                // ปิด desktop dropdown ถ้าเปิดอยู่
+                if (flagDropdownDesktop) {
+                    flagDropdownDesktop.style.display = 'none';
+                }
+            }
+        };
+
+        // ปิด dropdown ทั้งคู่เมื่อคลิกที่อื่น
+        document.addEventListener('click', function(e) {
+            if (flagDropdownDesktop && !flagDropdownDesktop.contains(e.target) && e.target !== currentFlagDesktop) {
+                flagDropdownDesktop.style.display = 'none';
+            }
+            if (flagDropdownMobile && !flagDropdownMobile.contains(e.target) && e.target !== currentFlagMobile) {
+                flagDropdownMobile.style.display = 'none';
+            }
+        });
+    });
+
+
     // สคริปต์สำหรับ Modal และ JWT
     document.addEventListener("DOMContentLoaded", function () {
         const jwt = sessionStorage.getItem("jwt");
@@ -933,50 +993,55 @@ a {
             }
         });
 
-        window.toggleFlagDropdown = function (mode = 'desktop') {
-            const dropdownId = mode === 'mobile' ? 'flag-dropdown-mobile' : 'flag-dropdown-desktop';
-            const dropdown = document.getElementById(dropdownId);
-            if (dropdown) {
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            }
-        };
+        // window.toggleFlagDropdown = function (mode = 'desktop') {
+        //     const dropdownId = mode === 'mobile' ? 'flag-dropdown-mobile' : 'flag-dropdown-desktop';
+        //     const dropdown = document.getElementById(dropdownId);
+        //     if (dropdown) {
+        //         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        //     }
+        // };
 
-        const flagLinks = document.querySelectorAll('.flag-dropdown a');
-        flagLinks.forEach(link => {
-            link.addEventListener('click', function (event) {
-                event.preventDefault();
-                const lang = this.dataset.lang;
-                const currentFlagDesktop = document.getElementById('current-flag');
-                const currentFlagMobile = document.getElementById('current-flag-mobile');
-                const newFlagSrc = this.querySelector('img').src;
-                const newFlagAlt = this.querySelector('img').alt;
-                if (currentFlagDesktop) {
-                    currentFlagDesktop.src = newFlagSrc;
-                    currentFlagDesktop.alt = newFlagAlt;
-                }
-                if (currentFlagMobile) {
-                    currentFlagMobile.src = newFlagSrc;
-                    currentFlagMobile.alt = newFlagAlt;
-                }
-                const dropdownDesktop = document.getElementById('flag-dropdown-desktop');
-                const dropdownMobile = document.getElementById('flag-dropdown-mobile');
-                if (dropdownDesktop) dropdownDesktop.style.display = 'none';
-                if (dropdownMobile) dropdownMobile.style.display = 'none';
-            });
-        });
+    //     const flagLinks = document.querySelectorAll('.flag-dropdown a');
+    //     flagLinks.forEach(link => {
+    //         link.addEventListener('click', function (event) {
+    //             event.preventDefault();
+    //             const lang = this.dataset.lang;
+    //             const currentFlagDesktop = document.getElementById('current-flag');
+    //             const currentFlagMobile = document.getElementById('current-flag-mobile');
+    //             const newFlagSrc = this.querySelector('img').src;
+    //             const newFlagAlt = this.querySelector('img').alt;
+    //             if (currentFlagDesktop) {
+    //                 currentFlagDesktop.src = newFlagSrc;
+    //                 currentFlagDesktop.alt = newFlagAlt;
+    //             }
+    //             if (currentFlagMobile) {
+    //                 currentFlagMobile.src = newFlagSrc;
+    //                 currentFlagMobile.alt = newFlagAlt;
+    //             }
+    //             const dropdownDesktop = document.getElementById('flag-dropdown-desktop');
+    //             const dropdownMobile = document.getElementById('flag-dropdown-mobile');
+    //             if (dropdownDesktop) dropdownDesktop.style.display = 'none';
+    //             if (dropdownMobile) dropdownMobile.style.display = 'none';
+    //         });
+    //     });
 
-        document.addEventListener('click', function (event) {
-            const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
-            const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
-            const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
-            if (!isClickInsideFlagDropdown) {
-                if (flagDropdownDesktop) flagDropdownDesktop.style.display = 'none';
-                if (flagDropdownMobile) flagDropdownMobile.style.display = 'none';
-            }
-        });
+    //     document.addEventListener('click', function (event) {
+    //         const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
+    //         const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+    //         const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+    //         if (!isClickInsideFlagDropdown) {
+    //             if (flagDropdownDesktop) flagDropdownDesktop.style.display = 'none';
+    //             if (flagDropdownMobile) flagDropdownMobile.style.display = 'none';
+    //         }
+    //     });
     });
 </script>
-
+<script>
+    const langLinks = {
+        th: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>",
+        en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>"
+    };
+</script>
 
 <div id="myModal-sign-in" class="modal">
     <div class="modal-content" style="width: 350px !important;">
@@ -1091,3 +1156,25 @@ a {
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,238 +1,198 @@
 <?php
 header('Content-Type: application/json');
-
-include '../../config/connect_db.php';
-
 date_default_timezone_set('Asia/Bangkok');
+require_once(__DIR__ . '/../../../../lib/base_directory.php');
+require_once(__DIR__ . '/../../../../lib/connect.php');
+require_once(__DIR__ . '/../../../../inc/getFunctions.php');
 
-//================================================================
-// ส่วนของการจัดการอัปโหลดไฟล์
-//================================================================
-function handleFileUpload($file, $base_path_admin = null, $base_path_web = null)
+global $base_path;
+global $base_path_admin;
+global $conn;
+
+// Helper function to handle file uploads
+function handleSingleFileUpload($file, $base_path)
 {
-    $uploadResults = [];
-    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
-    $maxFileSize = 20 * 1024 * 1024; // 20 MB
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    $maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    if (isset($file['name']) && is_array($file['name'])) {
-        foreach ($file['name'] as $key => $fileName) {
-            if ($file['error'][$key] === UPLOAD_ERR_OK) {
-                $fileTmpPath = $file['tmp_name'][$key];
-                $fileSize = $file['size'][$key];
-                $fileType = $file['type'][$key];
-                $fileNameCmps = explode(".", $fileName);
-                $fileExtension = strtolower(end($fileNameCmps));
+    if ($file['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $file['tmp_name'];
+        $fileSize = $file['size'];
+        $fileNameCmps = explode(".", $file['name']);
+        $fileExtension = strtolower(end($fileNameCmps));
+        $newFileName = time() . '-' . uniqid() . '.' . $fileExtension;
 
-                if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
-                    
-                    // ตั้งชื่อไฟล์ใหม่ด้วย timestamp และ random string เพื่อป้องกันชื่อซ้ำ
-                    $newFileName = time() . '-' . bin2hex(random_bytes(5)) . '.' . $fileExtension;
-
-                    // กำหนด path สำหรับบันทึกไฟล์
-                    $uploadFileDir = '../../../../public/news_img/';
-                    $destFilePath = $uploadFileDir . $newFileName;
-
-                    if (!is_dir($uploadFileDir)) {
-                        mkdir($uploadFileDir, 0755, true);
-                    }
-
-                    if (move_uploaded_file($fileTmpPath, $destFilePath)) {
-                        // สร้าง URL ที่ถูกต้องสำหรับบันทึกลง database
-                        $serverName = $_SERVER['SERVER_NAME'];
-                        if ($serverName == 'localhost' || $serverName == '127.0.0.1') {
-                            $apiPath = 'http://' . $serverName . '/trandar/public/news_img/' . $newFileName;
-                        } else {
-                            $apiPath = 'https://' . $serverName . '/public/news_img/' . $newFileName;
-                        }
-
-                        $uploadResults[] = [
-                            'success' => true,
-                            'fileName' => $newFileName,
-                            'fileSize' => $fileSize,
-                            'fileType' => $fileType,
-                            'filePath' => $destFilePath,
-                            'apiPath' => $apiPath
-                        ];
-                    } else {
-                        $uploadResults[] = ['success' => false, 'message' => 'Error moving file.'];
-                    }
-                } else {
-                    $uploadResults[] = ['success' => false, 'message' => 'Invalid file type or size.'];
-                }
-            } else {
-                $uploadResults[] = ['success' => false, 'message' => 'File upload error: ' . $file['error'][$key]];
-            }
-        }
-    } else {
-        $uploadResults[] = ['success' => false, 'message' => 'No files uploaded or invalid format.'];
-    }
-    return $uploadResults;
-}
-
-//================================================================
-// ฟังก์ชันสำหรับ insert ข้อมูล
-//================================================================
-function insertIntoDatabase($conn, $table, $columns, $values)
-{
-    $columnString = implode(", ", $columns);
-    $placeholders = implode(", ", array_fill(0, count($columns), "?"));
-    $sql = "INSERT INTO $table ($columnString) VALUES ($placeholders)";
-
-    $stmt = $conn->prepare($sql);
-    if ($stmt === false) {
-        return ['status' => 'error', 'message' => 'Prepare failed: ' . $conn->error];
-    }
-
-    $types = str_repeat('s', count($values));
-    $stmt->bind_param($types, ...$values);
-
-    if ($stmt->execute()) {
-        $last_id = $conn->insert_id;
-        $stmt->close();
-        return ['status' => 'success', 'last_id' => $last_id];
-    } else {
-        $stmt->close();
-        return ['status' => 'error', 'message' => 'Execute failed: ' . $stmt->error];
-    }
-}
-
-$response = ['status' => 'error', 'message' => 'Invalid action'];
-
-if (isset($_POST['action'])) {
-    $action = $_POST['action'];
-    $response = ['status' => 'error', 'message' => 'An error occurred.'];
-
-    switch ($action) {
-        case 'addservice_content':
-            $service_subject = $_POST['service_subject'] ?? '';
-            $service_description = $_POST['service_description'] ?? '';
-            $service_content = $_POST['service_content'] ?? '';
-            $date_create = date('Y-m-d H:i:s');
-
-            $columns = ['service_subject', 'service_description', 'service_content', 'date_create', 'status'];
-            $values = [$service_subject, $service_description, $service_content, $date_create, 1];
-            $insert_result = insertIntoDatabase($conn, 'service_content', $columns, $values);
-
-            if ($insert_result['status'] == 'success') {
-                $last_inserted_id = $insert_result['last_id'];
-
-                // Upload cover image
-                if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
-                    $fileInfos = handleFileUpload($_FILES['fileInput']);
-                    foreach ($fileInfos as $fileInfo) {
-                        if ($fileInfo['success']) {
-                            $picPath = $fileInfo['apiPath'];
-                            
-                            $fileColumns = ['service_content_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                            $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-                            insertIntoDatabase($conn, 'service_content_doc', $fileColumns, $fileValues);
-                        }
-                    }
-                }
-
-                $response = ['status' => 'success', 'message' => 'Service content added successfully.', 'id' => $last_inserted_id];
-            } else {
-                $response = ['status' => 'error', 'message' => 'Failed to add service content: ' . $insert_result['message']];
-            }
-            break;
-
-        case 'getData_service_content':
-            $draw = $_POST['draw'] ?? 1;
-            $start = $_POST['start'] ?? 0;
-            $length = $_POST['length'] ?? 10;
-            $searchValue = $_POST['search']['value'] ?? '';
-
-            // Total records without filtering
-            $totalRecordsQuery = "SELECT COUNT(id) AS total FROM service_content";
-            $totalResult = $conn->query($totalRecordsQuery);
-            $totalRecords = $totalResult->fetch_assoc()['total'];
-
-            // Query with filtering
-            $query = "SELECT * FROM service_content WHERE 1=1";
-            if (!empty($searchValue)) {
-                $query .= " AND (service_subject LIKE '%$searchValue%' OR date_create LIKE '%$searchValue%')";
-            }
-            $query .= " ORDER BY id DESC LIMIT $start, $length";
+        if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+            $uploadFileDir = realpath(__DIR__ . '/../../../../public/news_img/') . '/';
+            $destFilePath = $uploadFileDir . $newFileName;
             
-            $result = $conn->query($query);
-            $data = [];
-            if ($result) {
-                while ($row = $result->fetch_assoc()) {
-                    $data[] = $row;
-                }
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
             }
-
-            // Total records with filtering (same as total records if no filter)
-            $filteredRecords = count($data); 
-
-            $response = [
-                "draw" => intval($draw),
-                "recordsTotal" => intval($totalRecords),
-                "recordsFiltered" => intval($filteredRecords),
-                "data" => $data
-            ];
-            break;
-
-        case 'delservice_content':
-            $id = $_POST['id'] ?? 0;
-            if ($id > 0) {
-                $stmt = $conn->prepare("DELETE FROM service_content WHERE id = ?");
-                $stmt->bind_param("i", $id);
-                if ($stmt->execute()) {
-                    $response = ['status' => 'success', 'message' => 'Service content deleted successfully.'];
-                } else {
-                    $response = ['status' => 'error', 'message' => 'Failed to delete service content.'];
-                }
-                $stmt->close();
-            }
-            break;
-
-        case 'editservice_content':
-            $id = $_POST['id'] ?? 0;
-            $service_subject = $_POST['service_subject'] ?? '';
-            $service_description = $_POST['service_description'] ?? '';
-            $service_content = $_POST['service_content'] ?? '';
-            $date_update = date('Y-m-d H:i:s');
-
-            if ($id > 0) {
-                $stmt = $conn->prepare("UPDATE service_content SET service_subject=?, service_description=?, service_content=?, date_update=? WHERE id=?");
-                $stmt->bind_param("ssssi", $service_subject, $service_description, $service_content, $date_update, $id);
-
-                if ($stmt->execute()) {
-                    $stmt->close();
-                    
-                    // Handle file uploads for images inside the content
-                    $image_files = $_FILES['image_files'] ?? null;
-                    if ($image_files && $image_files['error'][0] != 4) {
-                        $fileInfos = handleFileUpload($image_files);
-                        // No specific database table for content images in the original script,
-                        // so we assume they are handled by the Summernote editor itself.
-                        // The file upload is done, and the new URLs are in the content.
-                    }
-
-                    // Handle cover image
-                    $existing_file = $_POST['existing_file'] ?? null; // Get old file path
-                    if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
-                        $fileInfos = handleFileUpload($_FILES['fileInput']);
-                        if ($fileInfos[0]['success']) {
-                            $picPath = $fileInfos[0]['apiPath'];
-                            
-                            $stmt_update_file = $conn->prepare("UPDATE service_content_doc SET api_path = ? WHERE service_content_id = ?");
-                            $stmt_update_file->bind_param("si", $picPath, $id);
-                            $stmt_update_file->execute();
-                            $stmt_update_file->close();
-                        }
-                    }
-
-                    $response = ['status' => 'success', 'message' => 'Service content updated successfully.'];
-                } else {
-                    $response = ['status' => 'error', 'message' => 'Failed to update service content.'];
-                }
+            if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                $image_url = $base_path . '/public/news_img/' . $newFileName;
+                return ['success' => true, 'url' => $image_url, 'message' => 'Image uploaded successfully.'];
             } else {
-                $response = ['status' => 'error', 'message' => 'Invalid ID.'];
+                return ['success' => false, 'error' => 'Error occurred while moving the uploaded file.'];
             }
-            break;
+        } else {
+            return ['success' => false, 'error' => 'Invalid file type or file size exceeds limit.'];
+        }
     }
+    return ['success' => false, 'error' => 'No file uploaded or there was an upload error.'];
+}
+
+$response = ['status' => 'error', 'message' => 'Invalid action.'];
+
+try {
+    if (!isset($_POST['action'])) {
+        throw new Exception("No action specified.");
+    }
+
+    $action = $_POST['action'];
+
+    // Action: Upload image from Summernote
+    if ($action == 'upload_image') {
+        if (isset($_FILES['image_file'])) {
+            $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
+            if ($uploadResult['success']) {
+                $response = ['status' => 'success', 'url' => $uploadResult['url']];
+            } else {
+                $response['message'] = $uploadResult['error'];
+            }
+        } else {
+            $response['message'] = 'No file was uploaded.';
+        }
+    }
+
+    // Action: Add new content block
+    elseif ($action == 'add_new_block') {
+        $type_th = $_POST['type_th'] ?? '';
+        $content_th = $_POST['content_th'] ?? '';
+        $author_th = $_POST['author_th'] ?? '';
+        $position_th = $_POST['position_th'] ?? '';
+        
+        $type_en = $_POST['type_en'] ?? ''; // English is optional
+        $content_en = $_POST['content_en'] ?? ''; // English is optional
+        
+        $image_url = null;
+
+        if (!empty($content_th) || !empty($content_en)) {
+            // Handle image file if uploaded
+            if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
+                $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
+                if ($uploadResult['success']) {
+                    $image_url = $uploadResult['url'];
+                } else {
+                    $response['message'] = 'Failed to upload image: ' . $uploadResult['error'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+            
+            $stmt = $conn->prepare("INSERT INTO service_content (type, content, type_en, content_en, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssss", $type_th, $content_th, $type_en, $content_en, $image_url, $author_th, $position_th);
+
+            if ($stmt->execute()) {
+                $response = ['status' => 'success', 'message' => 'เพิ่มเนื้อหาใหม่เรียบร้อย'];
+            } else {
+                throw new Exception("Failed to insert into database: " . $stmt->error);
+            }
+            $stmt->close();
+        } else {
+            $response['message'] = 'กรุณากรอกเนื้อหาอย่างน้อยหนึ่งภาษา';
+        }
+    }
+
+    // Action: Save all content blocks
+    elseif ($action == 'save_all_blocks') {
+        $ids = $_POST['ids'] ?? [];
+        $types_th = $_POST['types_th'] ?? [];
+        $contents_th = $_POST['contents_th'] ?? [];
+        $authors = $_POST['authors'] ?? [];
+        $positions = $_POST['positions'] ?? [];
+        $images_old = $_POST['images_old'] ?? [];
+        
+        $types_en = $_POST['types_en'] ?? [];
+        $contents_en = $_POST['contents_en'] ?? [];
+        
+        $uploaded_files = $_FILES['image_files'] ?? null;
+        
+        $hasError = false;
+        $errorMessage = '';
+
+        for ($i = 0; $i < count($ids); $i++) {
+            $current_image_url = $images_old[$i];
+            
+            if (isset($uploaded_files['name'][$i]) && $uploaded_files['error'][$i] == UPLOAD_ERR_OK) {
+                $file = [
+                    'name' => $uploaded_files['name'][$i],
+                    'type' => $uploaded_files['type'][$i],
+                    'tmp_name' => $uploaded_files['tmp_name'][$i],
+                    'error' => $uploaded_files['error'][$i],
+                    'size' => $uploaded_files['size'][$i]
+                ];
+                $uploadResult = handleSingleFileUpload($file, $base_path);
+                
+                if ($uploadResult['success']) {
+                    $current_image_url = $uploadResult['url'];
+                } else {
+                    $hasError = true;
+                    $errorMessage = 'Failed to upload new image for block ID ' . $ids[$i] . ': ' . $uploadResult['error'];
+                    break;
+                }
+            }
+
+            $type_en_val = $types_en[$i] ?? '';
+            $content_en_val = $contents_en[$i] ?? '';
+            
+            $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, type_en=?, content_en=?, image_url=?, author=?, position=? WHERE id=?");
+            $stmt->bind_param("sssssssi",
+                $types_th[$i],
+                $contents_th[$i],
+                $type_en_val,
+                $content_en_val,
+                $current_image_url,
+                $authors[$i],
+                $positions[$i],
+                $ids[$i]
+            );
+
+            if (!$stmt->execute()) {
+                $hasError = true;
+                $errorMessage = "Failed to update database for ID " . $ids[$i] . ": " . $stmt->error;
+                break;
+            }
+            $stmt->close();
+        }
+
+        if ($hasError) {
+            throw new Exception($errorMessage);
+        } else {
+            $response = ['status' => 'success', 'message' => 'บันทึกการแก้ไขทั้งหมดเรียบร้อย'];
+        }
+    }
+    
+    // Action: Delete block
+    elseif ($action == 'delete_block') {
+        $id = $_POST['id'] ?? 0;
+        if ($id > 0) {
+            $stmt = $conn->prepare("DELETE FROM service_content WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                $response = ['status' => 'success', 'message' => 'ลบข้อมูลเรียบร้อยแล้ว'];
+            } else {
+                throw new Exception("Failed to delete from database: " . $stmt->error);
+            }
+            $stmt->close();
+        } else {
+            $response['message'] = 'ID ไม่ถูกต้อง';
+        }
+    }
+
+} catch (Exception $e) {
+    $response['status'] = 'error';
+    $response['message'] = $e->getMessage();
 }
 
 echo json_encode($response);

@@ -2,20 +2,24 @@
 require_once('../lib/connect.php');
 global $conn;
 
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
 
-$subjectTitle = "โปรเจกต์"; // fallback title
-$pageUrl = ""; // Add this variable
+// สร้างชื่อคอลัมน์ตามภาษาที่เลือก
+$subject_col = $lang === 'en' ? 'subject_project_en' : 'subject_project';
+$content_col = $lang === 'en' ? 'content_project_en' : 'content_project';
+
+$subjectTitle = $lang === 'en' ? "Project" : "โปรเจกต์"; // fallback title
+$pageUrl = "";
 
 if (isset($_GET['id'])) {
     $encodedId = $_GET['id'];
-    // Generate dynamic URL
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
     $pageUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        $stmt = $conn->prepare("SELECT subject_project FROM dn_project WHERE del = 0 AND project_id = ?");
+        $stmt = $conn->prepare("SELECT {$subject_col} as subject_project FROM dn_project WHERE del = 0 AND project_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
         $resultTitle = $stmt->get_result();
@@ -39,7 +43,7 @@ if (isset($_GET['id'])) {
 
     <style>
         img{
-            max-width: 600px;
+            /* max-width: 600px; */
         }
         .shop-content-display {
             font-family: sans-serif, "Roboto" !important;
@@ -208,10 +212,10 @@ if (isset($_GET['id'])) {
     <?php include 'template/navbar_slide.php'?>
 
     <div class="content-sticky" id="">
-        <div class="container">
+        <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                    <p>แชร์หน้านี้:</p>
+                    <p><?= $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -230,22 +234,21 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?= $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
                 </div>
 
                 <div class="row">
 
                     <div class="">
                         <?php
-
                             if (isset($_GET['id'])) {
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
                                     $stmt = $conn->prepare("SELECT 
                                         dn.project_id, 
-                                        dn.subject_project, 
-                                        dn.content_project, 
+                                        dn.{$subject_col} AS subject_project, 
+                                        dn.{$content_col} AS content_project, 
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
                                         GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -287,22 +290,21 @@ if (isset($_GET['id'])) {
                                             echo '</div>';
                                         }
                                     } else {
-                                        echo "ไม่มีข้อมูล";
+                                        echo $lang === 'en' ? "No data found." : "ไม่มีข้อมูล";
                                     }
 
                                     $stmt->close(); 
                                 } else {
-                                    echo "Invalid ID.";
+                                    echo $lang === 'en' ? "Invalid ID." : "รหัสไม่ถูกต้อง";
                                 }
                             }
-
                         ?>
                     </div>
 
                 </div>
                             <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
-                    <p>แชร์หน้านี้:</p>
+                    <p><?= $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -321,12 +323,12 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?= $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
+                    <p><?= $lang === 'en' ? 'Inquire/order Trandar Acoustics products at' : 'สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่'; ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -341,12 +343,16 @@ if (isset($_GET['id'])) {
                 if (isset($_GET['id'])) {
                     $decodedId = base64_decode(urldecode($_GET['id']));
                     if ($decodedId !== false) {
+                        // เลือกคอลัมน์ตามภาษาที่เลือกสำหรับสินค้าที่เกี่ยวข้อง
+                        $subject_shop_col = $lang === 'en' ? 'subject_shop_en' : 'subject_shop';
+                        $description_shop_col = $lang === 'en' ? 'description_shop_en' : 'description_shop';
+                        $content_shop_col = $lang === 'en' ? 'content_shop_en' : 'content_shop';
                         $stmt_shop = $conn->prepare("
                             SELECT 
                                 ds.shop_id, 
-                                ds.subject_shop, 
-                                ds.description_shop,
-                                ds.content_shop,
+                                ds.{$subject_shop_col} AS subject_shop, 
+                                ds.{$description_shop_col} AS description_shop,
+                                ds.{$content_shop_col} AS content_shop,
                                 GROUP_CONCAT(dnd.api_path) AS pic_path
                             FROM dn_shop ds
                             JOIN dn_project_shop dps ON ds.shop_id = dps.shop_id
@@ -359,7 +365,7 @@ if (isset($_GET['id'])) {
                         $result_shop = $stmt_shop->get_result();
 
                         if ($result_shop->num_rows > 0) {
-                            echo '<h3 style="padding-top: 40px;">สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้</h3>';
+                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? 'Related Products' : 'สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้') . '</h3>';
                             echo '<div class="shop-wrapper-container">';
                             echo '<div class="scroll-btn left" onclick="scrollshop(\'left\')">&#10094;</div>';
                             echo '<div class="scroll-btn right" onclick="scrollshop(\'right\')">&#10095;</div>';
@@ -367,7 +373,8 @@ if (isset($_GET['id'])) {
                             
                             while ($row_shop = $result_shop->fetch_assoc()) {
                                 $shopIdEncoded = urlencode(base64_encode($row_shop['shop_id']));
-                                $shop_link = "shop_detail.php?id=" . $shopIdEncoded;
+                                // เพิ่มพารามิเตอร์ lang ในลิงก์
+                                $shop_link = "shop_detail.php?id=" . $shopIdEncoded . "&lang=" . htmlspecialchars($lang);
                                 
                                 $content = $row_shop['content_shop'];
                                 $iframeSrc = null;
@@ -379,7 +386,7 @@ if (isset($_GET['id'])) {
                                 $paths = !empty($row_shop['pic_path']) ? explode(',', $row_shop['pic_path']) : [];
                                 $image_path = !empty($paths) ? $paths[0] : null;
                                 
-                                $placeholder_image = 'https://via.placeholder.com/300x220.png?text=Shop+Image';
+                                $placeholder_image = 'https://via.placeholder.com/300x220.png?text=' . ($lang === 'en' ? 'Shop+Image' : 'รูปภาพสินค้า');
 
                                 echo '<div class="shop-card">';
                                 echo '<a href="' . htmlspecialchars($shop_link) . '" class="related-shop-box">';
@@ -392,7 +399,7 @@ if (isset($_GET['id'])) {
                                     echo '</div>';
                                 } else {
                                     echo '<div class="card-image-wrapper">';
-                                    echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="ไม่มีรูปภาพ">';
+                                    echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="' . ($lang === 'en' ? 'No image available' : 'ไม่มีรูปภาพ') . '">';
                                     echo '</div>';
                                 }
 
@@ -411,14 +418,14 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
-                <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
+                <h3 style ="padding-top: 40px;"><?= $lang === 'en' ? 'Comments' : 'ความคิดเห็น'; ?></h3>
+                <p><?= $lang === 'en' ? 'Your email will not be displayed to others. Required fields are marked *' : 'อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *'; ?></p>
                 <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= $lang === 'en' ? 'Comment *' : 'ความคิดเห็น *'; ?>"
                         style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                     <button type="submit"
                         style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        แสดงความคิดเห็น
+                        <?= $lang === 'en' ? 'Submit Comment' : 'แสดงความคิดเห็น'; ?>
                     </button>
                 </form>
 
@@ -460,19 +467,19 @@ if (isset($_GET['id'])) {
                             .then(res => res.json())
                             .then(result => {
                                 if (result.status === 'success') {
-                                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                                    alert("<?= $lang === 'en' ? 'Comment saved successfully.' : 'บันทึกความคิดเห็นเรียบร้อยแล้ว'; ?>");
                                     document.getElementById("commentText").value = '';
                                 } else {
-                                    alert("เกิดข้อผิดพลาด: " + result.message);
+                                    alert("<?= $lang === 'en' ? 'Error: ' : 'เกิดข้อผิดพลาด: '; ?>" + result.message);
                                 }
                             });
                         } else {
-                            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+                            alert("<?= $lang === 'en' ? 'You must be logged in as a viewer to comment.' : 'ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น'; ?>");
                         }
                     })
                     .catch(err => {
                         console.error("Error verifying user:", err);
-                        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+                        alert("<?= $lang === 'en' ? 'Authentication error occurred.' : 'เกิดข้อผิดพลาดในการยืนยันตัวตน'; ?>");
                     });
                 });
                 
@@ -490,9 +497,9 @@ if (isset($_GET['id'])) {
                 function copyLink() {
                     const pageUrl = "<?= $pageUrl ?>";
                     navigator.clipboard.writeText(pageUrl).then(function() {
-                        alert("คัดลอกลิงก์เรียบร้อยแล้ว");
+                        alert("<?= $lang === 'en' ? 'Link copied successfully!' : 'คัดลอกลิงก์เรียบร้อยแล้ว'; ?>");
                     }, function() {
-                        alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
+                        alert("<?= $lang === 'en' ? 'Unable to copy link. Please copy it manually.' : 'ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง'; ?>");
                     });
                 }
                 </script>

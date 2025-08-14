@@ -1,20 +1,31 @@
 <?php
+// ตรวจสอบภาษาจาก URL ถ้ามี `?lang=en` จะกำหนดให้เป็นภาษาอังกฤษ
+// ถ้าไม่มี หรือเป็นค่าอื่น จะกำหนดให้เป็นภาษาไทย
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+
+// กำหนดชื่อคอลัมน์ที่ต้องการดึงข้อมูล
+// ถ้าเป็นภาษาอังกฤษ ($lang === 'en') จะใช้ `subject_news_en`
+// ถ้าเป็นภาษาไทย จะใช้ `subject_news`
+$subjectColumn = ($lang === 'en') ? 'subject_news_en' : 'subject_news';
+
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
-// require_once('../lib/connect.php');
+// require_once('../lib/connect.php'); // ต้องแน่ใจว่าไฟล์นี้มีการเรียกใช้และเชื่อมต่อฐานข้อมูลถูกต้อง
 $newsList = [];
-$sql = "SELECT news_id, subject_news FROM dn_news ORDER BY date_create DESC LIMIT 3";
+
+// สร้างคำสั่ง SQL โดยใช้ตัวแปร $subjectColumn ที่เรากำหนดไว้
+$sql = "SELECT news_id, {$subjectColumn} FROM dn_news ORDER BY date_create DESC LIMIT 3";
+
 // ตรวจสอบว่า $conn ถูกกำหนดและมีการเชื่อมต่อก่อนเรียกใช้
 if (isset($conn)) {
     $result = $conn->query($sql);
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // ดึงข้อมูลมาเก็บใน $newsList
             $newsList[] = $row;
         }
     }
 }
-?>
 
-<?php
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
@@ -45,13 +56,14 @@ $dropdownItems = [
 ?>
 
 <style>
+/* CSS styles from the original code */
 /* ------------------------------------------------------------- */
 /* CSS สำหรับ Desktop Menu โดยเฉพาะ (ใหม่) */
 /* ------------------------------------------------------------- */
 .navbar-desktop {
     background-color: #ff9900;
     position: relative;
-    z-index: 999; /* ปรับลดค่านี้ให้ต่ำลงเล็กน้อย */
+    z-index: 999;
     padding: 6px 0;
 }
 
@@ -65,7 +77,7 @@ $dropdownItems = [
 }
 
 .desktop-menu-item {
-    position: relative; /* สำคัญ: เป็น parent ของ dropdown-content */
+    position: relative;
     display: inline-block;
     color: #ffffff;
     text-decoration: none;
@@ -86,7 +98,7 @@ $dropdownItems = [
     left: 0;
     background-color: #fff;
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
-    z-index: 1000; /* ตั้งค่า z-index ให้สูงกว่า News Ticker */
+    z-index: 1000;
     min-width: 180px;
     border-radius: 4px;
     style="text-decoration: none;"
@@ -113,14 +125,13 @@ $dropdownItems = [
 /* CSS สำหรับ Mobile Menu โดยเฉพาะ (ใหม่) */
 /* ------------------------------------------------------------- */
 .navbar-mobile-container {
-    display: none; /* ซ่อนเมนูนี้บนหน้าจอใหญ่ */
+    display: none;
     position: relative;
     background-color: #ff9900;
 }
 
 .mobile-header {
     display: flex;
-    /* justify-content: flex-end; */
     align-items: center;
     padding: 15px;
 }
@@ -140,7 +151,7 @@ $dropdownItems = [
     height: 100%;
     overflow-y: auto;
     z-index: 9999;
-    transform: translateX(-100%); /* แก้ไขตรงนี้ */
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     padding-top: 60px;
 }
@@ -198,18 +209,18 @@ $dropdownItems = [
 /* ------------------------------------------------------------- */
 @media (max-width: 1024px) {
     .navbar-desktop {
-        display: none; /* ซ่อนเมนู Desktop */
+        display: none;
     }
     .navbar-mobile-container {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 1em; /* แสดงเมนู Mobile */
+        padding: 0 1em;
     }
 }
 @media (min-width: 1025px) {
-     .navbar-mobile-container {
-        display: none; /* ซ่อนเมนู Mobile บน Desktop */
+    .navbar-mobile-container {
+        display: none;
     }
 }
 
@@ -219,13 +230,12 @@ $dropdownItems = [
 /* ------------------------------------------------------------- */
 #navbar-news {
     position: relative;
-    z-index: 998; /* ปรับลดค่านี้ให้ต่ำกว่า navbar-desktop และ dropdown */
+    z-index: 998;
 }
 .news-ticker {
-    position: relative; /* เปลี่ยนเป็น relative เพื่อให้ z-index ทำงาน */
+    position: relative;
     background-color: #ffffffff;
     color: #555;
-    /* padding: 15px 40px 20px 10px; */
     font-weight: bold;
     z-index: 998;
     white-space: nowrap;
@@ -247,8 +257,7 @@ $dropdownItems = [
     }
 }
 a {
-    color: #ffffff;;
-    /* text-decoration: underline; */
+    color: #ffffff;
 }
 </style>
 
@@ -293,9 +302,6 @@ a {
         
     </div>
 
-
-
-
 <script>
 // JavaScript สำหรับ Mobile Menu
 const mobileMenu = document.getElementById("mobileMenu");
@@ -316,7 +322,7 @@ function toggleMobileDropdown(id) {
 document.addEventListener('click', function(event) {
     const isClickInsideMenu = mobileMenu.contains(event.target);
     const isClickOnHamburger = hamburger.contains(event.target);
-    const closeBtn = document.querySelector(".close-btn"); // เรียกใช้ closeBtn ตรงนี้
+    const closeBtn = document.querySelector(".close-btn");
 
     if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger && !closeBtn.contains(event.target)) {
         toggleMobileNav();
@@ -329,14 +335,14 @@ document.addEventListener('click', function(event) {
         <div class="news-ticker">
             <span class="text-ticker">
                 <span class="blinking-icon"></span>
-                Daily News
+                <?= $lang === 'en' ? 'Daily News' : 'ข่าวประจำวัน'; ?>
             </span>
             <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
                 <div id="newsMarquee-link" style="display: inline;">
                     <?php foreach ($newsList as $news): ?>
                         <span style="padding: 0 50px;">
-                            <a href="news.php?id=<?= $news['news_id'] ?>" style="text-decoration: none; color: inherit;">
-                                <?= htmlspecialchars($news['subject_news']) ?>
+                            <a href="news.php?id=<?= $news['news_id'] ?>&lang=<?= $lang ?>" style="text-decoration: none; color: inherit;">
+                                <?= htmlspecialchars($news[$subjectColumn]) ?>
                             </a>
                         </span>
                     <?php endforeach; ?>
