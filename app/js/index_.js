@@ -1,26 +1,17 @@
-// let lastScrollTop = 0;
-// const headerTop = document.querySelector('.header-top');
-
-// window.addEventListener('scroll', function() {
-//     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-//     if (scrollTop > lastScrollTop) {
-//         headerTop.style.top = "-100px"; 
-//     } else {
-//         headerTop.style.top = "0";
-//     }
-//     lastScrollTop = scrollTop;
-// });
+// Function to get a URL parameter (Still useful, so we'll keep it)
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
 
 function toggleDropdown(id) {
     if (!id) return;
-
     closeAllDropdowns();
     const $dropdown = $('#' + id);
-
     if ($dropdown.length) {
         $dropdown.css('display', 'block');
-
         if ($dropdown.css('display') === 'block') {
             $('#background-blur').addClass('tab-open');
         }
@@ -30,61 +21,60 @@ function toggleDropdown(id) {
 function closeAllDropdowns() {
     let anyOpen = false;
     const $dropdowns = $('.dropdown-content');
-
     $dropdowns.each(function () {
         if ($(this).css('display') === 'block') {
             $(this).css('display', 'none');
             anyOpen = true;
         }
     });
-
     if (anyOpen) {
         $('#background-blur').removeClass('tab-open');
     }
 }
 
-
-
 /****nationLanguages**** */
-
-function nationLanguages() {
-    $.getJSON("../api/languages/nation.json" + '?' + new Date().getTime(), function (data) {
-        let nationalities = data.nationalities;
-        let $select = $('#language-select');
-        $select.empty();
-
-        $.each(nationalities, function (index, entry) {
-            let option = $('<option></option>')
-                .attr('value', entry.abbreviation)
-                .attr('data-flag', entry.flag)
-                .text(entry.name);
-
-            $select.append(option);
-        });
-
-        if (nationalities.length > 0) {
-            $select.val(nationalities[0].abbreviation);
-            updateSelectedLanguageFlag();
-        }
-    });
-}
 
 function updateSelectedLanguageFlag() {
     let selectedOption = $('#language-select option:selected');
     let flagUrl = selectedOption.data('flag');
 
     if (flagUrl) {
-        $('#language-select').css({
-            'background-image': 'url(' + flagUrl + ')',
-            'background-repeat': 'no-repeat',
-            'background-position': 'left 8px center',
-            'background-size': '20px 15px',
-            'padding-left': '30px'
-        });
+        // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM ถูกอัปเดตก่อน
+        setTimeout(function() {
+            $('#language-select').css({
+                'background-image': 'url(' + flagUrl + ')',
+                'background-repeat': 'no-repeat',
+                'background-position': 'left 8px center',
+                'background-size': '20px 15px',
+                'padding-left': '30px'
+            });
+        }, 0);
     }
 }
 
-   
+function nationLanguages(selectedLang) {
+    $.getJSON("../api/languages/nation.json" + '?' + new Date().getTime(), function (data) {
+        let nationalities = data.nationalities;
+        let $select = $('#language-select');
+        $select.empty();
+
+        $.each(nationalities, function (index, entry) {
+            // Convert abbreviation to lowercase when creating the option
+            let abbreviation = entry.abbreviation.toLowerCase();
+            let option = $('<option></option>')
+                .attr('value', abbreviation) // ใช้ค่าเป็นตัวพิมพ์เล็ก
+                .attr('data-flag', entry.flag)
+                .text(entry.name);
+            $select.append(option);
+        });
+
+        let langToSelect = getUrlParameter('lang') || 'th';
+        $select.val(langToSelect);
+
+        updateSelectedLanguageFlag(); 
+    });
+}
+
 function changeLanguage(lang) {
     const version = Date.now();
     fetch(`../api/languages/${lang}.json?v=${version}`)
@@ -95,17 +85,15 @@ function changeLanguage(lang) {
             return response.json();
         })
         .then(data => {
-            document.querySelectorAll("[data-translate][lang]").forEach(el => {
+            document.querySelectorAll("[data-translate]").forEach(el => {
                 const key = el.getAttribute("data-translate");
-
                 el.textContent = data[key] || el.textContent;
-                // Update the lang attribute to the selected language
                 el.setAttribute('lang', lang);
-
             });
         })
         .catch(error => console.error('Error loading language file:', error));
 }
+
 
 /****nationLanguages**** */
 
@@ -116,7 +104,6 @@ function setupModal(modalId, btnId, closeClass) {
 
     if ($modal.length && $btn.length && $span.length) {
         $btn.on('click', function () {
-            // Close any currently open modal before showing the new one
             $('.modal').each(function() {
                 if ($(this).is(':visible')) {
                     $(this).hide();
@@ -128,32 +115,35 @@ function setupModal(modalId, btnId, closeClass) {
         $span.on('click', function () {
             $modal.hide();
         });
-
-        // $(window).on('click', function (event) {
-        //     if ($(event.target).is($modal)) {
-        //         $modal.hide();
-        //     }
-        // });
-    } else {
-        // Handle cases where modal, button, or close button doesn't exist
     }
 }
 
 
 
 $(document).ready(function () {
-
     $('#loading-overlay').fadeIn();
     $('#loading-overlay').fadeOut();
 
-    nationLanguages();
-    const selectedLanguage = localStorage.getItem('language') || 'th';
+    // Get language from URL parameter, default to 'th'
+    const selectedLanguage = getUrlParameter('lang') || 'th';
+    
+    // Set up the language dropdown and flags
+    nationLanguages(selectedLanguage);
+    
+    // Change static text on the page
     changeLanguage(selectedLanguage);
 
+    // Event handler for language change
+    // Event handler for language change
     $('#language-select').on('change', function () {
-        const selectedLang = $(this).val().toLowerCase();
-        changeLanguage(selectedLang);
-        updateSelectedLanguageFlag();
+        const newLang = $(this).val().toLowerCase();
+        // ใช้ตัวแปร langLinks ที่เราสร้างไว้ใน header.php
+        if (langLinks[newLang]) {
+            window.location.href = langLinks[newLang];
+        } else {
+            // Fallback กรณีที่ไม่มีลิงก์สำหรับภาษานั้นๆ
+            window.location.href = window.location.pathname + '?lang=' + newLang;
+        }
     });
 
     setupModal("myModal-sign-in", "myBtn-sign-in", "modal-close-sign-in");

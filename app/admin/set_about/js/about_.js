@@ -16,7 +16,7 @@ $(document).ready(function () {
         fontSizes: ['8', '10', '12', '14', '16', '18', '24', '36', '48', '64'],
         fontNamesIgnoreCheck: ['Kanit', 'Roboto'],
         callbacks: {
-            onImageUpload: function(files, editor, welEditable) {
+            onImageUpload: function(files) {
                 var file = files[0];
                 var data = new FormData();
                 data.append('action', 'upload_image');
@@ -31,8 +31,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function(response) {
                         if(response.status === 'success') {
-                            var imgNode = $('<img>').attr('src', response.url);
-                            $(welEditable).summernote('insertNode', imgNode[0]);
+                            $('.summernote').summernote('insertImage', response.url);
                         } else {
                             Swal.fire('Error', response.message, 'error');
                         }
@@ -46,12 +45,39 @@ $(document).ready(function () {
         }
     });
 
+    // Handle language switch
+    $('.lang-switch-btn').on('click', function() {
+        const lang = $(this).data('lang');
+        $('.lang-switch-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        $('.lang-section').hide();
+        $(`.lang-section.${lang}-lang`).show();
+    });
+
+    // Handle "Copy from Thai" button
+    $(document).on('click', '.copy-from-th', function() {
+        const blockItem = $(this).closest('.block-item');
+        const thaiSection = blockItem.find('.th-lang');
+        const englishSection = blockItem.find('.en-lang');
+
+        // Copy type
+        const thaiType = thaiSection.find('select[name^="types_th"]').val();
+        englishSection.find('select[name^="types_en"]').val(thaiType);
+
+        // Copy content from Summernote
+        const thaiContent = thaiSection.find('textarea[name^="contents_th"]').summernote('code');
+        englishSection.find('textarea[name^="contents_en"]').summernote('code', thaiContent);
+        
+        // Note: author_en and position_en are not in the table, so we don't copy them
+    });
+
     // Handle form submission for ADDING new content (ใช้ AJAX)
     $('#addAboutForm').on('submit', function (e) {
         e.preventDefault();
         
         var formData = new FormData(this);
-        formData.append('action', 'add_new_block'); // กำหนด action สำหรับเพิ่มเนื้อหา
+        formData.append('action', 'add_new_block'); 
         
         Swal.fire({
             title: 'ยืนยันการเพิ่มเนื้อหา?',
@@ -64,7 +90,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: 'action/process_about.php', // ส่งไปที่ไฟล์จัดการ
+                    url: 'action/process_about.php', 
                     method: 'POST',
                     data: formData,
                     processData: false,
@@ -96,7 +122,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         var formData = new FormData(this);
-        formData.append('action', 'save_all_blocks'); // กำหนด action สำหรับบันทึกทั้งหมด
+        formData.append('action', 'save_all_blocks'); 
 
         Swal.fire({
             title: 'ยืนยันการบันทึก?',
@@ -109,7 +135,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: 'action/process_about.php', // ส่งไปที่ไฟล์จัดการ
+                    url: 'action/process_about.php', 
                     method: 'POST',
                     data: formData,
                     processData: false,
@@ -151,11 +177,11 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
-                $.post('delete_about_block.php', { id: blockId }, function (response) {
+                $.post('action/process_about.php', { action: 'delete_block', id: blockId }, function (response) {
                     $('#loading-overlay').fadeOut();
                     Swal.fire({
-                        title: response.success ? 'ลบแล้ว!' : 'ผิดพลาด',
-                        icon: response.success ? 'success' : 'error',
+                        title: response.status === 'success' ? 'ลบแล้ว!' : 'ผิดพลาด',
+                        icon: response.status,
                         text: response.message,
                         timer: 1000,
                         showConfirmButton: false

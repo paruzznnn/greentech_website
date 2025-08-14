@@ -13,7 +13,7 @@
 <?php include 'template/header.php'?>
 <?php include 'template/navbar_slide.php'?>
 
-<div class="container my-5" style="color: #555;">
+<div class="container my-5" style="color: #555; max-width: 90%;">
     <!-- Windows Section -->
     <h4><i class="bi bi-pc-display-horizontal text-danger"></i> <span class="text-danger">Insul for Windows</span></h4>
     <p>Trial licenses are currently only available for Windows.</p>

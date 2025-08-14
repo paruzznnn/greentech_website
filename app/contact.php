@@ -79,7 +79,7 @@ global $conn;
     <?php include 'template/navbar_slide.php' ?>
 
     <div class="content-sticky" id="page_contact">
-        <div class="container">
+        <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="row">
                     <div class="col-md-6">

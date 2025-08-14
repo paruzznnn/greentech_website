@@ -2,12 +2,20 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// ลบ LIMIT 5 ออกเพื่อให้ดึงข้อมูลสินค้าทั้งหมด
+// Check the 'lang' parameter from the URL. The default is 'th'.
+$lang = isset($_GET['lang']) ? $_GET['lang'] : 'th';
+
+// Select the correct columns based on the language.
+// If lang is 'th', use the normal column names. If 'en', use the '_en' columns.
+$subject_col = ($lang === 'en') ? 'subject_shop_en' : 'subject_shop';
+$description_col = ($lang === 'en') ? 'description_shop_en' : 'description_shop';
+$content_col = ($lang === 'en') ? 'content_shop_en' : 'content_shop';
+
 $sql = "SELECT
             dn.shop_id,
-            dn.subject_shop,
-            dn.description_shop,
-            dn.content_shop,
+            dn.$subject_col AS subject_shop,
+            dn.$description_col AS description_shop,
+            dn.$content_col AS content_shop,
             dn.date_create,
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -245,7 +253,7 @@ function scrollshop(direction) {
         <div class="shop-scroll" id="shop-scroll-box">
             <?php foreach ($boxesshop as $box): ?>
                 <div class="shop-card">
-                    <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
+                    <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark">
                         <div class="card">
                             <?php if(empty($box['image'])): ?>
                                 <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>

@@ -13,7 +13,7 @@ require_once('../lib/connect.php');
 <?php include 'template/navbar_slide.php'; ?>
 
 <div class="content-sticky" id="page_about">
-    <div class="container">
+    <div class="container" style="max-width: 90%;">
         <div class="box-content">
             <?php
             $result = $conn->query("SELECT * FROM about_content ORDER BY id ASC");

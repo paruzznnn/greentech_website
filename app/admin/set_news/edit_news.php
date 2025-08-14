@@ -1,13 +1,8 @@
-<?php 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
+<?php
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
 
-// ตรวจสอบว่าได้รับค่า news_id หรือไม่
 if (!isset($_POST['news_id'])) {
     echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
     exit;
@@ -20,7 +15,7 @@ $decodedId = $_POST['news_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit news</title>
+    <title>Edit News</title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -60,17 +55,11 @@ $decodedId = $_POST['news_id'];
 
     <style>
         .note-editable {
-            /* font-family: sans-serif, "Kanit", "Roboto" !important; ใช้ตามที่คุณต้องการให้ sans-serif เป็นอันดับแรก */
             color: #424242;
             font-size: 16px;
             line-height: 1.5;
-            /* กำหนด min-height/max-height ที่นี่ ถ้าต้องการ override ค่าจาก JS */
-            /* min-height: 600px; */
-            /* max-height: 600px; */
-            /* overflow: auto; */ /* เพื่อให้มี scrollbar ถ้าเนื้อหาเกิน */
         }
         .box-content p {
-            /* font-family: sans-serif */
             color: #424242;
         }
         .responsive-grid {
@@ -78,29 +67,33 @@ $decodedId = $_POST['news_id'];
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
-
         .responsive-button-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
-
         @media (max-width: 768px) {
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
         }
-
         @media (max-width: 480px) {
             .responsive-button-container div {
                 text-align: center;
             }
         }
-
         .note-toolbar {
             position: sticky !important;
             top: 70px !important;
             z-index: 1 !important;
+        }
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+        .flag-icon {
+            width: 36px;
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -113,133 +106,387 @@ $decodedId = $_POST['news_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit news
+                        <i class="far fa-newspaper"></i> Edit News
                     </h4>
+
                     <?php
-$stmt = $conn->prepare("
-    SELECT 
-    dn.news_id, 
-    dn.subject_news, 
-    dn.description_news,
-    dn.content_news, 
-    dn.date_create, 
-    GROUP_CONCAT(dnc.file_name) AS file_name,
-    GROUP_CONCAT(dnc.api_path) AS pic_path,
-    MAX(dnc.status) AS status
-FROM dn_news dn
-LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
-WHERE dn.news_id = ?
-GROUP BY dn.news_id
+                    $stmt = $conn->prepare("
+                        SELECT
+                            n.news_id,
+                            n.subject_news,
+                            n.description_news,
+                            n.content_news,
+                            n.subject_news_en,
+                            n.description_news_en,
+                            n.content_news_en,
+                            n.date_create,
+                            GROUP_CONCAT(DISTINCT d.file_name, ':::', d.api_path, ':::', d.status ORDER BY d.status DESC SEPARATOR '|||') AS files
+                        FROM dn_news n
+                        LEFT JOIN dn_news_doc d ON n.news_id = d.news_id AND d.del = 0
+                        WHERE n.news_id = ?
+                        GROUP BY n.news_id
+                    ");
 
-");
+                    if ($stmt === false) {
+                        die('❌ SQL Prepare failed: ' . $conn->error);
+                    }
 
-if ($stmt === false) {
-    die('❌ SQL Prepare failed: ' . $conn->error);
-}
+                    $stmt->bind_param('i', $decodedId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
 
-$stmt->bind_param('i', $decodedId);
-$stmt->execute();
-$result = $stmt->get_result();
+                    if ($result->num_rows > 0) {
+                        $row = $result->fetch_assoc();
+                        $content_th = $row['content_news'];
+                        $content_en = $row['content_news_en'];
+                        
+                        $pic_data = [];
+                        $previewImageSrc = '';
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $content = $row['content_news'];
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+                        if (!empty($row['files'])) {
+                            $files = explode('|||', $row['files']);
+                            foreach ($files as $file_str) {
+                                list($file_name, $api_path, $status) = explode(':::', $file_str);
+                                if ($status == 1) { 
+                                    $previewImageSrc = htmlspecialchars($api_path);
+                                } else { 
+                                    $pic_data[htmlspecialchars($file_name)] = htmlspecialchars($api_path);
+                                }
+                            }
+                        }
 
-        foreach ($files as $index => $file) {
-            $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
-            if (preg_match($pattern, $content, $matches)) {
-                $new_src = $paths[$index];
-                $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
-                $content = str_replace($matches[0], $new_img_tag, $content);
-            }
-        }
+                        $dom_th = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_th = !empty($content_th) ? mb_convert_encoding($content_th, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_th->loadHTML($source_th, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_th = $dom_th->getElementsByTagName('img');
+                        foreach ($images_th as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_th_with_correct_paths = $dom_th->saveHTML();
 
-        $previewImageSrc = !empty($paths[0]) ? htmlspecialchars($paths[0]) : '';
-        $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+                        $dom_en = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_en = !empty($content_en) ? mb_convert_encoding($content_en, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_en->loadHTML($source_en, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_en = $dom_en->getElementsByTagName('img');
+                        foreach ($images_en as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_en_with_correct_paths = $dom_en->saveHTML();
 
-        echo "
-        <form id='formnews_edit' enctype='multipart/form-data'>
-            <input type='hidden' class='form-control' id='news_id' name='news_id' value='" . htmlspecialchars($row['news_id']) . "'>
-            <div class='row'>
-                <div class='col-md-4'>
-                    <div style='margin: 10px;'>
-                        <label><span>Cover photo</span>:</label>
-                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
-                        <div id='previewContainer' class='previewContainer'>
-                            <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
-                        </div>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <input type='file' class='form-control' id='fileInput' name='fileInput[]'>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <label><span>Subject</span>:</label>
-                        <input type='text' class='form-control' id='news_subject' name='news_subject' value='" . htmlspecialchars($row['subject_news']) . "'>
-                    </div>
-                    <div style='margin: 10px;'>
-                        <label><span>Description</span>:</label>
-                        <textarea class='form-control' id='news_description' name='news_description'>" . htmlspecialchars($row['description_news']) . "</textarea>
-                    </div>
-                    <div style='margin: 10px; text-align: end;'>
-                        <button type='button' id='submitEditnews' class='btn btn-success'>
-                            <i class='fas fa-save'></i> Save news
-                        </button>
-                    </div>
-                </div>
-                <div class='col-md-8'>
-                 <div style='margin: 10px; text-align: end;'>
-                <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                    <i class='fas fa-arrow-left'></i> Back 
-                </button>
-            </div>
-                    <div style='margin: 10px;'>
-                        <label><span>Content</span>:</label>
-                        <textarea class='form-control summernote' id='summernote_update' name='news_content'>" . htmlspecialchars($content) . "</textarea>
-                    </div>
-                </div>
-            </div>
-        </form>
-        ";
-    }
-} else {
-    echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
-}
-$stmt->close();
-?>
+                        echo "
+                        <form id='formnews_edit' enctype='multipart/form-data'>
+                            <input type='hidden' class='form-control' id='news_id' name='news_id' value='" . htmlspecialchars($row['news_id']) . "'>
+                            <div class='row >
+                            
+                                <div>
+                                
+                                
+                                    <div style='margin: 10px;'>
+                                       <div style='margin: 10px; text-align: end;'>
+                                            <button type='button' id='backToNewsList' class='btn btn-secondary'> 
+                                                <i class='fas fa-arrow-left'></i> Back 
+                                            </button>
+                                        </div>
+                                         <label><span>Cover photo</span>:</label>
+                                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                         <div id='previewContainer' class='previewContainer'>
+                                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
+                                         </div>
+                                     </div>
+                                     <div style='margin: 10px;'>
+                                         <input type='file' class='form-control' id='fileInput' name='fileInput'>
+                                     </div>
+                                </div>
+                                <div>
+                                    
 
-<script>
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const container = document.getElementById('previewContainer');
-    container.innerHTML = ''; // clear preview
-    const files = e.target.files;
-    if (files.length > 0) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const img = document.createElement('img');
-                img.src = evt.target.result;
-                img.style.maxWidth = '100%';
-                img.style.marginBottom = '10px';
-                container.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-});
-</script>
-
+                                    <div class='card mb-4'>
+                                        <div class='card-header p-0'>
+                                            <ul class='nav nav-tabs' id='languageTabs' role='tablist'>
+                                                <li class='nav-item' role='presentation'>
+                                                    <button class='nav-link active' id='th-tab' data-bs-toggle='tab' data-bs-target='#th' type='button' role='tab' aria-controls='th' aria-selected='true'>
+                                                        <img src='https://flagcdn.com/w320/th.png' alt='Thai Flag' class='flag-icon' style=' width: 36px; 
+                                        margin-right: 8px;'>Thai
+                                                    </button>
+                                                </li>
+                                                <li class='nav-item' role='presentation'>
+                                                    <button class='nav-link' id='en-tab' data-bs-toggle='tab' data-bs-target='#en' type='button' role='tab' aria-controls='en' aria-selected='false'>
+                                                        <img src='https://flagcdn.com/w320/gb.png' alt='English Flag' class='flag-icon' style=' width: 36px; 
+                                        margin-right: 8px;'>English
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class='card-body'>
+                                            <div class='tab-content' id='languageTabsContent'>
+                                                <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>Subject (TH)</span>:</label>
+                                                        <input type='text' class='form-control' id='news_subject' name='news_subject' value='" . htmlspecialchars($row['subject_news']) . "'>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>Description (TH)</span>:</label>
+                                                        <textarea class='form-control' id='news_description' name='news_description'>" . htmlspecialchars($row['description_news']) . "</textarea>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>Content (TH)</span>:</label>
+                                                        <textarea class='form-control summernote' id='summernote_update' name='news_content'>" . $content_th_with_correct_paths . "</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
+                                                    <div style='margin: 10px;'>
+                                                        <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Copy from Thai</button>
+                                                        <label><span>Subject (EN)</span>:</label>
+                                                        <input type='text' class='form-control' id='news_subject_en' name='news_subject_en' value='" . htmlspecialchars($row['subject_news_en']) . "'>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>Description (EN)</span>:</label>
+                                                        <textarea class='form-control' id='news_description_en' name='news_description_en'>" . htmlspecialchars($row['description_news_en']) . "</textarea>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>Content (EN)</span>:</label>
+                                                        <textarea class='form-control summernote' id='summernote_update_en' name='news_content_en'>" . $content_en_with_correct_paths . "</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style='margin: 10px; text-align: end;'>
+                                        <button type='button' id='submitEditnews' class='btn btn-success'>
+                                            <i class='fas fa-save'></i> Save News
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        ";
+                    } else {
+                        echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
+                    }
+                    $stmt->close();
+                    $conn->close();
+                    ?>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        $(document).ready(function() {
+            // ลบโค้ดส่วนที่เกี่ยวข้องกับ related_shops ออกทั้งหมด
 
-    <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
+            $('#summernote_update').summernote({
+                height: 600,
+                minHeight: 600,
+                maxHeight: 600,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['fontname', 'fontsize', 'forecolor']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture', 'video', 'table']],
+                    ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                    ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                ],
+                fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                fontNamesIgnoreCheck: ['Kanit'],
+                fontsizeUnits: ['px', 'pt'],
+                fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+            });
+
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                var target = $(e.target).attr("data-bs-target");
+                if (target === '#en') {
+                    if ($('#summernote_update_en').data('summernote')) {
+                        $('#summernote_update_en').summernote('destroy');
+                    }
+                    $('#summernote_update_en').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+            });
+
+            // New Copy from Thai button functionality
+            $('#copyFromThai').on('click', function() {
+                var thaiSubject = $('#news_subject').val();
+                var thaiDescription = $('#news_description').val();
+                var thaiContent = $('#summernote_update').summernote('code');
+
+                $('#news_subject_en').val(thaiSubject);
+                $('#news_description_en').val(thaiDescription);
+                $('#summernote_update_en').summernote('code', thaiContent);
+            });
+            
+            $('#fileInput').on('change', function() {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewImage').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+            $('#backToNewsList').on('click', function() {
+                window.location.href = "list_news.php";
+            });
+
+            $("#submitEditnews").on("click", function(event) {
+                event.preventDefault();
+                var formnews = $("#formnews_edit")[0];
+                var formData = new FormData(formnews);
+                formData.set("action", "editnews");
+                formData.set("news_id", $("#news_id").val());
+                var contentFromEditor_th = $("#summernote_update").summernote('code');
+                var contentFromEditor_en = $('#summernote_update_en').summernote('code');
+                var checkIsUrl = false;
+                
+                if (contentFromEditor_th) {
+                    var tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = contentFromEditor_th;
+                    var imgTags = tempDiv.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags.length; i++) {
+                        var imgSrc = imgTags[i].getAttribute("src");
+                        var filename = imgTags[i].getAttribute("data-filename");
+                        if (!imgSrc) continue;
+
+                        imgSrc = imgSrc.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc)) {
+                            var file = base64ToFile(imgSrc, filename);
+                            if (file) {
+                                formData.append("image_files_th[]", file);
+                            }
+                            if (imgSrc.startsWith("data:image")) {
+                                imgTags[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("news_content", tempDiv.innerHTML);
+                }
+
+                if (contentFromEditor_en) {
+                    var tempDiv_en = document.createElement("div");
+                    tempDiv_en.innerHTML = contentFromEditor_en;
+                    var imgTags_en = tempDiv_en.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_en.length; i++) {
+                        var imgSrc_en = imgTags_en[i].getAttribute("src");
+                        var filename_en = imgTags_en[i].getAttribute("data-filename");
+                        if (!imgSrc_en) continue;
+
+                        imgSrc_en = imgSrc_en.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_en)) {
+                            var file_en = base64ToFile(imgSrc_en, filename_en);
+                            if (file_en) {
+                                formData.append("image_files_en[]", file_en);
+                            }
+                            if (imgSrc_en.startsWith("data:image")) {
+                                imgTags_en[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("news_content_en", tempDiv_en.innerHTML);
+                }
+
+                $(".is-invalid").removeClass("is-invalid");
+                if (!$("#news_subject").val().trim()) {
+                    $("#news_subject").addClass("is-invalid");
+                    return;
+                }
+                if (!$("#news_description").val().trim()) {
+                    $("#news_description").addClass("is-invalid");
+                    return;
+                }
+                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim()) {
+                    alertError("Please fill in content information for at least one language.");
+                    return;
+                }
+
+                formData.set("news_subject_en", $("#news_subject_en").val());
+                formData.set("news_description_en", $("#news_description_en").val());
+
+                Swal.fire({
+                    title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+                    text: "Do you want to edit news?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4CAF50",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Accept"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#loading-overlay').fadeIn();
+                        $.ajax({
+                            url: "actions/process_news.php",
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                try {
+                                    var json = (typeof response === "string") ? JSON.parse(response) : response;
+                                    if (json.status === 'success') {
+                                        location.reload();
+                                    } else {
+                                        Swal.fire('Error', json.message || 'Unknown error', 'error');
+                                    }
+                                } catch (e) {
+                                    console.error("❌ JSON parse error:", e);
+                                    Swal.fire('Error', 'Invalid response from server', 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                console.error("❌ AJAX error:", xhr.responseText);
+                                Swal.fire('Error', 'AJAX request failed', 'error');
+                                $('#loading-overlay').fadeOut();
+                            },
+                        });
+                    } else {
+                        $('#loading-overlay').fadeOut();
+                    }
+                });
+            });
+        });
+
+        function base64ToFile(base64, fileName) {
+            // ... (Your existing base64ToFile function) ...
+        }
+
+        function alertError(textAlert) {
+            // ... (Your existing alertError function) ...
+        }
+
+        function isValidUrl(str) {
+            // ... (Your existing isValidUrl function) ...
+        }
+    </script>
     <script src='js/news_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
-
-
-
-

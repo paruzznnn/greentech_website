@@ -49,9 +49,10 @@ function handleFileUpload($files)
 {
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
     $maxFileSize = 5 * 1024 * 1024; // 5 MB
-
     $uploadResults = [];
 
+    // ตรวจสอบว่ามีการอัปโหลดไฟล์หรือไม่
+    // โดยการตรวจสอบว่ามี 'name' array และ element แรกไม่ว่างเปล่า
     if (isset($files['name']) && is_array($files['name'])) {
         foreach ($files['name'] as $key => $fileName) {
             if ($files['error'][$key] === UPLOAD_ERR_OK) {
@@ -100,15 +101,14 @@ function handleFileUpload($files)
             }
         }
     } else {
+        // กรณีไม่มีไฟล์
         $uploadResults[] = [
             'success' => false,
             'error' => 'No files were uploaded.'
         ];
     }
-
     return $uploadResults;
 }
-
 
 $response = array('status' => 'error', 'message' => '');
 
@@ -144,8 +144,7 @@ try {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
             $last_inserted_id = $conn->insert_id;
-
-            // เพิ่มส่วนนี้: บันทึกข้อมูลสินค้าที่เกี่ยวข้อง
+            
             if (!empty($related_shops)) {
                 $stmt_shop_insert = $conn->prepare("INSERT INTO dn_project_shop (project_id, shop_id) VALUES (?, ?)");
                 foreach ($related_shops as $shop_id) {
@@ -155,8 +154,8 @@ try {
                 $stmt_shop_insert->close();
             }
 
-            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            // แก้ไขการตรวจสอบไฟล์
+            if (isset($_FILES['fileInput']) && is_array($_FILES['fileInput']['name']) && $_FILES['fileInput']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
@@ -165,11 +164,11 @@ try {
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
                         insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
+            if (isset($_FILES['image_files']) && is_array($_FILES['image_files']['name']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['image_files']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
@@ -178,12 +177,11 @@ try {
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
-
+            
             $response = array('status' => 'success', 'message' => 'save');
         }
 
@@ -193,6 +191,9 @@ try {
             'project_subject' => $_POST['project_subject'] ?? '',
             'project_description' => $_POST['project_description'] ?? '',
             'project_content'  => $_POST['project_content'] ?? '',
+            'project_subject_en' => $_POST['project_subject_en'] ?? '',
+            'project_description_en' => $_POST['project_description_en'] ?? '',
+            'project_content_en'  => $_POST['project_content_en'] ?? '',
         ];
 
         $related_shops = $_POST['related_shops'] ?? [];
@@ -201,21 +202,30 @@ try {
             $stmt = $conn->prepare("UPDATE dn_project 
             SET subject_project = ?, 
             description_project = ?, 
-            content_project = ?, 
+            content_project = ?,
+            subject_project_en = ?,
+            description_project_en = ?,
+            content_project_en = ?,
             date_create = ? 
             WHERE project_id = ?");
 
             $project_subject = $project_array['project_subject'];
             $project_description = $project_array['project_description'];
             $project_content = mb_convert_encoding($project_array['project_content'], 'UTF-8', 'auto');
+            $project_subject_en = $project_array['project_subject_en'] ?? '';
+            $project_description_en = $project_array['project_description_en'] ?? '';
+            $project_content_en = mb_convert_encoding($project_array['project_content_en'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $project_id = $project_array['project_id'];
 
             $stmt->bind_param(
-                "ssssi",
+                "sssssssi",
                 $project_subject,
                 $project_description,
                 $project_content,
+                $project_subject_en,
+                $project_description_en,
+                $project_content_en,
                 $current_date,
                 $project_id
             );
@@ -223,15 +233,12 @@ try {
             if (!$stmt->execute()) {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
-
-            // เพิ่มส่วนนี้: อัปเดตข้อมูลสินค้าที่เกี่ยวข้อง
-            // 1. ลบข้อมูลเก่าทั้งหมดของ project นี้ออกจากตาราง dn_project_shop
+            
             $stmt_delete_shops = $conn->prepare("DELETE FROM dn_project_shop WHERE project_id = ?");
             $stmt_delete_shops->bind_param("i", $project_id);
             $stmt_delete_shops->execute();
             $stmt_delete_shops->close();
 
-            // 2. เพิ่มข้อมูลใหม่
             if (!empty($related_shops)) {
                 $stmt_shop_insert = $conn->prepare("INSERT INTO dn_project_shop (project_id, shop_id) VALUES (?, ?)");
                 foreach ($related_shops as $shop_id) {
@@ -240,24 +247,25 @@ try {
                 }
                 $stmt_shop_insert->close();
             }
-            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
-                $fileInfos = handleFileUpload($_FILES['fileInput']);
-                foreach ($fileInfos as $fileInfo) {
-                    if ($fileInfo['success']) {
-                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-                        $fileWhereClause = 'project_id = ?';
-                        $fileWhereValues = [$project_id];
-                        updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-                    } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
-                    }
+
+            // จัดการรูป Cover
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] == UPLOAD_ERR_OK) {
+                $fileInfo = handleFileUpload($_FILES['fileInput'])[0];
+                if ($fileInfo['success']) {
+                    $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                    $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                    $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                    $fileWhereClause = 'project_id = ?';
+                    $fileWhereValues = [$project_id];
+                    updateInDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                } else {
+                    throw new Exception('Error uploading cover file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                 }
             }
-            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
-                $fileInfos = handleFileUpload($_FILES['image_files']);
+
+            // จัดการรูปภาพใน Content (ภาษาไทย)
+            if (isset($_FILES['image_files_th']) && is_array($_FILES['image_files_th']['name']) && $_FILES['image_files_th']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_th']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
@@ -265,11 +273,10 @@ try {
                         $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading content file (TH): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
             
             $response = array('status' => 'success', 'message' => 'edit save');
         }
@@ -296,7 +303,6 @@ try {
         }
         $stmt->close();
 
-        // เพิ่มส่วนนี้: อัปเดตตาราง dn_project_shop
         $stmt = $conn->prepare("UPDATE dn_project_shop 
             SET del = ? 
             WHERE project_id = ?");
