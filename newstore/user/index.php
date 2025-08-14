@@ -17,11 +17,6 @@
     <?php include '../template/head-bar.php'; ?>
     <main>
         <div id="sections_root_profile">
-
-            <div id="notificationContainer" class="notification-container">
-                <div id="notificationMessage" class="notification-message"></div>
-            </div>
-
             <section id="sections_cover_photo" class="section-space">
                 <div class="container">
                     <div class="cover-photo">
@@ -291,49 +286,8 @@
             });
     </script>
 
-    <!-- <script type="module">
-        import {
-            setupTabs
-        } from '../js/user/menuBuilder.js?v=<?php echo time() ?>';
-        import {
-            fetchOrders,
-            displayOrders,
-            displayTabOrders
-        } from '../js/user/orderListRender.js?v=<?php echo time() ?>';
-        import {
-            LikedProducts
-        } from '../js/user/wishlistRender.js?v=<?php echo time() ?>';
-        import {
-            ShoppingCart
-        } from '../js/user/cartRender.js?v=<?php echo time() ?>';
-
-        window.ShoppingCart = ShoppingCart;
-        document.addEventListener('DOMContentLoaded', async () => {
-            setupTabs();
-            displayTabOrders('tab-order-list');
-            let orders = await fetchOrders("getOrdersItems");
-            const tabButtonsHandler = () => {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        event.currentTarget.classList.add('active');
-                        const selectedStatus = event.currentTarget.dataset.status;
-                        displayOrders(selectedStatus, 'orders-list', orders);
-                    });
-                });
-            };
-            tabButtonsHandler();
-            displayOrders('All', 'orders-list', orders);
-            ShoppingCart.init();
-            LikedProducts.init();
-            LikedProducts.renderProducts(ShoppingCart);
-        });
-    </script> -->
-
     <script type="module">
         import {
-            showNotification,
             setupProfileImageUpload
         } from '../js/user/userRender.js?v=<?php echo time() ?>';
         document.addEventListener('DOMContentLoaded', () => {

@@ -1,4 +1,4 @@
-import { redirectGet } from '../formHandler.js';
+import { redirectGet, showNotification } from '../formHandler.js';
 
 //============== API PRODUCT ===========================
 export async function fetchProductData(req, call, obj) {
@@ -51,6 +51,7 @@ export const ProductDetailModule = {
         this.render();
         this.initLogic(selector, data.images);
         this.bindEvents();
+        // this.clearCart();
     },
 
     render() {
@@ -183,7 +184,7 @@ export const ProductDetailModule = {
                     this.cartItems.push({ id: productId, quantity: newQuantity });
                 }
 
-                this.saveCart();
+                // this.saveCart();
             }
         });
     },
@@ -195,9 +196,29 @@ export const ProductDetailModule = {
         } else {
             this.cartItems.push({ id: productId, quantity: 1 });
         }
-        this.saveCart();
+        // this.saveCart();
         if(this.cartItems[0].quantity > 0){
-            redirectGet(`${this.BASE_WEB}user/`, { id: productId });
+
+            const existingCart = JSON.parse(localStorage.getItem("userShoppingCart")) || [];
+            const productIndex = existingCart.findIndex((item) => item.id === this.cartItems[0].id);
+
+            if (productIndex !== -1) {
+                existingCart[productIndex].quantity = this.cartItems[0].quantity;
+                showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
+            } else {
+                existingCart.push({
+                    id: this.data.productId,
+                    name: this.data.title,
+                    price: parseFloat(this.data.currentPrice),
+                    quantity: parseInt(this.cartItems[0].quantity),
+                    imageUrl: this.data.images[0],
+                });
+                showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
+            }
+
+            localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
+            
+            // redirectGet(`${this.BASE_WEB}user/`, { id: productId });
         }
     },
 
@@ -208,9 +229,9 @@ export const ProductDetailModule = {
         } else {
             this.cartItems.push({ id: productId, quantity: 1 });
         }
-        this.saveCart();
+        // this.saveCart();
         if(this.cartItems[0].quantity > 0){
-            redirectGet(`${this.BASE_WEB}user/`, { id: productId });
+            // redirectGet(`${this.BASE_WEB}user/`, { id: productId });
         }
     },
 
@@ -227,12 +248,18 @@ export const ProductDetailModule = {
         } else {
             this.cartItems.push({ id: productId, quantity });
         }
-        this.saveCart();
+        // this.saveCart();
     },
 
-    saveCart() {
-        localStorage.setItem("cart", JSON.stringify(this.cartItems));
-    },
+    // saveCart() {
+        // localStorage.setItem("cart", JSON.stringify(this.cartItems));
+    // },
+
+    // clearCart() {
+    //     this.cartItems = [];
+    //     localStorage.removeItem("cart");
+    //     console.log("Cart cleared.");
+    // },
 
     //============== LOGIC (Carousel + Tabs) ========================
     initLogic(selector, images) {

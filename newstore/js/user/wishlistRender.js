@@ -26,7 +26,7 @@ export const LikedProducts = {
         card.innerHTML = `
             <img src="${product.imageUrl}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x150/CCCCCC/333333?text=No+Image';">
             <h3 class="product-name">${product.name}</h3>
-            <p class="product-price">฿${product.price.toFixed(2)}</p>
+            <p class="product-price">฿${product.price}</p>
             <div class="product-card-actions">
                 <button type="button" class="action-button add-to-cart-button" data-id="${product.id}">เพิ่มลงตะกร้า</button>
                 <button type="button" class="action-button remove-button" data-id="${product.id}">ลบ</button>

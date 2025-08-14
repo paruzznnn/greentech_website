@@ -1,20 +1,4 @@
-const notificationContainer = document.getElementById('notificationContainer');
-const notificationMessage = document.getElementById('notificationMessage');
-let notificationTimeout;
-export function showNotification(message, type) {
-    clearTimeout(notificationTimeout);
-    notificationMessage.textContent = message;
-    notificationMessage.className = 'notification-message ' + type;
-    notificationContainer.classList.add('show');
-
-    notificationTimeout = setTimeout(() => {
-        notificationContainer.classList.remove('show');
-        setTimeout(() => {
-            notificationMessage.textContent = '';
-            notificationMessage.className = 'notification-message';
-        }, 300);
-    }, 3000);
-}
+import { redirectGet, showNotification } from '../formHandler.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
 

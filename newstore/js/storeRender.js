@@ -1,4 +1,4 @@
-import { redirectGet } from './formHandler.js';
+import { redirectGet, showNotification } from './formHandler.js';
 
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
@@ -290,7 +290,7 @@ function addCart(product) {
   );
   if (productIndex !== -1) {
     // existingCart[productIndex].quantity += 1;
-    alert("เพิ่มลงตะกร้าแล้ว");
+    showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
   } else {
     existingCart.push({
       id: product.productId,
@@ -299,7 +299,7 @@ function addCart(product) {
       quantity: 1,
       imageUrl: product.image,
     });
-    alert("เพิ่มลงตะกร้าเรียบร้อย");
+    showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
   }
   localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
 }
@@ -311,7 +311,7 @@ function addWishlist(product) {
     (item) => item.id === product.productId
   );
   if (productIndex !== -1) {
-    alert("กดถูกใจไว้แล้ว");
+    showNotification('กดถูกใจไว้แล้ว', 'success');
   } else {
     existingWishlist.push({
       id: product.productId,
@@ -319,7 +319,7 @@ function addWishlist(product) {
       price: product.productPrice,
       imageUrl: product.image,
     });
-    alert("เพิ่มการถูกใจเรียบร้อย");
+    showNotification('กดถูกใจไว้แล้ว', 'success');
   }
 
   localStorage.setItem("userLikedProducts", JSON.stringify(existingWishlist));
@@ -506,13 +506,15 @@ export function renderCarouselMD(selector, items, config) {
     else if (e.target.closest(".btn-view-detail")) {
       const itemDiv = e.target.closest(".item");
       const productId = itemDiv.dataset.productId;
-      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
     }
 
     else if (e.target.closest(".img-view-detail")) {
       const itemDiv = e.target.closest(".item");
       const productId = itemDiv.dataset.productId;
-      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
     }
 
   });

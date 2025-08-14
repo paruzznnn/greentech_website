@@ -1,3 +1,4 @@
+//============== Function =========================================
 export function handleFormSubmit(event) {
     event.preventDefault();
 
@@ -100,11 +101,32 @@ export function redirectGetForm(url, params = {}, target = '_self') {
   document.body.removeChild(form);
 }
 
-// // Exsample GET query string
-// redirectGet('/search', { q: 'keyword', page: 2 });
+/*===================== Redirec function =============================
+Exsample POST form
+redirectPostForm('/login', { username: 'admin', password: '1234' });
 
-// // Exsample POST form 
-// redirectPostForm('/login', { username: 'admin', password: '1234' });
+Exsample GET query string
+redirectGet('/search', { q: 'keyword', page: 2 });
 
-// // Exsample GET form 
-// redirectGetForm('/download', { file: 'report.pdf' }, '_blank');
+Exsample GET form
+redirectGetForm('/download', { file: 'report.pdf' }, '_blank');
+=======================================================================*/
+
+//============ Notify Alert ========================================
+let notificationTimeout;
+export function showNotification(message, type) {
+    const notificationContainer = document.getElementById('notificationContainer');
+    const notificationMessage = document.getElementById('notificationMessage');
+    clearTimeout(notificationTimeout);
+    notificationMessage.textContent = message;
+    notificationMessage.className = 'notification-message ' + type;
+    notificationContainer.classList.add('show');
+
+    notificationTimeout = setTimeout(() => {
+        notificationContainer.classList.remove('show');
+        setTimeout(() => {
+            notificationMessage.textContent = '';
+            notificationMessage.className = 'notification-message';
+        }, 300);
+    }, 3000);
+}
