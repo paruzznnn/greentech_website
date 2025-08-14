@@ -14,14 +14,15 @@
         exit;
     }
     $token     = trim($data['token']     ?? '');
+    $code     = trim($data['code']     ?? '');
     $firstname = trim($data['firstname'] ?? '');
     $lastname  = trim($data['lastname']  ?? '');
     $email     = trim($data['email']     ?? '');
-    $username  = trim($data['username']  ?? '');
+    // $username  = trim($data['username']  ?? '');
     // $password  = trim($data['password']  ?? ''); // ลบบรรทัดนี้ออก
     $telephone = trim($data['telephone'] ?? '');
     $role_id   = 1;
-    $email = $email ?: $username;
+    // $email = $email ?: $username;
     if (empty($token)) {
         header("Location: index.php");
         exit;
@@ -32,14 +33,14 @@
         echo json_encode(['status' => false, 'message' => 'Prepare failed: ' . $conn->error]);
         exit;
     }
-    $stmt->bind_param("s", $token);
+    $stmt->bind_param("s", $code);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         session_regenerate_id(true);
         $_SESSION['email'] = $row['email'];
-        $_SESSION['role_id']  = (int) $row['role_id'];
+        $_SESSION['role_id']  = (int) $role_id;
         $_SESSION['logged_in']  = true;
         header("Location: admin/dashboard.php");
         exit;
@@ -81,6 +82,7 @@
     $_SESSION['email'] = $email;
     $_SESSION['role_id']  = $role_id;
     $_SESSION['logged_in']  = true;
+    $_SESSION['token']  = $token;
     header("Location: admin/dashboard.php");
     exit;
 ?>
