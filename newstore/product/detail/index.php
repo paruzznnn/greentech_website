@@ -1,9 +1,4 @@
 <?php include '../../routes.php'; ?>
-<?php
-echo '<pre>';
-print_r($_GET);
-echo '</pre>';
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,8 +31,7 @@ echo '</pre>';
         import(`${pathConfig.BASE_WEB}js/product/productDetailRender.js?v=<?= time() ?>`)
         .then(async ({ 
             fetchProductData,
-            createProductDetailHTML,
-            initProductDetailLogic,
+            ProductDetailModule,
             createProductSimilarHTML
         }) => {
 
@@ -49,10 +43,11 @@ echo '</pre>';
             const productDeatilItems = await fetchProductData("getProductDetailItems", service, reqProduct);
             // const productSimilarItems = await fetchProductData("getProductSimilarItems", service, reqProduct);
             if(productDeatilItems.data){
-                productDeatilItems.data.forEach((item, index) => {
-                    createProductDetailHTML("#product-detail-container-vibrant", item);
-                    initProductDetailLogic("#product-detail-container-vibrant", item.images);
-                });
+                ProductDetailModule.init(
+                    "#product-detail-container-vibrant", 
+                    productDeatilItems.data[0], 
+                    pathConfig.BASE_WEB
+                );
             }
             // if(productSimilarItems.data){
                 // createProductSimilarHTML("#product-similar-container", productSimilarItems.data);

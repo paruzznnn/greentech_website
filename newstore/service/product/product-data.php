@@ -97,6 +97,7 @@ if ($action == 'getProductItems') {
         $cost = explode(",",$item['cost']);
         $data[] = [
             'id' => $item['id'],
+            'product_id' => $item['material_id'],
             'title' => $item['code'],
             "description" => $item['description'],
             'image' => $item['pic_icon'],
@@ -158,8 +159,7 @@ if ($action == 'getProductItems') {
             ],
             'currentPrice' => $cost[0],
             'oldPrice' => 0,
-            'discountPercent' => 0,
-            ''
+            'discountPercent' => 0
         ];
     }
 

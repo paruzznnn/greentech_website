@@ -504,15 +504,15 @@ export function renderCarouselMD(selector, items, config) {
     }
 
     else if (e.target.closest(".btn-view-detail")) {
-        const itemDiv = e.target.closest(".item");
-        const productId = itemDiv.dataset.productId;
-        redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      const itemDiv = e.target.closest(".item");
+      const productId = itemDiv.dataset.productId;
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
     }
 
     else if (e.target.closest(".img-view-detail")) {
-        const itemDiv = e.target.closest(".item");
-        const productId = itemDiv.dataset.productId;
-        redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      const itemDiv = e.target.closest(".item");
+      const productId = itemDiv.dataset.productId;
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
     }
 
   });

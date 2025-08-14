@@ -1,3 +1,4 @@
+//========= init List Prodect ====================
 export async function initCardUI({
     containerId,
     // searchInputId,
@@ -84,7 +85,7 @@ export async function initCardUI({
             col.className = 'col-md-12 col-sm-6 mb-4';
             col.innerHTML = `
             <div class="search-card-product-list">
-            <a href="${BASE_WEB}product/detail/?id=" class="product-image">
+            <a href="${BASE_WEB}product/detail/?id=${card.productId}" class="product-image">
                 <img src="${card.img}" alt="${card.title}">
             </a>
             <div class="product-info">
@@ -154,6 +155,7 @@ export async function initCardUI({
 
             allCards = data.map(item => ({
                 id: item.id || '',
+                productId: item.product_id || '',
                 title: item.title || 'No title',
                 description: item.description || 'No description',
                 img: item.image || '',
