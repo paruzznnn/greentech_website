@@ -243,6 +243,10 @@
   </div>
 </div>
 
+<div id="notificationContainer" class="notification-container">
+    <div id="notificationMessage" class="notification-message"></div>
+</div>
+
 <?php if(!empty($_SESSION['user']) && $_SESSION['user']['role'] == "user") { ?>
 <div id="box-notify-panel" class="notify-panel">
 
