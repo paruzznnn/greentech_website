@@ -249,7 +249,6 @@
 
 <?php if(!empty($_SESSION['user']) && $_SESSION['user']['role'] == "user") { ?>
 <div id="box-notify-panel" class="notify-panel">
-
   <div class="notify-item border-bottom">
     <div class="notify-icon-wrapper">
       <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
@@ -257,7 +256,6 @@
       </a>
     </div>
   </div>
-
   <div class="notify-item border-bottom">
     <span id="wishlistCount" class="notify-count">0</span>
     <div class="notify-icon-wrapper">
@@ -266,7 +264,6 @@
       </a>
     </div>
   </div>
-
   <div class="notify-item">
     <span id="cartCount" class="notify-count">0</span>
     <div class="notify-icon-wrapper">
@@ -275,13 +272,12 @@
       </a>
     </div>
   </div>
-
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
       setInterval(() => {
-        const countCart = JSON.parse(localStorage.getItem('userShoppingCart')) || [];
-        const countWishlist = JSON.parse(localStorage.getItem('userLikedProducts')) || [];
+        const countCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+        const countWishlist = JSON.parse(localStorage.getItem('likedProducts')) || [];
 
         document.querySelector("#wishlistCount").textContent = countWishlist.length;
         document.querySelector("#cartCount").textContent = countCart.length;
@@ -289,11 +285,6 @@
     });
 </script>
 <?php } ?>
-
-
-  
-
-
 
 <aside id="sidenav-store1" class="sidenav">
   <div class="login-box-store1">
@@ -334,6 +325,87 @@
 </aside>
 <div id="overlay-store2"></div>
 
+
+<nav aria-label="Breadcrumb">
+  <div class="container">
+    <ul id="breadcrumb-list">
+    </ul>
+  </div>
+</nav>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const breadcrumbList = document.getElementById('breadcrumb-list');
+    const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
+
+    //ตรวจสอบว่าอยู่หน้าแรก (แค่ newstore หรือ trandar_website/newstore)
+    const isHomePage = (
+      pathSegments.length === 1 && pathSegments[0] === 'newstore' ||
+      pathSegments.length === 2 && pathSegments.includes('trandar_website') && pathSegments.includes('newstore')
+    );
+
+    if (isHomePage) {
+      //อยู่หน้าแรก ไม่ต้องแสดง breadcrumb
+      return;
+    }
+
+    //กรอง path segment ที่ไม่ต้องการแสดงใน breadcrumb
+    const filteredSegments = pathSegments.filter(
+      segment => segment !== 'trandar_website' && segment !== 'newstore'
+    );
+
+    function createBreadcrumbItem(text, url = null, isLast = false) {
+      const li = document.createElement('li');
+      li.className = 'flex items-center';
+
+      let link = '';
+      if (url === "/newstore") {
+        link = pathConfig.BASE_WEB;
+      } else {
+        link =  pathConfig.BASE_WEB + url;
+      }
+
+      if (url && !isLast) {
+        const a = document.createElement('a');
+        a.href = link;
+        a.textContent = text;
+        a.setAttribute('data-lang', text);
+        li.appendChild(a);
+      } else {
+        const span = document.createElement('span');
+        span.className = 'text-gray-500';
+        span.textContent = text;
+        span.setAttribute('data-lang', text);
+        li.appendChild(span);
+      }
+
+      if (!isLast) {
+        const separator = document.createElement('span');
+        separator.className = 'mx-2';
+        separator.innerHTML = '<i class="bi bi-chevron-right"></i>';
+        li.appendChild(separator);
+      }
+      return li;
+    }
+
+    breadcrumbList.appendChild(
+      createBreadcrumbItem('home', '/newstore', false)
+    );
+
+    let currentPath = '';
+    filteredSegments.forEach((segment, index) => {
+      currentPath += '/' + segment;
+      const cleanPath = currentPath.replace(/^\/+/, ''); 
+
+      const isLastSegment = (index === filteredSegments.length - 1);
+      let displayTitle = segment.replace(/-/g, ' ');
+
+      breadcrumbList.appendChild(
+        createBreadcrumbItem(displayTitle, cleanPath, isLastSegment)
+      );
+    });
+
+  });
+</script>
 
 <script type="module">
   const base = pathConfig.BASE_WEB;

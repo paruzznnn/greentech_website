@@ -199,7 +199,7 @@ export const ProductDetailModule = {
         // this.saveCart();
         if(this.cartItems[0].quantity > 0){
 
-            const existingCart = JSON.parse(localStorage.getItem("userShoppingCart")) || [];
+            const existingCart = JSON.parse(localStorage.getItem("shoppingCart")) || [];
             const productIndex = existingCart.findIndex((item) => item.id === this.cartItems[0].id);
 
             if (productIndex !== -1) {
@@ -216,7 +216,7 @@ export const ProductDetailModule = {
                 showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
             }
 
-            localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
+            localStorage.setItem("shoppingCart", JSON.stringify(existingCart));
             
             // redirectGet(`${this.BASE_WEB}user/`, { id: productId });
         }

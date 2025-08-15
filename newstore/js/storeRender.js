@@ -284,7 +284,7 @@ function setupCarousel(container) {
 
 function addCart(product) {
   const existingCart =
-    JSON.parse(localStorage.getItem("userShoppingCart")) || [];
+    JSON.parse(localStorage.getItem("shoppingCart")) || [];
   const productIndex = existingCart.findIndex(
     (item) => item.id === product.productId
   );
@@ -301,12 +301,12 @@ function addCart(product) {
     });
     showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
   }
-  localStorage.setItem("userShoppingCart", JSON.stringify(existingCart));
+  localStorage.setItem("shoppingCart", JSON.stringify(existingCart));
 }
 
 function addWishlist(product) {
   const existingWishlist =
-    JSON.parse(localStorage.getItem("userLikedProducts")) || [];
+    JSON.parse(localStorage.getItem("likedProducts")) || [];
   const productIndex = existingWishlist.findIndex(
     (item) => item.id === product.productId
   );
@@ -322,7 +322,7 @@ function addWishlist(product) {
     showNotification('กดถูกใจไว้แล้ว', 'success');
   }
 
-  localStorage.setItem("userLikedProducts", JSON.stringify(existingWishlist));
+  localStorage.setItem("likedProducts", JSON.stringify(existingWishlist));
 }
 
 function formatPrice(currency, price) {
