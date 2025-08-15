@@ -45,6 +45,70 @@ h5 {
 }
 
 /*-------------------------------------------
+  Breadcrumb
+-------------------------------------------*/
+nav[aria-label="Breadcrumb"] {
+    /* background-color: #ffffff; */
+    padding-top: 20px;
+    /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); */
+    width: 100%;
+}
+
+#breadcrumb-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+    #breadcrumb-list {
+        font-size: 1rem;
+    }
+}
+
+#breadcrumb-list li {
+    display: flex;
+    align-items: center;
+}
+
+#breadcrumb-list li a {
+    color: #f18b20;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    border-radius: 0.375rem;
+    outline: none;
+}
+
+#breadcrumb-list li a:hover {
+    color: #ff8300;
+    /* text-decoration: underline; */
+}
+
+#breadcrumb-list li a:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.75);
+}
+
+#breadcrumb-list li span.text-gray-500 {
+    color: #6b7280;
+    cursor: default;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    border-radius: 0.375rem;
+}
+
+#breadcrumb-list li span.mx-2 {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+/*-------------------------------------------
   Tooltip
 -------------------------------------------*/
 
@@ -1204,11 +1268,11 @@ body.modal-open {
   Section              
 -----------------------------------------*/
 .section-space {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .section-space-search {
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 50px;
 }
 

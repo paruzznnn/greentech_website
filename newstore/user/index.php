@@ -35,9 +35,9 @@
                                 <li data-tab="info">
                                     <span><i class="bi bi-person-gear"></i> บัญชีของฉัน</span>
                                 </li>
-                                <li data-tab="payment">
-                                    <span><i class="bi bi-cash-coin"></i> บัตร เครดิต / เดบิต</span>
-                                </li>
+                                <!-- <li data-tab="payment">
+                                    <span><i class="bi bi-cash-coin"></i>ชำระเงิน</span>
+                                </li> -->
                                 <li class="active" data-tab="orders">
                                     <span><i class="bi bi-tag"></i> รายการสั่งซื้อ</span>
                                 </li>
@@ -68,8 +68,8 @@
                                     <div id="orders-list" class="orders-list-container"></div>
                                 </div>
                             </div>
-                            <div class="tabContent" id="payment">
-                            </div>
+                            <!-- <div class="tabContent" id="payment">
+                            </div> -->
                             <div class="tabContent" id="addresses">
                                 <div class="main-container">
                                     <form id="shippingAddressForm" class="mb-4">
@@ -97,54 +97,6 @@
                             <div class="tabContent" id="cart">
                                 <div class="main-container">
                                     <div id="cartContent" class="cart-content">
-                                        <div id="cartItemsList" class="cart-items-list"></div>
-                                        <div id="bottomSummaryGrid" class="bottom-summary-grid">
-
-                                            <div id="discountCodeCard" class="discount-code-card summary-card">
-                                                <div>
-                                                    <h2>ใช้คูปอง</h2>
-                                                    <button id="applyCouponBtn" class="apply-coupon-button">ใช้คูปอง</button>
-                                                </div>
-                                                <div>
-                                                    <h2>รหัสส่วนลด</h2>
-                                                    <div class="input-group">
-                                                        <input type="text" id="discountCodeInput" placeholder="กรอกรหัสส่วนลด">
-                                                        <p id="discountMessage" class="discount-message"></p>
-                                                    </div>
-                                                    <button id="applyDiscountCodeBtn" class="apply-discount-code-button">ใช้รหัส</button>
-                                                </div>
-                                            </div>
-
-                                            <div id="orderSummary" class="summary-card">
-                                                <h2 class="summary-title">สรุปคำสั่งซื้อ</h2>
-                                                <div class="summary-row">
-                                                    <span>จำนวนสินค้าทั้งหมด</span>
-                                                    <span id="totalItemsCount">0 ชิ้น</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ยอดรวมสินค้า</span>
-                                                    <span id="subtotal">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ค่าจัดส่ง</span>
-                                                    <span id="shippingCost">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ส่วนลด</span>
-                                                    <span id="discountAmountDisplay">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
-                                                    <span id="vatAmount">฿0.00</span>
-                                                </div>
-                                                <div class="summary-total">
-                                                    <span>ยอดชำระทั้งหมด</span>
-                                                    <span id="totalAmount">฿0.00</span>
-                                                </div>
-                                                <button class="checkout-button" onclick="proceedToCheckout()">ดำเนินการชำระเงิน</button>
-                                            </div>
-
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -287,25 +239,21 @@
     </script>
 
     <script type="module">
-        import {
-            setupProfileImageUpload
-        } from '../js/user/userRender.js?v=<?php echo time() ?>';
+        import { setupProfileImageUpload } from '../js/user/userRender.js?v=<?php echo time() ?>';
         document.addEventListener('DOMContentLoaded', () => {
             setupProfileImageUpload();
         });
     </script>
 
     <script type="module">
-        import {
-            createAddressCard
-        } from '../js/user/addressRender.js?v=<?php echo time() ?>';
+        import { createAddressCard } from '../js/user/addressRender.js?v=<?php echo time() ?>';
         document.getElementById('addAddressCardBtn').addEventListener('click', () => {
             createAddressCard();
         });
         createAddressCard();
     </script>
 
-    <script>
+    <!-- <script>
         const initialMyCouponsData = [{
                 id: 'user_cpn_001',
                 name: 'ส่วนลด 15%',
@@ -595,7 +543,7 @@
             });
         }
         window.onload = renderReviews;
-    </script>
+    </script> -->
 
 </body>
 
