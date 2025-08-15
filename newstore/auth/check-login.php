@@ -37,7 +37,6 @@ $action = $dataJson['action'];
 
 if ($action == "checkLogin") {
 
-
     //SETING COOKIE
     $userId = 1;
     $jwtData = generateJWT($userId);

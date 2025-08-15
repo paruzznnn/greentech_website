@@ -16,7 +16,6 @@ export function applyTranslations(dict) {
   document.querySelectorAll('[data-lang]').forEach(el => {
     const key = el.dataset.lang;
     if (!key) return;
-
     const txt = dict[key];
 
     if (txt !== undefined) {

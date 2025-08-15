@@ -776,12 +776,27 @@ body.modal-open {
   align-items: center;
   gap: 10px;
   min-width: 218px;
+  justify-content: flex-end;
 }
 
 .nav-store1-btn {
   background: none;
   border: none;
 }
+
+.nav-store1-btn {
+  border: 1px solid #ff9800;
+  color: #ff9800;
+  border-radius: 0.25rem;
+  font-size: 14px;
+  padding: 4px 15px;
+}
+
+.nav-store1-btn:hover {
+  background: #ff9800;
+  color: #ffffff;
+}
+
 
 .input-search-store1 {
   position: relative;
@@ -829,19 +844,6 @@ body.modal-open {
 
 .input-search-store1 .btn-inside:hover {
   background-color: #fd7349;
-}
-
-#modal-auth-store1 {
-  border: 1px solid #ff9800;
-  color: #ff9800;
-  border-radius: 0.25rem;
-  font-size: 14px;
-  padding: 4px 15px;
-}
-
-#modal-auth-store1:hover {
-  background: #ff9800;
-  color: #ffffff;
 }
 
 #linkContainer {
@@ -1242,15 +1244,19 @@ body.modal-open {
   Lang              
 -----------------------------------------*/
 
-/* #langButtons {
+#langButtons {
   display: flex;
   justify-content: flex-end;
-  margin-right: 25px;
+  /* margin-right: 25px; */
+  margin-top: 0.5rem;
   align-items: center;
+  gap: 5px;
 }
 
 #langButtons button {
-  font-size: 12px;
+  border: none;
+  background: none;
+  font-size: 14px;
   transition: color 0.3s ease, border-bottom 0.3s ease;
 }
 
@@ -1262,7 +1268,7 @@ body.modal-open {
 #langButtons button.active {
   color: #ff7800;
   border-bottom: 2px solid #ff7800;
-} */
+}
 
 /*---------------------------------------
   Section              

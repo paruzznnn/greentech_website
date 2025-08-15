@@ -1,14 +1,15 @@
+<!-- header 1 -->
 <header class="header-store1">
   <div class="navbar-news">
     <div class="container">
-      <!-- <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+      <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
         <div style="display: inline;">
           <span style="padding: 0 50px;">
             <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
               Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 </a>
           </span>
         </div>
-      </marquee> -->
+      </marquee>
     </div>
   </div>
   <nav class="pt-1">
@@ -22,7 +23,7 @@
         </div>
 
         <div class="nav-store1-box-search">
-          <!-- <form style="margin: 0px;">
+          <form style="margin: 0px;">
             <div class="input-search-store1">
               <i class="fa fa-search icon-left"></i>
               <input type="text" id="input-search" class="input-search" placeholder="ค้นหา..." />
@@ -31,7 +32,7 @@
                 <span>ค้นหาสินค้า</span>
               </button>
             </div>
-          </form> -->
+          </form>
         </div>
 
         <div class="nav-store1-box-menu">
@@ -42,12 +43,16 @@
                   <span>เข้าสู่ระบบ / ลงทะเบียน</span>
                 </button>
             </div>
+            <?php } else { ?>
+            <div>
+                <span><?php echo $_SESSION['user']['username']?></span>
+            </div>
+            <?php } ?>
             <div>
               <span id="menu-open-store1" style="font-size:20px;cursor:pointer">
                 <i class="bi bi-three-dots-vertical"></i>
               </span>
             </div>
-          <?php } ?>
         </div>
 
       </div>
@@ -58,6 +63,7 @@
   </nav>
 </header>
 
+<!-- header 2 -->
 <header class="header-store2">
   <nav class="pt-3 pb-3">
     <div class="container">
@@ -83,6 +89,7 @@
   </nav>
 </header>
 
+<!-- Modal -->
 <div id="auth-modal" class="store-modal">
   <div class="store-modal-content">
 
@@ -113,8 +120,6 @@
 
         <div class="auth-remember">
           <div>
-            <!-- <input class="form-check-input" type="checkbox" value="" id="accept-remember"> -->
-            <!-- <span>จดจำผู้ใช้งาน</span> -->
             <i class="bi bi-lock"></i>
             <span>ข้อมูลของคุณทั้งหมดจะถูกเข้ารหัส เพื่อความปลอดภัย</span>
           </div>
@@ -243,6 +248,7 @@
   </div>
 </div>
 
+<!-- Notify -->
 <div id="notificationContainer" class="notification-container">
     <div id="notificationMessage" class="notification-message"></div>
 </div>
@@ -272,6 +278,7 @@
       </a>
     </div>
   </div>
+
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -286,20 +293,29 @@
 </script>
 <?php } ?>
 
+<!-- sidenav 1 -->
 <aside id="sidenav-store1" class="sidenav">
   <div class="login-box-store1">
+
+    <?php if(empty($_SESSION['user'])) { ?>
     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" class="avatar-store1">
     <p>กรุณาเข้าสู่ระบบ</p>
+    <?php } else { ?>
+    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" class="avatar-store1">
+    <p><?php echo $_SESSION['user']['username']?></p>
+    <?php } ?>
+
     <a href="javascript:void(0)" id="menu-close-store1" class="closebtn-store1">&times;</a>
   </div>
   <div>
     <div id="langButtons">
-      <button data-lang="en" type="button" class="nav-store1-btn btn-sm">English</button>
-      <button data-lang="th" type="button" class="nav-store1-btn btn-sm">Thai</button>
+      <button data-lang="en" type="button" class="btn-sm">English</button>
+      <button data-lang="th" type="button" class="btn-sm">Thai</button>
     </div>
   </div>
 </aside>
 
+<!-- sidenav 2 -->
 <aside id="sidenav-store2" class="sidenav">
   <!-- <a href="javascript:void(0)" class="closebtn-store2" >&times;</a> -->
   <div class="pt-2 ps-2 pe-2">

@@ -7,7 +7,7 @@ export function handleFormSubmit(event) {
     const fromRedirect = form.dataset.redir;
     const fromType = form.dataset.type;
     const formData = new FormData(form);
-    
+
     if (!form.checkValidity()) {
         alert("Please fill out the information completely.");
         return;
@@ -17,6 +17,14 @@ export function handleFormSubmit(event) {
     formData.forEach((value, key) => {
         data[key] = value;
     });
+
+    console.log('data', data);
+    console.log('fromUrl', fromUrl);
+    console.log('fromRedirect', fromRedirect);
+    console.log('fromType', fromType);
+    
+
+    return;
 
     fetch(fromUrl, {
         method: "POST",
@@ -28,9 +36,7 @@ export function handleFormSubmit(event) {
     })
     .then((res) => res.json())
     .then((response) => {
-
         if(response.status){
-
           switch (fromType) {
             case "register":
               
@@ -41,7 +47,7 @@ export function handleFormSubmit(event) {
             default:
               break;
           }
-           
+          
         }
     })
     .catch((error) => {
