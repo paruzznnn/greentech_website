@@ -12,8 +12,8 @@
     if (!is_array($data)) {
         header("Location: index.php");
         exit;
-    }
-    $token      = trim($data['token']       ?? '');
+    } 
+    $token      = trim($data['token']       ?? ''); 
     $code       = trim($data['code']        ?? '');
     $firstname  = trim($data['firstname']   ?? '');
     $lastname   = trim($data['lastname']    ?? '');
@@ -36,9 +36,11 @@
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         session_regenerate_id(true);
-        $_SESSION['email'] = $row['email'];
+        $_SESSION['email'] = $email;
         $_SESSION['role_id']  = (int) $role_id;
         $_SESSION['logged_in']  = true;
+        $_SESSION['token']      = $token;
+        $_SESSION['code']       = $code;
         header("Location: admin/dashboard.php");
         exit;
     }
