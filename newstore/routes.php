@@ -32,11 +32,12 @@ function getRelativePath() {
 function parseRoute($RELATIVEPath) {
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
+    $last = end($segments);//folder
 
     return [
-        'controller' => $segments[0] ?? '', //folder
-        'action'     => $segments[1] ?? 'index', //file
-        'params'     => array_slice($segments, 2),
+        'controller' => $last ?? '',
+        // 'action'     => $segments[1] ?? 'index', //file
+        // 'params'     => array_slice($segments, 2),
     ];
 }
 
@@ -51,7 +52,7 @@ function buildUrl($path = '', $query = []) {
 
 function requireLogin() {
     if (!isset($_SESSION['user'])) {
-        header("Location: " . buildUrl('login'));
+        header("Location: " . buildUrl('login.php'));
         exit;
     }
 }
@@ -64,7 +65,7 @@ function redirectTo($path) {
 $RELATIVE = getRelativePath();
 $ROUTE = parseRoute($RELATIVE);
 
-if (in_array($ROUTE['controller'], ['dashboard', 'admin', 'user', 'app'])) {
+if (in_array($ROUTE['controller'], ['dashboard', 'admin', 'user', 'app', 'payment'])) {
     requireLogin();
 }
 
@@ -76,6 +77,7 @@ switch ($ROUTE['controller']) {
     case 'admin':
         break;
     case 'user':
+    case 'payment':
 
         $GLOBALS['BASE_WEB'] = getBasePath();
         echo "

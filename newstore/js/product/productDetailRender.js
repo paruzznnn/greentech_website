@@ -10,7 +10,6 @@ export async function fetchProductData(req, call, obj) {
         });
 
         const url = call + params.toString();
-
         const response = await fetch(url, {
             method: 'GET',
             headers: {
