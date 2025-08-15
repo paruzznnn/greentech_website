@@ -189,7 +189,7 @@ if ($result_projects->num_rows > 0) {
     </div>
 
 <script src='../js/index_.js?v=<?php echo time();?>'></script>
-<script src='js/blog_.js?v=<?php echo time();?>'></script>
+<script src='js/Blog_.js?v=<?php echo time();?>'></script>
 
 <script>
     $(document).ready(function() {

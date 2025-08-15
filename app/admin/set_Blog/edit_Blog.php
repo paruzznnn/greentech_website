@@ -380,7 +380,7 @@ $decodedId = $_POST['blog_id'];
             });
 
             $('#backToblogList').on('click', function() {
-                window.location.href = "list_blog.php";
+                window.location.href = "list_Blog.php";
             });
 
             $("#submitEditblog").on("click", function(event) {
@@ -472,7 +472,7 @@ $decodedId = $_POST['blog_id'];
                     if (result.isConfirmed) {
                         $('#loading-overlay').fadeIn();
                         $.ajax({
-                            url: "actions/process_blog.php",
+                            url: "actions/process_Blog.php",
                             type: "POST",
                             data: formData,
                             processData: false,
@@ -515,6 +515,6 @@ $decodedId = $_POST['blog_id'];
             // ... (Your existing isValidUrl function) ...
         }
     </script>
-    <script src='js/blog_.js?v=<?php echo time(); ?>'></script>
+    <script src='js/Blog_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
