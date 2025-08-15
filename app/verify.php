@@ -13,7 +13,7 @@
         header("Location: index.php");
         exit;
     } 
-    $token      = trim($data['token']       ?? '');
+    $token      = trim($data['token']       ?? ''); 
     $code       = trim($data['code']        ?? '');
     $firstname  = trim($data['firstname']   ?? '');
     $lastname   = trim($data['lastname']    ?? '');

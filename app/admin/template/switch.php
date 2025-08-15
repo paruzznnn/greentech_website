@@ -4,7 +4,7 @@
     $code       = $_SESSION['code'];
     $token      = $_SESSION['token'];
     if($token){
-        $dataArray = array(
+        $dataArray = array( 
             'token' => $token,
             'code' => $code 
         );
