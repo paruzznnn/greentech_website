@@ -6,7 +6,7 @@
     if($token){
         $dataArray = array(
             'token' => $token,
-            'code' => $code
+            'code' => $code 
         );
         $jsonData = json_encode($dataArray);
         $encodedData = urlencode($jsonData);

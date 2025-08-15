@@ -12,7 +12,7 @@
     if (!is_array($data)) {
         header("Location: index.php");
         exit;
-    }
+    } 
     $token      = trim($data['token']       ?? '');
     $code       = trim($data['code']        ?? '');
     $firstname  = trim($data['firstname']   ?? '');
