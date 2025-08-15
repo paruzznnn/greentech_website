@@ -419,6 +419,12 @@ $("#submitEditproject").on("click", function (event) {
         console.warn("⚠️ contentFromEditor is empty");
     }
 
+    // ส่วนที่เพิ่มเข้ามาสำหรับ Cover Photo
+    var coverFileInput = $("#fileInput_edit")[0]; 
+    if (coverFileInput && coverFileInput.files && coverFileInput.files[0]) {
+        formData.append("cover_photo", coverFileInput.files[0]);
+    }
+
     $(".is-invalid").removeClass("is-invalid");
     if (!$("#project_subject").val().trim()) {
         $("#project_subject").addClass("is-invalid");
@@ -435,9 +441,15 @@ $("#submitEditproject").on("click", function (event) {
         console.error("❌ Validation failed: project_content is empty");
         return;
     }
+    
+    // ตรวจสอบว่ามีการอัปโหลด cover photo หรือไม่ (เฉพาะตอนสร้างใหม่)
+    // สำหรับหน้าแก้ไข, สามารถเว้นได้ หากไม่ต้องการบังคับให้อัปโหลดใหม่
+    // ถ้าต้องการบังคับให้มีรูปภาพตลอดเวลา ให้เพิ่มเงื่อนไขนี้
+    // if (!formData.get("cover_photo") && !มีรูปเดิม) { ... }
+
     formData.set("project_subject", $("#project_subject").val());
     formData.set("project_description", $("#project_description").val());
-
+    
     Swal.fire({
         title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
         text: "Do you want to edit project?",
@@ -459,7 +471,7 @@ $("#submitEditproject").on("click", function (event) {
                     try {
                         var json = (typeof response === "string") ? JSON.parse(response) : response;
                         if (json.status === 'success') {
-                             location.reload();
+                            location.reload();
                         } else {
                             Swal.fire('Error', json.message || 'Unknown error', 'error');
                         }
@@ -479,6 +491,23 @@ $("#submitEditproject").on("click", function (event) {
         }
     });
 });
+
+// เพิ่มส่วนสำหรับ preview cover photo บนหน้า edit
+// $("#fileInput_edit").on('change', function () {
+//     readURL(this, '#previewImage_edit');
+// });
+
+// function readURL(input, previewElementId) {
+//     if (input.files && input.files[0]) {
+//         var reader = new FileReader();
+//         reader.onload = function (e) {
+//             let previewImage = $(previewElementId);
+//             previewImage.attr('src', e.target.result);
+//             previewImage.css('display', 'block');
+//         }
+//         reader.readAsDataURL(input.files[0]);
+//     }
+// }
 
 $("#backToShopList").on("click", function () {
     window.location.href = "list_project.php";
