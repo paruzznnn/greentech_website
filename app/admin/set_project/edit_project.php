@@ -12,6 +12,7 @@ $decodedId = $_POST['project_id'];
 ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,11 +28,14 @@ $decodedId = $_POST['project_id'];
     <script src="../../../inc/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+        crossorigin="anonymous" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
 
     <link href="../../../inc/sweetalert2/css/sweetalert2.min.css" rel="stylesheet">
     <script src="../../../inc/sweetalert2/js/sweetalert2.all.min.js"></script>
@@ -42,8 +46,10 @@ $decodedId = $_POST['project_id'];
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.4/datatables.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.4/datatables.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
@@ -59,38 +65,46 @@ $decodedId = $_POST['project_id'];
             font-size: 16px;
             line-height: 1.5;
         }
+
         .box-content p {
             color: #424242;
         }
+
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
+
         .responsive-button-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
+
         @media (max-width: 768px) {
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
         }
+
         @media (max-width: 480px) {
             .responsive-button-container div {
                 text-align: center;
             }
         }
+
         .note-toolbar {
             position: sticky !important;
             top: 70px !important;
             z-index: 1 !important;
         }
+
         .nav-link.active {
             font-weight: bold;
             border-bottom: 2px solid #007bff;
         }
+
         .flag-icon {
             width: 36px;
             margin-right: 8px;
@@ -139,7 +153,7 @@ $decodedId = $_POST['project_id'];
                         $row = $result->fetch_assoc();
                         $content_th = $row['content_project'];
                         $content_en = $row['content_project_en'];
-                        
+
                         $pic_data = [];
                         $previewImageSrc = '';
 
@@ -147,9 +161,9 @@ $decodedId = $_POST['project_id'];
                             $files = explode('|||', $row['files']);
                             foreach ($files as $file_str) {
                                 list($file_name, $api_path, $status) = explode(':::', $file_str);
-                                if ($status == 1) { 
+                                if ($status == 1) {
                                     $previewImageSrc = htmlspecialchars($api_path);
-                                } else { 
+                                } else {
                                     $pic_data[htmlspecialchars($file_name)] = htmlspecialchars($api_path);
                                 }
                             }
@@ -188,7 +202,7 @@ $decodedId = $_POST['project_id'];
                         while ($shop = $allShopsQuery->fetch_assoc()) {
                             $allShopsOptions .= "<option value='{$shop['shop_id']}'>{$shop['subject_shop']}</option>";
                         }
-                        
+
                         // **แก้ไข** ส่วนนี้โดยลบ WHERE del = 0 ออก
                         $relatedShopsQuery = $conn->prepare("SELECT shop_id FROM dn_project_shop WHERE project_id = ?");
                         if ($relatedShopsQuery === false) {
@@ -306,9 +320,9 @@ $decodedId = $_POST['project_id'];
             </div>
         </div>
     </div>
-    
+
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.select2-multiple').select2();
             var relatedShops = <?php echo $relatedShopsJSON; ?>;
             $('#related_shops_edit').val(relatedShops).trigger('change');
@@ -331,7 +345,7 @@ $decodedId = $_POST['project_id'];
                 fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
             });
 
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
                 var target = $(e.target).attr("data-bs-target");
                 if (target === '#en') {
                     if ($('#summernote_update_en').data('summernote')) {
@@ -358,32 +372,72 @@ $decodedId = $_POST['project_id'];
             });
 
             // New Copy from Thai button functionality
-            $('#copyFromThai').on('click', function() {
+            $('#copyFromThai').on('click', function () {
+                // ดึงค่าจากฟอร์มภาษาไทย
                 var thaiSubject = $('#project_subject').val();
                 var thaiDescription = $('#project_description').val();
                 var thaiContent = $('#summernote_update').summernote('code');
 
-                $('#project_subject_en').val(thaiSubject);
-                $('#project_description_en').val(thaiDescription);
-                $('#summernote_update_en').summernote('code', thaiContent);
+                // สร้าง Object สำหรับข้อมูลที่จะส่งไป
+                const dataToSend = {
+                    language: "th",
+                    translate: "en",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
+
+                // ส่งข้อมูลแบบ POST ไปยังไฟล์ actions/translate.php
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer', // แก้ไข token ถ้าจำเป็น
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
+
+                    // ตรวจสอบสถานะการทำงาน
+                    if (response.status === 'success' && response.data) {
+                        // นำค่าที่แปลแล้วไปใส่ในฟอร์มภาษาอังกฤษ
+                        $('#project_subject_en').val(response.data.subject);
+                        $('#project_description_en').val(response.data.description);
+                        $('#summernote_update_en').summernote('code', response.data.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        // แสดงข้อความ error ถ้าการแปลไม่สำเร็จ
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                });
             });
-            
-            $('#fileInput').on('change', function() {
+
+
+            $('#fileInput').on('change', function () {
                 var input = this;
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         $('#previewImage').attr('src', e.target.result);
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
             });
 
-            $('#backToProjectList').on('click', function() {
+            $('#backToProjectList').on('click', function () {
                 window.location.href = "list_project.php";
             });
 
-            $("#submitEditproject").on("click", function(event) {
+            $("#submitEditproject").on("click", function (event) {
                 event.preventDefault();
                 var formproject = $("#formproject_edit")[0];
                 var formData = new FormData(formproject);
@@ -392,7 +446,7 @@ $decodedId = $_POST['project_id'];
                 var contentFromEditor_th = $("#summernote_update").summernote('code');
                 var contentFromEditor_en = $('#summernote_update_en').summernote('code');
                 var checkIsUrl = false;
-                
+
                 if (contentFromEditor_th) {
                     var tempDiv = document.createElement("div");
                     tempDiv.innerHTML = contentFromEditor_th;
@@ -517,4 +571,5 @@ $decodedId = $_POST['project_id'];
     </script>
     <script src='js/project_.js?v=<?php echo time(); ?>'></script>
 </body>
+
 </html>
