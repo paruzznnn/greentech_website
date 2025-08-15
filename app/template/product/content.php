@@ -1,13 +1,20 @@
 <?php
 // ตรวจสอบว่าได้มีการเชื่อมต่อฐานข้อมูลและตัวแปร $conn พร้อมใช้งานแล้ว
 if (!isset($conn)) {
-    // ในกรณีที่คุณไม่มีการเชื่อมต่อฐานข้อมูลในไฟล์นี้ ผมจะสร้างตัวแปรจำลองขึ้นมาเพื่อไม่ให้เกิด error
-    // แต่ถ้าคุณมีจริง ๆ ให้ลบบรรทัดนี้ออก
     $conn = new mysqli('localhost', 'user', 'password', 'database');
     if ($conn->connect_error) {
         die("Database connection failed: " . $conn->connect_error);
     }
 }
+
+// 1. กำหนดตัวแปรภาษา
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th']) ? $_GET['lang'] : 'th';
+
+// 2. สร้างตัวแปรสำหรับชื่อคอลัมน์
+$subject_col = ($lang === 'en') ? 'subject_shop_en' : 'subject_shop';
+$description_col = ($lang === 'en') ? 'description_shop_en' : 'description_shop';
+$content_col = ($lang === 'en') ? 'content_shop_en' : 'content_shop';
+$group_name_col = ($lang === 'en') ? 'group_name_en' : 'group_name';
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $selectedGroupId = isset($_GET['group_id']) ? (int)$_GET['group_id'] : 0;
@@ -16,16 +23,16 @@ $selectedSubGroupId = isset($_GET['sub_group_id']) ? (int)$_GET['sub_group_id'] 
 $allProductsData = [];
 $sqlAllProducts = "SELECT
     dn.shop_id,
-    dn.subject_shop,
-    dn.description_shop,
-    dn.content_shop,
+    dn.$subject_col AS subject_shop,
+    dn.$description_col AS description_shop,
+    dn.$content_col AS content_shop,
     dn.date_create,
     dn.group_id,
     sub_group.group_id AS sub_group_id,
-    sub_group.group_name AS sub_group_name,
+    sub_group.$group_name_col AS sub_group_name,
     sub_group.parent_group_id,
     main_group.group_id AS main_group_id,
-    main_group.group_name AS main_group_name,
+    main_group.$group_name_col AS main_group_name,
     main_group.image_path AS main_group_image_path,
     (SELECT dnc.api_path FROM dn_shop_doc dnc WHERE dnc.shop_id = dn.shop_id AND dnc.del = '0' AND dnc.status = '1' ORDER BY dnc.id ASC LIMIT 1) AS first_image_path
 FROM dn_shop dn
@@ -35,7 +42,8 @@ WHERE dn.del = '0' AND sub_group.parent_group_id IS NOT NULL";
 
 if ($searchQuery) {
     $safeQuery = $conn->real_escape_string($searchQuery);
-    $sqlAllProducts .= " AND (dn.subject_shop LIKE '%$safeQuery%' OR dn.description_shop LIKE '%$safeQuery%')";
+    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษด้วย
+    $sqlAllProducts .= " AND (dn.$subject_col LIKE '%$safeQuery%' OR dn.$description_col LIKE '%$safeQuery%')";
 }
 
 if ($selectedSubGroupId > 0) {
@@ -44,7 +52,8 @@ if ($selectedSubGroupId > 0) {
     $sqlAllProducts .= " AND main_group.group_id = $selectedGroupId";
 }
 
-$sqlAllProducts .= " ORDER BY main_group.group_name ASC, sub_group.group_name ASC, dn.shop_id ASC";
+// เรียงลำดับตามชื่อกลุ่มภาษาที่เลือก
+$sqlAllProducts .= " ORDER BY main_group.$group_name_col ASC, sub_group.$group_name_col ASC, dn.shop_id ASC";
 
 $resultAllProducts = $conn->query($sqlAllProducts);
 $allProductsData = [];
@@ -105,6 +114,7 @@ $finalDisplayItems = array_values($organizedGroups);
 if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
     $tempDisplayItems = [];
     foreach ($allProductsData as $product) {
+        // ใช้ชื่อคอลัมน์ที่ถูกเลือกตามภาษาที่เลือก
         $shouldAddProduct = false;
         if ($searchQuery && (stripos($product['subject_shop'], $searchQuery) !== false || stripos($product['description_shop'], $searchQuery) !== false)) {
             $shouldAddProduct = true;
@@ -403,7 +413,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
     <form method="GET" action="">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="Search product...">
+            <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
+            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo $lang === 'en' ? 'Search product...' : 'ค้นหาสินค้า...'; ?>">
             <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
@@ -412,7 +423,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 <h2 style="font-size: 28px; font-weight: bold; margin-top: 20px;">
     <?php
     if ($searchQuery) {
-        echo 'Search Results for "' . htmlspecialchars($searchQuery) . '"';
+        $text = $lang === 'en' ? 'Search Results for' : 'ผลการค้นหาสำหรับ';
+        echo $text . ' "' . htmlspecialchars($searchQuery) . '"';
     } elseif ($selectedSubGroupId > 0) {
         $groupName = '';
         foreach ($allProductsData as $prod) {
@@ -421,7 +433,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 break;
             }
         }
-        echo 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"';
+        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"';
+        echo $text;
     } elseif ($selectedGroupId > 0) {
         $groupName = '';
         foreach ($allProductsData as $prod) {
@@ -430,9 +443,10 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 break;
             }
         }
-        echo 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"';
+        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"';
+        echo $text;
     } else {
-        echo 'Product Categories';
+        echo $lang === 'en' ? 'Product Categories' : 'หมวดหมู่สินค้า';
     }
     ?>
 </h2>
@@ -440,24 +454,24 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 <div class="product-grid-container">
     <?php if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0): ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p>No products found for your criteria.</p>
+            <p><?php echo $lang === 'en' ? 'No products found for your criteria.' : 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ'; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $product): ?>
                 <div class="box-news">
                     <div class="box-image">
                         <?php $encodedId = urlencode(base64_encode($product['id'])); ?>
-                        <a href="shop_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                        <a href="shop_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
                             <?php if (!empty($product['iframe'])): ?>
                                 <iframe frameborder="0" src="<?php echo htmlspecialchars($product['iframe']); ?>" width="100%" height="100%" class="note-video-clip"></iframe>
                             <?php elseif (!empty($product['image'])): ?>
                                 <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                             <?php else: ?>
-                                <img src="path/to/default/shop_placeholder.jpg" alt="No image available">
+                                <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $lang === 'en' ? 'No image available' : 'ไม่มีรูปภาพ'; ?>">
                             <?php endif; ?>
                         </a>
                     </div>
                     <div class="box-content">
-                        <a href="shop_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                        <a href="shop_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
                             <h5 class="line-clamp"><?php echo htmlspecialchars($product['title']); ?></h5>
                             <p class="line-clamp"><?php echo htmlspecialchars($product['description']); ?></p>
                         </a>
@@ -467,7 +481,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         <?php endif; ?>
     <?php else: // ไม่ใช่การค้นหาหรือกรองกลุ่ม ให้แสดงบล็อกหมวดหมู่หลัก ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p>No categories found with assigned products.</p>
+            <p><?php echo $lang === 'en' ? 'No categories found with assigned products.' : 'ไม่พบหมวดหมู่ที่มีสินค้า'; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $mainGroupData): ?>
                 <div class="main-category-block" data-main-group-id="<?php echo htmlspecialchars($mainGroupData['id']); ?>">
@@ -477,7 +491,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                     <div class="block-header-bottom">
                         <div class="block-title-info">
                             <h3><?php echo htmlspecialchars($mainGroupData['name']); ?></h3>
-                            <p class="product-count"><?php echo $mainGroupData['total_products']; ?> products</p>
+                            <p class="product-count"><?php echo $mainGroupData['total_products'] . ($lang === 'en' ? ' products' : ' รายการ'); ?></p>
                         </div>
                         <span class="toggle-arrow"><i class="fas fa-chevron-down"></i></span>
                     </div>
@@ -492,7 +506,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                                         </div>
                                         <ul class="product-list-accordion" style="display: none;">
                                             <?php foreach ($subGroupData['products'] as $product): ?>
-                                                <li><a href="shop_detail.php?id=<?php echo urlencode(base64_encode($product['id'])); ?>"><?php echo htmlspecialchars($product['title']); ?></a></li>
+                                                <li><a href="shop_detail.php?id=<?php echo urlencode(base64_encode($product['id'])); ?>&lang=<?php echo $lang; ?>"><?php echo htmlspecialchars($product['title']); ?></a></li>
                                             <?php endforeach; ?>
                                         </ul>
                                     </li>
@@ -514,16 +528,13 @@ $(document).ready(function() {
         var $blockContent = $(this).siblings('.dropdown-container');
         var $toggleArrow = $(this).find('.toggle-arrow i');
         
-        // ตรวจสอบว่า Dropdown กำลังจะเปิดหรือปิด
         var isCurrentlyVisible = $blockContent.is(':visible');
 
-        // ปิด dropdown ทั้งหมดก่อน
         $('.main-category-block').removeClass('active');
         $('.product-grid-container').removeClass('is-dropdown-open');
         $('.main-category-block .dropdown-container').slideUp(300);
         $('.main-category-block .toggle-arrow i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
 
-        // ถ้า Dropdown ไม่ได้เปิดอยู่ ให้เปิดอันที่คลิก
         if (!isCurrentlyVisible) {
             $mainCategoryBlock.addClass('active');
             $('.product-grid-container').addClass('is-dropdown-open');
@@ -534,15 +545,13 @@ $(document).ready(function() {
 
     // Toggle for Sub Category items
     $('.sub-category-item .sub-category-header').on('click', function(e) {
-        e.stopPropagation(); // หยุด event propagation
+        e.stopPropagation();
         var $productList = $(this).next('.product-list-accordion');
         var $toggleArrowSub = $(this).find('.toggle-arrow-sub i');
         
-        // ปิด sub-category dropdown อันอื่นในกลุ่มเดียวกัน
         $(this).closest('.sub-category-list').find('.product-list-accordion').not($productList).slideUp(300);
         $(this).closest('.sub-category-list').find('.toggle-arrow-sub i').not($toggleArrowSub).removeClass('fa-chevron-up').addClass('fa-chevron-down');
         
-        // เปิด/ปิด sub-category dropdown
         $productList.slideToggle(300, function() {
             if ($productList.is(':visible')) {
                 $toggleArrowSub.removeClass('fa-chevron-down').addClass('fa-chevron-up');

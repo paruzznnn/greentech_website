@@ -49,9 +49,9 @@ function handleFileUpload($files)
 {
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf'];
     $maxFileSize = 5 * 1024 * 1024; // 5 MB
-
     $uploadResults = [];
 
+    // ตรวจสอบว่าเป็นไฟล์ array หรือไฟล์เดียว
     if (isset($files['name']) && is_array($files['name'])) {
         foreach ($files['name'] as $key => $fileName) {
             if ($files['error'][$key] === UPLOAD_ERR_OK) {
@@ -99,44 +99,80 @@ function handleFileUpload($files)
                 ];
             }
         }
+    } else if (isset($files['name']) && $files['error'] === UPLOAD_ERR_OK) { // จัดการกรณีที่เป็นไฟล์เดียว (เช่น Cover Photo)
+        $fileTmpPath = $files['tmp_name'];
+        $fileName = $files['name'];
+        $fileSize = $files['size'];
+        $fileType = $files['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+            $uploadFileDir = '../../../../public/news_img/';
+            $destFilePath = $uploadFileDir . $fileName;
+
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
+            }
+
+            if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                $uploadResults[] = [
+                    'success' => true,
+                    'fileName' => $fileName,
+                    'fileSize' => $fileSize,
+                    'fileType' => $fileType,
+                    'filePath' => $destFilePath
+                ];
+            } else {
+                $uploadResults[] = [
+                    'success' => false,
+                    'fileName' => $fileName,
+                    'error' => 'Error occurred while moving the uploaded file.'
+                ];
+            }
+        } else {
+            $uploadResults[] = [
+                'success' => false,
+                'fileName' => $fileName,
+                'error' => 'Invalid file type or file size exceeds limit.'
+            ];
+        }
     } else {
         $uploadResults[] = [
             'success' => false,
             'error' => 'No files were uploaded.'
         ];
     }
-
     return $uploadResults;
 }
-
 
 $response = array('status' => 'error', 'message' => '');
 
 try {
     if (isset($_POST['action']) && $_POST['action'] == 'addblog') {
-        $Blog_array = [
-            'Blog_subject' => $_POST['Blog_subject'] ?? '',
-            'Blog_description' => $_POST['Blog_description'] ?? '',
-            'Blog_content'  => $_POST['Blog_content'] ?? '',
+        $blog_array = [
+            'blog_subject' => $_POST['blog_subject'] ?? '',
+            'blog_description' => $_POST['blog_description'] ?? '',
+            'blog_content'  => $_POST['blog_content'] ?? '',
         ];
         
         $related_projects = $_POST['related_projects'] ?? [];
 
-        if (isset($Blog_array)) {
+        if (isset($blog_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_blog 
                 (subject_blog, description_blog, content_blog, date_create) 
                 VALUES (?, ?, ?, ?)");
 
-            $Blog_subject = $Blog_array['Blog_subject'];
-            $Blog_description = $Blog_array['Blog_description'];
-            $Blog_content = mb_convert_encoding($Blog_array['Blog_content'], 'UTF-8', 'auto');
+            $blog_subject = $blog_array['blog_subject'];
+            $blog_description = $blog_array['blog_description'];
+            $blog_content = mb_convert_encoding($blog_array['blog_content'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
                 "ssss",
-                $Blog_subject,
-                $Blog_description,
-                $Blog_content,
+                $blog_subject,
+                $blog_description,
+                $blog_content,
                 $current_date
             );
 
@@ -144,10 +180,9 @@ try {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
             $last_inserted_id = $conn->insert_id;
-
-            // เพิ่มส่วนนี้: บันทึกข้อมูลสินค้าที่เกี่ยวข้อง
+            
             if (!empty($related_projects)) {
-                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (Blog_id, project_id) VALUES (?, ?)");
+                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (blog_id, project_id) VALUES (?, ?)");
                 foreach ($related_projects as $project_id) {
                     $stmt_project_insert->bind_param("ii", $last_inserted_id, $project_id);
                     $stmt_project_insert->execute();
@@ -155,133 +190,186 @@ try {
                 $stmt_project_insert->close();
             }
 
-            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
+            // แก้ไขการตรวจสอบไฟล์
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                        $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['image_files']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                        $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
                         $fileValues = [$last_inserted_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
-
+            
             $response = array('status' => 'success', 'message' => 'save');
         }
 
     } elseif (isset($_POST['action']) && $_POST['action'] == 'editblog') {
-        $Blog_array = [
-            'Blog_id' => $_POST['Blog_id'] ?? '',
-            'Blog_subject' => $_POST['Blog_subject'] ?? '',
-            'Blog_description' => $_POST['Blog_description'] ?? '',
-            'Blog_content'  => $_POST['Blog_content'] ?? '',
+        $blog_array = [
+            'blog_id' => $_POST['blog_id'] ?? '',
+            'blog_subject' => $_POST['blog_subject'] ?? '',
+            'blog_description' => $_POST['blog_description'] ?? '',
+            'blog_content'  => $_POST['blog_content'] ?? '',
+            'blog_subject_en' => $_POST['blog_subject_en'] ?? '',
+            'blog_description_en' => $_POST['blog_description_en'] ?? '',
+            'blog_content_en'  => $_POST['blog_content_en'] ?? '',
         ];
 
         $related_projects = $_POST['related_projects'] ?? [];
 
-        if (!empty($Blog_array['Blog_id'])) {
+        if (!empty($blog_array['blog_id'])) {
             $stmt = $conn->prepare("UPDATE dn_blog 
             SET subject_blog = ?, 
             description_blog = ?, 
-            content_blog = ?, 
+            content_blog = ?,
+            subject_blog_en = ?,
+            description_blog_en = ?,
+            content_blog_en = ?,
             date_create = ? 
-            WHERE Blog_id = ?");
+            WHERE blog_id = ?");
 
-            $Blog_subject = $Blog_array['Blog_subject'];
-            $Blog_description = $Blog_array['Blog_description'];
-            $Blog_content = mb_convert_encoding($Blog_array['Blog_content'], 'UTF-8', 'auto');
+            $blog_subject = $blog_array['blog_subject'];
+            $blog_description = $blog_array['blog_description'];
+            $blog_content = mb_convert_encoding($blog_array['blog_content'], 'UTF-8', 'auto');
+            $blog_subject_en = $blog_array['blog_subject_en'] ?? '';
+            $blog_description_en = $blog_array['blog_description_en'] ?? '';
+            $blog_content_en = mb_convert_encoding($blog_array['blog_content_en'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
-            $Blog_id = $Blog_array['Blog_id'];
+            $blog_id = $blog_array['blog_id'];
 
             $stmt->bind_param(
-                "ssssi",
-                $Blog_subject,
-                $Blog_description,
-                $Blog_content,
+                "sssssssi",
+                $blog_subject,
+                $blog_description,
+                $blog_content,
+                $blog_subject_en,
+                $blog_description_en,
+                $blog_content_en,
                 $current_date,
-                $Blog_id
+                $blog_id
             );
 
             if (!$stmt->execute()) {
                 throw new Exception("Execute statement failed: " . $stmt->error);
             }
-
-            // เพิ่มส่วนนี้: อัปเดตข้อมูลสินค้าที่เกี่ยวข้อง
-            // 1. ลบข้อมูลเก่าทั้งหมดของ blog นี้ออกจากตาราง dn_blog_project
-            $stmt_delete_projects = $conn->prepare("DELETE FROM dn_blog_project WHERE Blog_id = ?");
-            $stmt_delete_projects->bind_param("i", $Blog_id);
+            
+            $stmt_delete_projects = $conn->prepare("DELETE FROM dn_blog_project WHERE blog_id = ?");
+            $stmt_delete_projects->bind_param("i", $blog_id);
             $stmt_delete_projects->execute();
             $stmt_delete_projects->close();
 
-            // 2. เพิ่มข้อมูลใหม่
             if (!empty($related_projects)) {
-                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (Blog_id, project_id) VALUES (?, ?)");
+                $stmt_project_insert = $conn->prepare("INSERT INTO dn_blog_project (blog_id, project_id) VALUES (?, ?)");
                 foreach ($related_projects as $project_id) {
-                    $stmt_project_insert->bind_param("ii", $Blog_id, $project_id);
+                    $stmt_project_insert->bind_param("ii", $blog_id, $project_id);
                     $stmt_project_insert->execute();
                 }
                 $stmt_project_insert->close();
             }
-            // ... (โค้ดส่วนการอัปโหลดไฟล์เหมือนเดิม) ...
-            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] != 4) {
-                $fileInfos = handleFileUpload($_FILES['fileInput']);
-                foreach ($fileInfos as $fileInfo) {
-                    if ($fileInfo['success']) {
-                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                        $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                        $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-                        $fileWhereClause = 'Blog_id = ?';
-                        $fileWhereValues = [$Blog_id];
-                        updateInDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
-                    } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+
+            // จัดการรูป Cover Photo
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] == UPLOAD_ERR_OK) {
+                // 1. ดึง path ของรูปเก่าเพื่อลบ
+                $getOldCoverStmt = $conn->prepare("SELECT file_path FROM dn_blog_doc WHERE blog_id = ? AND status = 1 AND del = 0");
+                if ($getOldCoverStmt) {
+                    $getOldCoverStmt->bind_param("i", $blog_id);
+                    $getOldCoverStmt->execute();
+                    $oldCoverResult = $getOldCoverStmt->get_result();
+                    if ($oldCoverRow = $oldCoverResult->fetch_assoc()) {
+                        $oldCoverPath = $oldCoverRow['file_path'];
+                        // 2. ลบไฟล์เก่าถ้ามีอยู่จริง
+                        if ($oldCoverPath && file_exists($oldCoverPath)) {
+                            unlink($oldCoverPath);
+                        }
                     }
+                    $getOldCoverStmt->close();
+                }
+
+                // 3. อัปโหลดไฟล์รูปภาพใหม่
+                $fileInfo = handleFileUpload($_FILES['fileInput'])[0];
+                if ($fileInfo['success']) {
+                    $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                    
+                    // 4. ตรวจสอบว่ามี Cover Photo ในฐานข้อมูลอยู่แล้วหรือไม่
+                    $checkExistingCoverStmt = $conn->prepare("SELECT COUNT(*) FROM dn_blog_doc WHERE blog_id = ? AND status = 1 AND del = 0");
+                    $checkExistingCoverStmt->bind_param("i", $blog_id);
+                    $checkExistingCoverStmt->execute();
+                    $existingCount = $checkExistingCoverStmt->get_result()->fetch_row()[0];
+                    $checkExistingCoverStmt->close();
+
+                    if ($existingCount > 0) {
+                         // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
+                        $updateCoverStmt = $conn->prepare("UPDATE dn_blog_doc
+                            SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
+                            WHERE blog_id = ? AND status = 1 AND del = 0");
+                        if ($updateCoverStmt) {
+                            $updateCoverStmt->bind_param(
+                                "sisssi",
+                                $fileInfo['fileName'],
+                                $fileInfo['fileSize'],
+                                $fileInfo['fileType'],
+                                $fileInfo['filePath'],
+                                $picPath,
+                                $blog_id
+                            );
+                            $updateCoverStmt->execute();
+                            $updateCoverStmt->close();
+                        }
+                    } else {
+                        // 6. ถ้าไม่มี ให้แทรกข้อมูลใหม่
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    }
+                    
+                } else {
+                    throw new Exception('Error uploading cover file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                 }
             }
-            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'] != 4) {
-                $fileInfos = handleFileUpload($_FILES['image_files']);
+
+            // จัดการรูปภาพใน Content (ภาษาไทย)
+            if (isset($_FILES['image_files_th']) && is_array($_FILES['image_files_th']['name']) && $_FILES['image_files_th']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_th']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
                         $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                        $fileColumns = ['Blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
-                        $fileValues = [$Blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath];
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
-                        throw new Exception('Error uploading file: ' . $fileInfo['fileName'] . ' - ' . $fileInfo['error']);
+                        throw new Exception('Error uploading content file (TH): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
-            // ... (สิ้นสุดโค้ดส่วนการอัปโหลดไฟล์) ...
             
             $response = array('status' => 'success', 'message' => 'edit save');
         }
 
     } elseif (isset($_POST['action']) && $_POST['action'] == 'delblog') {
-        $Blog_id = $_POST['id'] ?? '';
+        $blog_id = $_POST['id'] ?? '';
         $del = '1';
         
         $stmt = $conn->prepare("UPDATE dn_blog 
             SET del = ? 
-            WHERE Blog_id = ?");
-        $stmt->bind_param("si", $del, $Blog_id);
+            WHERE blog_id = ?");
+        $stmt->bind_param("si", $del, $blog_id);
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed: " . $stmt->error);
         }
@@ -289,18 +377,17 @@ try {
         
         $stmt = $conn->prepare("UPDATE dn_blog_doc 
             SET del = ? 
-            WHERE Blog_id = ?");
-        $stmt->bind_param("si", $del, $Blog_id);
+            WHERE blog_id = ?");
+        $stmt->bind_param("si", $del, $blog_id);
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed: " . $stmt->error);
         }
         $stmt->close();
 
-        // เพิ่มส่วนนี้: อัปเดตตาราง dn_blog_project
         $stmt = $conn->prepare("UPDATE dn_blog_project 
             SET del = ? 
-            WHERE Blog_id = ?");
-        $stmt->bind_param("si", $del, $Blog_id);
+            WHERE blog_id = ?");
+        $stmt->bind_param("si", $del, $blog_id);
         if (!$stmt->execute()) {
             throw new Exception("Execute statement failed: " . $stmt->error);
         }
@@ -317,7 +404,7 @@ try {
         $orderIndex = isset($_POST['order'][0]['column']) ? intval($_POST['order'][0]['column']) : 0;
         $orderDir = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'asc';
 
-        $columns = ['Blog_id'];
+        $columns = ['blog_id'];
 
         $whereClause = "del = 0";
 
@@ -327,7 +414,7 @@ try {
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
-        $dataQuery = "SELECT Blog_id, subject_blog, date_create FROM dn_blog 
+        $dataQuery = "SELECT blog_id, subject_blog, date_create FROM dn_blog 
                     WHERE $whereClause
                     ORDER BY $orderBy
                     LIMIT $start, $length";
@@ -338,7 +425,7 @@ try {
             $data[] = $row;
         }
 
-        $Index = 'Blog_id';
+        $Index = 'blog_id';
         $totalRecords = getTotalRecords($conn, 'dn_blog', $Index);
         $totalFiltered = getFilteredRecordsCount($conn, 'dn_blog', $whereClause, $Index);
 
@@ -360,3 +447,4 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
+?>

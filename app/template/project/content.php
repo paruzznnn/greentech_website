@@ -3,16 +3,22 @@ $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+
+// สร้างชื่อคอลัมน์ตามภาษาที่เลือก
+$subject_col = $lang === 'en' ? 'subject_project_en' : 'subject_project';
+$description_col = $lang === 'en' ? 'description_project_en' : 'description_project';
 
 // --- MODIFIED: Ensure totalQuery also respects 'del' status and valid documents ---
 $totalQuery = "SELECT COUNT(DISTINCT dn.project_id) as total
                FROM dn_project dn
                LEFT JOIN dn_project_doc dnc ON dn.project_id = dnc.project_id
-                                           AND dnc.del = '0'
-                                           AND dnc.status = '1'
+                                             AND dnc.del = '0'
+                                             AND dnc.status = '1'
                WHERE dn.del = '0'"; // Filter projects that are not deleted
 if ($searchQuery) {
-    $totalQuery .= " AND dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    // ใช้คอลัมน์ที่ถูกต้องสำหรับการค้นหาตามภาษา
+    $totalQuery .= " AND dn.{$subject_col} LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -23,8 +29,8 @@ $totalPages = ceil($totalItems / $perPage);
 // --- MODIFIED: Main SQL query to correctly handle filtering and aggregation ---
 $sql = "SELECT
             dn.project_id,
-            dn.subject_project,
-            dn.description_project,
+            dn.{$subject_col} AS subject_project,
+            dn.{$description_col} AS description_project,
             dn.content_project,
             dn.date_create,
             GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
@@ -33,14 +39,15 @@ $sql = "SELECT
             dn_project dn
         LEFT JOIN
             dn_project_doc dnc ON dn.project_id = dnc.project_id
-                                AND dnc.del = '0'
-                                AND dnc.status = '1'
+                                 AND dnc.del = '0'
+                                 AND dnc.status = '1'
         WHERE
             dn.del = '0'"; // Only select projects where del is 0
 
 if ($searchQuery) {
+    // ใช้คอลัมน์ที่ถูกต้องสำหรับการค้นหาตามภาษา
     $sql .= "
-    AND dn.subject_project LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
+    AND dn.{$subject_col} LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
     ";
 }
 
@@ -79,18 +86,25 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
-    echo "No project found.";
+    // แสดงข้อความตามภาษาที่เลือก
+    if ($lang === 'en') {
+        echo "No project found.";
+    } else {
+        echo "ไม่พบโปรเจกต์";
+    }
 }
 ?>
 <div style="display: flex; justify-content: space-between;">
 
     <div>
-        </div>
+        <!-- <h3><span data-translate="Our Projects" lang="<?php echo $lang; ?>">Our Projects</span></h3> -->
+    </div>
 
     <div>
         <form method="GET" action="">
+            <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="Search project...">
+                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo $lang === 'en' ? 'Search project...' : 'ค้นหาโปรเจกต์...'; ?>">
                 <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
             </div>
         </form>
@@ -104,11 +118,12 @@ if ($result->num_rows > 0) {
             <div class="box-image">
                 <?php
                     $encodedId = urlencode(base64_encode($box['id']));
+                    // ส่งค่า lang ไปยังหน้า detail ด้วย
+                    $detailUrl = "project_detail.php?id=" . $encodedId . "&lang=" . htmlspecialchars($lang);
                 ?>
-                <a href="project_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                <a href="<?php echo $detailUrl; ?>" class="text-news">
 
                     <?php
-                    // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
                     if(!empty($box['iframe'])){
                         echo '<iframe frameborder="0" src="' . $box['iframe'] . '" width="100%" height="100%" class="note-video-clip"></iframe>';
                     } else if (!empty($box['image'])){
@@ -122,7 +137,7 @@ if ($result->num_rows > 0) {
                 </a>
             </div>
             <div class="box-content">
-                <a href="project_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                <a href="<?php echo $detailUrl; ?>" class="text-news">
                     <h5 class="line-clamp"><?php echo htmlspecialchars($box['title']); ?></h5>
                     <p class="line-clamp"><?php echo htmlspecialchars($box['description']); ?></p>
                 </a>
@@ -134,84 +149,20 @@ if ($result->num_rows > 0) {
 
 <div class="pagination">
     <?php if ($page > 1): ?>
-        <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Previous</a>
+        <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo htmlspecialchars($lang); ?>">
+            <?php echo $lang === 'en' ? 'Previous' : 'ก่อนหน้า'; ?>
+        </a>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-        <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>" <?php echo $i == $page ? 'class="active"' : ''; ?>>
+        <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo htmlspecialchars($lang); ?>" <?php echo $i == $page ? 'class="active"' : ''; ?>>
             <?php echo $i; ?>
         </a>
     <?php endfor; ?>
 
     <?php if ($page < $totalPages): ?>
-        <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Next</a>
+        <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo htmlspecialchars($lang); ?>">
+            <?php echo $lang === 'en' ? 'Next' : 'ถัดไป'; ?>
+        </a>
     <?php endif; ?>
 </div>
-
-<!-- แสดงฟอร์มด้านล่างนี้
-<h3>ใส่ความคิดเห็น</h3>
-<p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
-<form id="commentForm" style="max-width: 600px;">
-    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
-        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
-    <button type="submit"
-        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-        แสดงความคิดเห็น
-    </button>
-</form>
-
-<script>
-document.getElementById("commentForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const jwt = sessionStorage.getItem("jwt");
-    const comment = document.getElementById("commentText").value;
-    const pageUrl = window.location.pathname;
-
-    if (!jwt) {
-        // alert("กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น");
-        document.getElementById("myBtn-sign-in").click(); // เปิด modal login
-        return;
-    }
-
-    fetch('actions/protected.php', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + jwt
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-            // ส่งคอมเม้นไปเก็บใน database
-            fetch('actions/save_comment.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwt
-                },
-                body: JSON.stringify({
-                    comment: comment,
-                    page_url: pageUrl
-                })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
-                    document.getElementById("commentText").value = '';
-                } else {
-                    alert("เกิดข้อผิดพลาด: " + result.message);
-                }
-            });
-        } else {
-            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
-        }
-    })
-    .catch(err => {
-        console.error("Error verifying user:", err);
-        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
-    });
-});
-</script>
- -->

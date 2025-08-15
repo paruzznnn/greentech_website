@@ -2,26 +2,34 @@
 require_once('../lib/connect.php');
 global $conn;
 
+// ----------------------------------------------------
+// ส่วนที่ 1: กำหนดภาษาและค่าเริ่มต้น
+// ----------------------------------------------------
+// สมมติว่ามีตัวแปร $lang ที่เก็บภาษาที่เลือกไว้ (เช่น 'th' หรือ 'en')
+// ถ้าไม่มีการกำหนดภาษา ให้ใช้ภาษาไทยเป็นค่าเริ่มต้น
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+$subjectTitle = ($lang === 'en') ? "Blog" : "บล็อก";
+$pageUrl = "";
 
-$subjectTitle = "บล็อก"; // fallback title, changed from "สินค้า" to "บล็อก"
-$pageUrl = ""; 
-
+// ----------------------------------------------------
+// ส่วนที่ 2: ดึงข้อมูลบล็อกหลัก
+// ----------------------------------------------------
 if (isset($_GET['id'])) {
     $encodedId = $_GET['id'];
-    // Generate dynamic URL
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
     $pageUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        $stmt = $conn->prepare("SELECT subject_blog FROM dn_blog WHERE del = 0 AND blog_id = ?");
+        $subjectColumn = ($lang === 'en') ? 'subject_blog_en' : 'subject_blog';
+        $stmt = $conn->prepare("SELECT {$subjectColumn} FROM dn_blog WHERE del = 0 AND blog_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
         $resultTitle = $stmt->get_result();
         if ($resultTitle->num_rows > 0) {
             $row = $resultTitle->fetch_assoc();
-            $subjectTitle = $row['subject_blog'];
+            $subjectTitle = $row[$subjectColumn];
         }
         $stmt->close();
     }
@@ -39,7 +47,7 @@ if (isset($_GET['id'])) {
 
     <style>
         img{
-            max-width: 600px;
+            /* max-width: 600px; */
         }
         .shop-content-display {
             font-family: sans-serif, "Roboto" !important;
@@ -53,16 +61,16 @@ if (isset($_GET['id'])) {
         .project-wrapper-container {
             position: relative;
             max-width: 1280px;
-            margin: 0; /* แก้ไข: ให้ margin เป็น 0 เพื่อให้ชิดซ้าย */
+            margin: 0;
             overflow: hidden;
-            padding: 0 20px; /* ลด padding เพื่อให้มีพื้นที่เพิ่มขึ้น */
+            padding: 0 20px;
             margin-bottom: 20px;
-            box-sizing: border-box; /* เพิ่ม box-sizing เพื่อให้ padding ไม่ขยายขนาดกล่อง */
+            box-sizing: border-box;
         }
 
         .project-scroll {
             display: flex;
-            gap: 40px; /* เพิ่มระยะห่างระหว่างกล่อง Project */
+            gap: 40px;
             scroll-behavior: smooth;
             overflow-x: auto;
             padding-bottom: 1rem;
@@ -72,7 +80,6 @@ if (isset($_GET['id'])) {
             display: none;
         }
 
-        /* ปรับปรุง CSS สำหรับ project card */
         .project-card {
             flex: 0 0 350px;
             max-width: 350px;
@@ -162,7 +169,7 @@ if (isset($_GET['id'])) {
         }
         
         .shop-card {
-             flex: 0 0 180px;
+            flex: 0 0 180px;
             max-width: 180px;
             height: auto;
         }
@@ -207,10 +214,10 @@ if (isset($_GET['id'])) {
             font-size: 1.5rem;
             font-weight: bold;
             color: #555;
-            display: none; /* เริ่มต้นด้วยการซ่อนปุ่มไว้ก่อน */
+            display: none;
         }
         .scroll-btn.show {
-            display: block; /* แสดงปุ่มเมื่อมี class 'show' */
+            display: block;
         }
 
         .scroll-btn.left {
@@ -221,7 +228,6 @@ if (isset($_GET['id'])) {
             right: 5px;
         }
 
-        /* ปรับปุ่ม scroll ของ shop ให้เล็กลงและสีจางลง */
         .shop-wrapper-container .scroll-btn {
             background: rgba(204, 204, 204, 0.5);
             border: 1px solid rgba(170, 170, 170, 0.3);
@@ -294,29 +300,29 @@ if (isset($_GET['id'])) {
     <?php include 'template/navbar_slide.php'?>
 
     <div class="content-sticky" id="">
-        <div class="container">
+        <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                    <p>แชร์หน้านี้:</p>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                    </a>
-                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                    </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                    </a>
-                    <a href="https://www.tiktok.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                    </a>
-                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                </a>
+                <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                </a>
+                <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                </a>
+                <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                </a>
+                <a href="https://www.instagram.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                </a>
+                <a href="https://www.tiktok.com/" target="_blank">
+                    <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                </a>
+                <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
                 </div>
 
                 <div class="row">
@@ -326,10 +332,11 @@ if (isset($_GET['id'])) {
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
+                                    $contentColumn = ($lang === 'en') ? 'content_blog_en' : 'content_blog';
                                     $stmt = $conn->prepare("SELECT 
                                         dn.blog_id, 
                                         dn.subject_blog, 
-                                        dn.content_blog, 
+                                        dn.{$contentColumn} AS content_blog, 
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
                                         GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -369,12 +376,12 @@ if (isset($_GET['id'])) {
                                             echo '</div>';
                                         }
                                     } else {
-                                        echo "ไม่มีข้อมูล";
+                                        echo ($lang === 'en') ? "No data found." : "ไม่มีข้อมูล";
                                     }
 
                                     $stmt->close(); 
                                 } else {
-                                    echo "Invalid ID.";
+                                    echo ($lang === 'en') ? "Invalid ID." : "Invalid ID.";
                                 }
                             }
                         ?>
@@ -383,7 +390,7 @@ if (isset($_GET['id'])) {
                 
                 <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
-                    <p>แชร์หน้านี้:</p>
+                    <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -402,12 +409,12 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()">คัดลอกลิงก์</button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p>สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่</p>
+                    <p><?= ($lang === 'en') ? "Inquire/Order Trandar Acoustics products at" : "สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่" ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -422,12 +429,14 @@ if (isset($_GET['id'])) {
                 if (isset($_GET['id'])) {
                     $decodedId = base64_decode(urldecode($_GET['id']));
                     if ($decodedId !== false) {
-                        // Query to fetch related projects
+                        $projectSubjectColumn = ($lang === 'en') ? 'dp.subject_project_en' : 'dp.subject_project';
+                        $projectDescColumn = ($lang === 'en') ? 'dp.description_project_en' : 'dp.description_project';
+                        
                         $stmt_project = $conn->prepare("
                             SELECT 
                                 dp.project_id, 
-                                dp.subject_project, 
-                                dp.description_project,
+                                {$projectSubjectColumn} AS subject_project, 
+                                {$projectDescColumn} AS description_project,
                                 GROUP_CONCAT(dnc.api_path) AS pic_path
                             FROM dn_project dp
                             JOIN dn_blog_project dbp ON dp.project_id = dbp.project_id
@@ -441,7 +450,7 @@ if (isset($_GET['id'])) {
                         $project_cards_data = $result_project->fetch_all(MYSQLI_ASSOC);
 
                         if ($result_project->num_rows > 0) {
-                            echo '<h3 style="padding-top: 40px;">โปรเจกต์ที่เกี่ยวข้องกับบทความนี้</h3>';
+                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? "Related Projects" : "โปรเจกต์ที่เกี่ยวข้องกับบทความนี้") . '</h3>';
                             echo '<div class="project-wrapper-container">';
                             echo '<div class="scroll-btn left" id="project-scroll-left" onclick="scrollProject(\'left\')">&#10094;</div>';
                             echo '<div class="scroll-btn right" id="project-scroll-right" onclick="scrollProject(\'right\')">&#10095;</div>';
@@ -449,7 +458,7 @@ if (isset($_GET['id'])) {
                             
                             foreach ($project_cards_data as $row_project) {
                                 $projectIdEncoded = urlencode(base64_encode($row_project['project_id']));
-                                $project_link = "project_detail.php?id=" . $projectIdEncoded;
+                                $project_link = "project_detail.php?id=" . $projectIdEncoded . "&lang=" . $lang;
                                 $paths_project = !empty($row_project['pic_path']) ? explode(',', $row_project['pic_path']) : [];
                                 $image_path_project = !empty($paths_project) ? $paths_project[0] : null;
                                 $placeholder_image = 'https://via.placeholder.com/350x220.png?text=Project+Image';
@@ -466,11 +475,13 @@ if (isset($_GET['id'])) {
                                 echo '</a>';
                                 
                                 // Start of related shops for this project
+                                $shopSubjectColumn = ($lang === 'en') ? 'ds.subject_shop_en' : 'ds.subject_shop';
+                                $shopDescColumn = ($lang === 'en') ? 'ds.description_shop_en' : 'ds.description_shop';
                                 $stmt_shop = $conn->prepare("
                                     SELECT 
                                         ds.shop_id, 
-                                        ds.subject_shop, 
-                                        ds.description_shop,
+                                        {$shopSubjectColumn} AS subject_shop, 
+                                        {$shopDescColumn} AS description_shop,
                                         ds.content_shop,
                                         GROUP_CONCAT(dnd.api_path) AS pic_path
                                     FROM dn_shop ds
@@ -485,16 +496,15 @@ if (isset($_GET['id'])) {
                                 $shop_count = $result_shop->num_rows;
 
                                 if ($shop_count > 0) {
-                                    $shop_scroll_id = 'shop-scroll-' . $row_project['project_id'];
-                                    echo '<h6 class="shop-title">สินค้าที่ใช้ในโปรเจกต์นี้</h6>';
+                                    echo '<h6 class="shop-title">' . ($lang === 'en' ? "Products used in this project" : "สินค้าที่ใช้ในโปรเจกต์นี้") . '</h6>';
                                     echo '<div class="shop-wrapper-container">';
-                                    echo '<div class="scroll-btn left" id="shop-scroll-left-' . $row_project['project_id'] . '" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'left\')">&#10094;</div>';
-                                    echo '<div class="scroll-btn right" id="shop-scroll-right-' . $row_project['project_id'] . '" onclick="scrollShop(\'' . $shop_scroll_id . '\', \'right\')">&#10095;</div>';
-                                    echo '<div class="shop-scroll" id="' . $shop_scroll_id . '">';
+                                    echo '<div class="scroll-btn left" id="shop-scroll-left-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'left\')">&#10094;</div>';
+                                    echo '<div class="scroll-btn right" id="shop-scroll-right-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'right\')">&#10095;</div>';
+                                    echo '<div class="shop-scroll" id="shop-scroll-' . $row_project['project_id'] . '">';
                                     
                                     while ($row_shop = $result_shop->fetch_assoc()) {
                                         $shopIdEncoded = urlencode(base64_encode($row_shop['shop_id']));
-                                        $shop_link = "shop_detail.php?id=" . $shopIdEncoded;
+                                        $shop_link = "shop_detail.php?id=" . $shopIdEncoded . "&lang=" . $lang;
                                         
                                         $paths_shop = !empty($row_shop['pic_path']) ? explode(',', $row_shop['pic_path']) : [];
                                         $image_path_shop = !empty($paths_shop) ? $paths_shop[0] : null;
@@ -528,14 +538,14 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                <h3 style ="padding-top: 40px;">ความคิดเห็น</h3>
-                <p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
+                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? "Comments" : "ความคิดเห็น" ?></h3>
+                <p><?= ($lang === 'en') ? "Your email will not be displayed. Required fields are marked with *" : "อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *" ?></p>
                 <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? "Comment *" : "ความคิดเห็น *" ?>"
                         style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                     <button type="submit"
                         style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        แสดงความคิดเห็น
+                        <?= ($lang === 'en') ? "Post Comment" : "แสดงความคิดเห็น" ?>
                     </button>
                 </form>
                 
@@ -574,19 +584,19 @@ if (isset($_GET['id'])) {
                                 .then(res => res.json())
                                 .then(result => {
                                     if (result.status === 'success') {
-                                        alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                                        alert("<?= ($lang === 'en') ? "Comment saved successfully." : "บันทึกความคิดเห็นเรียบร้อยแล้ว" ?>");
                                         document.getElementById("commentText").value = '';
                                     } else {
-                                        alert("เกิดข้อผิดพลาด: " + result.message);
+                                        alert("<?= ($lang === 'en') ? "An error occurred: " : "เกิดข้อผิดพลาด: " ?>" + result.message);
                                     }
                                 });
                             } else {
-                                alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+                                alert("<?= ($lang === 'en') ? "You must be logged in as a viewer to comment." : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น" ?>");
                             }
                         })
                         .catch(err => {
                             console.error("Error verifying user:", err);
-                            alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
+                            alert("<?= ($lang === 'en') ? "Error verifying identity." : "เกิดข้อผิดพลาดในการยืนยันตัวตน" ?>");
                         });
                     });
 
@@ -610,19 +620,16 @@ if (isset($_GET['id'])) {
                         }
                     }
                     
-                    // JavaScript for Copy Link functionality
                     function copyLink() {
                         const pageUrl = "<?= $pageUrl ?>";
                         navigator.clipboard.writeText(pageUrl).then(function() {
-                            alert("คัดลอกลิงก์เรียบร้อยแล้ว");
+                            alert("<?= ($lang === 'en') ? "Link copied successfully." : "คัดลอกลิงก์เรียบร้อยแล้ว" ?>");
                         }, function() {
-                            alert("ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
+                            alert("<?= ($lang === 'en') ? "Could not copy link. Please copy manually." : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง" ?>");
                         });
                     }
 
-                    // Function to show/hide scroll buttons based on content count
                     function toggleScrollButtons() {
-                        // For Project Slider
                         const projectScrollBox = document.getElementById('project-scroll-box');
                         if(projectScrollBox) {
                             const projectCards = projectScrollBox.querySelectorAll('.project-card');
@@ -638,11 +645,9 @@ if (isset($_GET['id'])) {
                             }
                         }
                         
-                        // For each Shop Slider
                         document.querySelectorAll('.shop-scroll').forEach(shopContainer => {
                             const shopCards = shopContainer.querySelectorAll('.shop-card');
                             const containerId = shopContainer.id;
-                            // Extract project_id from containerId like 'shop-scroll-123'
                             const projectId = containerId.split('-')[2];
                             const shopLeftBtn = document.getElementById('shop-scroll-left-' + projectId);
                             const shopRightBtn = document.getElementById('shop-scroll-right-' + projectId);
@@ -657,9 +662,9 @@ if (isset($_GET['id'])) {
                         });
                     }
 
-                    // Run the function when the page loads and on resize
                     window.addEventListener('load', toggleScrollButtons);
                     window.addEventListener('resize', toggleScrollButtons);
+                    
                 </script>
             </div>
         </div>

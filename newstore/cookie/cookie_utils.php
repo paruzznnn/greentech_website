@@ -63,9 +63,6 @@ function checkAutoLoginCookie() {
 
     try {
         $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
-
-        print_r($decoded);
-        
         if (time() < $decoded->exp) {
             return $decoded->uid;  
         } else {

@@ -14,39 +14,29 @@ if (!isset($conn) || !$conn) {
 
 // กำหนด base URL ของเว็บของคุณ (สำคัญมากสำหรับการแสดงรูปภาพ)
 // ถ้าโปรเจกต์คุณอยู่ภายใต้ http://localhost/trandar/
-$base_url = 'http://localhost/trandar/'; 
+// กำหนด base URL ของเว็บของคุณ
+$base_url = 'http://localhost/trandar/';
 
-// ดึงข้อมูลกลุ่มทั้งหมด
+// ดึงข้อมูลกลุ่มทั้งหมด พร้อมกับฟิลด์ภาษาอังกฤษ
 $main_groups = [];
 $sub_groups = [];
-$sql_groups = "SELECT group_id, group_name, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
+$sql_groups = "SELECT group_id, group_name, group_name_en, description, description_en, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
 $result_groups = $conn->query($sql_groups);
 
 if ($result_groups) {
     while ($row = $result_groups->fetch_assoc()) {
-        // เตรียม full_image_url สำหรับการแสดงผลใน HTML/JS
-        // เนื่องจาก image_path ใน DB เป็น URL เต็มอยู่แล้ว (จากการที่คุณเคยให้รูปมา)
         $row['full_image_url_display'] = !empty($row['image_path']) ? htmlspecialchars($row['image_path']) : $base_url . 'public/img/group_placeholder.jpg';
-        
-        // เตรียม image_path_for_js สำหรับส่งไปให้ JS (ควรเป็น URL เต็มเหมือนกัน)
-        // หรือถ้าอยากส่งเป็น path สัมพัทธ์ ต้องปรับ JS ให้ต่อ BASE_URL เอาเอง
-        // ณ ที่นี้ เราจะส่งเป็น URL เต็มเหมือนเดิมเพื่อให้ JS ไม่ต้องแปลง
         $row['image_path_for_js'] = !empty($row['image_path']) ? htmlspecialchars($row['image_path'], ENT_QUOTES) : '';
 
-
-        if ($row['parent_group_id'] === NULL || $row['parent_group_id'] == 0) { // ถือว่าเป็นกลุ่มแม่
+        if ($row['parent_group_id'] === NULL || $row['parent_group_id'] == 0) {
             $main_groups[] = $row;
         } else {
             $sub_groups[] = $row;
         }
     }
 } else {
-    // กรณี Query ผิดพลาด
     echo "Error fetching groups: " . $conn->error;
 }
-// ไม่ต้องปิด $conn ตรงนี้ เพราะ Modal ด้านล่างยังต้องใช้
-// $conn->close(); // เราจะปิด connection เมื่อจบไฟล์ PHP นี้ หรือใน connect_db.php ถ้ามีการจัดการที่ดี
-
 ?>
 
 <!DOCTYPE html>
@@ -97,6 +87,26 @@ if ($result_groups) {
             background-color: #e9ecef;
             border-color: #e9ecef;
         }
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .language-switcher img {
+            width: 30px;
+            height: auto;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease-in-out;
+        }
+        .language-switcher img.active {
+            border-color: #007bff;
+        }
+        .lang-thai-fields, .lang-en-fields {
+            display: none;
+        }
     </style>
 </head>
 <?php include '../template/header.php' ?>
@@ -121,7 +131,8 @@ if ($result_groups) {
                                     <tr>
                                         <th>ID</th>
                                         <th>รูปภาพ</th>
-                                        <th>ชื่อหมวดหมู่</th>
+                                        <th>ชื่อหมวดหมู่ (TH)</th>
+                                        <th>ชื่อหมวดหมู่ (EN)</th>
                                         <th>หมวดหมู่หลัก</th>
                                         <th>การจัดการ</th>
                                     </tr>
@@ -132,21 +143,19 @@ if ($result_groups) {
                                         echo '<tr>';
                                         echo '<td>' . htmlspecialchars($group['group_id']) . '</td>';
                                         echo '<td>';
-                                        // ใช้ full_image_url_display ที่เตรียมไว้แล้วสำหรับ src ของ img
                                         echo '<img src="' . $group['full_image_url_display'] . '" class="group-image-preview" alt="Group Image">';
                                         echo '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
                                         echo '<td>- (หมวดหมู่หลัก)</td>';
                                         echo '<td>';
-                                        // ส่ง image_path_for_js (ซึ่งเป็น URL เต็ม) ให้ฟังก์ชัน JavaScript
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> แก้ไข</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> แก้ไข</button>';
                                         echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
                                         echo '</td>';
                                         echo '</tr>';
                                     }
 
                                     foreach ($sub_groups as $group) {
-                                        // ค้นหาชื่อกลุ่มแม่
                                         $parent_name = 'ไม่พบ';
                                         foreach ($main_groups as $main_g) {
                                             if ($main_g['group_id'] == $group['parent_group_id']) {
@@ -156,12 +165,12 @@ if ($result_groups) {
                                         }
                                         echo '<tr>';
                                         echo '<td>' . htmlspecialchars($group['group_id']) . '</td>';
-                                        echo '<td>-</td>'; // กลุ่มย่อยไม่มีรูปภาพ
+                                        echo '<td>-</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
                                         echo '<td>' . htmlspecialchars($parent_name) . '</td>';
                                         echo '<td>';
-                                        // สำหรับกลุ่มย่อย image_path เป็นค่าว่างเสมอ
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> แก้ไข</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> แก้ไข</button>';
                                         echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
                                         echo '</td>';
                                         echo '</tr>';
@@ -185,29 +194,35 @@ if ($result_groups) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="newGroupName" class="form-label">ชื่อหมวดหมู่</label>
-                            <input type="text" class="form-control" id="newGroupName" name="group_name" required>
+                         <div class="language-switcher mb-3">
+                            <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
+                            <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
+                        </div>
+                        <div class="lang-thai-fields" style="display:block;">
+                            <div class="mb-3">
+                                <label for="newGroupName" class="form-label">ชื่อหมวดหมู่ (TH)</label>
+                                <input type="text" class="form-control" id="newGroupName" name="group_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newGroupDescription" class="form-label">คำอธิบาย (TH)</label>
+                                <textarea class="form-control" id="newGroupDescription" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="lang-en-fields">
+                            <div class="mb-3">
+                                <label for="newGroupNameEn" class="form-label">ชื่อหมวดหมู่ (EN)</label>
+                                <input type="text" class="form-control" id="newGroupNameEn" name="group_name_en">
+                            </div>
+                            <div class="mb-3">
+                                <label for="newGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
+                                <textarea class="form-control" id="newGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="newParentGroupId" class="form-label">หมวดหมู่หลัก (ถ้ามี)</label>
                             <select class="form-select" id="newParentGroupId" name="parent_group_id">
                                 <option value="">- เลือกหมวดหมู่หลัก -</option>
                                 <?php
-                                // เนื่องจากเราปิด $conn ไปแล้ว (และจะเปิดใหม่ด้านล่าง) 
-                                // เราควรดึงข้อมูลนี้เก็บไว้ในตัวแปรตั้งแต่ต้น หรือส่งผ่าน JSON
-                                // แต่เพื่อให้โค้ดนี้ทำงานได้ ถ้า connect_db.php ไม่ได้ปิด connection หลัง fetch groups
-                                // ก็สามารถใช้ $conn ได้ต่อ
-                                // ณ ตอนนี้คือ $conn ถูกปิดไปแล้ว เราต้องเปิดใหม่สำหรับ Modal นี้
-                                // หรือเก็บ $main_groups_for_dropdown ไว้ตั้งแต่ต้น
-                                // ผมจะปรับให้ดึง $main_groups_for_dropdown มาใช้
-                                // เพื่อไม่ต้อง connect DB ซ้ำซ้อนใน PHP file เดียวกัน
-                                
-                                // ดึงข้อมูลกลุ่มหลักอีกครั้ง (หรือใช้ $main_groups จากด้านบน)
-                                // เพื่อให้ง่ายในการแสดงผลใน modal ที่ต้องการข้อมูลตอนโหลดหน้า
-                                // ควรเก็บ main_groups ที่ดึงมาตอนแรกไว้ในตัวแปร
-                                // หรือ connect DB อีกครั้ง (แต่ไม่แนะนำ)
-                                // ในที่นี้ผมจะสมมติว่าคุณมี $main_groups ที่ดึงมาแล้ว
                                 foreach ($main_groups as $main_g) {
                                     echo '<option value="' . $main_g['group_id'] . '">' . htmlspecialchars($main_g['group_name']) . '</option>';
                                 }
@@ -241,16 +256,38 @@ if ($result_groups) {
                     <div class="modal-body">
                         <input type="hidden" id="editGroupId" name="group_id">
                         <input type="hidden" id="editGroupType" name="group_type">
-                        <div class="mb-3">
-                            <label for="editGroupName" class="form-label">ชื่อหมวดหมู่</label>
-                            <input type="text" class="form-control" id="editGroupName" name="group_name" required>
+                        <div class="language-switcher mb-3">
+                            <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
+                            <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
                         </div>
+
+                        <div class="lang-thai-fields" style="display:block;">
+                            <div class="mb-3">
+                                <label for="editGroupName" class="form-label">ชื่อหมวดหมู่ (TH)</label>
+                                <input type="text" class="form-control" id="editGroupName" name="group_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editGroupDescription" class="form-label">คำอธิบาย (TH)</label>
+                                <textarea class="form-control" id="editGroupDescription" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="lang-en-fields">
+                            <div class="mb-3">
+                                <label for="editGroupNameEn" class="form-label">ชื่อหมวดหมู่ (EN)</label>
+                                <input type="text" class="form-control" id="editGroupNameEn" name="group_name_en">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
+                                <textarea class="form-control" id="editGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                            </div>
+                        </div>
+
                         <div class="mb-3" id="editParentGroupContainer">
                             <label for="editParentGroupId" class="form-label">หมวดหมู่หลัก (ถ้ามี)</label>
                             <select class="form-select" id="editParentGroupId" name="parent_group_id">
                                 <option value="">- เลือกหมวดหมู่หลัก -</option>
                                 <?php
-                                // ใช้ $main_groups จากที่ดึงมาตั้งแต่ต้น
                                 foreach ($main_groups as $main_g) {
                                     echo '<option value="' . $main_g['group_id'] . '">' . htmlspecialchars($main_g['group_name']) . '</option>';
                                 }
@@ -273,56 +310,55 @@ if ($result_groups) {
         </div>
     </div>
 
-
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script>
-        // กำหนด BASE_URL และ PLACEHOLDER_IMAGE ให้ JavaScript รู้จัก
-        // BASE_URL ใช้สำหรับในกรณีที่ต้องสร้าง URL สัมพัทธ์เป็น URL เต็ม
-        const GLOBAL_APP_BASE_URL = '<?php echo $base_url; ?>'; 
+        const GLOBAL_APP_BASE_URL = '<?php echo $base_url; ?>';
         const GLOBAL_APP_PLACEHOLDER_IMAGE = GLOBAL_APP_BASE_URL + 'public/img/group_placeholder.jpg';
 
-        // ฟังก์ชันสำหรับเปิด Modal แก้ไขและเติมข้อมูล
-        // ทำให้ฟังก์ชันนี้เป็น Global โดยการกำหนดให้กับ window object หรือไม่ใช้ var/let/const
-        window.myApp_editGroup = function(groupId, groupName, groupType, imagePath, parentGroupId = null) {
-            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupType, imagePath, parentGroupId });
-            
+        window.myApp_editGroup = function(groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId = null) {
+            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId });
+
             $('#editGroupId').val(groupId);
-            $('#editGroupName').val(groupName);
             $('#editGroupType').val(groupType);
+
+            // เติมข้อมูลภาษาไทยและอังกฤษ
+            $('#editGroupName').val(groupName);
+            $('#editGroupNameEn').val(groupNameEn);
+            $('#editGroupDescription').val(description);
+            $('#editGroupDescriptionEn').val(descriptionEn);
 
             // Reset image input and preview
             $('#editGroupImage').val('');
-            $('#editGroupImagePreview').hide().attr('src', ''); 
-            $('#editGroupImagePreview').data('current-image', ''); 
+            $('#editGroupImagePreview').hide().attr('src', '');
+            $('#editGroupImagePreview').data('current-image', '');
 
             if (groupType === 'main') {
                 $('#editParentGroupContainer').hide();
-                $('#editParentGroupId').val(''); 
+                $('#editParentGroupId').val('');
                 $('#editImageContainer').show();
                 if (imagePath) {
-                    // imagePath ที่ส่งมาเป็น URL เต็มอยู่แล้ว ไม่ต้องต่อ BASE_URL ซ้ำ
-                    $('#editGroupImagePreview').attr('src', imagePath).show(); 
-                    $('#editGroupImagePreview').data('current-image', imagePath); 
+                    $('#editGroupImagePreview').attr('src', imagePath).show();
+                    $('#editGroupImagePreview').data('current-image', imagePath);
                 } else {
                     $('#editGroupImagePreview').attr('src', GLOBAL_APP_PLACEHOLDER_IMAGE).show();
                     $('#editGroupImagePreview').data('current-image', GLOBAL_APP_PLACEHOLDER_IMAGE);
                 }
             } else { // sub group
                 $('#editParentGroupContainer').show();
-                // Set the value for parentGroupId. Handle 'null' string from PHP if needed, convert to actual null or empty string for select
                 $('#editParentGroupId').val(parentGroupId === 'null' ? '' : parentGroupId);
-                $('#editImageContainer').hide(); // ซ่อนส่วนอัปโหลดรูปสำหรับกลุ่มย่อย
-                $('#editGroupImagePreview').hide().attr('src', ''); // ซ่อนพรีวิวรูปภาพ
-                $('#editGroupImagePreview').data('current-image', ''); // ลบข้อมูลรูปภาพปัจจุบัน
+                $('#editImageContainer').hide();
+                $('#editGroupImagePreview').hide().attr('src', '');
+                $('#editGroupImagePreview').data('current-image', '');
             }
 
-            // แสดง modal
+            // แสดง Modal
             $('#editGroupModal').modal('show');
+            // ตั้งค่าเริ่มต้นให้แสดงภาษาไทย
+            $('.lang-flag[data-lang="th"]').click();
         }
 
-        // ฟังก์ชันสำหรับลบกลุ่ม
         window.myApp_deleteGroup = function(groupId) {
-            console.log("DEBUG: myApp_deleteGroup called for ID:", groupId); 
+            console.log("DEBUG: myApp_deleteGroup called for ID:", groupId);
             Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
                 text: "คุณต้องการลบหมวดหมู่นี้หรือไม่? สินค้าภายใต้หมวดหมู่นี้จะไม่มีหมวดหมู่",
@@ -335,13 +371,13 @@ if ($result_groups) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: 'group_actions.php', // Path สัมพัทธ์ไปยังไฟล์ PHP
+                        url: 'group_actions.php',
                         type: 'POST',
                         data: {
                             action: 'delete_group',
                             group_id: groupId
                         },
-                        dataType: 'json', 
+                        dataType: 'json',
                         success: function(response) {
                             console.log("DEBUG: Delete Group Response:", response);
                             Swal.fire({
@@ -351,7 +387,7 @@ if ($result_groups) {
                                 timer: 1500
                             }).then(() => {
                                 if (response.status === 'success') {
-                                    location.reload(); // โหลดหน้าใหม่เมื่อสำเร็จ
+                                    location.reload();
                                 }
                             });
                         },
@@ -364,11 +400,9 @@ if ($result_groups) {
             })
         }
 
-        // *** ส่วนโค้ดที่ต้องรันเมื่อ DOM พร้อม (สำหรับ DataTable และ Event Listeners ของ Form) ***
         $(document).ready(function() {
             console.log("DEBUG: DOM is ready. Initializing DataTables and Form Event Listeners.");
 
-            // ตรวจสอบว่า jQuery และ DataTables โหลดมาหรือยัง
             if (typeof jQuery === 'undefined') {
                 console.error("ERROR: jQuery is not loaded!");
                 return;
@@ -387,7 +421,7 @@ if ($result_groups) {
                 "autoWidth": false,
                 "responsive": true,
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Thai.json"
+                    // "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Thai.json"
                 }
             });
 
@@ -413,7 +447,6 @@ if ($result_groups) {
                     }
                     reader.readAsDataURL(this.files[0]);
                 } else {
-                    // ถ้าไม่มีไฟล์ใหม่ถูกเลือก ให้แสดงรูปภาพเดิมถ้ามี หรือซ่อน
                     var currentImage = $('#editGroupImagePreview').data('current-image');
                     if (currentImage) {
                         $('#editGroupImagePreview').attr('src', currentImage).show();
@@ -423,21 +456,41 @@ if ($result_groups) {
                 }
             });
 
+            // Handle language switching in Modals
+            function setupLanguageSwitcher(modalId) {
+                $(modalId + ' .lang-flag').on('click', function() {
+                    const lang = $(this).data('lang');
+                    $(modalId + ' .lang-flag').removeClass('active');
+                    $(this).addClass('active');
+
+                    if (lang === 'th') {
+                        $(modalId + ' .lang-thai-fields').show();
+                        $(modalId + ' .lang-en-fields').hide();
+                    } else if (lang === 'en') {
+                        $(modalId + ' .lang-thai-fields').hide();
+                        $(modalId + ' .lang-en-fields').show();
+                    }
+                });
+            }
+
+            setupLanguageSwitcher('#addGroupModal');
+            setupLanguageSwitcher('#editGroupModal');
+
             // Add Group Form Submission
             $('#addGroupForm').on('submit', function(e) {
-                e.preventDefault(); // หยุดการ submit แบบปกติ
+                e.preventDefault();
                 var formData = new FormData(this);
                 formData.append('action', 'add_group');
 
                 console.log("DEBUG: Adding Group with FormData:", Object.fromEntries(formData.entries()));
 
                 $.ajax({
-                    url: 'group_actions.php', // Path สัมพัทธ์ไปยังไฟล์ PHP
+                    url: 'group_actions.php',
                     type: 'POST',
                     data: formData,
-                    processData: false, // ไม่ต้องประมวลผลข้อมูล
-                    contentType: false, // ไม่ต้องตั้งค่า Content-Type (FormData จะตั้งให้เอง)
-                    dataType: 'json', // คาดหวัง JSON response
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
                     success: function(response) {
                         console.log("DEBUG: Add Group Response:", response);
                         Swal.fire({
@@ -448,7 +501,7 @@ if ($result_groups) {
                         }).then(() => {
                             if (response.status === 'success') {
                                 $('#addGroupModal').modal('hide');
-                                location.reload(); // โหลดหน้าใหม่เมื่อสำเร็จ
+                                location.reload();
                             }
                         });
                     },
@@ -461,19 +514,19 @@ if ($result_groups) {
 
             // Edit Group Form Submission
             $('#editGroupForm').on('submit', function(e) {
-                e.preventDefault(); // หยุดการ submit แบบปกติ
+                e.preventDefault();
                 var formData = new FormData(this);
                 formData.append('action', 'edit_group');
 
                 console.log("DEBUG: Editing Group with FormData:", Object.fromEntries(formData.entries()));
 
                 $.ajax({
-                    url: 'group_actions.php', // Path สัมพัทธ์ไปยังไฟล์ PHP
+                    url: 'group_actions.php',
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
-                    dataType: 'json', // Expect JSON response
+                    dataType: 'json',
                     success: function(response) {
                         console.log("DEBUG: Edit Group Response:", response);
                         Swal.fire({
@@ -484,7 +537,7 @@ if ($result_groups) {
                         }).then(() => {
                             if (response.status === 'success') {
                                 $('#editGroupModal').modal('hide');
-                                location.reload(); // โหลดหน้าใหม่เมื่อสำเร็จ
+                                location.reload();
                             }
                         });
                     },

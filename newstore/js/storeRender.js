@@ -1,16 +1,17 @@
+import { redirectGet, showNotification } from './formHandler.js';
+
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
   try {
-
     const params = new URLSearchParams({ action: req });
     const url = call + params.toString();
 
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': 'Bearer my_secure_token_123',
-        'Content-Type': 'application/json'
-      }
+        Authorization: "Bearer my_secure_token_123",
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
@@ -19,17 +20,17 @@ export async function fetchIndexData(req, call) {
 
     return await response.json();
   } catch (error) {
-    console.error('Fetch error:', error);
+    console.error("Fetch error:", error);
     return { data: [] };
   }
 }
 
 // ---------- RENDER SECTIONS -----------------
 export function renderSections(targetId, data) {
-  let html = '';
-  data.forEach(section => {
-    const sectionClass = section.class || '';
-    const titleHtml = section.title ? `<h5>${section.title}</h5>` : '';
+  let html = "";
+  data.forEach((section) => {
+    const sectionClass = section.class || "";
+    const titleHtml = section.title ? `<h5>${section.title}</h5>` : "";
     const contentHtml = section.isSlide
       ? `${titleHtml}<div id="${section.carouselId}" class="owl-carousel owl-theme"></div>`
       : `${titleHtml}<div id="${section.carouselId}"></div>`;
@@ -54,26 +55,36 @@ export function renderIntroduce(containerId, items) {
     return;
   }
 
-  container.innerHTML = '';
+  container.innerHTML = "";
 
   items.forEach((item) => {
-    const intdDiv = document.createElement('div');
+    const intdDiv = document.createElement("div");
     const products = item.products || [];
     const itemsPerPage = 1;
     let currentPage = 1;
     const totalPages = Math.ceil(products.length / itemsPerPage);
 
-    const carouselItemsHtml = item.carousel?.map((img, i) => `
-      <div class="intd-carousel-item ${i === 0 ? 'active' : 'hidden'}">
+    const carouselItemsHtml =
+      item.carousel
+        ?.map(
+          (img, i) => `
+      <div class="intd-carousel-item ${i === 0 ? "active" : "hidden"}">
         <img src="${img.image}" alt="${img.alt}" title="${img.label}">
       </div>
-    `).join('') || '';
+    `
+        )
+        .join("") || "";
 
-    const categoryButtonsHtml = item.categories?.map(category => `
+    const categoryButtonsHtml =
+      item.categories
+        ?.map(
+          (category) => `
       <a href="${category.link}" class="intd-option-button">
         ${category.icon} ${category.title}
       </a>
-    `).join('') || '';
+    `
+        )
+        .join("") || "";
 
     intdDiv.innerHTML = `
       <div class="intd-main-container">
@@ -104,8 +115,12 @@ export function renderIntroduce(containerId, items) {
 
     container.appendChild(intdDiv);
 
-    const productListContainer = intdDiv.querySelector('.intd-products-container');
-    const paginationControls = intdDiv.querySelector('.intd-pagination-controls');
+    const productListContainer = intdDiv.querySelector(
+      ".intd-products-container"
+    );
+    const paginationControls = intdDiv.querySelector(
+      ".intd-pagination-controls"
+    );
 
     const handlePageChange = (newPage) => {
       currentPage = newPage;
@@ -116,7 +131,7 @@ export function renderIntroduce(containerId, items) {
         itemsPerPage,
         currentPage,
         totalPages,
-        onPageChange: handlePageChange
+        onPageChange: handlePageChange,
       });
     };
 
@@ -125,58 +140,84 @@ export function renderIntroduce(containerId, items) {
   });
 }
 
-function renderProductsPage({ products, productListContainer, paginationControls, itemsPerPage, currentPage, totalPages, onPageChange }) {
+function renderProductsPage({
+  products,
+  productListContainer,
+  paginationControls,
+  itemsPerPage,
+  currentPage,
+  totalPages,
+  onPageChange,
+}) {
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const currentItems = products.slice(start, end);
 
-  const productItemsHtml = currentItems.map(product => `
+  const productItemsHtml = currentItems
+    .map(
+      (product) => `
     <div class="intd-product-card">
-      <h2 class="intd-card-title">${product.title || ''}</h2>
-      <p class="intd-card-subtitle">โดย: ${product.subtitle || ''}</p>
-      <img src="${product.image || ''}" alt="${product.title || ''}">
+      <h2 class="intd-card-title">${product.title || ""}</h2>
+      <p class="intd-card-subtitle">โดย: ${product.subtitle || ""}</p>
+      <img src="${product.image || ""}" alt="${product.title || ""}">
       <div class="intd-price-info">
-        <span class="intd-current-price">${product.price?.toLocaleString() || '0'}</span>
-        <span class="intd-old-price">${product.oldPrice?.toLocaleString() || ''}</span>
-        <span class="intd-discount-text">${product.discount || ''}</span>
+        <span class="intd-current-price">${
+          product.price?.toLocaleString() || "0"
+        }</span>
+        <span class="intd-old-price">${
+          product.oldPrice?.toLocaleString() || ""
+        }</span>
+        <span class="intd-discount-text">${product.discount || ""}</span>
       </div>
     </div>
-  `).join('');
+  `
+    )
+    .join("");
 
   productListContainer.innerHTML = productItemsHtml;
 
   paginationControls.innerHTML = `
-    <button class="intd-page-btn prev-btn" ${currentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button>
+    <button class="intd-page-btn prev-btn" ${
+      currentPage === 1 ? "disabled" : ""
+    }>ก่อนหน้า</button>
     <span class="intd-page-info">หน้า ${currentPage} / ${totalPages}</span>
-    <button class="intd-page-btn next-btn" ${currentPage === totalPages ? 'disabled' : ''}>ถัดไป</button>
+    <button class="intd-page-btn next-btn" ${
+      currentPage === totalPages ? "disabled" : ""
+    }>ถัดไป</button>
   `;
 
-  paginationControls.querySelector('.prev-btn')?.addEventListener('click', () => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  });
+  paginationControls
+    .querySelector(".prev-btn")
+    ?.addEventListener("click", () => {
+      if (currentPage > 1) {
+        onPageChange(currentPage - 1);
+      }
+    });
 
-  paginationControls.querySelector('.next-btn')?.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
-  });
+  paginationControls
+    .querySelector(".next-btn")
+    ?.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        onPageChange(currentPage + 1);
+      }
+    });
 }
 
 function setupCarousel(container) {
-  const carouselItems = Array.from(container.querySelectorAll('.intd-carousel-item'));
-  const prevBtn = container.querySelector('.intd-prev-btn');
-  const nextBtn = container.querySelector('.intd-next-btn');
-  const dotsContainer = container.querySelector('.intd-dots-container');
+  const carouselItems = Array.from(
+    container.querySelectorAll(".intd-carousel-item")
+  );
+  const prevBtn = container.querySelector(".intd-prev-btn");
+  const nextBtn = container.querySelector(".intd-next-btn");
+  const dotsContainer = container.querySelector(".intd-dots-container");
 
   let currentIndex = 0;
   let autoPlayInterval;
 
   function showSlide(index) {
     carouselItems.forEach((item, i) => {
-      item.classList.toggle('active', i === index);
-      item.classList.toggle('hidden', i !== index);
+      item.classList.toggle("active", i === index);
+      item.classList.toggle("hidden", i !== index);
     });
     updateDots(index);
   }
@@ -187,16 +228,17 @@ function setupCarousel(container) {
   }
 
   function prevSlide() {
-    currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+    currentIndex =
+      (currentIndex - 1 + carouselItems.length) % carouselItems.length;
     showSlide(currentIndex);
   }
 
   function generateDots() {
-    dotsContainer.innerHTML = '';
+    dotsContainer.innerHTML = "";
     carouselItems.forEach((_, index) => {
-      const dot = document.createElement('button');
-      dot.classList.add('intd-carousel-dot');
-      dot.addEventListener('click', () => {
+      const dot = document.createElement("button");
+      dot.classList.add("intd-carousel-dot");
+      dot.addEventListener("click", () => {
         currentIndex = index;
         showSlide(index);
         resetAutoPlay();
@@ -208,7 +250,7 @@ function setupCarousel(container) {
 
   function updateDots(index) {
     [...dotsContainer.children].forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
+      dot.classList.toggle("active", i === index);
     });
   }
 
@@ -225,12 +267,12 @@ function setupCarousel(container) {
     startAutoPlay();
   }
 
-  prevBtn?.addEventListener('click', () => {
+  prevBtn?.addEventListener("click", () => {
     prevSlide();
     resetAutoPlay();
   });
 
-  nextBtn?.addEventListener('click', () => {
+  nextBtn?.addEventListener("click", () => {
     nextSlide();
     resetAutoPlay();
   });
@@ -240,8 +282,59 @@ function setupCarousel(container) {
   startAutoPlay();
 }
 
-// ---------- RENDER INTRODUCE ----------------
+function addCart(product) {
+  const existingCart =
+    JSON.parse(localStorage.getItem("shoppingCart")) || [];
+  const productIndex = existingCart.findIndex(
+    (item) => item.id === product.productId
+  );
+  if (productIndex !== -1) {
+    // existingCart[productIndex].quantity += 1;
+    showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
+  } else {
+    existingCart.push({
+      id: product.productId,
+      name: product.productName,
+      price: product.productPrice,
+      quantity: 1,
+      imageUrl: product.image,
+    });
+    showNotification('เพิ่มสินค้าลงตะกร้าแล้ว', 'success');
+  }
+  localStorage.setItem("shoppingCart", JSON.stringify(existingCart));
+}
 
+function addWishlist(product) {
+  const existingWishlist =
+    JSON.parse(localStorage.getItem("likedProducts")) || [];
+  const productIndex = existingWishlist.findIndex(
+    (item) => item.id === product.productId
+  );
+  if (productIndex !== -1) {
+    showNotification('กดถูกใจไว้แล้ว', 'success');
+  } else {
+    existingWishlist.push({
+      id: product.productId,
+      name: product.productName,
+      price: product.productPrice,
+      imageUrl: product.image,
+    });
+    showNotification('กดถูกใจไว้แล้ว', 'success');
+  }
+
+  localStorage.setItem("likedProducts", JSON.stringify(existingWishlist));
+}
+
+function formatPrice(currency, price) {
+  return Number(price).toLocaleString("th-TH", {
+    style: "currency",
+    currency: currency || "THB",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+// ---------- RENDER INTRODUCE ----------------
 
 // ---------- RENDER BANNERS ------------------
 export function renderBanners(containerId, banners) {
@@ -251,11 +344,11 @@ export function renderBanners(containerId, banners) {
     return;
   }
 
-  container.innerHTML = '';
+  container.innerHTML = "";
 
-  banners.forEach(item => {
-    const bannerDiv = document.createElement('div');
-    bannerDiv.classList.add('banner');
+  banners.forEach((item) => {
+    const bannerDiv = document.createElement("div");
+    bannerDiv.classList.add("banner");
 
     bannerDiv.innerHTML = `
       <img src="${item.image}" alt="">
@@ -279,7 +372,7 @@ export function renderBanners(containerId, banners) {
 // ---------- RENDER CAROUSEL SMALL -----------
 export function renderCarouselSM(selector, items) {
   const container = document.querySelector(selector);
-  items.forEach(item => {
+  items.forEach((item) => {
     const div = document.createElement("div");
     div.classList.add("item");
     div.innerHTML = `
@@ -301,31 +394,28 @@ export function renderCarouselSM(selector, items) {
 }
 
 // ---------- RENDER CAROUSEL MEDIUM ----------
-export function renderCarouselMD(selector, items) {
+export function renderCarouselMD(selector, items, config) {
   const container = document.querySelector(selector);
-  items.forEach(item => {
-
-    const badgesWithIcon = item.productBadges.map(badge =>
-      `<span class="badges-tag">${badge}</span> `
-    ).join('');
+  items.forEach((item) => {
+    const badgesWithIcon = item.productBadges
+      .map((badge) => `<span class="badges-tag">${badge}</span> `)
+      .join("");
 
     // <a href="#"><i class="fa fa-share-alt"></i> Share</a>
     // <a href="#"><i class="fas fa-copy"></i> Copy URL</a>
-
-    // <div class="e-store-tooltip left"><i class="bi bi-file-text"></i>
-    //   <span class="e-store-tooltiptext">ขอใบเสนอราคา</span>
-    // </div>
-
     // /e-store/partner/?id=${1}
 
     const div = document.createElement("div");
     div.classList.add("item");
+    div.setAttribute("data-product-id", item.productId);
     div.innerHTML = `
       <div class="store-card">
         <div class="store-card-row">
           <div class="store-card-header">
             <div class="box-card-header">
-              <img class="store-card-logo" src="${item.compLogo}" alt="">
+              <div>
+                <img class="store-card-logo" src="${item.compLogo}" alt="">
+              </div>
               <div>
                 <strong>${item.compName}</strong>
                 <span>
@@ -343,7 +433,9 @@ export function renderCarouselMD(selector, items) {
               </div>
             </div>
           </div>
-          <img src="${item.image}" alt="" class="store-card-image" />
+          <div class="img-view-detail">
+            <img src="${item.image}" alt="" class="store-card-image" />
+          </div>
           <div class="store-card-body">
             <div>
               <span style="font-size: 12px;"><i class="bi bi-layers"></i><span>
@@ -367,10 +459,14 @@ export function renderCarouselMD(selector, items) {
             <div class="box-card-footer">
               <div>
                 <span style="color: #ff9902; font-weight: bold; font-size: 1.2rem;">
-                  ${formatPrice(item.productPrice)}
+                  ${formatPrice(item.productCurrency, item.productPrice)}
                 </span>
               </div>
               <div class="box-card-footer-action">
+                <div class="e-store-tooltip left btn-view-detail">
+                  <i class="bi bi-file-text"></i>
+                  <span class="e-store-tooltiptext">รายละเอียดเพิ่มเติม</span>
+                </div>
                 <span class="btn-add-wishlist"><i class="bi bi-heart"></i></span>
                 <span class="btn-add-cart"><i class="bi bi-cart3"></i></span>
               </div>
@@ -380,78 +476,62 @@ export function renderCarouselMD(selector, items) {
       </div>
     `;
 
-    const cartBtn = div.querySelector('.btn-add-cart');
-    cartBtn.addEventListener('click', () => addCart(item));
-
-    const wishlistBtn = div.querySelector('.btn-add-wishlist');
-    wishlistBtn.addEventListener('click', () => addWishlist(item));
-
     container.appendChild(div);
+  });
+
+  container.addEventListener("click", (e) => {
+
+    if (e.target.closest(".btn-add-wishlist")) {
+      if (config.user) {
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addWishlist(product);
+      } else {
+        document.getElementById("auth-modal").style.display = "flex";
+      }
+    }
+
+    else if (e.target.closest(".btn-add-cart")) {
+      if (config.user) {
+        const itemDiv = e.target.closest(".item");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addCart(product);
+      } else {
+        document.getElementById("auth-modal").style.display = "flex";
+      }
+    }
+
+    else if (e.target.closest(".btn-view-detail")) {
+      const itemDiv = e.target.closest(".item");
+      const productId = itemDiv.dataset.productId;
+      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
+    }
+
+    else if (e.target.closest(".img-view-detail")) {
+      const itemDiv = e.target.closest(".item");
+      const productId = itemDiv.dataset.productId;
+      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
+    }
 
   });
 
-
-  function addCart(product) {
-    const existingCart = JSON.parse(localStorage.getItem('userShoppingCart')) || [];
-    const productIndex = existingCart.findIndex(item => item.id === product.productId);
-    if (productIndex !== -1) {
-      existingCart[productIndex].quantity += 1;
-      alert('เพิ่มลงตะกร้าแล้ว');
-    } else {
-      existingCart.push({
-        id: product.productId,
-        name: product.productName,
-        price: product.productPrice,
-        quantity: 1,
-        imageUrl: product.image
-      });
-      alert('เพิ่มลงตะกร้าเรียบร้อย');
-    }
-    localStorage.setItem('userShoppingCart', JSON.stringify(existingCart));
-  }
-
-
-  function addWishlist(product) {
-    const existingWishlist = JSON.parse(localStorage.getItem('userLikedProducts')) || [];
-    const productIndex = existingWishlist.findIndex(item => item.id === product.productId);
-    if (productIndex !== -1) {
-      alert('กดถูกใจไว้แล้ว');
-    } else {
-      existingWishlist.push({
-        id: product.productId,
-        name: product.productName,
-        price: product.productPrice,
-        imageUrl: product.image
-      });
-      alert('เพิ่มการถูกใจเรียบร้อย');
-    }
-    
-    localStorage.setItem('userLikedProducts', JSON.stringify(existingWishlist));
-  }
-
-  function formatPrice(price) {
-    return Number(price).toLocaleString('th-TH', {
-      style: 'currency',
-      currency: 'THB',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }
-
   $(selector).owlCarousel({
-    loop: true,
+    loop: false,
     margin: 10,
     nav: false,
     dots: false,
     autoWidth: true,
   });
-
 }
 
 // ---------- RENDER CAROUSEL LARGE ------------
 export function renderCarouselLG(selector, items) {
   const container = document.querySelector(selector);
-  items.forEach(item => {
+  items.forEach((item) => {
     const div = document.createElement("div");
     div.classList.add("item");
     div.innerHTML = `
@@ -481,3 +561,4 @@ export function renderCarouselLG(selector, items) {
     autoWidth: true,
   });
 }
+

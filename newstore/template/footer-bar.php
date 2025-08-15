@@ -5,9 +5,8 @@
         <!-- <img src="/e-store/trandar_logo.png" alt="" class="store-modal-title" /> -->
 
         <form id="cookie-preferences" class="cookie-content">
-
+            
             <h3>การตั้งค่าความเป็นส่วนตัว</h3>
-
             <!-- คุกกี้ที่มีความจำเป็น -->
             <div class="cookie-section">
                 <div class="cookie-row">
@@ -62,8 +61,6 @@
             </div>
 
         </form>
-
-
 
     </div>
 </div>

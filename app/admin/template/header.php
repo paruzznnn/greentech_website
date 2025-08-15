@@ -50,7 +50,7 @@ if (!isset($base_path_admin)) {
       <div class="header-item dropdown-parent" onclick="toggleDropdown('origamiDropdownMenu', event)">
         <img src="<?php echo $new_path; ?>public/img/origami_app.png" height="25" style="cursor:pointer;">
         <div id="origamiDropdownMenu" class="dropdown-box hidden">
-          <a href="https://www.origami.life">
+          <a href="/app/admin/template/switch.php">
             <img src="<?php echo $new_path; ?>public/img/2_20180425103337.ico" height="40"><br>
             <span>Origami</span>
           </a>

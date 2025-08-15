@@ -2,10 +2,17 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
+// ตรวจสอบว่ามีการส่งค่า lang มาหรือไม่ ถ้าไม่มีให้ใช้ 'th' เป็นค่าเริ่มต้น
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+
+// สร้างชื่อคอลัมน์ตามภาษาที่เลือก
+$subject_col = $lang === 'en' ? 'subject_project_en' : 'subject_project';
+$description_col = $lang === 'en' ? 'description_project_en' : 'description_project';
+
 $sql = "SELECT 
             dn.project_id, 
-            dn.subject_project, 
-            dn.description_project,
+            dn.{$subject_col} AS subject_project, 
+            dn.{$description_col} AS description_project,
             dn.content_project, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -40,7 +47,7 @@ if ($result->num_rows > 0) {
 
         $boxesproject[] = [
             'id' => $row['project_id'],
-            'image' =>  $paths[0],
+            'image' => $paths[0],
             'title' => $row['subject_project'],
             'description' => $row['description_project'],
             'iframe' => $iframe
@@ -230,7 +237,7 @@ if ($result->num_rows > 0) {
                 <div class="project-slider">
                     <?php foreach ($boxesproject as $box): ?>
                         <div class="col-md-3 mb-4 d-flex">
-                            <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark w-100">
+                           <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
                                 <div class="project-card d-flex flex-column">
                                     <?php if (empty($box['image'])): ?>
                                         <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="100%" class="note-video-clip" style="border-radius: 20px 20px 0 0;"></iframe>
@@ -242,7 +249,7 @@ if ($result->num_rows > 0) {
                                     <div class="project-body d-flex flex-column">
                                         <h6 class="project-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
                                         <p class="project-text"><?= htmlspecialchars($box['description']) ?></p>
-                                        <span class="learn-more">Learn more ></span>
+                                        <span class="learn-more" data-translate="Learnmore" lang="th">Learn more ></span>
                                     </div>
                                 </div>
                             </a>

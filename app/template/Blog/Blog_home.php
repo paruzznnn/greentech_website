@@ -2,11 +2,17 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// เปลี่ยน LIMIT เพื่อให้ดึงบทความมาแสดงได้มากขึ้น
+// เพิ่มโค้ดนี้: รับค่า lang และกำหนดชื่อคอลัมน์ตามภาษา
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+$subject_col = $lang === 'en' ? 'subject_blog_en' : 'subject_blog';
+$description_col = $lang === 'en' ? 'description_blog_en' : 'description_blog';
+$content_col = $lang === 'en' ? 'content_blog_en' : 'content_blog'; // เผื่อไว้ใช้ในอนาคต
+
+// แก้ไข SQL Query ให้ใช้คอลัมน์ตามภาษาที่กำหนด
 $sql = "SELECT 
             dn.Blog_id, 
-            dn.subject_Blog, 
-            dn.description_Blog,
+            dn.{$subject_col} AS subject_Blog, 
+            dn.{$description_col} AS description_Blog,
             dn.content_Blog, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -21,7 +27,8 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.Blog_id 
         ORDER BY dn.date_create DESC
-        LIMIT 100"; // ดึงข้อมูลมามากขึ้นเพื่อรองรับการเลื่อน
+        LIMIT 100"; 
+// ... โค้ดส่วนอื่น ๆ ที่เหลือ
 
 $result = $conn->query($sql);
 $boxesBlog = [];
@@ -238,7 +245,7 @@ function scrollBlog(direction) {
         <div class="blog-scroll" id="blog-scroll-box">
             <?php foreach ($boxesBlog as $box): ?>
                 <div class="blog-card">
-                    <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
+                        <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                         <div class="card">
                             <?php if(empty($box['image'])): ?>
                                 <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>

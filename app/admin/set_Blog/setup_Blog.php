@@ -134,14 +134,14 @@ if ($result_projects->num_rows > 0) {
                                     <label for="">
                                         <span>Subject</span>:
                                     </label>
-                                    <input type="text" class="form-control" id="Blog_subject" name="Blog_subject">
+                                    <input type="text" class="form-control" id="blog_subject" name="blog_subject">
                                 </div>
                                 <div style="margin: 10px;">
                                     <label for="">
                                         <span>Description</span>:
                                     </label>
                                     <div>
-                                        <textarea class="form-control" id="Blog_description" name="Blog_description"></textarea>
+                                        <textarea class="form-control" id="blog_description" name="blog_description"></textarea>
                                     </div>
                                 </div>
                                 
@@ -177,7 +177,7 @@ if ($result_projects->num_rows > 0) {
                                         <span>Content</span>:
                                     </label>
                                     <div>
-                                        <textarea class="form-control summernote" id="summernote" name="Blog_content"></textarea>
+                                        <textarea class="form-control summernote" id="summernote" name="blog_content"></textarea>
                                     </div>
                                 </div>
                             </div>

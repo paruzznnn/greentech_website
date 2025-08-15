@@ -1,94 +1,82 @@
 <?php
-include '../check_permission.php';
-date_default_timezone_set('Asia/Bangkok');
+include '../check_permission.php'; 
+require_once('action/process_about.php'); // แก้ path ให้ถูกต้อง
 
-// ตรวจสอบว่ามีไฟล์อัปโหลดมาหรือไม่ และจัดการการอัปโหลด
-function handleImageUpload($file_array, $base_path) {
-    if (isset($file_array) && $file_array['error'] == 0) {
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-        $fileExtension = strtolower(pathinfo($file_array['name'], PATHINFO_EXTENSION));
+// ✅ ถ้ามีการเพิ่มใหม่
+if (isset($_POST['add_new'])) {
+    $type = $_POST['type'] ?? '';
+    $content = $_POST['content'] ?? '';
+    $author = $_POST['author'] ?? '';
+    $position = $_POST['position'] ?? '';
+    
+    $image_url = null;
 
-        if (in_array($fileExtension, $allowedExtensions)) {
-            $timestamp = time();
-            $randomString = bin2hex(random_bytes(5)); // สร้าง string สุ่ม 10 ตัวอักษร
-            $newFileName = $timestamp . '-' . $randomString . '.' . $fileExtension;
-            $uploadFileDir = '../../../public/news_img/';
-            
-            // ตรวจสอบและสร้าง directory ถ้ายังไม่มี
-            if (!is_dir($uploadFileDir)) {
-                mkdir($uploadFileDir, 0755, true);
-            }
-
-            $destFilePath = $uploadFileDir . $newFileName;
-            if (move_uploaded_file($file_array['tmp_name'], $destFilePath)) {
-                // สร้าง URL ที่ถูกต้อง
-                // ตรวจสอบว่ามาจาก localhost หรือ domain จริง
-                $serverName = $_SERVER['SERVER_NAME'];
-                if ($serverName == 'localhost' || $serverName == '127.0.0.1') {
-                    // สำหรับ Localhost
-                    return 'http://' . $serverName . '/trandar/public/news_img/' . $newFileName;
-                } else {
-                    // สำหรับ Production
-                    return 'https://' . $serverName . '/public/news_img/' . $newFileName;
-                }
-            }
+    if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
+        $fileInfo = handleSingleFileUpload($_FILES['image_file']);
+        if ($fileInfo['success']) {
+            $base_url = 'https://www.trandar.com';
+            $image_url = $base_url . '/public/news_img/' . $fileInfo['fileName'];
         }
     }
-    return null; // ถ้าไม่มีการอัปโหลดหรือเกิดข้อผิดพลาด
-}
 
-// 1. อัปเดตข้อมูลที่มีอยู่
-if (!empty($_POST['ids'])) {
-    foreach ($_POST['ids'] as $index => $id) {
-        $type = $_POST['types'][$index];
-        $content = $_POST['contents'][$index];
-        $author = $_POST['authors'][$index];
-        $position = $_POST['positions'][$index];
-        $image_url = $_POST['existing_images'][$index]; // ตั้งค่าเริ่มต้นเป็นภาพเดิม
-
-        // ตรวจสอบว่ามีการอัปโหลดภาพใหม่หรือไม่
-        if (isset($_FILES['images_files']['name'][$index]) && $_FILES['images_files']['error'][$index] == 0) {
-            $image_file = [
-                'name' => $_FILES['images_files']['name'][$index],
-                'type' => $_FILES['images_files']['type'][$index],
-                'tmp_name' => $_FILES['images_files']['tmp_name'][$index],
-                'error' => $_FILES['images_files']['error'][$index],
-                'size' => $_FILES['images_files']['size'][$index],
-            ];
-            $new_image_url = handleImageUpload($image_file, ''); // ส่งพารามิเตอร์ที่จำเป็น
-            if ($new_image_url) {
-                $image_url = $new_image_url;
-            }
-        }
-
-        $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, image_url=?, author=?, position=? WHERE id=?");
-        $stmt->bind_param("sssssi", $type, $content, $image_url, $author, $position, $id);
+    if (!empty($content)) {
+        $stmt = $conn->prepare("INSERT INTO about_content (type, content, image_url, author, position) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $type, $content, $image_url, $author, $position);
         $stmt->execute();
         $stmt->close();
+        echo "<script>alert('เพิ่มเนื้อหาใหม่เรียบร้อย'); window.location.href='edit_about.php';</script>";
+        exit;
+    } else {
+        echo "<script>alert('กรุณากรอกเนื้อหา'); window.location.href='edit_about.php';</script>";
+        exit;
     }
 }
 
-// 2. เพิ่มเนื้อหาใหม่ (ถ้ามี)
-if (!empty($_POST['new_content'])) {
-    $new_type = $_POST['new_type'];
-    $new_content = $_POST['new_content'];
-    $new_author = $_POST['new_author'];
-    $new_position = $_POST['new_position'];
-    $new_image = null;
+// ✅ ถ้ามีการอัปเดตหลายรายการ
+$ids = $_POST['ids'] ?? [];
+$types = $_POST['types'] ?? [];
+$contents = $_POST['contents'] ?? [];
+$authors = $_POST['authors'] ?? [];
+$positions = $_POST['positions'] ?? [];
+$images_old = $_POST['images_old'] ?? [];
 
-    // ตรวจสอบว่ามีการอัปโหลดภาพใหม่สำหรับบล็อกใหม่หรือไม่
-    if (isset($_FILES['new_image_file']) && $_FILES['new_image_file']['error'] == 0) {
-        $new_image_url = handleImageUpload($_FILES['new_image_file'], ''); // ส่งพารามิเตอร์ที่จำเป็น
-        if ($new_image_url) {
-            $new_image = $new_image_url;
+$uploaded_files = $_FILES['image_files'] ?? null;
+$image_urls_new = [];
+if ($uploaded_files && is_array($uploaded_files['name'])) {
+    foreach ($uploaded_files['name'] as $key => $name) {
+        if ($uploaded_files['error'][$key] == UPLOAD_ERR_OK) {
+            $fileInfo = handleSingleFileUpload([
+                'name' => $uploaded_files['name'][$key],
+                'type' => $uploaded_files['type'][$key],
+                'tmp_name' => $uploaded_files['tmp_name'][$key],
+                'error' => $uploaded_files['error'][$key],
+                'size' => $uploaded_files['size'][$key]
+            ]);
+            if ($fileInfo['success']) {
+                $base_url = 'https://www.trandar.com';
+                $image_urls_new[$key] = $base_url . '/public/news_img/' . $fileInfo['fileName'];
+            }
+        } else {
+            $image_urls_new[$key] = $images_old[$key];
         }
     }
+}
+
+for ($i = 0; $i < count($ids); $i++) {
+    $current_image_url = $image_urls_new[$i] ?? $images_old[$i];
     
-    $stmt = $conn->prepare("INSERT INTO service_content (type, content, image_url, author, position) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $new_type, $new_content, $new_image, $new_author, $new_position);
+    $stmt = $conn->prepare("UPDATE about_content SET type=?, content=?, image_url=?, author=?, position=? WHERE id=?");
+    $stmt->bind_param("sssssi",
+        $types[$i],
+        $contents[$i],
+        $current_image_url,
+        $authors[$i],
+        $positions[$i],
+        $ids[$i]
+    );
     $stmt->execute();
     $stmt->close();
 }
 
-echo "<script>alert('บันทึกเรียบร้อย'); window.location.href='edit_service.php';</script>";
+echo "<script>alert('บันทึกการแก้ไขเรียบร้อย'); window.location.href='edit_about.php';</script>";
 ?>

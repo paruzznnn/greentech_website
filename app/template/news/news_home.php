@@ -2,11 +2,17 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
+// --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
+            dn.subject_news_en, 
             dn.description_news,
-            dn.content_news, 
+            dn.description_news_en,
+            dn.content_news,
+            dn.content_news_en,
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -28,21 +34,28 @@ $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 
-        $content = $row['content_news'];
+        // --- MODIFIED: Use English content if lang is 'en' and the English column is not empty. ---
+        $content = ($lang === 'en' && !empty($row['content_news_en'])) ? $row['content_news_en'] : $row['content_news'];
+
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+        // --- MODIFIED: Ensure paths and files are not empty before exploding. ---
+        $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
+        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
+
+        // --- MODIFIED: Select the correct language for title and description. ---
+        $title = ($lang === 'en' && !empty($row['subject_news_en'])) ? $row['subject_news_en'] : $row['subject_news'];
+        $description = ($lang === 'en' && !empty($row['description_news_en'])) ? $row['description_news_en'] : $row['description_news'];
 
         $boxesNews[] = [
             'id' => $row['news_id'],
-            'image' =>  $paths[0],
-            'title' => $row['subject_news'],
-            'description' => $row['description_news'],
+            'image' => !empty($paths) ? $paths[0] : null,
+            'title' => $title,
+            'description' => $description,
             'iframe' => $iframe
         ];
     }
@@ -50,7 +63,7 @@ if ($result->num_rows > 0) {
 ?>
 
 <style>
-    /* --- สไตล์ที่ปรับปรุงใหม่ทั้งหมดให้ดู Premium มากขึ้น ✨ --- */
+    /* ... (CSS styles remain the same) ... */
     .card-premium {
         border: none;
         border-radius: 6px;
@@ -217,7 +230,7 @@ if ($result->num_rows > 0) {
                     <div class="carousel-inner flex-grow-1">
                         <?php foreach (array_slice($boxesNews, 0, 4) as $i => $box): ?>
                             <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
-                                <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark">
+                                <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark">
                                     <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px 6px 0 0; height: 450px; object-fit: cover;">
                                 </a>
                                 <div class="p-3 bg-light">
@@ -243,7 +256,7 @@ if ($result->num_rows > 0) {
             <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
                 <?php foreach (array_slice($boxesNews, offset: 1) as $box): ?>
                     <div class="col d-flex">
-                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>" class="text-decoration-none text-dark w-100">
+                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark w-100">
                             <div class="card-premium p-0 d-flex flex-column">
                                 <div class="sub-news-image-wrapper flex-shrink-0">
                                     <img src="<?= htmlspecialchars($box['image']) ?>" class="sub-news-img">

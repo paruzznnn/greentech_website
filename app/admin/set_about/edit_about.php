@@ -53,6 +53,16 @@ include '../check_permission.php';
         .note-editable span[style*="font-size"] { display: inline !important; }
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .spinner-border { width: 3rem; height: 3rem; }
+        .lang-switch-btn {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+        }
+        .lang-switch-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
     </style>
 </head>
 
@@ -65,62 +75,117 @@ include '../check_permission.php';
     </div>
 </div>
 <div class="container mt-4">
-    <h3>เพิ่มเนื้อหาใหม่</h3>
-    <form id="addAboutForm" method="post" enctype="multipart/form-data">
-        <div class="card mb-4 border-success">
-            <div class="card-body">
-                <label>ประเภท</label>
-                <select name="type" class="form-control" required>
-                    <option value="text">Text</option>
-                    <option value="image">Image + Text</option>
-                    <option value="quote">Quote</option>
-                </select>
-                <label>เนื้อหา (HTML)</label>
-                <textarea name="content" class="form-control summernote" required></textarea>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>แก้ไขเนื้อหา "เกี่ยวกับเรา"</h3>
+        <div class="btn-group">
+            <button type="button" class="btn lang-switch-btn active" data-lang="th">
+                <img src="https://flagcdn.com/th.svg" alt="Thai" width="24"> TH
+            </button>
+            <button type="button" class="btn lang-switch-btn" data-lang="en">
+                <img src="https://flagcdn.com/us.svg" alt="English" width="24"> EN
+            </button>
+        </div>
+    </div>
+    
+    <div id="add-new-block" class="card mb-4 border-success">
+        <div class="card-body">
+            <h4>เพิ่มเนื้อหาใหม่</h4>
+            <form id="addAboutForm" method="post" enctype="multipart/form-data">
+                <div class="lang-section th-lang active">
+                    <label>ประเภท</label>
+                    <select name="type_th" class="form-control" required>
+                        <option value="text">Text</option>
+                        <option value="image">Image + Text</option>
+                        <option value="quote">Quote</option>
+                    </select>
+                    <label>เนื้อหา (HTML)</label>
+                    <textarea name="content_th" class="form-control summernote"></textarea>
+                    <label>ผู้พูด (สำหรับ quote)</label>
+                    <input type="text" name="author_th" class="form-control">
+                    <label>ตำแหน่ง</label>
+                    <input type="text" name="position_th" class="form-control">
+                </div>
+                <div class="lang-section en-lang" style="display:none;">
+                    <label>ประเภท (English)</label>
+                    <select name="type_en" class="form-control">
+                        <option value="text">Text</option>
+                        <option value="image">Image + Text</option>
+                        <option value="quote">Quote</option>
+                    </select>
+                    <label>เนื้อหา (HTML) (English)</label>
+                    <textarea name="content_en" class="form-control summernote"></textarea>
+                </div>
                 <label>อัปโหลดรูปภาพ (ถ้ามี)</label>
                 <input type="file" name="image_file" class="form-control">
-                <label>ผู้พูด (สำหรับ quote)</label>
-                <input type="text" name="author" class="form-control">
-                <label>ตำแหน่ง</label>
-                <input type="text" name="position" class="form-control">
                 <button class="btn btn-primary mt-3" type="submit" id="submitAdd">เพิ่มเนื้อหาใหม่</button>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <hr>
 
-    <h3>แก้ไขเนื้อหา "เกี่ยวกับเรา"</h3>
     <form id="editAboutForm" method="post" enctype="multipart/form-data">
         <?php
         $result = $conn->query("SELECT * FROM about_content ORDER BY id ASC");
         while ($row = $result->fetch_assoc()):
+            $id = htmlspecialchars($row['id']);
+            $type_th = htmlspecialchars($row['type'] ?? '');
+            $content_th = $row['content'] ?? '';
+            $image_url = htmlspecialchars($row['image_url'] ?? '');
+            $author = htmlspecialchars($row['author'] ?? '');
+            $position = htmlspecialchars($row['position'] ?? '');
+            
+            // ดึงข้อมูลภาษาอังกฤษจากคอลัมน์ _en ถ้ามี
+            $type_en = htmlspecialchars($row['type_en'] ?? '');
+            $content_en = $row['content_en'] ?? '';
         ?>
-            <div class="card mb-3">
+            <div class="card mb-3 block-item" data-id="<?= $id ?>">
                 <div class="card-body">
-                    <input type="hidden" name="ids[]" value="<?= $row['id'] ?>">
-                    <label>ประเภท</label>
-                    <select name="types[]" class="form-control" required>
-                        <option value="text" <?= $row['type'] == 'text' ? 'selected' : '' ?>>Text</option>
-                        <option value="image" <?= $row['type'] == 'image' ? 'selected' : '' ?>>Image + Text</option>
-                        <option value="quote" <?= $row['type'] == 'quote' ? 'selected' : '' ?>>Quote</option>
-                    </select>
-                    <label>เนื้อหา (HTML)</label>
-                    <textarea name="contents[]" class="form-control summernote"><?= $row['content'] ?></textarea>
-                    <label>อัปโหลดรูปภาพใหม่ (ถ้ามี)</label>
-                    <?php if (!empty($row['image_url'])): ?>
-                        <div>
-                            <img src="<?= htmlspecialchars($row['image_url']) ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
-                            <br><small>รูปภาพปัจจุบัน</small>
-                        </div>
-                    <?php endif; ?>
-                    <input type="file" name="image_files[]" class="form-control mt-2">
-                    <input type="hidden" name="images_old[]" value="<?= htmlspecialchars($row['image_url']) ?>">
-                    <label>ผู้พูด (สำหรับ quote)</label>
-                    <input type="text" name="authors[]" class="form-control" value="<?= htmlspecialchars($row['author']) ?>">
-                    <label>ตำแหน่ง</label>
-                    <input type="text" name="positions[]" class="form-control" value="<?= htmlspecialchars($row['position']) ?>">
-                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $row['id'] ?>">ลบบล็อคนี้</button>
+                    <input type="hidden" name="ids[]" value="<?= $id ?>">
+                    
+                    <div class="lang-section th-lang active">
+                        <label>ประเภท</label>
+                        <select name="types_th[]" class="form-control">
+                            <option value="text" <?= $type_th == 'text' ? 'selected' : '' ?>>Text</option>
+                            <option value="image" <?= $type_th == 'image' ? 'selected' : '' ?>>Image + Text</option>
+                            <option value="quote" <?= $type_th == 'quote' ? 'selected' : '' ?>>Quote</option>
+                        </select>
+                        <label>เนื้อหา (HTML)</label>
+                        <textarea name="contents_th[]" class="form-control summernote"><?= $content_th ?></textarea>
+                        <label>ผู้พูด</label>
+                        <input type="text" name="authors[]" class="form-control" value="<?= $author ?>">
+                        <label>ตำแหน่ง</label>
+                        <input type="text" name="positions[]" class="form-control" value="<?= $position ?>">
+                    </div>
+
+                    <div class="lang-section en-lang" style="display:none;">
+                        <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
+                        <label>ประเภท (English)</label>
+                        <select name="types_en[]" class="form-control">
+                            <option value="text" <?= $type_en == 'text' ? 'selected' : '' ?>>Text</option>
+                            <option value="image" <?= $type_en == 'image' ? 'selected' : '' ?>>Image + Text</option>
+                            <option value="quote" <?= $type_en == 'quote' ? 'selected' : '' ?>>Quote</option>
+                        </select>
+                        <label>เนื้อหา (HTML) (English)</label>
+                        <textarea name="contents_en[]" class="form-control summernote"><?= $content_en ?></textarea>
+                        <label>ผู้พูด (English)</label>
+                        <input type="text" name="authors_en[]" class="form-control" value="<?= $author ?>">
+                        <label>ตำแหน่ง (English)</label>
+                        <input type="text" name="positions_en[]" class="form-control" value="<?= $position ?>">
+                    </div>
+
+                    <div class="image-section mt-3">
+                        <label>อัปโหลดรูปภาพใหม่ (ถ้ามี)</label>
+                        <?php if (!empty($image_url)): ?>
+                            <div class="mb-2">
+                                <img src="<?= $image_url ?>" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                <br><small>รูปภาพปัจจุบัน</small>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" name="image_files[]" class="form-control">
+                        <input type="hidden" name="images_old[]" value="<?= $image_url ?>">
+                    </div>
+                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $id ?>">ลบบล็อคนี้</button>
                 </div>
             </div>
         <?php endwhile; ?>

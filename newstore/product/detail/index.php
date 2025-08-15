@@ -20,7 +20,7 @@
             <section id="sections_products_deatil" class="section-space-search">
                 <div class="container">
                     <div id="product-detail-container-vibrant"></div>
-                    <div id="product-similar-container" class="owl-carousel owl-theme"></div>
+                    <!-- <div id="product-similar-container" class="owl-carousel owl-theme"></div> -->
                 </div>
             </section>
         </div>
@@ -31,23 +31,27 @@
         import(`${pathConfig.BASE_WEB}js/product/productDetailRender.js?v=<?= time() ?>`)
         .then(async ({ 
             fetchProductData,
-            createProductDetailHTML,
-            initProductDetailLogic,
+            ProductDetailModule,
             createProductSimilarHTML
         }) => {
 
+            let reqProduct = {
+                productId: <?php echo json_encode($_GET['id']); ?>
+            };
+
             const service = pathConfig.BASE_WEB + 'service/product/product-data.php?';
-            const productDeatilItems = await fetchProductData("getProductDetailItems", service);
-            const productSimilarItems = await fetchProductData("getProductSimilarItems", service);
-
+            const productDeatilItems = await fetchProductData("getProductDetailItems", service, reqProduct);
+            // const productSimilarItems = await fetchProductData("getProductSimilarItems", service, reqProduct);
             if(productDeatilItems.data){
-                createProductDetailHTML("#product-detail-container-vibrant", productDeatilItems.data);
-                initProductDetailLogic("#product-detail-container-vibrant", productDeatilItems.data.images);
+                ProductDetailModule.init(
+                    "#product-detail-container-vibrant", 
+                    productDeatilItems.data[0], 
+                    pathConfig.BASE_WEB
+                );
             }
-
-            if(productSimilarItems.data){
-                createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
-            }
+            // if(productSimilarItems.data){
+                // createProductSimilarHTML("#product-similar-container", productSimilarItems.data);
+            // }
             
         })
         .catch((e) => console.error("Module import failed", e));

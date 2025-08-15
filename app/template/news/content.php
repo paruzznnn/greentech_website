@@ -3,17 +3,19 @@ $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
+// --- ADDED: Check for language preference, default to Thai ---
+$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// --- MODIFIED: Ensure totalQuery also respects 'del' status and valid documents ---
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches English columns too ---
 $totalQuery = "SELECT COUNT(DISTINCT dn.news_id) as total
-               FROM dn_news dn
-               LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
-                                           AND dnc.del = '0'
-                                           AND dnc.status = '1'
-               WHERE dn.del = '0'"; // Filter news entries that are not deleted
+                FROM dn_news dn
+                LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
+                                            AND dnc.del = '0'
+                                            AND dnc.status = '1'
+                WHERE dn.del = '0'"; // Filter news entries that are not deleted
 if ($searchQuery) {
-    $totalQuery .= " AND dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    $totalQuery .= " AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -21,12 +23,15 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
-// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation ---
+// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation, including English columns ---
 $sql = "SELECT
             dn.news_id,
             dn.subject_news,
+            dn.subject_news_en,
             dn.description_news,
+            dn.description_news_en,
             dn.content_news,
+            dn.content_news_en,
             dn.date_create,
             GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
             GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
@@ -34,14 +39,14 @@ $sql = "SELECT
             dn_news dn
         LEFT JOIN
             dn_news_doc dnc ON dn.news_id = dnc.news_id
-                                AND dnc.del = '0'
-                                AND dnc.status = '1'
+                               AND dnc.del = '0'
+                               AND dnc.status = '1'
         WHERE
             dn.del = '0'"; // Only select news entries where del is 0
 
 if ($searchQuery) {
     $sql .= "
-    AND dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
+    AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
     ";
 }
 
@@ -52,12 +57,12 @@ LIMIT $perPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
-
 $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 
-        $content = $row['content_news'];
+        // --- MODIFIED: Select the correct language content ---
+        $content = ($lang === 'en' && !empty($row['content_news_en'])) ? $row['content_news_en'] : $row['content_news'];
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
@@ -74,8 +79,9 @@ if ($result->num_rows > 0) {
             'id' => $row['news_id'],
             'image' => !empty($paths) ? $paths[0] : null, // Set to null if no valid image path
             'date_time' => $row['date_create'],
-            'title' => $row['subject_news'],
-            'description' => $row['description_news'],
+            // --- MODIFIED: Select the correct language for title and description ---
+            'title' => ($lang === 'en' && !empty($row['subject_news_en'])) ? $row['subject_news_en'] : $row['subject_news'],
+            'description' => ($lang === 'en' && !empty($row['description_news_en'])) ? $row['description_news_en'] : $row['description_news'],
             'iframe' => $iframe
         ];
     }
@@ -91,9 +97,10 @@ if ($result->num_rows > 0) {
     <div>
         <form method="GET" action="">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="Search news...">
+                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo $lang === 'en' ? 'Search news...' : 'ค้นหาข่าว...'; ?>">
                 <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
             </div>
+            <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
         </form>
     </div>
 
@@ -106,7 +113,7 @@ if ($result->num_rows > 0) {
                 <?php
                     $encodedId = urlencode(base64_encode($box['id']));
                 ?>
-                <a href="news_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                <a href="news_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
 
                     <?php
                     // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
@@ -123,7 +130,7 @@ if ($result->num_rows > 0) {
                 </a>
             </div>
             <div class="box-content">
-                <a href="news_detail.php?id=<?php echo $encodedId; ?>" class="text-news">
+                <a href="news_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
                     <h5 class="line-clamp"><?php echo htmlspecialchars($box['title']); ?></h5>
                     <p class="line-clamp"><?php echo htmlspecialchars($box['description']); ?></p>
                 </a>
@@ -135,85 +142,16 @@ if ($result->num_rows > 0) {
 
 <div class="pagination">
     <?php if ($page > 1): ?>
-        <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Previous</a>
+        <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">Previous</a>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-        <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>" <?php echo $i == $page ? 'class="active"' : ''; ?>>
+        <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>" <?php echo $i == $page ? 'class="active"' : ''; ?>>
             <?php echo $i; ?>
         </a>
     <?php endfor; ?>
 
     <?php if ($page < $totalPages): ?>
-        <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>">Next</a>
+        <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">Next</a>
     <?php endif; ?>
 </div>
-
-
-<!-- แสดงฟอร์มด้านล่างนี้ -->
-<!-- <h3>ใส่ความคิดเห็น</h3>
-<p>อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *</p>
-<form id="commentForm" style="max-width: 600px;">
-    <textarea id="commentText" name="comment" rows="5" required placeholder="ความคิดเห็น *"
-        style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
-    <button type="submit"
-        style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-        แสดงความคิดเห็น
-    </button>
-</form>
-
-<script>
-document.getElementById("commentForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const jwt = sessionStorage.getItem("jwt");
-    const comment = document.getElementById("commentText").value;
-    const pageUrl = window.location.pathname;
-
-    if (!jwt) {
-        // alert("กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น");
-        document.getElementById("myBtn-sign-in").click(); // เปิด modal login
-        return;
-    }
-
-    fetch('actions/protected.php', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + jwt
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success" && parseInt(data.data.role_id) === 3) {
-            // ส่งคอมเม้นไปเก็บใน database
-            fetch('actions/save_comment.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwt
-                },
-                body: JSON.stringify({
-                    comment: comment,
-                    page_url: pageUrl
-                })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    alert("บันทึกความคิดเห็นเรียบร้อยแล้ว");
-                    document.getElementById("commentText").value = '';
-                } else {
-                    alert("เกิดข้อผิดพลาด: " + result.message);
-                }
-            });
-        } else {
-            alert("ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
-        }
-    })
-    .catch(err => {
-        console.error("Error verifying user:", err);
-        alert("เกิดข้อผิดพลาดในการยืนยันตัวตน");
-    });
-});
-</script>
- -->

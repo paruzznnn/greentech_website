@@ -13,7 +13,7 @@
 require_once('../lib/connect.php');
 
 $content = '<div class="content-sticky" id="page_about">';
-$content .= '<div class="container">';
+$content .= '<div class="container" style="max-width: 90%;">';
 $content .= '<div class="box-content">';
 
 // ดึงข้อมูลจากฐานข้อมูล

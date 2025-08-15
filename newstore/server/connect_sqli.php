@@ -22,8 +22,14 @@ function connectDB($host, $user, $pass, $dbname) {
     return $conn;
 }
 
-// $GLOBALS['mysqli1'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
-// $GLOBALS['mysqli2'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+
+$server_name = $_SERVER['SERVER_NAME'];
+if($server_name === 'localhost' || $server_name === '127.0.0.1'){
+$GLOBALS['conn_cloudpanel'] = connectDB($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+}else{
+$GLOBALS['conn_cloudpanel'] = connectDB($_ENV['DB_HOST_PD'], $_ENV['DB_USER_PD'], "wD20#20dW", $_ENV['DB_NAME_PD']);
+}
+
 function webBasePath() {
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);

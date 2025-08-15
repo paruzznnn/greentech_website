@@ -17,11 +17,6 @@
     <?php include '../template/head-bar.php'; ?>
     <main>
         <div id="sections_root_profile">
-
-            <div id="notificationContainer" class="notification-container">
-                <div id="notificationMessage" class="notification-message"></div>
-            </div>
-
             <section id="sections_cover_photo" class="section-space">
                 <div class="container">
                     <div class="cover-photo">
@@ -40,9 +35,9 @@
                                 <li data-tab="info">
                                     <span><i class="bi bi-person-gear"></i> บัญชีของฉัน</span>
                                 </li>
-                                <li data-tab="payment">
-                                    <span><i class="bi bi-cash-coin"></i> บัตร เครดิต / เดบิต</span>
-                                </li>
+                                <!-- <li data-tab="payment">
+                                    <span><i class="bi bi-cash-coin"></i>ชำระเงิน</span>
+                                </li> -->
                                 <li class="active" data-tab="orders">
                                     <span><i class="bi bi-tag"></i> รายการสั่งซื้อ</span>
                                 </li>
@@ -73,8 +68,8 @@
                                     <div id="orders-list" class="orders-list-container"></div>
                                 </div>
                             </div>
-                            <div class="tabContent" id="payment">
-                            </div>
+                            <!-- <div class="tabContent" id="payment">
+                            </div> -->
                             <div class="tabContent" id="addresses">
                                 <div class="main-container">
                                     <form id="shippingAddressForm" class="mb-4">
@@ -102,54 +97,6 @@
                             <div class="tabContent" id="cart">
                                 <div class="main-container">
                                     <div id="cartContent" class="cart-content">
-                                        <div id="cartItemsList" class="cart-items-list"></div>
-                                        <div id="bottomSummaryGrid" class="bottom-summary-grid">
-
-                                            <div id="discountCodeCard" class="discount-code-card summary-card">
-                                                <div>
-                                                    <h2>ใช้คูปอง</h2>
-                                                    <button id="applyCouponBtn" class="apply-coupon-button">ใช้คูปอง</button>
-                                                </div>
-                                                <div>
-                                                    <h2>รหัสส่วนลด</h2>
-                                                    <div class="input-group">
-                                                        <input type="text" id="discountCodeInput" placeholder="กรอกรหัสส่วนลด">
-                                                        <p id="discountMessage" class="discount-message"></p>
-                                                    </div>
-                                                    <button id="applyDiscountCodeBtn" class="apply-discount-code-button">ใช้รหัส</button>
-                                                </div>
-                                            </div>
-
-                                            <div id="orderSummary" class="summary-card">
-                                                <h2 class="summary-title">สรุปคำสั่งซื้อ</h2>
-                                                <div class="summary-row">
-                                                    <span>จำนวนสินค้าทั้งหมด</span>
-                                                    <span id="totalItemsCount">0 ชิ้น</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ยอดรวมสินค้า</span>
-                                                    <span id="subtotal">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ค่าจัดส่ง</span>
-                                                    <span id="shippingCost">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ส่วนลด</span>
-                                                    <span id="discountAmountDisplay">฿0.00</span>
-                                                </div>
-                                                <div class="summary-row">
-                                                    <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
-                                                    <span id="vatAmount">฿0.00</span>
-                                                </div>
-                                                <div class="summary-total">
-                                                    <span>ยอดชำระทั้งหมด</span>
-                                                    <span id="totalAmount">฿0.00</span>
-                                                </div>
-                                                <button class="checkout-button" onclick="proceedToCheckout()">ดำเนินการชำระเงิน</button>
-                                            </div>
-
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -246,65 +193,67 @@
     <?php include '../template/footer-bar.php'; ?>
 
     <script type="module">
-        import {
-            setupTabs
-        } from '../js/user/menuBuilder.js?v=<?php echo time() ?>';
-        import {
-            fetchOrders,
-            displayOrders,
-            displayTabOrders
-        } from '../js/user/orderListRender.js?v=<?php echo time() ?>';
-        import {
-            LikedProducts
-        } from '../js/user/wishlistRender.js?v=<?php echo time() ?>';
-        import {
-            ShoppingCart
-        } from '../js/user/cartRender.js?v=<?php echo time() ?>';
+        const base = pathConfig.BASE_WEB;
+        const timestamp = <?= time() ?>;
+        Promise.all([
+                import(`${base}js/user/menuBuilder.js?v=${timestamp}`),
+                import(`${base}js/user/orderListRender.js?v=${timestamp}`),
+                import(`${base}js/user/wishlistRender.js?v=${timestamp}`),
+                import(`${base}js/user/cartRender.js?v=${timestamp}`)
+            ])
+            .then(async ([menuBuilder, orderListRender, wishlistRender, cartRender]) => {
 
-        window.ShoppingCart = ShoppingCart;
-        document.addEventListener('DOMContentLoaded', async () => {
-            setupTabs();
-            displayTabOrders('tab-order-list');
-            let orders = await fetchOrders("getOrdersItems");
-            const tabButtonsHandler = () => {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        event.currentTarget.classList.add('active');
-                        const selectedStatus = event.currentTarget.dataset.status;
-                        displayOrders(selectedStatus, 'orders-list', orders);
+                const { setupTabs } = menuBuilder;
+                const { fetchOrders, displayOrders, displayTabOrders } = orderListRender;
+                const { LikedProducts } = wishlistRender;
+                const { ShoppingCart } = cartRender;
+
+                window.ShoppingCart = ShoppingCart;
+                const service = base + 'service/user/user-data.php?';
+
+                setupTabs();
+                displayTabOrders('tab-order-list');
+                let orders = await fetchOrders("getOrdersItems", service);
+                const tabButtonsHandler = () => {
+                    const tabButtons = document.querySelectorAll('.tab-button');
+                    tabButtons.forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            tabButtons.forEach(btn => btn.classList.remove('active'));
+                            event.currentTarget.classList.add('active');
+                            const selectedStatus = event.currentTarget.dataset.status;
+                            displayOrders(selectedStatus, 'orders-list', orders);
+                        });
                     });
-                });
-            };
-            tabButtonsHandler();
-            displayOrders('All', 'orders-list', orders);
-            ShoppingCart.init();
-            LikedProducts.init();
-            LikedProducts.renderProducts(ShoppingCart);
-        });
+                };
+                tabButtonsHandler();
+                displayOrders('All', 'orders-list', orders);
+                ShoppingCart.init();
+                LikedProducts.init();
+                LikedProducts.renderProducts(ShoppingCart);
+
+
+            })
+            .catch((e) => {
+                console.error("One or more module imports failed", e);
+            });
     </script>
+
     <script type="module">
-        import {
-            showNotification,
-            setupProfileImageUpload
-        } from '../js/user/userRender.js?v=<?php echo time() ?>';
+        import { setupProfileImageUpload } from '../js/user/userRender.js?v=<?php echo time() ?>';
         document.addEventListener('DOMContentLoaded', () => {
             setupProfileImageUpload();
         });
     </script>
+
     <script type="module">
-        import {
-            createAddressCard
-        } from '../js/user/addressRender.js?v=<?php echo time() ?>';
+        import { createAddressCard } from '../js/user/addressRender.js?v=<?php echo time() ?>';
         document.getElementById('addAddressCardBtn').addEventListener('click', () => {
             createAddressCard();
         });
         createAddressCard();
     </script>
 
-    <script>
-        
+    <!-- <script>
         const initialMyCouponsData = [{
                 id: 'user_cpn_001',
                 name: 'ส่วนลด 15%',
@@ -510,8 +459,7 @@
     </script>
 
     <script>
-        const reviews = [
-            {
+        const reviews = [{
                 productName: "Trandar AMF Mercure แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว",
                 rating: 5,
                 reviewText: "สินค้าดี แข็งแรง พนักงานบริการดี",
@@ -595,8 +543,7 @@
             });
         }
         window.onload = renderReviews;
-    </script>
-
+    </script> -->
 
 </body>
 

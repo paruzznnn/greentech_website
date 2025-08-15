@@ -147,6 +147,11 @@ if (isset($_POST['action'])) {
         case 'edit_group':
             $group_id = (int)$_POST['group_id'];
             $group_name = trim($conn->real_escape_string($_POST['group_name']));
+            // เพิ่มตัวแปรสำหรับคอลัมน์ที่ต้องการแก้ไข
+            $group_name_en = trim($conn->real_escape_string($_POST['group_name_en']));
+            $description = trim($conn->real_escape_string($_POST['description']));
+            $description_en = trim($conn->real_escape_string($_POST['description_en']));
+
             $group_type = $_POST['group_type']; // 'main' or 'sub'
             $parent_group_id = null; // Default for main groups
 
@@ -246,10 +251,13 @@ if (isset($_POST['action'])) {
                 $parent_group_id = !empty($_POST['parent_group_id']) ? (int)$_POST['parent_group_id'] : null;
             }
 
-            $sql = "UPDATE dn_shop_groups SET group_name = ?, parent_group_id = ?, image_path = ? WHERE group_id = ?";
+            // คำสั่ง SQL ที่แก้ไขแล้ว: เพิ่มคอลัมน์ group_name_en, description, description_en
+            $sql = "UPDATE dn_shop_groups SET group_name = ?, group_name_en = ?, description = ?, description_en = ?, parent_group_id = ?, image_path = ? WHERE group_id = ?";
             $stmt = $conn->prepare($sql);
             if ($stmt) {
-                $stmt->bind_param("sssi", $group_name, $parent_group_id, $new_image_path, $group_id);
+                // bind_param ที่แก้ไขแล้ว: เพิ่ม type และตัวแปรสำหรับคอลัมน์ใหม่
+                // ssssssi -> 6 string, 1 integer
+                $stmt->bind_param("ssssssi", $group_name, $group_name_en, $description, $description_en, $parent_group_id, $new_image_path, $group_id);
 
                 if ($stmt->execute()) {
                     $response = ['status' => 'success', 'message' => 'แก้ไขหมวดหมู่สำเร็จ!'];

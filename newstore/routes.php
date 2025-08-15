@@ -3,6 +3,13 @@
 require_once __DIR__ . '/cookie/cookie_utils.php';
 
 function getBasePath() {
+
+    /*==== FILE SETUP BASE PATH =======
+    routes.php
+    inc-cdn.php
+    server/connect_sqli.php
+    ==================================*/
+
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
 
@@ -69,21 +76,37 @@ switch ($ROUTE['controller']) {
     case 'admin':
         break;
     case 'user':
+
+        $GLOBALS['BASE_WEB'] = getBasePath();
+        echo "
+        <script>
+            var pathConfig = {
+                BASE_WEB: " . json_encode($BASE_WEB) . "
+            };
+        </script>
+        ";
+
         break;
     default:
-            if (checkAutoLoginCookie() !== false) {
-                // echo "Welcome back, user ID: " . checkAutoLoginCookie();
-            } else {
-                // session_destroy();
-                // echo "Please login.";
-            }
-            $GLOBALS['BASE_WEB'] = getBasePath();
-            echo "
-            <script>
-                var pathConfig = {
-                    BASE_WEB: " . json_encode($BASE_WEB) . "
-                };
-            </script>
-            ";
+
+        // echo '<pre>';
+        // print_r($_SESSION);
+        // echo '</pre>';
+
+        // if (!empty($_SESSION['user'])) {
+        //     echo "Welcome back, user ID: " . checkAutoLoginCookie();
+        // } else {
+            // session_destroy();
+        // }
+
+        $GLOBALS['BASE_WEB'] = getBasePath();
+        echo "
+        <script>
+            var pathConfig = {
+                BASE_WEB: " . json_encode($BASE_WEB) . "
+            };
+        </script>
+        ";
+
         break;
 }

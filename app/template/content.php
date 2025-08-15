@@ -215,7 +215,7 @@ body, html {
     padding: 20px 0;
 }
 .full-width-content {
-    max-width: 70%;
+    max-width: 95%;
     margin: 0 auto;
 }
 .full-width-content .line-ref2 {
@@ -247,7 +247,7 @@ body, html {
 </style>
 
 <div class="content-sticky" id="" style=" margin: 0 auto;">
-    <div style="max-width: 70%;">
+    <div style="max-width: 90%;">
         <div class="row">
             <div class="col-md-12 text-end" style="padding-top: 30px;">
                 <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
@@ -308,7 +308,7 @@ body, html {
 </div>
 
 <div class="content-sticky" id="" style=" margin: 0 auto;">
-    <div style="max-width: 70%;">
+    <div style="max-width: 90%;">
         <div class="row">
             <div class="col-md-12 section bottom-shasow "style="padding-top:3rem;">
                 <h4 data-translate="blog" lang="th" class="line-ref">บทความ</h4>

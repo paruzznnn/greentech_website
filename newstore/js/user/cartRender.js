@@ -1,14 +1,14 @@
 // Object Literal --------------------------------------
 export const ShoppingCart = {
     cartItems: [],
-    CART_STORAGE_KEY: 'userShoppingCart',
-    SHIPPING_COST: 50.00,
+    CART_STORAGE_KEY: 'shoppingCart',
+    // SHIPPING_COST: 50.00,
+    SHIPPING_COST: 0,
     VAT_RATE: 0.07,
     currentDiscount: 0,
 
     init() {
         this.loadCart();
-        // this.addDummyItems();
         this.renderCart();
         this.setupEventListeners();
     },
@@ -64,24 +64,28 @@ export const ShoppingCart = {
         const card = document.createElement('div');
         card.className = 'cart-item-card';
         card.innerHTML = `
-            <img src="${item.imageUrl}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x150/CCCCCC/333333?text=No+Image';">
+            <img src="${item.imageUrl}" alt="${item.name}">
             <div class="item-details">
                 <div class="item-title">
                     <h3 class="item-name">${item.name}</h3>
                     <span class="remove-item-button" data-id="${item.id}">ลบ</span>
                 </div>
-                <p class="item-price">฿${item.price.toFixed(2)}</p>
+                <p class="item-price">฿${item.price}</p>
                 <div class="quantity-control">
                     <button type="button" data-id="${item.id}" data-action="decrease">-</button>
                     <input type="number" value="${item.quantity}" min="1" data-id="${item.id}" class="quantity-input">
                     <button type="button" data-id="${item.id}" data-action="increase">+</button>
                 </div>
                 <div class="item-total-price">
-                    ฿${(item.price * item.quantity).toFixed(2)}
+                    ฿${(item.price * item.quantity)}
                 </div>
             </div>
         `;
         return card;
+    },
+
+    createCoupon() {
+
     },
 
     renderCart() {
@@ -91,39 +95,38 @@ export const ShoppingCart = {
         if (this.cartItems.length === 0) {
             cartContent.innerHTML = '<p class="empty-cart-message">ตะกร้าสินค้าของคุณว่างเปล่า</p>';
         } else {
-            let cartItemsList = document.getElementById('cartItemsList');
-            if (!cartItemsList) {
-                cartContent.innerHTML = `
-                    <div id="cartItemsList" class="cart-items-list"></div>
-                    <div id="bottomSummaryGrid" class="bottom-summary-grid">
-                        <div id="discountCodeCard" class="discount-code-card summary-card">
-                            <div>
-                                <h2>ใช้คูปอง</h2>
-                                <button type="button" id="applyCouponBtn" class="apply-coupon-button">ใช้คูปอง</button>
-                            </div>
-                            <div>
-                                <h2>รหัสส่วนลด</h2>
-                                <div class="input-group">
-                                    <input type="text" id="discountCodeInput" placeholder="กรอกรหัสส่วนลด">
-                                    <p id="discountMessage" class="discount-message"></p>
-                                </div>
-                                <button type="button" id="applyDiscountCodeBtn" class="apply-discount-code-button">ใช้รหัส</button>
-                            </div>
-                        </div>
-                        <div id="orderSummary" class="summary-card">
-                            <h2 class="summary-title">สรุปคำสั่งซื้อ</h2>
-                            <div class="summary-row"><span>จำนวนสินค้าทั้งหมด</span><span id="totalItemsCount">0 ชิ้น</span></div>
-                            <div class="summary-row"><span>ยอดรวมสินค้า</span><span id="subtotal">฿0.00</span></div>
-                            <div class="summary-row"><span>ค่าจัดส่ง</span><span id="shippingCost">฿0.00</span></div>
-                            <div class="summary-row"><span>ส่วนลด</span><span id="discountAmountDisplay">฿0.00</span></div>
-                            <div class="summary-row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span><span id="vatAmount">฿0.00</span></div>
-                            <div class="summary-total"><span>ยอดชำระทั้งหมด</span><span id="totalAmount">฿0.00</span></div>
-                            <button type="button" class="checkout-button">ดำเนินการชำระเงิน</button>
-                        </div>
-                    </div>`;
-                cartItemsList = document.getElementById('cartItemsList');
-            }
 
+            // <button type="button" id="applyCouponBtn" class="apply-coupon-button">ใช้คูปอง</button>
+            // <div class="input-group">
+            //     <input type="text" id="discountCodeInput" placeholder="กรอกรหัสส่วนลด">
+            //     <p id="discountMessage" class="discount-message"></p>
+            // </div>
+            // <button type="button" id="applyDiscountCodeBtn" class="apply-discount-code-button">ใช้รหัส</button>
+
+            cartContent.innerHTML = `
+                <div id="cartItemsList" class="cart-items-list"></div>
+                <div id="bottomSummaryGrid" class="bottom-summary-grid">
+                    <div id="discountCodeCard" class="discount-code-card summary-card">
+                        <div>
+                            <h2>ใช้คูปอง</h2>
+                        </div>
+                        <div>
+                            <h2>รหัสส่วนลด</h2>
+                        </div>
+                    </div>
+                    <div id="orderSummary" class="summary-card">
+                        <h2 class="summary-title">สรุปคำสั่งซื้อ</h2>
+                        <div class="summary-row"><span>จำนวนสินค้าทั้งหมด</span><span id="totalItemsCount">0 ชิ้น</span></div>
+                        <div class="summary-row"><span>ยอดรวมสินค้า</span><span id="subtotal">฿0.00</span></div>
+                        <div class="summary-row"><span>ค่าจัดส่ง</span><span id="shippingCost">฿0.00</span></div>
+                        <div class="summary-row"><span>ส่วนลด</span><span id="discountAmountDisplay">฿0.00</span></div>
+                        <div class="summary-row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span><span id="vatAmount">฿0.00</span></div>
+                        <div class="summary-total"><span>ยอดชำระทั้งหมด</span><span id="totalAmount">฿0.00</span></div>
+                        <button type="button" class="checkout-button">ซื้อสินค้า</button>
+                    </div>
+                </div>`;
+
+            let cartItemsList = document.getElementById('cartItemsList');
             cartItemsList.innerHTML = '';
             this.cartItems.forEach(item => cartItemsList.appendChild(this.createCartItemCard(item)));
             this.calculateSummary();
@@ -250,29 +253,34 @@ export const ShoppingCart = {
             alert('ตะกร้าสินค้าของคุณว่างเปล่า กรุณาเพิ่มสินค้าก่อนดำเนินการชำระเงิน');
             return;
         }
-        console.log('ดำเนินการชำระเงิน...');
-        alert('กำลังดำเนินการชำระเงิน...');
-    },
 
-    // addDummyItems() {
-    //     if (this.cartItems.length === 0) {
-    //         this.cartItems.push(
-    //             {
-    //                 id: 'PROD001',
-    //                 name: 'Trandar Mineral Fiber AMF',
-    //                 price: 350.00,
-    //                 quantity: 1,
-    //                 imageUrl: 'https://www.trandar.com//public/shop_img/6883336b6606d_______________________AMF-_________.jpg'
-    //             },
-    //             {
-    //                 id: 'PROD002',
-    //                 name: 'Trandar AMF Mercure',
-    //                 price: 890.00,
-    //                 quantity: 2,
-    //                 imageUrl: 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
-    //             }
-    //         );
-    //         this.saveCart();
-    //     }
-    // }
+        const subtotal = this.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const totalAfterDiscount = Math.max(0, subtotal - this.currentDiscount);
+        const vatAmount = totalAfterDiscount * this.VAT_RATE;
+        const totalAmount = totalAfterDiscount + vatAmount + this.SHIPPING_COST;
+
+        const orderSummary = {
+            items: this.cartItems,
+            subtotal: subtotal.toFixed(2),
+            discount: this.currentDiscount.toFixed(2),
+            vat: vatAmount.toFixed(2),
+            shipping: this.SHIPPING_COST.toFixed(2),
+            totalAmount: totalAmount.toFixed(2),
+            createdAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('orderProduct', JSON.stringify(orderSummary));
+
+        alert('สรุปคำสั่งซื้อถูกบันทึกเรียบร้อยแล้ว!');
+        
+        this.cartItems = [];
+        this.currentDiscount = 0;
+        this.saveCart();
+        this.renderCart();
+
+        // ส่งไปหน้าอื่นได้ เช่น redirect หรือแสดงสรุปคำสั่งซื้อ
+        // window.location.href = '/order-summary.html';
+    }
+
+
 };

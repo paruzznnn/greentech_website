@@ -130,7 +130,7 @@ $(document).ready(function () {
 
             editButton.off('click').on('click', function () {
                 reDirect('edit_Blog.php', {
-                    Blog_id: data.Blog_id
+                    blog_id: data.blog_id
                 });
             });
 
@@ -151,7 +151,7 @@ $(document).ready(function () {
                             type: 'POST',
                             data: {
                                 action: 'delblog',
-                                id: data.Blog_id,
+                                id: data.blog_id,
                             },
                             dataType: 'json',
                             success: function (response) {
@@ -246,7 +246,7 @@ $("#submitAddblog").on("click", function (event) {
     var formblog = $("#formblog")[0];
     var formData = new FormData(formblog);
     formData.append("action", "addblog");
-    var blogContent = formData.get("Blog_content");
+    var blogContent = formData.get("blog_content");
 
     // ดึงค่าจาก Select2 และเพิ่มลงใน FormData
     var relatedprojects = $("#related_projects_add").val();
@@ -278,7 +278,7 @@ $("#submitAddblog").on("click", function (event) {
                 checkIsUrl = true;
             }
         }
-        formData.set("Blog_content", tempDiv.innerHTML);
+        formData.set("blog_content", tempDiv.innerHTML);
     }
 
     $(".is-invalid").removeClass("is-invalid");
@@ -287,15 +287,15 @@ $("#submitAddblog").on("click", function (event) {
             alertError("Please add a cover photo.");
             return;
         }
-        if (tag[0] === 'Blog_subject' && tag[1].trim() === '') {
-            $("#Blog_subject").addClass("is-invalid");
+        if (tag[0] === 'blog_subject' && tag[1].trim() === '') {
+            $("#blog_subject").addClass("is-invalid");
             return;
         }
-        if (tag[0] === 'Blog_description' && tag[1].trim() === '') {
-            $("#Blog_description").addClass("is-invalid");
+        if (tag[0] === 'blog_description' && tag[1].trim() === '') {
+            $("#blog_description").addClass("is-invalid");
             return;
         }
-        if (tag[0] === 'Blog_content' && tag[1].trim() === '') {
+        if (tag[0] === 'blog_content' && tag[1].trim() === '') {
             alertError("Please fill in content information.");
             return;
         }
@@ -369,10 +369,10 @@ $("#submitAddblog").on("click", function (event) {
 
 $("#submitEditblog").on("click", function (event) {
     event.preventDefault();
-    var formblog = $("#formBlog_edit")[0];
+    var formblog = $("#formblog_edit")[0];
     var formData = new FormData(formblog);
     formData.set("action", "editblog");
-    formData.set("Blog_id", $("#Blog_id").val());
+    formData.set("blog_id", $("#blog_id").val());
     var contentFromEditor = $("#summernote_update").summernote('code');
     var checkIsUrl = false;
     var finalContent = '';
@@ -414,29 +414,29 @@ $("#submitEditblog").on("click", function (event) {
             }
         }
         finalContent = tempDiv.innerHTML;
-        formData.set("Blog_content", finalContent);
+        formData.set("blog_content", finalContent);
     } else {
         console.warn("⚠️ contentFromEditor is empty");
     }
 
     $(".is-invalid").removeClass("is-invalid");
-    if (!$("#Blog_subject").val().trim()) {
-        $("#Blog_subject").addClass("is-invalid");
-        console.error("❌ Validation failed: Blog_subject is empty");
+    if (!$("#blog_subject").val().trim()) {
+        $("#blog_subject").addClass("is-invalid");
+        console.error("❌ Validation failed: blog_subject is empty");
         return;
     }
-    if (!$("#Blog_description").val().trim()) {
-        $("#Blog_description").addClass("is-invalid");
-        console.error("❌ Validation failed: Blog_description is empty");
+    if (!$("#blog_description").val().trim()) {
+        $("#blog_description").addClass("is-invalid");
+        console.error("❌ Validation failed: blog_description is empty");
         return;
     }
     if (!finalContent.trim()) {
         alertError("Please fill in content information.");
-        console.error("❌ Validation failed: Blog_content is empty");
+        console.error("❌ Validation failed: blog_content is empty");
         return;
     }
-    formData.set("Blog_subject", $("#Blog_subject").val());
-    formData.set("Blog_description", $("#Blog_description").val());
+    formData.set("blog_subject", $("#blog_subject").val());
+    formData.set("blog_description", $("#blog_description").val());
 
     Swal.fire({
         title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
