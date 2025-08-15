@@ -798,274 +798,274 @@ function alertError(textAlert) {
     });
 }
 
-$(document).ready(function () {
-    // Setup Summernote for "add shop" page
-    if ($('#summernote').length) {
-        $('#summernote').summernote({
-            placeholder: 'เขียนเนื้อหาเกี่ยวกับร้านค้าของคุณที่นี่...',
-            tabsize: 2,
-            height: 600,
-            callbacks: {
-                onImageUpload: function(files) {
-                    uploadFile(files[0], '#summernote');
-                }
-            }
-        });
-    }
+// $(document).ready(function () {
+//     // Setup Summernote for "add shop" page
+//     if ($('#summernote').length) {
+//         $('#summernote').summernote({
+//             placeholder: 'เขียนเนื้อหาเกี่ยวกับร้านค้าของคุณที่นี่...',
+//             tabsize: 2,
+//             height: 600,
+//             callbacks: {
+//                 onImageUpload: function(files) {
+//                     uploadFile(files[0], '#summernote');
+//                 }
+//             }
+//         });
+//     }
 
-    // Setup Summernote for "edit shop" page
-    if ($('#summernote_update').length) {
-        $('#summernote_update').summernote({
-            placeholder: 'เขียนเนื้อหาเกี่ยวกับร้านค้าของคุณที่นี่...',
-            tabsize: 2,
-            height: 600,
-            callbacks: {
-                onImageUpload: function(files) {
-                    uploadFile(files[0], '#summernote_update');
-                }
-            }
-        });
-    }
+//     // Setup Summernote for "edit shop" page
+//     if ($('#summernote_update').length) {
+//         $('#summernote_update').summernote({
+//             placeholder: 'เขียนเนื้อหาเกี่ยวกับร้านค้าของคุณที่นี่...',
+//             tabsize: 2,
+//             height: 600,
+//             callbacks: {
+//                 onImageUpload: function(files) {
+//                     uploadFile(files[0], '#summernote_update');
+//                 }
+//             }
+//         });
+//     }
 
-    // Event listener for the Add Shop button
-    $("#submitAddshop").on("click", function (event) {
-        event.preventDefault();
-        let subGroupVal = $('#sub_group_select').val();
-        let mainGroupVal = $('#main_group_select').val();
-        let groupId = subGroupVal ? subGroupVal : mainGroupVal;
-        var formshop = $("#formshop")[0];
-        var formData = new FormData(formshop);
-        formData.append("action", "addshop");
-        formData.set('group_id', groupId);
+//     // Event listener for the Add Shop button
+//     $("#submitAddshop").on("click", function (event) {
+//         event.preventDefault();
+//         let subGroupVal = $('#sub_group_select').val();
+//         let mainGroupVal = $('#main_group_select').val();
+//         let groupId = subGroupVal ? subGroupVal : mainGroupVal;
+//         var formshop = $("#formshop")[0];
+//         var formData = new FormData(formshop);
+//         formData.append("action", "addshop");
+//         formData.set('group_id', groupId);
 
-        var contentFromEditor = $("#summernote").summernote('code');
-        var checkIsUrl = false;
-        var finalContent = '';
-        if (contentFromEditor) {
-            var tempDiv = document.createElement("div");
-            tempDiv.innerHTML = contentFromEditor;
-            var imgTags = tempDiv.getElementsByTagName("img");
-            for (var i = 0; i < imgTags.length; i++) {
-                var imgSrc = imgTags[i].getAttribute("src");
-                var filename = imgTags[i].getAttribute("data-filename");
-                if (!imgSrc) {
-                    continue;
-                }
-                imgSrc = imgSrc.replace(/ /g, "%20");
-                if (imgSrc.startsWith("data:image")) {
-                    var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
-                    if (file) {
-                        formData.append("image_files[]", file);
-                        imgTags[i].setAttribute("src", "");
-                    }
-                } else if (isValidUrl(imgSrc)) {
-                    checkIsUrl = true;
-                }
-            }
-            finalContent = tempDiv.innerHTML;
-            formData.set("shop_content", finalContent);
-        }
+//         var contentFromEditor = $("#summernote").summernote('code');
+//         var checkIsUrl = false;
+//         var finalContent = '';
+//         if (contentFromEditor) {
+//             var tempDiv = document.createElement("div");
+//             tempDiv.innerHTML = contentFromEditor;
+//             var imgTags = tempDiv.getElementsByTagName("img");
+//             for (var i = 0; i < imgTags.length; i++) {
+//                 var imgSrc = imgTags[i].getAttribute("src");
+//                 var filename = imgTags[i].getAttribute("data-filename");
+//                 if (!imgSrc) {
+//                     continue;
+//                 }
+//                 imgSrc = imgSrc.replace(/ /g, "%20");
+//                 if (imgSrc.startsWith("data:image")) {
+//                     var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
+//                     if (file) {
+//                         formData.append("image_files[]", file);
+//                         imgTags[i].setAttribute("src", "");
+//                     }
+//                 } else if (isValidUrl(imgSrc)) {
+//                     checkIsUrl = true;
+//                 }
+//             }
+//             finalContent = tempDiv.innerHTML;
+//             formData.set("shop_content", finalContent);
+//         }
 
-        // Form Validation
-        $(".is-invalid").removeClass("is-invalid");
-        if (!formData.get('fileInput') || formData.get('fileInput').name === '') {
-            alertError("Please add a cover photo.");
-            return;
-        }
-        if (!$("#shop_subject").val().trim()) {
-            $("#shop_subject").addClass("is-invalid");
-            alertError("Please fill in the subject.");
-            return;
-        }
-        if (!$("#shop_description").val().trim()) {
-            $("#shop_description").addClass("is-invalid");
-            alertError("Please fill in the description.");
-            return;
-        }
-        if (!finalContent.trim()) {
-            alertError("Please fill in content information.");
-            return;
-        }
-        if (!groupId) {
-            alertError("Please select a group.");
-            $('#main_group_select').addClass("is-invalid");
-            $('#sub_group_select').addClass("is-invalid");
-            return;
-        }
+//         // Form Validation
+//         $(".is-invalid").removeClass("is-invalid");
+//         if (!formData.get('fileInput') || formData.get('fileInput').name === '') {
+//             alertError("Please add a cover photo.");
+//             return;
+//         }
+//         if (!$("#shop_subject").val().trim()) {
+//             $("#shop_subject").addClass("is-invalid");
+//             alertError("Please fill in the subject.");
+//             return;
+//         }
+//         if (!$("#shop_description").val().trim()) {
+//             $("#shop_description").addClass("is-invalid");
+//             alertError("Please fill in the description.");
+//             return;
+//         }
+//         if (!finalContent.trim()) {
+//             alertError("Please fill in content information.");
+//             return;
+//         }
+//         if (!groupId) {
+//             alertError("Please select a group.");
+//             $('#main_group_select').addClass("is-invalid");
+//             $('#sub_group_select').addClass("is-invalid");
+//             return;
+//         }
 
-        Swal.fire({
-            title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
-            text: "Do you want to add shop?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#loading-overlay').fadeIn();
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        try {
-                            var json = (typeof response === "string") ? JSON.parse(response) : response;
-                            if (json.status === 'success') {
-                                Swal.fire('Success', json.message, 'success').then(() => {
-                                    window.location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', json.message || 'Unknown error', 'error');
-                            }
-                        } catch (e) {
-                            Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
-                    },
-                    complete: function () {
-                        $('#loading-overlay').fadeOut();
-                    }
-                });
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-        });
-    });
+//         Swal.fire({
+//             title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+//             text: "Do you want to add shop?",
+//             icon: "warning",
+//             showCancelButton: true,
+//             confirmButtonColor: "#4CAF50",
+//             cancelButtonColor: "#d33",
+//             confirmButtonText: "Accept"
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 $('#loading-overlay').fadeIn();
+//                 $.ajax({
+//                     url: "actions/process_shop.php",
+//                     type: "POST",
+//                     data: formData,
+//                     processData: false,
+//                     contentType: false,
+//                     success: function (response) {
+//                         try {
+//                             var json = (typeof response === "string") ? JSON.parse(response) : response;
+//                             if (json.status === 'success') {
+//                                 Swal.fire('Success', json.message, 'success').then(() => {
+//                                     window.location.reload();
+//                                 });
+//                             } else {
+//                                 Swal.fire('Error', json.message || 'Unknown error', 'error');
+//                             }
+//                         } catch (e) {
+//                             Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
+//                         }
+//                     },
+//                     error: function (xhr, status, error) {
+//                         Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
+//                     },
+//                     complete: function () {
+//                         $('#loading-overlay').fadeOut();
+//                     }
+//                 });
+//             } else {
+//                 $('#loading-overlay').fadeOut();
+//             }
+//         });
+//     });
 
-    // Event listener for the Edit Shop button
-    $("#submitEditshop").on("click", function (event) {
-        event.preventDefault();
-        let subGroupVal = $('#sub_group_select').val();
-        let mainGroupVal = $('#main_group_select').val();
-        let groupId = subGroupVal ? subGroupVal : mainGroupVal;
-        let formData = new FormData(document.getElementById('formshop_edit'));
-        formData.append('action', 'editshop');
-        formData.set('group_id', groupId);
+//     // Event listener for the Edit Shop button
+//     $("#submitEditshop").on("click", function (event) {
+//         event.preventDefault();
+//         let subGroupVal = $('#sub_group_select').val();
+//         let mainGroupVal = $('#main_group_select').val();
+//         let groupId = subGroupVal ? subGroupVal : mainGroupVal;
+//         let formData = new FormData(document.getElementById('formshop_edit'));
+//         formData.append('action', 'editshop');
+//         formData.set('group_id', groupId);
 
-        var contentFromEditor = $("#summernote_update").summernote('code');
-        var checkIsUrl = false;
-        var finalContent = '';
-        if (contentFromEditor) {
-            var tempDiv = document.createElement("div");
-            tempDiv.innerHTML = contentFromEditor;
-            var imgTags = tempDiv.getElementsByTagName("img");
-            for (var i = 0; i < imgTags.length; i++) {
-                var imgSrc = imgTags[i].getAttribute("src");
-                var filename = imgTags[i].getAttribute("data-filename");
-                if (!imgSrc) {
-                    continue;
-                }
-                imgSrc = imgSrc.replace(/ /g, "%20");
-                if (imgSrc.startsWith("data:image")) {
-                    var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
-                    if (file) {
-                        formData.append("image_files[]", file);
-                        imgTags[i].setAttribute("src", "");
-                    }
-                } else if (isValidUrl(imgSrc)) {
-                    checkIsUrl = true;
-                }
-            }
-            finalContent = tempDiv.innerHTML;
-            formData.set("shop_content", finalContent);
-        }
+//         var contentFromEditor = $("#summernote_update").summernote('code');
+//         var checkIsUrl = false;
+//         var finalContent = '';
+//         if (contentFromEditor) {
+//             var tempDiv = document.createElement("div");
+//             tempDiv.innerHTML = contentFromEditor;
+//             var imgTags = tempDiv.getElementsByTagName("img");
+//             for (var i = 0; i < imgTags.length; i++) {
+//                 var imgSrc = imgTags[i].getAttribute("src");
+//                 var filename = imgTags[i].getAttribute("data-filename");
+//                 if (!imgSrc) {
+//                     continue;
+//                 }
+//                 imgSrc = imgSrc.replace(/ /g, "%20");
+//                 if (imgSrc.startsWith("data:image")) {
+//                     var file = base64ToFile(imgSrc, filename || `image_${Date.now()}.png`);
+//                     if (file) {
+//                         formData.append("image_files[]", file);
+//                         imgTags[i].setAttribute("src", "");
+//                     }
+//                 } else if (isValidUrl(imgSrc)) {
+//                     checkIsUrl = true;
+//                 }
+//             }
+//             finalContent = tempDiv.innerHTML;
+//             formData.set("shop_content", finalContent);
+//         }
 
-        // Form Validation
-        $(".is-invalid").removeClass("is-invalid");
-        if (!$("#shop_subject").val().trim()) {
-            $("#shop_subject").addClass("is-invalid");
-            alertError("Please fill in the subject.");
-            return;
-        }
-        if (!$("#shop_description").val().trim()) {
-            $("#shop_description").addClass("is-invalid");
-            alertError("Please fill in the description.");
-            return;
-        }
-        if (!finalContent.trim()) {
-            alertError("Please fill in content information.");
-            return;
-        }
-        if (!groupId) {
-            alertError("Please select a group.");
-            $('#main_group_select').addClass("is-invalid");
-            $('#sub_group_select').addClass("is-invalid");
-            return;
-        }
-        formData.set("shop_subject", $("#shop_subject").val());
-        formData.set("shop_description", $("#shop_description").val());
+//         // Form Validation
+//         $(".is-invalid").removeClass("is-invalid");
+//         if (!$("#shop_subject").val().trim()) {
+//             $("#shop_subject").addClass("is-invalid");
+//             alertError("Please fill in the subject.");
+//             return;
+//         }
+//         if (!$("#shop_description").val().trim()) {
+//             $("#shop_description").addClass("is-invalid");
+//             alertError("Please fill in the description.");
+//             return;
+//         }
+//         if (!finalContent.trim()) {
+//             alertError("Please fill in content information.");
+//             return;
+//         }
+//         if (!groupId) {
+//             alertError("Please select a group.");
+//             $('#main_group_select').addClass("is-invalid");
+//             $('#sub_group_select').addClass("is-invalid");
+//             return;
+//         }
+//         formData.set("shop_subject", $("#shop_subject").val());
+//         formData.set("shop_description", $("#shop_description").val());
 
-        Swal.fire({
-            title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
-            text: "Do you want to edit shop?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#4CAF50",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Accept"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#loading-overlay').fadeIn();
-                $.ajax({
-                    url: "actions/process_shop.php",
-                    type: "POST",
-                    dataType:"json",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        try {
-                            var json = (typeof response === "string") ? JSON.parse(response) : response;
-                            if (json.status === 'success') {
-                                // เปลี่ยนแปลงตรงนี้
-                                Swal.fire('Success', json.message, 'success').then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', json.message || 'Unknown error', 'error');
-                            }
-                        } catch (e) {
-                            Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
-                    },
-                    complete: function () {
-                        $('#loading-overlay').fadeOut();
-                    }
-                });
-            } else {
-                $('#loading-overlay').fadeOut();
-            }
-        });
-    });
+//         Swal.fire({
+//             title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+//             text: "Do you want to edit shop?",
+//             icon: "warning",
+//             showCancelButton: true,
+//             confirmButtonColor: "#4CAF50",
+//             cancelButtonColor: "#d33",
+//             confirmButtonText: "Accept"
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 $('#loading-overlay').fadeIn();
+//                 $.ajax({
+//                     url: "actions/process_shop.php",
+//                     type: "POST",
+//                     dataType:"json",
+//                     data: formData,
+//                     processData: false,
+//                     contentType: false,
+//                     success: function (response) {
+//                         try {
+//                             var json = (typeof response === "string") ? JSON.parse(response) : response;
+//                             if (json.status === 'success') {
+//                                 // เปลี่ยนแปลงตรงนี้
+//                                 Swal.fire('Success', json.message, 'success').then(() => {
+//                                     location.reload();
+//                                 });
+//                             } else {
+//                                 Swal.fire('Error', json.message || 'Unknown error', 'error');
+//                             }
+//                         } catch (e) {
+//                             Swal.fire('Error', 'Invalid response from server: ' + e.message, 'error');
+//                         }
+//                     },
+//                     error: function (xhr, status, error) {
+//                         Swal.fire('Error', 'AJAX request failed: ' + xhr.status + ' ' + xhr.statusText, 'error');
+//                     },
+//                     complete: function () {
+//                         $('#loading-overlay').fadeOut();
+//                     }
+//                 });
+//             } else {
+//                 $('#loading-overlay').fadeOut();
+//             }
+//         });
+//     });
 
-    // Event listener for the "Back" button
-    $("#backToShopList").on("click", function () {
-        window.location.href = "list_shop.php";
-    });
+//     // Event listener for the "Back" button
+//     $("#backToShopList").on("click", function () {
+//         window.location.href = "list_shop.php";
+//     });
 
-    // Helper function for redirection
-    function reDirect(url, data) {
-        var form = $('<form>', {
-            method: 'POST',
-            action: url,
-            target: '_self'
-        });
-        $.each(data, function(key, value) {
-            $('<input>', {
-                type: 'hidden',
-                name: key,
-                value: value
-            }).appendTo(form);
-        });
-        $('body').append(form);
-        form.submit();
-    }
-});
+//     // Helper function for redirection
+//     function reDirect(url, data) {
+//         var form = $('<form>', {
+//             method: 'POST',
+//             action: url,
+//             target: '_self'
+//         });
+//         $.each(data, function(key, value) {
+//             $('<input>', {
+//                 type: 'hidden',
+//                 name: key,
+//                 value: value
+//             }).appendTo(form);
+//         });
+//         $('body').append(form);
+//         form.submit();
+//     }
+// });

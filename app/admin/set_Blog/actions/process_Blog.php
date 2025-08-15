@@ -51,8 +51,7 @@ function handleFileUpload($files)
     $maxFileSize = 5 * 1024 * 1024; // 5 MB
     $uploadResults = [];
 
-    // ตรวจสอบว่ามีการอัปโหลดไฟล์หรือไม่
-    // โดยการตรวจสอบว่ามี 'name' array และ element แรกไม่ว่างเปล่า
+    // ตรวจสอบว่าเป็นไฟล์ array หรือไฟล์เดียว
     if (isset($files['name']) && is_array($files['name'])) {
         foreach ($files['name'] as $key => $fileName) {
             if ($files['error'][$key] === UPLOAD_ERR_OK) {
@@ -100,8 +99,45 @@ function handleFileUpload($files)
                 ];
             }
         }
+    } else if (isset($files['name']) && $files['error'] === UPLOAD_ERR_OK) { // จัดการกรณีที่เป็นไฟล์เดียว (เช่น Cover Photo)
+        $fileTmpPath = $files['tmp_name'];
+        $fileName = $files['name'];
+        $fileSize = $files['size'];
+        $fileType = $files['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
+            $uploadFileDir = '../../../../public/news_img/';
+            $destFilePath = $uploadFileDir . $fileName;
+
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
+            }
+
+            if (move_uploaded_file($fileTmpPath, $destFilePath)) {
+                $uploadResults[] = [
+                    'success' => true,
+                    'fileName' => $fileName,
+                    'fileSize' => $fileSize,
+                    'fileType' => $fileType,
+                    'filePath' => $destFilePath
+                ];
+            } else {
+                $uploadResults[] = [
+                    'success' => false,
+                    'fileName' => $fileName,
+                    'error' => 'Error occurred while moving the uploaded file.'
+                ];
+            }
+        } else {
+            $uploadResults[] = [
+                'success' => false,
+                'fileName' => $fileName,
+                'error' => 'Invalid file type or file size exceeds limit.'
+            ];
+        }
     } else {
-        // กรณีไม่มีไฟล์
         $uploadResults[] = [
             'success' => false,
             'error' => 'No files were uploaded.'
@@ -155,7 +191,7 @@ try {
             }
 
             // แก้ไขการตรวจสอบไฟล์
-            if (isset($_FILES['fileInput']) && is_array($_FILES['fileInput']['name']) && $_FILES['fileInput']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['fileInput']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
@@ -168,7 +204,7 @@ try {
                     }
                 }
             }
-            if (isset($_FILES['image_files']) && is_array($_FILES['image_files']['name']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+            if (isset($_FILES['image_files']) && $_FILES['image_files']['error'][0] !== UPLOAD_ERR_NO_FILE) {
                 $fileInfos = handleFileUpload($_FILES['image_files']);
                 foreach ($fileInfos as $fileInfo) {
                     if ($fileInfo['success']) {
@@ -248,16 +284,61 @@ try {
                 $stmt_project_insert->close();
             }
 
-            // จัดการรูป Cover
+            // จัดการรูป Cover Photo
             if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] == UPLOAD_ERR_OK) {
+                // 1. ดึง path ของรูปเก่าเพื่อลบ
+                $getOldCoverStmt = $conn->prepare("SELECT file_path FROM dn_blog_doc WHERE blog_id = ? AND status = 1 AND del = 0");
+                if ($getOldCoverStmt) {
+                    $getOldCoverStmt->bind_param("i", $blog_id);
+                    $getOldCoverStmt->execute();
+                    $oldCoverResult = $getOldCoverStmt->get_result();
+                    if ($oldCoverRow = $oldCoverResult->fetch_assoc()) {
+                        $oldCoverPath = $oldCoverRow['file_path'];
+                        // 2. ลบไฟล์เก่าถ้ามีอยู่จริง
+                        if ($oldCoverPath && file_exists($oldCoverPath)) {
+                            unlink($oldCoverPath);
+                        }
+                    }
+                    $getOldCoverStmt->close();
+                }
+
+                // 3. อัปโหลดไฟล์รูปภาพใหม่
                 $fileInfo = handleFileUpload($_FILES['fileInput'])[0];
                 if ($fileInfo['success']) {
                     $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
-                    $fileColumns = ['file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
-                    $fileValues = [$fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
-                    $fileWhereClause = 'blog_id = ?';
-                    $fileWhereValues = [$blog_id];
-                    updateInDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues, $fileWhereClause, $fileWhereValues);
+                    
+                    // 4. ตรวจสอบว่ามี Cover Photo ในฐานข้อมูลอยู่แล้วหรือไม่
+                    $checkExistingCoverStmt = $conn->prepare("SELECT COUNT(*) FROM dn_blog_doc WHERE blog_id = ? AND status = 1 AND del = 0");
+                    $checkExistingCoverStmt->bind_param("i", $blog_id);
+                    $checkExistingCoverStmt->execute();
+                    $existingCount = $checkExistingCoverStmt->get_result()->fetch_row()[0];
+                    $checkExistingCoverStmt->close();
+
+                    if ($existingCount > 0) {
+                         // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
+                        $updateCoverStmt = $conn->prepare("UPDATE dn_blog_doc
+                            SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
+                            WHERE blog_id = ? AND status = 1 AND del = 0");
+                        if ($updateCoverStmt) {
+                            $updateCoverStmt->bind_param(
+                                "sisssi",
+                                $fileInfo['fileName'],
+                                $fileInfo['fileSize'],
+                                $fileInfo['fileType'],
+                                $fileInfo['filePath'],
+                                $picPath,
+                                $blog_id
+                            );
+                            $updateCoverStmt->execute();
+                            $updateCoverStmt->close();
+                        }
+                    } else {
+                        // 6. ถ้าไม่มี ให้แทรกข้อมูลใหม่
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'status'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 1];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    }
+                    
                 } else {
                     throw new Exception('Error uploading cover file: ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                 }
@@ -366,3 +447,4 @@ if (isset($stmt)) {
 $conn->close();
 
 echo json_encode($response);
+?>
