@@ -4,11 +4,11 @@
     header('Content-Type: application/json; charset=UTF-8');
     date_default_timezone_set('Asia/Bangkok');
     session_start();
-    if (empty($_GET['data'])) {
+    if (empty($_POST['data'])) {
         header("Location: index.php");
         exit;
     }
-    $data = json_decode(base64_decode($_GET['data']), true);
+    $data = json_decode(base64_decode($_POST['data']), true);
     if (!is_array($data)) {
         header("Location: index.php");
         exit;
