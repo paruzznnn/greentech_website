@@ -17,9 +17,11 @@ function testTranslationAPI($data) {
     $language = $data['language'];
 $translate = $data['translate'];
 $company = $data['company'];
-$content = $data['content']; // content จะเป็น array/object ที่มี subject, description, content อยู่ข้างใน
+ $code = $data['code'];
+ $content = $data['content']; // content จะเป็น array/object ที่มี subject, description, content อยู่ข้างใน
     $test_data = [
         'company' => '2', // comp_id ของคุณ
+        'code' => $code,
         'language' => $language,
         'translate' => $translate, 
         'content' => $content
