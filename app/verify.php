@@ -13,14 +13,14 @@
         header("Location: index.php");
         exit;
     } 
-    $token      = trim($data['token']       ?? ''); 
-    $code       = trim($data['code']        ?? '');
+  
+    $oid       = trim($data['oid']        ?? '');
     $firstname  = trim($data['firstname']   ?? '');
     $lastname   = trim($data['lastname']    ?? '');
     $email      = trim($data['email']       ?? '');
     $telephone  = trim($data['telephone']    ?? '');
     $role_id    = 1;
-    if (empty($token)) {
+    if (empty($oid)) {
         header("Location: index.php");
         exit;
     }
@@ -30,7 +30,7 @@
         echo json_encode(['status' => false, 'message' => 'Prepare failed: ' . $conn->error]);
         exit;
     }
-    $stmt->bind_param("s", $code);
+    $stmt->bind_param("s", $oid);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result && $result->num_rows > 0) {
@@ -39,8 +39,8 @@
         $_SESSION['email'] = $email;
         $_SESSION['role_id']  = (int) $role_id;
         $_SESSION['logged_in']  = true;
-        $_SESSION['token']      = $token;
-        $_SESSION['code']       = $code;
+        
+        $_SESSION['oid']       = $codeoid;
         header("Location: admin/dashboard.php");
         exit;
     }
@@ -61,7 +61,7 @@
         $email,
         $telephone,
         $otp,
-        $token
+        $oid
     );
     if (!$insert->execute()) {
         http_response_code(500);
@@ -72,8 +72,8 @@
     $_SESSION['email']      = $email;
     $_SESSION['role_id']    = $role_id;
     $_SESSION['logged_in']  = true;
-    $_SESSION['token']      = $token;
-    $_SESSION['code']       = $code;
+    
+    $_SESSION['oid']       = $oid;
     header("Location: admin/dashboard.php");
     exit;
 ?>
