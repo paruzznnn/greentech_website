@@ -153,16 +153,19 @@ try {
         $news_array = [
             'news_subject' => $_POST['news_subject'] ?? '',
             'news_description' => $_POST['news_description'] ?? '',
-            'news_content'  => $_POST['news_content'] ?? '',
+            'news_content' => $_POST['news_content'] ?? '',
             'news_subject_en' => $_POST['news_subject_en'] ?? '',
             'news_description_en' => $_POST['news_description_en'] ?? '',
-            'news_content_en'  => $_POST['news_content_en'] ?? '',
+            'news_content_en' => $_POST['news_content_en'] ?? '',
+            'news_subject_cn' => $_POST['news_subject_cn'] ?? '',
+            'news_description_cn' => $_POST['news_description_cn'] ?? '',
+            'news_content_cn' => $_POST['news_content_cn'] ?? '',
         ];
 
         if (isset($news_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_news 
-                (subject_news, description_news, content_news, subject_news_en, description_news_en, content_news_en, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)");
+                (subject_news, description_news, content_news, subject_news_en, description_news_en, content_news_en, subject_news_cn, description_news_cn, content_news_cn, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $news_subject = $news_array['news_subject'];
             $news_description = $news_array['news_description'];
@@ -170,16 +173,22 @@ try {
             $news_subject_en = $news_array['news_subject_en'];
             $news_description_en = $news_array['news_description_en'];
             $news_content_en = mb_convert_encoding($news_array['news_content_en'], 'UTF-8', 'auto');
+            $news_subject_cn = $news_array['news_subject_cn'];
+            $news_description_cn = $news_array['news_description_cn'];
+            $news_content_cn = mb_convert_encoding($news_array['news_content_cn'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sssssss",
+                "ssssssssss",
                 $news_subject,
                 $news_description,
                 $news_content,
                 $news_subject_en,
                 $news_description_en,
                 $news_content_en,
+                $news_subject_cn,
+                $news_description_cn,
+                $news_content_cn,
                 $current_date
             );
 
@@ -224,10 +233,13 @@ try {
             'news_id' => $_POST['news_id'] ?? '',
             'news_subject' => $_POST['news_subject'] ?? '',
             'news_description' => $_POST['news_description'] ?? '',
-            'news_content'  => $_POST['news_content'] ?? '',
+            'news_content' => $_POST['news_content'] ?? '',
             'news_subject_en' => $_POST['news_subject_en'] ?? '',
             'news_description_en' => $_POST['news_description_en'] ?? '',
-            'news_content_en'  => $_POST['news_content_en'] ?? '',
+            'news_content_en' => $_POST['news_content_en'] ?? '',
+            'news_subject_cn' => $_POST['news_subject_cn'] ?? '',
+            'news_description_cn' => $_POST['news_description_cn'] ?? '',
+            'news_content_cn' => $_POST['news_content_cn'] ?? '',
         ];
 
         if (!empty($news_array['news_id'])) {
@@ -238,6 +250,9 @@ try {
             subject_news_en = ?,
             description_news_en = ?,
             content_news_en = ?,
+            subject_news_cn = ?,
+            description_news_cn = ?,
+            content_news_cn = ?,
             date_create = ? 
             WHERE news_id = ?");
 
@@ -247,17 +262,23 @@ try {
             $news_subject_en = $news_array['news_subject_en'];
             $news_description_en = $news_array['news_description_en'];
             $news_content_en = mb_convert_encoding($news_array['news_content_en'], 'UTF-8', 'auto');
+            $news_subject_cn = $news_array['news_subject_cn'];
+            $news_description_cn = $news_array['news_description_cn'];
+            $news_content_cn = mb_convert_encoding($news_array['news_content_cn'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $news_id = $news_array['news_id'];
 
             $stmt->bind_param(
-                "sssssssi",
+                "sssssssssi",
                 $news_subject,
                 $news_description,
                 $news_content,
                 $news_subject_en,
                 $news_description_en,
                 $news_content_en,
+                $news_subject_cn,
+                $news_description_cn,
+                $news_content_cn,
                 $current_date,
                 $news_id
             );
@@ -382,7 +403,7 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_news LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_news LIKE '%$searchValue%' OR subject_news_en LIKE '%$searchValue%' OR subject_news_cn LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;

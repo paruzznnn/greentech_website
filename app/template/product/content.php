@@ -8,13 +8,25 @@ if (!isset($conn)) {
 }
 
 // 1. กำหนดตัวแปรภาษา
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th']) ? $_GET['lang'] : 'th';
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn']) ? $_GET['lang'] : 'th';
 
 // 2. สร้างตัวแปรสำหรับชื่อคอลัมน์
-$subject_col = ($lang === 'en') ? 'subject_shop_en' : 'subject_shop';
-$description_col = ($lang === 'en') ? 'description_shop_en' : 'description_shop';
-$content_col = ($lang === 'en') ? 'content_shop_en' : 'content_shop';
-$group_name_col = ($lang === 'en') ? 'group_name_en' : 'group_name';
+$subject_col = 'subject_shop';
+$description_col = 'description_shop';
+$content_col = 'content_shop';
+$group_name_col = 'group_name';
+
+if ($lang === 'en') {
+    $subject_col .= '_en';
+    $description_col .= '_en';
+    $content_col .= '_en';
+    $group_name_col .= '_en';
+} elseif ($lang === 'cn') {
+    $subject_col .= '_cn';
+    $description_col .= '_cn';
+    $content_col .= '_cn';
+    $group_name_col .= '_cn';
+}
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $selectedGroupId = isset($_GET['group_id']) ? (int)$_GET['group_id'] : 0;
@@ -42,7 +54,7 @@ WHERE dn.del = '0' AND sub_group.parent_group_id IS NOT NULL";
 
 if ($searchQuery) {
     $safeQuery = $conn->real_escape_string($searchQuery);
-    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษด้วย
+    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษและจีนด้วย
     $sqlAllProducts .= " AND (dn.$subject_col LIKE '%$safeQuery%' OR dn.$description_col LIKE '%$safeQuery%')";
 }
 
@@ -148,7 +160,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo htmlspecialchars($lang); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -414,7 +426,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
     <form method="GET" action="">
         <div class="input-group">
             <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
-            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo $lang === 'en' ? 'Search product...' : 'ค้นหาสินค้า...'; ?>">
+            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo getPlaceholderText($lang); ?>">
             <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
@@ -422,39 +434,79 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 
 <h2 style="font-size: 28px; font-weight: bold; margin-top: 20px;">
     <?php
-    if ($searchQuery) {
-        $text = $lang === 'en' ? 'Search Results for' : 'ผลการค้นหาสำหรับ';
-        echo $text . ' "' . htmlspecialchars($searchQuery) . '"';
-    } elseif ($selectedSubGroupId > 0) {
-        $groupName = '';
-        foreach ($allProductsData as $prod) {
-            if ($prod['sub_group_id'] == $selectedSubGroupId) {
-                $groupName = $prod['sub_group_name'];
-                break;
-            }
+    function getPlaceholderText($lang) {
+        switch ($lang) {
+            case 'en':
+                return 'Search product...';
+            case 'cn':
+                return '搜索产品...';
+            case 'th':
+            default:
+                return 'ค้นหาสินค้า...';
         }
-        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"';
-        echo $text;
-    } elseif ($selectedGroupId > 0) {
-        $groupName = '';
-        foreach ($allProductsData as $prod) {
-            if ($prod['main_group_id'] == $selectedGroupId || ($prod['sub_group_id'] == $selectedGroupId && $prod['parent_group_id'] === NULL)) {
-                $groupName = $prod['main_group_name'];
-                break;
-            }
-        }
-        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"';
-        echo $text;
-    } else {
-        echo $lang === 'en' ? 'Product Categories' : 'หมวดหมู่สินค้า';
     }
+    
+    function getDisplayText($lang, $searchQuery, $selectedSubGroupId, $selectedGroupId, $allProductsData) {
+        if ($searchQuery) {
+            $text = [
+                'th' => 'ผลการค้นหาสำหรับ',
+                'en' => 'Search Results for',
+                'cn' => '搜索结果'
+            ];
+            return $text[$lang] . ' "' . htmlspecialchars($searchQuery) . '"';
+        } elseif ($selectedSubGroupId > 0) {
+            $groupName = '';
+            foreach ($allProductsData as $prod) {
+                if ($prod['sub_group_id'] == $selectedSubGroupId) {
+                    $groupName = $prod['sub_group_name'];
+                    break;
+                }
+            }
+            $text = [
+                'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"',
+                'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"',
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的子组') . '"'
+            ];
+            return $text[$lang];
+        } elseif ($selectedGroupId > 0) {
+            $groupName = '';
+            foreach ($allProductsData as $prod) {
+                if ($prod['main_group_id'] == $selectedGroupId || ($prod['sub_group_id'] == $selectedGroupId && $prod['parent_group_id'] === NULL)) {
+                    $groupName = $prod['main_group_name'];
+                    break;
+                }
+            }
+            $text = [
+                'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"',
+                'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"',
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的主组') . '"'
+            ];
+            return $text[$lang];
+        } else {
+            $text = [
+                'th' => 'หมวดหมู่สินค้า',
+                'en' => 'Product Categories',
+                'cn' => '产品分类'
+            ];
+            return $text[$lang];
+        }
+    }
+
+    echo getDisplayText($lang, $searchQuery, $selectedSubGroupId, $selectedGroupId, $allProductsData);
     ?>
 </h2>
 
 <div class="product-grid-container">
     <?php if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0): ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p><?php echo $lang === 'en' ? 'No products found for your criteria.' : 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ'; ?></p>
+            <?php
+            $noProductsText = [
+                'th' => 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ',
+                'en' => 'No products found for your criteria.',
+                'cn' => '未找到符合您条件的产品'
+            ];
+            ?>
+            <p><?php echo $noProductsText[$lang]; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $product): ?>
                 <div class="box-news">
@@ -466,7 +518,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                             <?php elseif (!empty($product['image'])): ?>
                                 <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                             <?php else: ?>
-                                <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $lang === 'en' ? 'No image available' : 'ไม่มีรูปภาพ'; ?>">
+                                <?php
+                                $noImageText = [
+                                    'th' => 'ไม่มีรูปภาพ',
+                                    'en' => 'No image available',
+                                    'cn' => '没有图片'
+                                ];
+                                ?>
+                                <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $noImageText[$lang]; ?>">
                             <?php endif; ?>
                         </a>
                     </div>
@@ -481,7 +540,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         <?php endif; ?>
     <?php else: // ไม่ใช่การค้นหาหรือกรองกลุ่ม ให้แสดงบล็อกหมวดหมู่หลัก ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p><?php echo $lang === 'en' ? 'No categories found with assigned products.' : 'ไม่พบหมวดหมู่ที่มีสินค้า'; ?></p>
+            <?php
+            $noCategoriesText = [
+                'th' => 'ไม่พบหมวดหมู่ที่มีสินค้า',
+                'en' => 'No categories found with assigned products.',
+                'cn' => '未找到包含产品的分类'
+            ];
+            ?>
+            <p><?php echo $noCategoriesText[$lang]; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $mainGroupData): ?>
                 <div class="main-category-block" data-main-group-id="<?php echo htmlspecialchars($mainGroupData['id']); ?>">
@@ -491,7 +557,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                     <div class="block-header-bottom">
                         <div class="block-title-info">
                             <h3><?php echo htmlspecialchars($mainGroupData['name']); ?></h3>
-                            <p class="product-count"><?php echo $mainGroupData['total_products'] . ($lang === 'en' ? ' products' : ' รายการ'); ?></p>
+                            <?php
+                            $productsText = [
+                                'th' => 'รายการ',
+                                'en' => 'products',
+                                'cn' => '个产品'
+                            ];
+                            ?>
+                            <p class="product-count"><?php echo $mainGroupData['total_products'] . ' ' . $productsText[$lang]; ?></p>
                         </div>
                         <span class="toggle-arrow"><i class="fas fa-chevron-down"></i></span>
                     </div>

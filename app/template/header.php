@@ -648,6 +648,9 @@ a {
                         <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>">
                             <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
                         </a>
+                        <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>">
+                            <img src="https://flagcdn.com/cn.svg" alt="Chinese Flag" width="24"> 中文
+                        </a>
                     </div>
                 </div>
                 <div class="header-social-links" style="padding: 12px 16px;">
@@ -753,13 +756,13 @@ a {
                                 <div class="col-md-12">
                                     <div class="d-inline-flex">
                                         <button type="submit" class="" style="
-                                            width: 260px;
-                                            border: none;
-                                            border-radius: 4px;
-                                            padding: 10px;
-                                            background: #ff8200;
-                                            color: white;
-                                            "> Login </button>
+                                        width: 260px;
+                                        border: none;
+                                        border-radius: 4px;
+                                        padding: 10px;
+                                        background: #ff8200;
+                                        color: white;
+                                        "> Login </button>
                                     </div>
                                 </div>
                             </div>
@@ -818,11 +821,49 @@ a {
 </div>
 
 <script>
-    // JavaScript สำหรับ Mobile Menu
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lang = urlParams.get('lang') || 'th';
+        
+        // ฟังก์ชันสำหรับอัปเดตธงตามภาษา
+        function updateFlags(language) {
+            const flagMap = {
+                'th': 'https://flagcdn.com/th.svg',
+                'en': 'https://flagcdn.com/us.svg',
+                'cn': 'https://flagcdn.com/cn.svg' // เพิ่ม URL ธงจีน
+            };
+            const flagUrl = flagMap[language] || flagMap['th'];
+            
+            const currentFlagDesktop = document.getElementById('current-flag-desktop');
+            const currentFlagMobile = document.getElementById('current-flag-mobile');
+            
+            if (currentFlagDesktop) {
+                currentFlagDesktop.src = flagUrl;
+            }
+            if (currentFlagMobile) {
+                currentFlagMobile.src = flagUrl;
+            }
+        }
+        
+        // อัปเดตธงเมื่อหน้าเว็บโหลด
+        updateFlags(lang);
+
+        // เพิ่มการจัดการเมื่อคลิกที่ลิงก์ใน dropdown
+        const flagLinks = document.querySelectorAll('.flag-dropdown a');
+        flagLinks.forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const newLang = new URLSearchParams(this.href.split('?')[1]).get('lang');
+                updateFlags(newLang);
+                window.location.href = this.href;
+            });
+        });
+    });
+
+    // โค้ด JavaScript สำหรับ Mobile Menu, Modal และ JWT ที่คุณมีอยู่
     const mobileMenu = document.getElementById("mobileMenu");
     const hamburger = document.querySelector(".hamburger");
 
-    // ฟังก์ชันสำหรับสลับสถานะเมนู (เปิด/ปิด)
     function toggleMobileNav() {
         mobileMenu.classList.toggle("open");
     }
@@ -844,59 +885,39 @@ a {
         }
     });
 
-    // โค้ด JavaScript ที่แก้ไขเพื่อจัดการ dropdown ของธง
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentFlagDesktop = document.getElementById('current-flag-desktop');
+    window.toggleFlagDropdown = function(type) {
         const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
-        const currentFlagMobile = document.getElementById('current-flag-mobile');
         const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
-
-        // ฟังก์ชันสำหรับอัปเดตธงและ URL เมื่อมีการเลือกภาษา
-        function updateFlagAndLanguage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const lang = urlParams.get('lang') || 'th';
-            const flagUrl = (lang === 'en') ? 'https://flagcdn.com/us.svg' : 'https://flagcdn.com/th.svg';
-            if (currentFlagDesktop) {
-                currentFlagDesktop.src = flagUrl;
-            }
-            if (currentFlagMobile) {
-                currentFlagMobile.src = flagUrl;
-            }
-        }
-        updateFlagAndLanguage();
-
-        // ฟังก์ชันสำหรับสลับการแสดงผล dropdown
-        window.toggleFlagDropdown = function(type) {
-            if (type === 'desktop') {
-                const isDropdownOpen = flagDropdownDesktop.style.display === 'block';
-                flagDropdownDesktop.style.display = isDropdownOpen ? 'none' : 'block';
-                // ปิด mobile dropdown ถ้าเปิดอยู่
-                if (flagDropdownMobile) {
-                    flagDropdownMobile.style.display = 'none';
-                }
-            } else if (type === 'mobile') {
-                const isDropdownOpen = flagDropdownMobile.style.display === 'block';
-                flagDropdownMobile.style.display = isDropdownOpen ? 'none' : 'block';
-                // ปิด desktop dropdown ถ้าเปิดอยู่
-                if (flagDropdownDesktop) {
-                    flagDropdownDesktop.style.display = 'none';
-                }
-            }
-        };
-
-        // ปิด dropdown ทั้งคู่เมื่อคลิกที่อื่น
-        document.addEventListener('click', function(e) {
-            if (flagDropdownDesktop && !flagDropdownDesktop.contains(e.target) && e.target !== currentFlagDesktop) {
-                flagDropdownDesktop.style.display = 'none';
-            }
-            if (flagDropdownMobile && !flagDropdownMobile.contains(e.target) && e.target !== currentFlagMobile) {
+        
+        if (type === 'desktop') {
+            const isDropdownOpen = flagDropdownDesktop.style.display === 'block';
+            flagDropdownDesktop.style.display = isDropdownOpen ? 'none' : 'block';
+            if (flagDropdownMobile) {
                 flagDropdownMobile.style.display = 'none';
             }
-        });
+        } else if (type === 'mobile') {
+            const isDropdownOpen = flagDropdownMobile.style.display === 'block';
+            flagDropdownMobile.style.display = isDropdownOpen ? 'none' : 'block';
+            if (flagDropdownDesktop) {
+                flagDropdownDesktop.style.display = 'none';
+            }
+        }
+    };
+    
+    document.addEventListener('click', function(e) {
+        const currentFlagDesktop = document.getElementById('current-flag-desktop');
+        const currentFlagMobile = document.getElementById('current-flag-mobile');
+        const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+        const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+
+        if (flagDropdownDesktop && !flagDropdownDesktop.contains(e.target) && e.target !== currentFlagDesktop) {
+            flagDropdownDesktop.style.display = 'none';
+        }
+        if (flagDropdownMobile && !flagDropdownMobile.contains(e.target) && e.target !== currentFlagMobile) {
+            flagDropdownMobile.style.display = 'none';
+        }
     });
 
-
-    // สคริปต์สำหรับ Modal และ JWT
     document.addEventListener("DOMContentLoaded", function () {
         const jwt = sessionStorage.getItem("jwt");
         const authButtonsDesktop = document.getElementById("auth-buttons");
@@ -993,178 +1014,15 @@ a {
             }
         });
 
-        // window.toggleFlagDropdown = function (mode = 'desktop') {
-        //     const dropdownId = mode === 'mobile' ? 'flag-dropdown-mobile' : 'flag-dropdown-desktop';
-        //     const dropdown = document.getElementById(dropdownId);
-        //     if (dropdown) {
-        //         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        //     }
-        // };
-
-    //     const flagLinks = document.querySelectorAll('.flag-dropdown a');
-    //     flagLinks.forEach(link => {
-    //         link.addEventListener('click', function (event) {
-    //             event.preventDefault();
-    //             const lang = this.dataset.lang;
-    //             const currentFlagDesktop = document.getElementById('current-flag');
-    //             const currentFlagMobile = document.getElementById('current-flag-mobile');
-    //             const newFlagSrc = this.querySelector('img').src;
-    //             const newFlagAlt = this.querySelector('img').alt;
-    //             if (currentFlagDesktop) {
-    //                 currentFlagDesktop.src = newFlagSrc;
-    //                 currentFlagDesktop.alt = newFlagAlt;
-    //             }
-    //             if (currentFlagMobile) {
-    //                 currentFlagMobile.src = newFlagSrc;
-    //                 currentFlagMobile.alt = newFlagAlt;
-    //             }
-    //             const dropdownDesktop = document.getElementById('flag-dropdown-desktop');
-    //             const dropdownMobile = document.getElementById('flag-dropdown-mobile');
-    //             if (dropdownDesktop) dropdownDesktop.style.display = 'none';
-    //             if (dropdownMobile) dropdownMobile.style.display = 'none';
-    //         });
-    //     });
-
-    //     document.addEventListener('click', function (event) {
-    //         const isClickInsideFlagDropdown = event.target.closest('.language-select-container');
-    //         const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
-    //         const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
-    //         if (!isClickInsideFlagDropdown) {
-    //             if (flagDropdownDesktop) flagDropdownDesktop.style.display = 'none';
-    //             if (flagDropdownMobile) flagDropdownMobile.style.display = 'none';
-    //         }
-    //     });
     });
 </script>
 <script>
     const langLinks = {
         th: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>",
-        en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>"
+        en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>",
+        cn: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>" // เพิ่มภาษาจีน
     };
 </script>
-
-<div id="myModal-sign-in" class="modal">
-    <div class="modal-content" style="width: 350px !important;">
-        <div class="modal-header">
-            <span class="modal-close-sign-in">×</span>
-        </div>
-        <div class="modal-body" style="background-color: #9e9e9e1f;">
-            <div class="box-sign-in-container">
-                <div class="card">
-                    <section class="card-body">
-                        <div style="text-align: center;">
-                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
-                        </div>
-                        <h6 style="text-align: center; color: #555;" class="mt-2">
-                            <span><i class="fas fa-unlock"></i></span>
-                            <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
-                        </h6>
-                        <hr>
-                        <form id="loginModal" action="" method="post">
-                            <div class="form-group mt-4">
-                                <input id="username" type="text" class="emet-login input"
-                                    placeholder="Please enter your email.">
-                            </div>
-                            <div class="form-group mt-2" style="position: relative;">
-                                <input id="password" type="password" class="emet-login inpu" data-type="password">
-                                <span class="" style="position: absolute; top: 10px; right: 20px; color: #555555;"
-                                    id="togglePasswordSignin">
-                                    <i class="fas fa-eye-slash"></i>
-                                </span>
-                            </div>
-                            <div class="row mt-4">
-                                <div class="col-md-12 text-end" style="
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                ">
-                                    <a href="<?php echo 'register' . $isFile ?>">
-                                        <span style="font-size: 13px !important;">
-                                            สมัครสมาชิก
-                                        </span>
-                                    </a>
-                                    <a type="button" href="#" id="myBtn-forgot-password">
-                                        <span style="font-size: 13px !important;">
-                                            ลืมรหัสผ่าน
-                                        </span>
-                                    </a>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="d-inline-flex">
-                                        <button type="submit" class="" style="
-                                            width: 260px;
-                                            border: none;
-                                            border-radius: 4px;
-                                            padding: 10px;
-                                            background: #ff8200;
-                                            color: white;
-                                            "> Login </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="myModal-forgot-password" class="modal">
-    <div class="modal-content" style="width: 350px !important;">
-        <div class="modal-header">
-            <span class="modal-close-forgot-password">×</span>
-        </div>
-        <div class="modal-body" style="background-color: #9e9e9e1f;">
-            <div class="box-forgot-password-container">
-                <div class="card">
-                    <section class="card-body">
-                        <div style="text-align: center;">
-                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
-                        </div>
-                        <h6 style="text-align: center; color: #555;" class="mt-2">
-                            <span>
-                                <i class="fas fa-key"></i>
-                            </span>
-                            <span data-key-lang="" lang="US">Forgot your password?</span>
-                        </h6>
-                        <hr>
-                        <form id="forgotModal" action="" method="post">
-                            <div class="form-group mt-4">
-                                <input id="forgot_email" name="forgot_email" type="text"
-                                    class="form-control emet-login input" placeholder="Please enter your email.">
-                            </div>
-                            <div class="row mt-4">
-                                <div class="col-md-12">
-                                    <div class="d-inline-flex">
-                                        <button type="button" id="submitForgot" class="" style="
-                                        width: 260px;
-                                        border: none;
-                                        border-radius: 4px;
-                                        padding: 10px;
-                                        background: #ff8200;
-                                        color: white;
-                                        "> send email </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
 
 
 

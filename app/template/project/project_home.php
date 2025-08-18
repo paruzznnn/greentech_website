@@ -2,12 +2,20 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// ตรวจสอบว่ามีการส่งค่า lang มาหรือไม่ ถ้าไม่มีให้ใช้ 'th' เป็นค่าเริ่มต้น
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+// --- MODIFIED: Allow 'cn' as a valid language option.
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn']) ? $_GET['lang'] : 'th';
 
 // สร้างชื่อคอลัมน์ตามภาษาที่เลือก
-$subject_col = $lang === 'en' ? 'subject_project_en' : 'subject_project';
-$description_col = $lang === 'en' ? 'description_project_en' : 'description_project';
+$subject_col = 'subject_project';
+$description_col = 'description_project';
+
+if ($lang === 'en') {
+    $subject_col = 'subject_project_en';
+    $description_col = 'description_project_en';
+} elseif ($lang === 'cn') {
+    $subject_col = 'subject_project_cn';
+    $description_col = 'description_project_cn';
+}
 
 $sql = "SELECT 
             dn.project_id, 
@@ -41,13 +49,14 @@ if ($result->num_rows > 0) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+        // Handle cases where pic_path might be NULL if no valid documents
+        $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
+        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesproject[] = [
             'id' => $row['project_id'],
-            'image' => $paths[0],
+            'image' => !empty($paths) ? $paths[0] : null,
             'title' => $row['subject_project'],
             'description' => $row['description_project'],
             'iframe' => $iframe
@@ -239,7 +248,7 @@ if ($result->num_rows > 0) {
                         <div class="col-md-3 mb-4 d-flex">
                            <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
                                 <div class="project-card d-flex flex-column">
-                                    <?php if (empty($box['image'])): ?>
+                                    <?php if (empty($box['image']) && !empty($box['iframe'])): ?>
                                         <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="100%" class="note-video-clip" style="border-radius: 20px 20px 0 0;"></iframe>
                                     <?php else: ?>
                                         <div class="project-image-wrapper">
@@ -249,7 +258,17 @@ if ($result->num_rows > 0) {
                                     <div class="project-body d-flex flex-column">
                                         <h6 class="project-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
                                         <p class="project-text"><?= htmlspecialchars($box['description']) ?></p>
-                                        <span class="learn-more" data-translate="Learnmore" lang="th">Learn more ></span>
+                                        <span class="learn-more">
+                                            <?php 
+                                                if ($lang === 'en') {
+                                                    echo 'Learn more >';
+                                                } elseif ($lang === 'cn') {
+                                                    echo '了解更多 >';
+                                                } else {
+                                                    echo 'ดูเพิ่มเติม >';
+                                                }
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
                             </a>

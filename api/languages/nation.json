@@ -9,6 +9,11 @@
             "name": "English",
             "abbreviation": "EN",
             "flag": "https://flagcdn.com/w320/gb.png"
+        },
+        {
+            "name": "Chinese",
+            "abbreviation": "CN",
+            "flag": "https://flagcdn.com/w320/cn.png"
         }
     ]
 }

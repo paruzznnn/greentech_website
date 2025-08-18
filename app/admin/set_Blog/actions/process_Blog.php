@@ -154,25 +154,43 @@ try {
             'blog_subject' => $_POST['blog_subject'] ?? '',
             'blog_description' => $_POST['blog_description'] ?? '',
             'blog_content'  => $_POST['blog_content'] ?? '',
+            'blog_subject_en' => $_POST['blog_subject_en'] ?? '',
+            'blog_description_en' => $_POST['blog_description_en'] ?? '',
+            'blog_content_en'  => $_POST['blog_content_en'] ?? '',
+            'blog_subject_cn' => $_POST['blog_subject_cn'] ?? '',
+            'blog_description_cn' => $_POST['blog_description_cn'] ?? '',
+            'blog_content_cn'  => $_POST['blog_content_cn'] ?? '',
         ];
         
         $related_projects = $_POST['related_projects'] ?? [];
 
         if (isset($blog_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_blog 
-                (subject_blog, description_blog, content_blog, date_create) 
-                VALUES (?, ?, ?, ?)");
+                (subject_blog, description_blog, content_blog, subject_blog_en, description_blog_en, content_blog_en, subject_blog_cn, description_blog_cn, content_blog_cn, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $blog_subject = $blog_array['blog_subject'];
             $blog_description = $blog_array['blog_description'];
             $blog_content = mb_convert_encoding($blog_array['blog_content'], 'UTF-8', 'auto');
+            $blog_subject_en = $blog_array['blog_subject_en'];
+            $blog_description_en = $blog_array['blog_description_en'];
+            $blog_content_en = mb_convert_encoding($blog_array['blog_content_en'], 'UTF-8', 'auto');
+            $blog_subject_cn = $blog_array['blog_subject_cn'];
+            $blog_description_cn = $blog_array['blog_description_cn'];
+            $blog_content_cn = mb_convert_encoding($blog_array['blog_content_cn'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "ssss",
+                "ssssssssss",
                 $blog_subject,
                 $blog_description,
                 $blog_content,
+                $blog_subject_en,
+                $blog_description_en,
+                $blog_content_en,
+                $blog_subject_cn,
+                $blog_description_cn,
+                $blog_content_cn,
                 $current_date
             );
 
@@ -230,6 +248,9 @@ try {
             'blog_subject_en' => $_POST['blog_subject_en'] ?? '',
             'blog_description_en' => $_POST['blog_description_en'] ?? '',
             'blog_content_en'  => $_POST['blog_content_en'] ?? '',
+            'blog_subject_cn' => $_POST['blog_subject_cn'] ?? '',
+            'blog_description_cn' => $_POST['blog_description_cn'] ?? '',
+            'blog_content_cn'  => $_POST['blog_content_cn'] ?? '',
         ];
 
         $related_projects = $_POST['related_projects'] ?? [];
@@ -242,6 +263,9 @@ try {
             subject_blog_en = ?,
             description_blog_en = ?,
             content_blog_en = ?,
+            subject_blog_cn = ?,
+            description_blog_cn = ?,
+            content_blog_cn = ?,
             date_create = ? 
             WHERE blog_id = ?");
 
@@ -251,17 +275,23 @@ try {
             $blog_subject_en = $blog_array['blog_subject_en'] ?? '';
             $blog_description_en = $blog_array['blog_description_en'] ?? '';
             $blog_content_en = mb_convert_encoding($blog_array['blog_content_en'] ?? '', 'UTF-8', 'auto');
+            $blog_subject_cn = $blog_array['blog_subject_cn'] ?? '';
+            $blog_description_cn = $blog_array['blog_description_cn'] ?? '';
+            $blog_content_cn = mb_convert_encoding($blog_array['blog_content_cn'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $blog_id = $blog_array['blog_id'];
 
             $stmt->bind_param(
-                "sssssssi",
+                "ssssssssssi",
                 $blog_subject,
                 $blog_description,
                 $blog_content,
                 $blog_subject_en,
                 $blog_description_en,
                 $blog_content_en,
+                $blog_subject_cn,
+                $blog_description_cn,
+                $blog_content_cn,
                 $current_date,
                 $blog_id
             );
@@ -315,7 +345,7 @@ try {
                     $checkExistingCoverStmt->close();
 
                     if ($existingCount > 0) {
-                         // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
+                          // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
                         $updateCoverStmt = $conn->prepare("UPDATE dn_blog_doc
                             SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
                             WHERE blog_id = ? AND status = 1 AND del = 0");
@@ -355,6 +385,36 @@ try {
                         insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
                     } else {
                         throw new Exception('Error uploading content file (TH): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            // จัดการรูปภาพใน Content (ภาษาอังกฤษ)
+            if (isset($_FILES['image_files_en']) && is_array($_FILES['image_files_en']['name']) && $_FILES['image_files_en']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_en']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang_tag'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'en'];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (EN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            // จัดการรูปภาพใน Content (ภาษาจีน)
+            if (isset($_FILES['image_files_cn']) && is_array($_FILES['image_files_cn']['name']) && $_FILES['image_files_cn']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_cn']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang_tag'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'cn'];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (CN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
@@ -409,7 +469,7 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_blog LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_blog LIKE '%$searchValue%' OR subject_blog_en LIKE '%$searchValue%' OR subject_blog_cn LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;

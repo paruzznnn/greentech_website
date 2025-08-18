@@ -103,7 +103,7 @@ $decodedId = $_POST['shop_id'];
             width: 4px; /* ปรับขนาดธงให้เล็กลง */
             margin-right: 8px;
         }
-              /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+             /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -156,7 +156,10 @@ $stmt = $conn->prepare("
         dn.group_id,
         dn.subject_shop_en,
         dn.description_shop_en,
-        dn.content_shop_en
+        dn.content_shop_en,
+        dn.subject_shop_cn,
+        dn.description_shop_cn,
+        dn.content_shop_cn
     FROM dn_shop dn
     WHERE dn.shop_id = ?
 ");
@@ -173,6 +176,7 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $content_th = $row['content_shop'];
     $content_en = $row['content_shop_en'];
+    $content_cn = $row['content_shop_cn'];
     $current_group_id = $row['group_id'];
 
     // ดึงข้อมูลรูปภาพทั้งหมดที่เกี่ยวข้องกับ shop_id นี้
@@ -225,6 +229,21 @@ if ($result->num_rows > 0) {
         }
     }
     $content_en_with_correct_paths = $dom_en->saveHTML();
+    
+     // แทนที่ src ของรูปภาพใน content ภาษาจีนด้วย api_path ที่ถูกต้องจาก $pic_data
+    $dom_cn = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $source_cn = !empty($content_cn) ? mb_convert_encoding($content_cn, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+    $dom_cn->loadHTML($source_cn, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    $images_cn = $dom_cn->getElementsByTagName('img');
+    foreach ($images_cn as $img) {
+        $data_filename = $img->getAttribute('data-filename');
+        if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+            $img->setAttribute('src', $pic_data[$data_filename]);
+        }
+    }
+    $content_cn_with_correct_paths = $dom_cn->saveHTML();
 
     // ดึงข้อมูลกลุ่มทั้งหมดเพื่อใช้ในการแสดงผล
     $mainGroupQuery = $conn->query("SELECT group_id, group_name FROM dn_shop_groups WHERE parent_group_id IS NULL ORDER BY group_name ASC");
@@ -308,6 +327,12 @@ if ($result->num_rows > 0) {
             margin-right: 8px;'>English
                                 </button>
                             </li>
+                            <li class='nav-item' role='presentation'>
+                                <button class='nav-link' id='cn-tab' data-bs-toggle='tab' data-bs-target='#cn' type='button' role='tab' aria-controls='cn' aria-selected='false'>
+                                    <img src='https://flagcdn.com/w320/cn.png' alt='Chinese Flag' class='flag-icon' style=' width: 36px; 
+            margin-right: 8px;'>Chinese
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div class='card-body'>
@@ -328,10 +353,10 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                     <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
-                                                        <div id='loadingIndicator' class='loading-overlay' style='display: none;'>
-                                                            <div class='loading-spinner'></div>
-                                                        </div>
+                                     <button type='button' id='copyFromThaiEn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                     <div id='loadingIndicatorEn' class='loading-overlay' style='display: none;'>
+                                        <div class='loading-spinner'></div>
+                                     </div>
                                 </div>
                                 <div style='margin: 10px;'>
                                     
@@ -345,6 +370,27 @@ if ($result->num_rows > 0) {
                                 <div style='margin: 10px;'>
                                     <label><span>Content (EN)</span>:</label>
                                     <textarea class='form-control summernote' id='summernote_update_en' name='shop_content_en'>" . $content_en_with_correct_paths . "</textarea>
+                                </div>
+                            </div>
+                            <div class='tab-pane fade' id='cn' role='tabpanel' aria-labelledby='cn-tab'>
+                                <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+                                     <button type='button' id='copyFromThaiCn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                     <div id='loadingIndicatorCn' class='loading-overlay' style='display: none;'>
+                                        <div class='loading-spinner'></div>
+                                     </div>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    
+                                    <label><span>Subject (CN)</span>:</label>
+                                    <input type='text' class='form-control' id='shop_subject_cn' name='shop_subject_cn' value='" . htmlspecialchars($row['subject_shop_cn']) . "'>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Description (CN)</span>:</label>
+                                    <textarea class='form-control' id='shop_description_cn' name='shop_description_cn'>" . htmlspecialchars($row['description_shop_cn']) . "</textarea>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Content (CN)</span>:</label>
+                                    <textarea class='form-control summernote' id='summernote_update_cn' name='shop_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                 </div>
                             </div>
                         </div>
@@ -412,6 +458,21 @@ $stmt->close();
                         }
                     }
                 });
+            } else if (target === '#cn') {
+                if ($('#summernote_update_cn').data('summernote')) {
+                    $('#summernote_update_cn').summernote('destroy');
+                }
+                $('#summernote_update_cn').summernote({
+                    height: 600,
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            uploadFile(files[0], $(this));
+                        },
+                        onMediaDelete: function(target) {
+                            deleteFile(target);
+                        }
+                    }
+                });
             }
         });
 
@@ -467,72 +528,127 @@ $stmt->close();
             $('#main_group_select').val(mainGroupSelected).trigger('change');
         }
 
-        // --- เพิ่มโค้ดสำหรับปุ่ม Copy from Thai ---
-        // $('#copyFromThai').on('click', function() {
-        //     // ดึงค่าจากฟิลด์ภาษาไทย
-        //     var subjectThai = $('#shop_subject').val();
-        //     var descriptionThai = $('#shop_description').val();
-        //     var contentThai = $('#summernote_update').summernote('code');
+        $('#copyFromThaiEn').on('click', function () {
+            $('#loadingIndicatorEn').show(); 
+            var thaiSubject = $('#shop_subject').val();
+            var thaiDescription = $('#shop_description').val();
+            var thaiContent = $('#summernote_update').summernote('code');
 
-        //     // กำหนดค่าให้ฟิลด์ภาษาอังกฤษ
-        //     $('#shop_subject_en').val(subjectThai);
-        //     $('#shop_description_en').val(descriptionThai);
-        //     $('#summernote_update_en').summernote('code', contentThai);
-        // });
+            const dataToSend = {
+                language: "th",
+                translate: "en",
+                company: 2,
+                content: {
+                    subject: thaiSubject,
+                    description: thaiDescription,
+                    content: thaiContent
+                }
+            };
 
-        $('#copyFromThai').on('click', function () {
-                // 1. แสดง Loading Indicator
-                $('#loadingIndicator').show(); // ให้โชว์ loading animation
+            fetch('actions/translate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log(response);
 
-                // ดึงค่าจากฟอร์มภาษาไทย
-                var thaiSubject = $('#shop_subject').val();
-                var thaiDescription = $('#shop_description').val();
-                var thaiContent = $('#summernote_update').summernote('code');
-
-                // สร้าง Object สำหรับข้อมูลที่จะส่งไป
-                const dataToSend = {
-                    language: "th",
-                    translate: "en",
-                    company: 2,
-                    content: {
-                        subject: thaiSubject,
-                        description: thaiDescription,
-                        content: thaiContent
-                    }
-                };
-
-                // ส่งข้อมูลแบบ POST ไปยังไฟล์ actions/translate.php
-                fetch('actions/translate.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer',
-                    },
-                    body: JSON.stringify(dataToSend),
-                })
-                .then(res => res.json())
-                .then(response => {
-                    console.log(response);
-
-                    if (response.status === 'success') {
-                        $('#shop_subject_en').val(response.subject);
-                        $('#shop_description_en').val(response.description);
-                        $('#summernote_update_en').summernote('code', response.content);
-                        alert('การแปลสำเร็จ!');
-                    } else {
-                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
-                    }
-                })
-                .catch(error => {
-                    console.error("error:", error);
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
-                })
-                .finally(() => {
-                    // 2. ซ่อน Loading Indicator เมื่อเสร็จสิ้นกระบวนการทั้งหมด
-                    $('#loadingIndicator').hide();
+                if (response.status === 'success') {
+                    $('#shop_subject_en').val(response.subject);
+                    $('#shop_description_en').val(response.description);
+                    $('#summernote_update_en').summernote('code', response.content);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'การแปลสำเร็จแล้ว!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'การแปลล้มเหลว: ' + (response.message || response.error),
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error,
                 });
+            })
+            .finally(() => {
+                $('#loadingIndicatorEn').hide();
             });
+        });
 
+        $('#copyFromThaiCn').on('click', function () {
+            $('#loadingIndicatorCn').show(); 
+            var thaiSubject = $('#shop_subject').val();
+            var thaiDescription = $('#shop_description').val();
+            var thaiContent = $('#summernote_update').summernote('code');
+
+            const dataToSend = {
+                language: "th",
+                translate: "cn",
+                company: 2,
+                content: {
+                    subject: thaiSubject,
+                    description: thaiDescription,
+                    content: thaiContent
+                }
+            };
+
+            fetch('actions/translate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log(response);
+
+                if (response.status === 'success') {
+                    $('#shop_subject_cn').val(response.subject);
+                    $('#shop_description_cn').val(response.description);
+                    $('#summernote_update_cn').summernote('code', response.content);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'การแปลสำเร็จแล้ว!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'การแปลล้มเหลว: ' + (response.message || response.error),
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error,
+                });
+            })
+            .finally(() => {
+                $('#loadingIndicatorCn').hide();
+            });
+        });
         
     });
 </script>

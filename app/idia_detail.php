@@ -2,10 +2,10 @@
 require_once('../lib/connect.php');
 global $conn;
 
-// --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+// --- MODIFIED: Check for language preference, now including 'cn'. Default is Thai. ---
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn']) ? $_GET['lang'] : 'th';
 
-$subjectTitle = "สินค้า"; // fallback title
+$subjectTitle = ($lang === 'cn' ? '商品' : ($lang === 'en' ? 'Product' : 'สินค้า')); // fallback title
 $pageUrl = ""; // Add this variable
 
 if (isset($_GET['id'])) {
@@ -19,15 +19,21 @@ if (isset($_GET['id'])) {
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        // --- MODIFIED: Select English title if lang is 'en' ---
-        $stmt = $conn->prepare("SELECT subject_idia, subject_idia_en FROM dn_idia WHERE del = 0 AND idia_id = ?");
+        // --- MODIFIED: Select English and Chinese titles ---
+        $stmt = $conn->prepare("SELECT subject_idia, subject_idia_en, subject_idia_cn FROM dn_idia WHERE del = 0 AND idia_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
         $resultTitle = $stmt->get_result();
         if ($resultTitle->num_rows > 0) {
             $row = $resultTitle->fetch_assoc();
-            // --- MODIFIED: Use English title if available and lang is 'en' ---
-            $subjectTitle = ($lang === 'en' && !empty($row['subject_idia_en'])) ? $row['subject_idia_en'] : $row['subject_idia'];
+            // --- MODIFIED: Use the correct language title based on preference ---
+            if ($lang === 'en' && !empty($row['subject_idia_en'])) {
+                $subjectTitle = $row['subject_idia_en'];
+            } elseif ($lang === 'cn' && !empty($row['subject_idia_cn'])) {
+                $subjectTitle = $row['subject_idia_cn'];
+            } else {
+                $subjectTitle = $row['subject_idia'];
+            }
         }
         $stmt->close();
     }
@@ -36,8 +42,6 @@ if (isset($_GET['id'])) {
 <!DOCTYPE html>
 <html>
 <head>
-
-    
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($subjectTitle); ?></title>
 
@@ -109,7 +113,7 @@ if (isset($_GET['id'])) {
         <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
+                <p><?php echo ($lang === 'cn' ? '分享本页：' : ($lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:')); ?></p>
                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                     <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                 </a>
@@ -128,7 +132,7 @@ if (isset($_GET['id'])) {
                 <a href="https://www.tiktok.com/" target="_blank">
                     <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                 </a>
-                <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
+                <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'cn' ? '复制链接' : ($lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์')); ?></button>
                 </div>
 
                 <div class="row">
@@ -140,13 +144,15 @@ if (isset($_GET['id'])) {
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
-                                    // --- MODIFIED: Select English content if lang is 'en' ---
+                                    // --- MODIFIED: Select all three languages for content ---
                                     $stmt = $conn->prepare("SELECT 
                                         dn.idia_id, 
                                         dn.subject_idia,
                                         dn.subject_idia_en,
+                                        dn.subject_idia_cn,
                                         dn.content_idia,
                                         dn.content_idia_en,
+                                        dn.content_idia_cn,
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
                                         GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -161,8 +167,13 @@ if (isset($_GET['id'])) {
 
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            // --- MODIFIED: Use English content if available and lang is 'en' ---
-                                            $content = ($lang === 'en' && !empty($row['content_idia_en'])) ? $row['content_idia_en'] : $row['content_idia'];
+                                            // --- MODIFIED: Use the correct language content based on preference ---
+                                            $content = $row['content_idia'];
+                                            if ($lang === 'en' && !empty($row['content_idia_en'])) {
+                                                $content = $row['content_idia_en'];
+                                            } elseif ($lang === 'cn' && !empty($row['content_idia_cn'])) {
+                                                $content = $row['content_idia_cn'];
+                                            }
 
                                             $paths = explode(',', $row['pic_path']);
                                             $files = explode(',', $row['file_name']);
@@ -191,13 +202,13 @@ if (isset($_GET['id'])) {
                                         }
                                     } else {
                                         // --- MODIFIED: Change text based on language ---
-                                        echo $lang === 'en' ? 'No information available.' : 'ไม่มีข้อมูล';
+                                        echo ($lang === 'cn' ? '无可用信息。' : ($lang === 'en' ? 'No information available.' : 'ไม่มีข้อมูล'));
                                     }
 
                                     $stmt->close(); 
                                 } else {
                                     // --- MODIFIED: Change text based on language ---
-                                    echo $lang === 'en' ? 'Invalid ID.' : 'ID ไม่ถูกต้อง';
+                                    echo ($lang === 'cn' ? 'ID 无效。' : ($lang === 'en' ? 'Invalid ID.' : 'ID ไม่ถูกต้อง'));
                                 }
                             }
 
@@ -207,7 +218,7 @@ if (isset($_GET['id'])) {
                 </div>
                             <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
-                    <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
+                    <p><?php echo ($lang === 'cn' ? '分享本页：' : ($lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:')); ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -226,12 +237,12 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'cn' ? '复制链接' : ($lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์')); ?></button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p><?php echo $lang === 'en' ? 'Inquire/Order Trandar Acoustics products at' : 'สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่'; ?></p>
+                    <p><?php echo ($lang === 'cn' ? '咨询/订购 Trandar Acoustics 产品：' : ($lang === 'en' ? 'Inquire/Order Trandar Acoustics products at' : 'สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่')); ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -244,14 +255,14 @@ if (isset($_GET['id'])) {
 
            
             
-            <h3 style ="padding-top: 40px;"><?php echo $lang === 'en' ? 'Comments' : 'ความคิดเห็น'; ?></h3>
-            <p><?php echo $lang === 'en' ? 'Your email will not be displayed to others. Required fields are marked *' : 'อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *'; ?></p>
+            <h3 style ="padding-top: 40px;"><?php echo ($lang === 'cn' ? '评论' : ($lang === 'en' ? 'Comments' : 'ความคิดเห็น')); ?></h3>
+            <p><?php echo ($lang === 'cn' ? '您的电子邮件地址不会被公开。必填字段已标记 *' : ($lang === 'en' ? 'Your email will not be displayed to others. Required fields are marked *' : 'อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *')); ?></p>
             <form id="commentForm" style="max-width: 600px;">
-                <textarea id="commentText" name="comment" rows="5" required placeholder="<?php echo $lang === 'en' ? 'Comment *' : 'ความคิดเห็น *'; ?>"
+                <textarea id="commentText" name="comment" rows="5" required placeholder="<?php echo ($lang === 'cn' ? '评论 *' : ($lang === 'en' ? 'Comment *' : 'ความคิดเห็น *')); ?>"
                     style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                 <button type="submit"
                     style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                    <?php echo $lang === 'en' ? 'Post Comment' : 'แสดงความคิดเห็น'; ?>
+                    <?php echo ($lang === 'cn' ? '发表评论' : ($lang === 'en' ? 'Post Comment' : 'แสดงความคิดเห็น')); ?>
                 </button>
             </form>
 
@@ -270,11 +281,11 @@ if (isset($_GET['id'])) {
                 }
                 
                 const lang = "<?= $lang ?>";
-                const loginAlertMsg = lang === 'en' ? "Please log in to post a comment." : "กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น";
-                const roleAlertMsg = lang === 'en' ? "You must be logged in as a viewer to post a comment." : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น";
-                const errorAlertMsg = lang === 'en' ? "An error occurred during authentication." : "เกิดข้อผิดพลาดในการยืนยันตัวตน";
-                const successAlertMsg = lang === 'en' ? "Comment saved successfully." : "บันทึกความคิดเห็นเรียบร้อยแล้ว";
-                const failAlertMsg = lang === 'en' ? "An error occurred: " : "เกิดข้อผิดพลาด: ";
+                const loginAlertMsg = lang === 'en' ? "Please log in to post a comment." : (lang === 'cn' ? "请登录后发表评论。" : "กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น");
+                const roleAlertMsg = lang === 'en' ? "You must be logged in as a viewer to post a comment." : (lang === 'cn' ? "您必须以浏览者身份登录才能发表评论。" : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น");
+                const errorAlertMsg = lang === 'en' ? "An error occurred during authentication." : (lang === 'cn' ? "身份验证过程中发生错误。" : "เกิดข้อผิดพลาดในการยืนยันตัวตน");
+                const successAlertMsg = lang === 'en' ? "Comment saved successfully." : (lang === 'cn' ? "评论保存成功。" : "บันทึกความคิดเห็นเรียบร้อยแล้ว");
+                const failAlertMsg = lang === 'en' ? "An error occurred: " : (lang === 'cn' ? "发生错误：" : "เกิดข้อผิดพลาด: ");
 
                 fetch('actions/protected.php', {
                     method: 'GET',
@@ -319,8 +330,8 @@ if (isset($_GET['id'])) {
             function copyLink() {
                 const pageUrl = "<?= $pageUrl ?>";
                 const lang = "<?= $lang ?>";
-                const successAlertMsg = lang === 'en' ? "Link copied successfully!" : "คัดลอกลิงก์เรียบร้อยแล้ว";
-                const errorAlertMsg = lang === 'en' ? "Failed to copy link. Please copy it manually." : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง";
+                const successAlertMsg = lang === 'en' ? "Link copied successfully!" : (lang === 'cn' ? "链接复制成功！" : "คัดลอกลิงก์เรียบร้อยแล้ว");
+                const errorAlertMsg = lang === 'en' ? "Failed to copy link. Please copy it manually." : (lang === 'cn' ? "复制链接失败。请手动复制。" : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง");
                 
                 navigator.clipboard.writeText(pageUrl).then(function() {
                     alert(successAlertMsg);

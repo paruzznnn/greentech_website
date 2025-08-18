@@ -1,4 +1,4 @@
-<?php 
+<?php
 // *** ตรวจสอบ PATH นี้ให้ถูกต้องที่สุด ***
 // สมมติว่า group_management.php อยู่ที่ /admin/set_product/
 // check_permission.php อยู่ที่ /admin/check_permission.php
@@ -20,7 +20,7 @@ $base_url = 'http://localhost/trandar/';
 // ดึงข้อมูลกลุ่มทั้งหมด พร้อมกับฟิลด์ภาษาอังกฤษ
 $main_groups = [];
 $sub_groups = [];
-$sql_groups = "SELECT group_id, group_name, group_name_en, description, description_en, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
+$sql_groups = "SELECT group_id, group_name, group_name_en, group_name_cn, description, description_en, description_cn, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
 $result_groups = $conn->query($sql_groups);
 
 if ($result_groups) {
@@ -104,7 +104,7 @@ if ($result_groups) {
         .language-switcher img.active {
             border-color: #007bff;
         }
-        .lang-thai-fields, .lang-en-fields {
+        .lang-thai-fields, .lang-en-fields, .lang-cn-fields {
             display: none;
         }
     </style>
@@ -133,6 +133,7 @@ if ($result_groups) {
                                         <th>รูปภาพ</th>
                                         <th>ชื่อหมวดหมู่ (TH)</th>
                                         <th>ชื่อหมวดหมู่ (EN)</th>
+                                        <th>ชื่อหมวดหมู่ (CN)</th>
                                         <th>หมวดหมู่หลัก</th>
                                         <th>การจัดการ</th>
                                     </tr>
@@ -147,9 +148,10 @@ if ($result_groups) {
                                         echo '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_cn']) . '</td>';
                                         echo '<td>- (หมวดหมู่หลัก)</td>';
                                         echo '<td>';
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> แก้ไข</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_cn'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> แก้ไข</button>';
                                         echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
                                         echo '</td>';
                                         echo '</tr>';
@@ -168,9 +170,10 @@ if ($result_groups) {
                                         echo '<td>-</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_cn']) . '</td>';
                                         echo '<td>' . htmlspecialchars($parent_name) . '</td>';
                                         echo '<td>';
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> แก้ไข</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_cn'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> แก้ไข</button>';
                                         echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
                                         echo '</td>';
                                         echo '</tr>';
@@ -194,9 +197,10 @@ if ($result_groups) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                         <div class="language-switcher mb-3">
+                        <div class="language-switcher mb-3">
                             <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
                             <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
+                            <img src="https://flagcdn.com/w320/cn.png" alt="Chinese" class="lang-flag" data-lang="cn">
                         </div>
                         <div class="lang-thai-fields" style="display:block;">
                             <div class="mb-3">
@@ -216,6 +220,16 @@ if ($result_groups) {
                             <div class="mb-3">
                                 <label for="newGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
                                 <textarea class="form-control" id="newGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="lang-cn-fields">
+                            <div class="mb-3">
+                                <label for="newGroupNameCn" class="form-label">ชื่อหมวดหมู่ (CN)</label>
+                                <input type="text" class="form-control" id="newGroupNameCn" name="group_name_cn">
+                            </div>
+                            <div class="mb-3">
+                                <label for="newGroupDescriptionCn" class="form-label">คำอธิบาย (CN)</label>
+                                <textarea class="form-control" id="newGroupDescriptionCn" name="description_cn" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -259,6 +273,7 @@ if ($result_groups) {
                         <div class="language-switcher mb-3">
                             <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
                             <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
+                            <img src="https://flagcdn.com/w320/cn.png" alt="Chinese" class="lang-flag" data-lang="cn">
                         </div>
 
                         <div class="lang-thai-fields" style="display:block;">
@@ -280,6 +295,17 @@ if ($result_groups) {
                             <div class="mb-3">
                                 <label for="editGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
                                 <textarea class="form-control" id="editGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="lang-cn-fields">
+                            <div class="mb-3">
+                                <label for="editGroupNameCn" class="form-label">ชื่อหมวดหมู่ (CN)</label>
+                                <input type="text" class="form-control" id="editGroupNameCn" name="group_name_cn">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editGroupDescriptionCn" class="form-label">คำอธิบาย (CN)</label>
+                                <textarea class="form-control" id="editGroupDescriptionCn" name="description_cn" rows="3"></textarea>
                             </div>
                         </div>
 
@@ -315,17 +341,19 @@ if ($result_groups) {
         const GLOBAL_APP_BASE_URL = '<?php echo $base_url; ?>';
         const GLOBAL_APP_PLACEHOLDER_IMAGE = GLOBAL_APP_BASE_URL + 'public/img/group_placeholder.jpg';
 
-        window.myApp_editGroup = function(groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId = null) {
-            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId });
+        window.myApp_editGroup = function(groupId, groupName, groupNameEn, groupNameCn, description, descriptionEn, descriptionCn, groupType, imagePath, parentGroupId = null) {
+            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupNameEn, groupNameCn, description, descriptionEn, descriptionCn, groupType, imagePath, parentGroupId });
 
             $('#editGroupId').val(groupId);
             $('#editGroupType').val(groupType);
 
-            // เติมข้อมูลภาษาไทยและอังกฤษ
+            // เติมข้อมูลภาษาไทย, อังกฤษ, และจีน
             $('#editGroupName').val(groupName);
             $('#editGroupNameEn').val(groupNameEn);
+            $('#editGroupNameCn').val(groupNameCn);
             $('#editGroupDescription').val(description);
             $('#editGroupDescriptionEn').val(descriptionEn);
+            $('#editGroupDescriptionCn').val(descriptionCn);
 
             // Reset image input and preview
             $('#editGroupImage').val('');
@@ -463,12 +491,16 @@ if ($result_groups) {
                     $(modalId + ' .lang-flag').removeClass('active');
                     $(this).addClass('active');
 
+                    $(modalId + ' .lang-thai-fields').hide();
+                    $(modalId + ' .lang-en-fields').hide();
+                    $(modalId + ' .lang-cn-fields').hide();
+
                     if (lang === 'th') {
                         $(modalId + ' .lang-thai-fields').show();
-                        $(modalId + ' .lang-en-fields').hide();
                     } else if (lang === 'en') {
-                        $(modalId + ' .lang-thai-fields').hide();
                         $(modalId + ' .lang-en-fields').show();
+                    } else if (lang === 'cn') {
+                        $(modalId + ' .lang-cn-fields').show();
                     }
                 });
             }

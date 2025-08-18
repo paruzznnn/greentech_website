@@ -25,7 +25,7 @@ function handleSingleFileUpload($file, $base_path)
         if (in_array($fileExtension, $allowedExtensions) && $fileSize <= $maxFileSize) {
             $uploadFileDir = realpath(__DIR__ . '/../../../../public/news_img/') . '/';
             $destFilePath = $uploadFileDir . $newFileName;
-            
+
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0755, true);
             }
@@ -71,13 +71,17 @@ try {
         $content_th = $_POST['content_th'] ?? '';
         $author_th = $_POST['author_th'] ?? '';
         $position_th = $_POST['position_th'] ?? '';
-        
+
         $type_en = $_POST['type_en'] ?? ''; // English is optional
         $content_en = $_POST['content_en'] ?? ''; // English is optional
         
+        // Add Chinese (cn) fields
+        $type_cn = $_POST['type_cn'] ?? ''; // Chinese is optional
+        $content_cn = $_POST['content_cn'] ?? ''; // Chinese is optional
+
         $image_url = null;
 
-        if (!empty($content_th) || !empty($content_en)) {
+        if (!empty($content_th) || !empty($content_en) || !empty($content_cn)) {
             // Handle image file if uploaded
             if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
                 $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
@@ -89,9 +93,9 @@ try {
                     exit;
                 }
             }
-            
-            $stmt = $conn->prepare("INSERT INTO service_content (type, content, type_en, content_en, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssss", $type_th, $content_th, $type_en, $content_en, $image_url, $author_th, $position_th);
+
+            $stmt = $conn->prepare("INSERT INTO service_content (type, content, type_en, content_en, type_cn, content_cn, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssss", $type_th, $content_th, $type_en, $content_en, $type_cn, $content_cn, $image_url, $author_th, $position_th);
 
             if ($stmt->execute()) {
                 $response = ['status' => 'success', 'message' => 'เพิ่มเนื้อหาใหม่เรียบร้อย'];
@@ -112,18 +116,22 @@ try {
         $authors = $_POST['authors'] ?? [];
         $positions = $_POST['positions'] ?? [];
         $images_old = $_POST['images_old'] ?? [];
-        
+
         $types_en = $_POST['types_en'] ?? [];
         $contents_en = $_POST['contents_en'] ?? [];
         
+        // Add Chinese (cn) fields
+        $types_cn = $_POST['types_cn'] ?? [];
+        $contents_cn = $_POST['contents_cn'] ?? [];
+
         $uploaded_files = $_FILES['image_files'] ?? null;
-        
+
         $hasError = false;
         $errorMessage = '';
 
         for ($i = 0; $i < count($ids); $i++) {
             $current_image_url = $images_old[$i];
-            
+
             if (isset($uploaded_files['name'][$i]) && $uploaded_files['error'][$i] == UPLOAD_ERR_OK) {
                 $file = [
                     'name' => $uploaded_files['name'][$i],
@@ -133,7 +141,7 @@ try {
                     'size' => $uploaded_files['size'][$i]
                 ];
                 $uploadResult = handleSingleFileUpload($file, $base_path);
-                
+
                 if ($uploadResult['success']) {
                     $current_image_url = $uploadResult['url'];
                 } else {
@@ -146,12 +154,18 @@ try {
             $type_en_val = $types_en[$i] ?? '';
             $content_en_val = $contents_en[$i] ?? '';
             
-            $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, type_en=?, content_en=?, image_url=?, author=?, position=? WHERE id=?");
-            $stmt->bind_param("sssssssi",
+            // Assign Chinese values
+            $type_cn_val = $types_cn[$i] ?? '';
+            $content_cn_val = $contents_cn[$i] ?? '';
+
+            $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, type_en=?, content_en=?, type_cn=?, content_cn=?, image_url=?, author=?, position=? WHERE id=?");
+            $stmt->bind_param("sssssssssi",
                 $types_th[$i],
                 $contents_th[$i],
                 $type_en_val,
                 $content_en_val,
+                $type_cn_val,
+                $content_cn_val,
                 $current_image_url,
                 $authors[$i],
                 $positions[$i],
@@ -172,7 +186,7 @@ try {
             $response = ['status' => 'success', 'message' => 'บันทึกการแก้ไขทั้งหมดเรียบร้อย'];
         }
     }
-    
+
     // Action: Delete block
     elseif ($action == 'delete_block') {
         $id = $_POST['id'] ?? 0;

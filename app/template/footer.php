@@ -22,19 +22,19 @@ global $conn;
 global $base_path;
 
 // --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn']) ? $_GET['lang'] : 'th';
 
 $footer_settings = [];
 $footer_id_for_display = 1;
 
-// --- MODIFIED: Select English columns from the database ---
+// --- MODIFIED: Select English and Chinese columns from the database ---
 $stmt_footer = $conn->prepare("SELECT 
-    bg_color, footer_top_title, footer_top_title_en, footer_top_subtitle, footer_top_subtitle_en,
-    about_heading, about_heading_en, about_text, about_text_en,
-    contact_heading, contact_heading_en, contact_address, contact_address_en,
+    bg_color, footer_top_title, footer_top_title_en, footer_top_title_cn, footer_top_subtitle, footer_top_subtitle_en, footer_top_subtitle_cn,
+    about_heading, about_heading_en, about_heading_cn, about_text, about_text_en, about_text_cn,
+    contact_heading, contact_heading_en, contact_heading_cn, contact_address, contact_address_en, contact_address_cn,
     contact_phone, contact_email,
-    contact_hours_wk, contact_hours_wk_en, contact_hours_sat, contact_hours_sat_en,
-    social_heading, social_heading_en, social_links_json,
+    contact_hours_wk, contact_hours_wk_en, contact_hours_wk_cn, contact_hours_sat, contact_hours_sat_en, contact_hours_sat_cn,
+    social_heading, social_heading_en, social_heading_cn, social_links_json,
     copyright_text
     FROM footer_settings WHERE id = ?");
 $stmt_footer->bind_param("i", $footer_id_for_display);
@@ -51,29 +51,38 @@ if ($data = $result_footer->fetch_assoc()) {
     }
 } else {
     // กำหนดค่า default หากไม่พบข้อมูลใน database (ควรมีการ insert ข้อมูลเริ่มต้นไว้แล้ว)
-    // --- MODIFIED: Added English default values ---
+    // --- MODIFIED: Added English and Chinese default values ---
     $footer_settings = [
         'bg_color' => '#393939',
         'footer_top_title' => 'ลงทะเบียน',
         'footer_top_title_en' => 'Register',
+        'footer_top_title_cn' => '注册',
         'footer_top_subtitle' => 'สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ',
         'footer_top_subtitle_en' => 'Subscribe to our newsletter for the latest news and special offers.',
+        'footer_top_subtitle_cn' => '订阅我们的时事通讯，获取最新消息和特别优惠。',
         'about_heading' => 'เกี่ยวกับเรา',
         'about_heading_en' => 'About Us',
+        'about_heading_cn' => '关于我们',
         'about_text' => 'บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก',
         'about_text_en' => 'Trandar International Co., Ltd. was founded on March 1, 1988. We are experts in sound-absorbing ceilings, soundproof walls, and all types of acoustic ceilings. We have a team and experts ready to provide advice on design and installation. We also manufacture and distribute acoustic panels, sound-absorbing walls, soundboards, and ceiling panels that meet both domestic and international standards, along with efficient services from Trandar Acoustic.',
+        'about_text_cn' => 'Trandar International Co., Ltd. 成立于 1988 年 3 月 1 日。我们是吸音天花板、隔音墙和各种声学天花板系统的专家。我们拥有一支随时可以提供设计和安装咨询的团队和专家。我们还制造和分销符合国内和国际标准的声学板、吸音墙、隔音板和天花板，并提供来自 Trandar Acoustic 的高效服务。',
         'contact_heading' => 'ติดต่อเรา',
         'contact_heading_en' => 'Contact Us',
+        'contact_heading_cn' => '联系我们',
         'contact_address' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
         'contact_address_en' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
+        'contact_address_cn' => '曼谷 Suan Luang Phatthanakan 40 102号，邮编 10250',
         'contact_phone' => '(+66)2 722 7007',
         'contact_email' => 'info@trandar.com',
         'contact_hours_wk' => 'Monday – Friday 08:30 AM – 05:00 PM',
         'contact_hours_wk_en' => 'Monday – Friday 08:30 AM – 05:00 PM',
+        'contact_hours_wk_cn' => '周一至周五 08:30 AM – 05:00 PM',
         'contact_hours_sat' => 'Saturday 08:30 AM – 12:00 PM',
         'contact_hours_sat_en' => 'Saturday 08:30 AM – 12:00 PM',
+        'contact_hours_sat_cn' => '周六 08:30 AM – 12:00 PM',
         'social_heading' => 'Follow Us',
         'social_heading_en' => 'Follow Us',
+        'social_heading_cn' => '关注我们',
         'social_links' => [
             ["icon" => "fab fa-facebook-f", "url" => "https://www.facebook.com/trandaracoustic/", "color" => "#3b5998"],
             ["icon" => "fab fa-instagram", "url" => "https://www.instagram.com/trandaracoustics/", "color" => "#e1306c"],
@@ -90,8 +99,12 @@ $stmt_footer->close();
 // --- ADDED: A helper function to get text based on language ---
 function get_text($settings, $field_name, $lang) {
     $field_en = $field_name . '_en';
+    $field_cn = $field_name . '_cn';
     if ($lang === 'en' && !empty($settings[$field_en])) {
         return $settings[$field_en];
+    }
+    if ($lang === 'cn' && !empty($settings[$field_cn])) {
+        return $settings[$field_cn];
     }
     return $settings[$field_name];
 }
@@ -143,7 +156,14 @@ function get_text($settings, $field_name, $lang) {
                             </a>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <p class="text-muted"><?php echo $lang === 'en' ? 'No Social Links configured.' : 'ยังไม่มี Social Link กำหนดค่า.'; ?></p>
+                        <?php
+                        $noSocialText = [
+                            'th' => 'ยังไม่มี Social Link กำหนดค่า.',
+                            'en' => 'No Social Links configured.',
+                            'cn' => '未配置社交链接。'
+                        ];
+                        ?>
+                        <p class="text-muted"><?php echo $noSocialText[$lang]; ?></p>
                     <?php endif; ?>
                 </div>
             </div>
