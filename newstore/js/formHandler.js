@@ -22,8 +22,6 @@ export function handleFormSubmit(event) {
     console.log('fromUrl', fromUrl);
     console.log('fromRedirect', fromRedirect);
     console.log('fromType', fromType);
-    
-
     return;
 
     fetch(fromUrl, {

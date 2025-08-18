@@ -44,7 +44,7 @@ export async function initCardUI({
             const res = await response.json();
             const data = res.data;
 
-            console.log('data', data);
+            // console.log('data', data);
             
 
             allCards = data.map(item => ({

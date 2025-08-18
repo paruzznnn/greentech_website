@@ -12,10 +12,11 @@
 .section-header {
     display: flex;
     align-items: center;
-    font-size: 1.25rem;
+    /* font-size: 1.25rem;
     font-weight: 700;
-    color: #212529;
+    color: #212529; */
     margin-bottom: 1rem;
+    justify-content: space-between;
 }
 
 /* ---- Form Grid Layout ---- */
@@ -83,7 +84,7 @@
 .product-list-header,
 .product-item {
     display: grid;
-    grid-template-columns: 3fr 1fr 2fr;
+    grid-template-columns: 3fr 2fr 2fr 2fr;
     align-items: center;
 }
 
@@ -111,6 +112,13 @@
     height: 80px;
     object-fit: cover;
     border-radius: 0.4rem;
+}
+
+.product-detail {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 /* ---- Summary Card ---- */
