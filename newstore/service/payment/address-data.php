@@ -1,5 +1,6 @@
 <?php
 require_once '../../server/connect_sqli.php';
+require_once '../../server/select_sqli.php';
 header('Content-Type: application/json');
 
 
@@ -27,17 +28,47 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
+$userId = $_SESSION['user']['id'];
 
 if ($action == 'getAddress') {
 
-    $data = [];
+    $conditions = [
+        [
+            'column' => 'member_id', 
+            'operator' => '=', 
+            'value' => $userId
+        ]
+    ];
 
-    http_response_code(200);
+    $items = selectData(
+        $conn_cloudpanel, 
+        'ecm_address', 
+        $conditions, 
+        '*'
+    );
+
+    $data = [];
+    $seen_category_ids = [];
+    foreach ($items as $item) {
+        $data[] = [
+            'id' => $item['address_id'],
+            'fullname' => $item['firstname'] . ' ' . $item['lastname'],
+            'phoneNumber' => $item['phone_number'],
+            'addressDetail' => $item['detail'],
+            'province_id' => $item['province_id'],
+            'district_id' => $item['district_id'],
+            'sub_district_id' => $item['sub_district_id'],
+            'postcode_id' => $item['postcode_id']
+        ];
+    }
+
     $response = [
         "data" => $data
     ];
 
+    http_response_code(200);
     echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 } else {
 

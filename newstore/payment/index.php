@@ -26,25 +26,26 @@
 
                                 <!-- ข้อมูลสั่งซื้อ -->
                                 <div class="section-card">
-                                    <div><span>เลขที่สั่งซื้อ:</span> <span>#ORD-20250814-12345</span></div>
+                                    <h5><span>เลขที่สั่งซื้อ:</span> <span>ORD-20250814-12345</span></h5>
                                     <div><span>วันที่สั่งซื้อ:</span> <span>14 สิงหาคม 2568</span></div>
                                 </div>
 
                                 <!-- เลือกวิธีรับสินค้า -->
                                 <div class="section-card">
-                                    <h4 class="section-header">เลือกวิธีรับสินค้า</h4>
+                                    <h5 class="section-header">เลือกวิธีรับสินค้า</h5>
                                     <div class="selection-options-grid">
                                         <div class="selection-card delivery">
                                             <input class="hidden-radio" type="radio" name="delivery_option" id="delivery_shipping" value="shipping" checked>
                                             <label for="delivery_shipping">
-                                                <h5>จัดส่งถึงที่อยู่</h5>
+                                                <i class="fas fa-truck"></i>
                                                 <span>จัดส่งโดยขนส่งพัสดุ</span>
                                             </label>
                                         </div>
                                         <div class="selection-card delivery">
                                             <input class="hidden-radio" type="radio" name="delivery_option" id="delivery_pickup" value="pickup">
                                             <label for="delivery_pickup">
-                                                <h5>รับหน้าร้าน</h5>
+                                                <i class="fas fa-truck-pickup"></i>
+                                                <!-- <i class="bi bi-person-walking"></i> -->
                                                 <span>รับสินค้าที่สาขา</span>
                                             </label>
                                         </div>
@@ -54,11 +55,16 @@
                                 <!-- ที่อยู่จัดส่ง -->
                                 <div id="shippingAddressFormSection" class="section-card">
                                     <div class="section-header">
-                                        <h4>กรอกข้อมูลที่อยู่จัดส่ง</h4>
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" id="setupShipping"/>
-                                            <span class="slider"></span>
-                                        </label>
+                                        <div>
+                                            <p>กรอกข้อมูลที่อยู่จัดส่ง</p>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 0.8rem;">ตามการตั้งค่า</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="setupShipping"/>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="form-grid">
                                         <div class="form-group">
@@ -69,9 +75,9 @@
                                             <label for="phone_number" class="form-label">เบอร์โทรศัพท์:</label>
                                             <input type="tel" id="phone_number" name="phone_number" class="form-input" value="">
                                         </div>
-                                        <div class="full-width">
-                                            <label for="address_line1" class="form-label">ที่อยู่:</label>
-                                            <input type="text" id="address_line1" name="address_line1" class="form-input" value="">
+                                        <div class="full-width form-group">
+                                            <label for="address_detail" class="form-label">ที่อยู่:</label>
+                                            <textarea id="address_detail" name="address_detail" class="form-input" style="min-height: 60px !important;"></textarea>
                                         </div>
                                         <div class="form-group">
                                             <label for="province" class="form-label">จังหวัด:</label>
@@ -80,13 +86,13 @@
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="district">อำเภอ/เขต</label>
+                                            <label for="district" class="form-label">อำเภอ/เขต</label>
                                             <select id="district" name="district" class="form-input" required disabled>
                                                 <option value="">เลือกอำเภอ/เขต</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="subdistrict">ตำบล/แขวง</label>
+                                            <label for="subdistrict" class="form-label">ตำบล/แขวง</label>
                                             <select id="subdistrict" name="subdistrict" class="form-input" required disabled>
                                                 <option value="">เลือกตำบล/แขวง</option>
                                             </select>
@@ -100,19 +106,19 @@
 
                                 <!-- เลือกการชำระเงิน -->
                                 <div class="section-card">
-                                    <h4 class="section-header">เลือกบริการชำระเงิน</h4>
+                                    <h5 class="section-header">เลือกบริการชำระเงิน</h5>
                                     <div class="payment-grid">
                                         <div class="selection-card payment">
                                             <input class="hidden-radio" type="radio" name="payment_method" id="payment_bank_transfer" value="bank_transfer" checked>
                                             <label for="payment_bank_transfer">
-                                                <h5>โอนเงินผ่านธนาคาร</h5>
-                                                <span>โอนโดยตรงจากบัญชีธนาคาร</span>
+                                                <i class="fas fa-landmark"></i>
+                                                <span>โอนเงินผ่านธนาคาร</span>
                                             </label>
                                         </div>
                                         <div class="selection-card payment">
                                             <input class="hidden-radio" type="radio" name="payment_method" id="payment_promptpay" value="promptpay">
                                             <label for="payment_promptpay">
-                                                <h5>พร้อมเพย์</h5>
+                                                <i class="bi bi-qr-code-scan"></i>
                                                 <span>สแกน QR Code</span>
                                             </label>
                                         </div>
@@ -123,7 +129,7 @@
                             <!-- รายการสินค้า + สรุป -->
                             <div class="col-md-6 col-sm-12">
                                 <div class="section-card">
-                                    <h4 class="section-header">รายการสินค้า</h4>
+                                    <h5 class="section-header">รายการสินค้า</h5>
                                     <div class="product-list-header">
                                         <div>สินค้า</div>
                                         <div style="text-align: end;">ราคา</div>
@@ -135,7 +141,7 @@
 
                                 <!-- สรุปยอดรวม -->
                                 <div class="summary-card section-card">
-                                    <h4 class="section-header">สรุปยอดรวม</h4>
+                                    <h5 class="section-header">สรุปยอดรวม</h5>
                                     <div class="summary-details">
                                         <div class="summary-row">
                                             <span class="summary-label">ราคารวมสินค้า</span>
@@ -158,7 +164,7 @@
                                             <span class="total-value" id="total-amount">1,550.00 บาท</span>
                                         </div>
                                     </div>
-                                    <button type="submit">ยืนยันการสั่งซื้อ</button>
+                                    <button id="confirm-order" type="submit">ยืนยันการสั่งซื้อ</button>
                                 </div>
 
                             </div>
@@ -184,9 +190,7 @@
             const formOrder = document.querySelector("#formOrder");
             formOrder?.addEventListener("submit", formModule.handleFormSubmit);
 
-            // const serviceSetup = baseWeb + 'service/payment/address-data.php?';
-            // const addressSetup = await paymentModule.fetchAddressData("getAddress", serviceSetup);
-
+            const address = await paymentModule.fetchAddressData("getAddress", baseWeb + 'service/payment/address-data.php?');
             const provinces = await paymentModule.fetchProvincesData(baseWeb + 'locales/provinces.json');
             const districts = await paymentModule.fetchDistrictsData(baseWeb + 'locales/districts.json');
             const subdistricts = await paymentModule.fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
@@ -194,7 +198,8 @@
             paymentModule.CheckoutUI.init(
                 provinces,
                 districts,
-                subdistricts
+                subdistricts,
+                address.data[0]
             );
         })
         .catch((e) => console.error("Module import failed", e));

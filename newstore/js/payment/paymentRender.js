@@ -83,18 +83,20 @@ export async function fetchSubdistricts(call) {
 }
 
 export const CheckoutUI = {
+    lang: null,
     baseTotal: 1500.00,
     shippingFee: 50.00,
     ORDER_STORAGE_KEY: 'orderProduct',
     orderItems: [],
 
+    addressData: [],
     provincesData: [],
     districtsData: [],
     subdistrictsData: [],
-    lang: null,
+
     provinceActive: null,
     districtActive: null,
-    subdistrictActive: null,
+    postalCodeActive: null,
 
     deliveryMethodNames: {
         shipping: 'จัดส่งถึงที่อยู่',
@@ -117,22 +119,29 @@ export const CheckoutUI = {
         selectedDeliveryMethod: document.getElementById('selected-delivery-method'),
 
         //Shipping Address
+        selectedFullname: document.getElementById('full_name'),
+        selectedPhoneNumber: document.getElementById('phone_number'),
+        selectedAddressDetail: document.getElementById('address_detail'),
+
         selectedProvince: document.getElementById('province'),
         selectedDistrict: document.getElementById('district'),
-        selectedSubdistrict: document.getElementById('subdistrict')
+        selectedSubdistrict: document.getElementById('subdistrict'),
+        selectedPostalCode: document.getElementById('postalCode')
     },
 
 
-    init(provinces, districts, subdistricts) {
+    init(provinces, districts, subdistricts, address) {
+
+        this.lang = 'th';
 
         this.initRadioEvents();
         this.initializeUI();
         this.initClickEvents();
 
         this.loadOrder();
-        // this.renderProduct();
+        this.renderProductItem();
 
-        this.lang = 'th';
+        this.addressData = address;
         this.provincesData = provinces;
         this.districtsData = districts;
         this.subdistrictsData = subdistricts;
@@ -150,64 +159,135 @@ export const CheckoutUI = {
         }
     },
 
-    // renderProduct() {
-    //     const orderItems = this.orderItems.items;
-    //     let productHtml = '';
-    //     orderItems.forEach(item => {
-    //         productHtml += `
-    //         <div class="product-item">
-    //             <div>
-    //                 <img src="${item.imageUrl}" alt="" class="product-img">
-    //             </div>
-    //             <div style="text-align: end;">${formatPrice("THB", parseFloat(item.price))}</div>
-    //             <div style="text-align: end;">${item.quantity}</div>
-    //             <div style="text-align: end;">${formatPrice("THB", (parseFloat(item.price) * item.quantity))}</div>
-    //         </div>
-    //         `;
-    //     });
-    //     document.getElementById("order-product").innerHTML = productHtml;
-    // },
+    renderProductItem() {
+        const orderItems = this.orderItems?.items || [];
+        let productHtml = '';
+        orderItems.forEach(item => {
+            productHtml += `
+            <div class="product-item">
+                <div>
+                    <img src="${item.imageUrl}" alt="" class="product-img">
+                </div>
+                <div style="text-align: end;">${formatPrice("THB", parseFloat(item.price))}</div>
+                <div style="text-align: end;">${item.quantity}</div>
+                <div style="text-align: end;">${formatPrice("THB", (parseFloat(item.price) * item.quantity))}</div>
+            </div>
+            `;
+        });
+        document.getElementById("order-product").innerHTML = productHtml;
+    },
 
     populateProvinces() {
         const provinceOption = this.provincesData.map(item => {
             const provinceName = this.lang === 'en' ? item.provinceNameEn : item.provinceNameTh;
-            return `<option value="${item.id}" data-code="${item.provinceCode}">${provinceName}</option>`;
+            return `<option value="${item.provinceCode}" data-code="${item.provinceCode}">${provinceName}</option>`;
         });
         const defaultOption = `<option value="">${this.lang === 'en' ? 'Select Province' : 'เลือกจังหวัด'}</option>`;
         this.selectors.selectedProvince.innerHTML = defaultOption + provinceOption.join('');
     },
 
     populateDistricts() {
-
         if(this.provinceActive){
             this.selectors.selectedDistrict.disabled = false;
         }else{
             this.selectors.selectedDistrict.disabled = true;
         }
-
         const districtOption = this.districtsData
         .filter(item => item.provinceCode == this.provinceActive)
         .map(item => {
             const districtName = this.lang === 'en' ? item.districtNameEn : item.districtNameTh;
-            return `<option value="${item.id}">${districtName}</option>`;
+            return `<option value="${item.districtCode}" data-code="${item.districtCode}">${districtName}</option>`;
         });
         const defaultOption = `<option value="">${this.lang === 'en' ? 'Select District' : 'เลือกอำเภอ/เขต'}</option>`;
         this.selectors.selectedDistrict.innerHTML = defaultOption + districtOption.join('');
     },
 
     populateSubDistricts() {
+        if(this.districtActive){
+            this.selectors.selectedSubdistrict.disabled = false;
+        }else{
+            this.selectors.selectedSubdistrict.disabled = true;
+        }
         const subdistrictOption = this.subdistrictsData
-        .filter(item => item.provinceCode == 10)
+        .filter(item => item.districtCode == this.districtActive)
         .map(item => {
             const subdistrictName = this.lang === 'en' ? item.subdistrictNameEn : item.subdistrictNameTh;
-            return `<option value="${item.id}" data-code="">${subdistrictName}</option>`;
+            return `<option value="${item.subdistrictCode}" data-code="${item.postalCode}">${subdistrictName}</option>`;
         });
         const defaultOption = `<option value="">${this.lang === 'en' ? 'Select Subdistrict' : 'เลือกตำบล/แขวง'}</option>`;
         this.selectors.selectedSubdistrict.innerHTML = defaultOption + subdistrictOption.join('');
     },
 
+    populatePostalCode() {
+        this.selectors.selectedPostalCode.value = this.postalCodeActive;
+    },
+
     updateShipping(isChecked) {
-        // console.log('isChecked', isChecked);
+        if (isChecked) {
+
+            this.selectors.selectedFullname.setAttribute("readonly", "");
+            this.selectors.selectedPhoneNumber.setAttribute("readonly", "");
+            this.selectors.selectedAddressDetail.setAttribute("readonly", "");
+
+            this.selectors.selectedFullname.value = this.addressData.fullname;
+            this.selectors.selectedPhoneNumber.value = this.addressData.phoneNumber;
+            this.selectors.selectedAddressDetail.value = this.addressData.addressDetail;
+
+            this.populateProvinces();
+            const province = this.provincesData.find(p => p.provinceCode == this.addressData.province_id);
+            if(province){
+                this.selectors.selectedProvince.value = province.provinceCode;
+                this.provinceActive = province.provinceCode
+            }
+            this.populateDistricts();
+            const district = this.districtsData.find(d => d.districtCode == this.addressData.district_id);
+            if(district){
+                this.selectors.selectedDistrict.value = district.districtCode;
+                this.districtActive = district.districtCode;
+            }
+            this.populateSubDistricts();
+            const subdistrict = this.subdistrictsData.find(s => s.subdistrictCode == this.addressData.sub_district_id);
+            if(subdistrict){
+                this.selectors.selectedSubdistrict.value = subdistrict.subdistrictCode;
+                this.postalCodeActive = subdistrict.postalCode;
+            }
+            this.populatePostalCode();
+
+            this.selectors.selectedProvince.setAttribute("readonly", "");
+            this.selectors.selectedDistrict.setAttribute("readonly", "");
+            this.selectors.selectedSubdistrict.setAttribute("readonly", "");
+            this.selectors.selectedPostalCode.setAttribute("readonly", "");
+
+        } else {
+
+            this.selectors.selectedFullname.value = '';
+            this.selectors.selectedPhoneNumber.value = '';
+            this.selectors.selectedAddressDetail.value = '';
+
+            this.selectors.selectedProvince.value = null;
+            this.selectors.selectedDistrict.value = null;
+            this.selectors.selectedSubdistrict.value = null;
+            this.selectors.selectedPostalCode.value = null;
+
+            this.provinceActive = null;
+            this.districtActive = null;
+            this.postalCodeActive = null;
+
+            this.populateProvinces();
+            this.populateDistricts();
+            this.populateSubDistricts();
+
+            this.selectors.selectedFullname.removeAttribute("readonly");
+            this.selectors.selectedPhoneNumber.removeAttribute("readonly");
+            this.selectors.selectedAddressDetail.removeAttribute("readonly");
+
+            this.selectors.selectedProvince.removeAttribute("readonly");
+            this.selectors.selectedDistrict.removeAttribute("readonly");
+            this.selectors.selectedSubdistrict.removeAttribute("readonly");
+            // this.selectors.selectedPostalCode.removeAttribute("readonly");
+
+        }
+
     },
 
     updateDeliveryUI(value) {
@@ -285,22 +365,58 @@ export const CheckoutUI = {
         });
 
         document.addEventListener('change', (event) => {
-            // const target = event.target;
-            // if (target.closest('#setupShipping')) {
-            //     if (target.type === 'checkbox') {
-            //         const isChecked = target.checked;
-            //         this.updateShipping(isChecked);
-            //     }
-            // }
+            if (event.target.closest('#setupShipping')) {
+                if (event.target.type === 'checkbox') {
+                    const isChecked = event.target.checked;
+                    this.updateShipping(isChecked);
+                }
+            }
 
             if(event.target.closest('#province')){
                 const selectedOption = event.target.closest('#province').options[event.target.closest('#province').selectedIndex];
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
                 this.provinceActive = dataCode;
+                this.districtActive = null;
+                this.postalCodeActive = null;
                 this.populateDistricts();
+                this.populateSubDistricts();
+                this.populatePostalCode();
+
+                const setupShippingCheckbox = document.querySelector('#setupShipping');
+                if (setupShippingCheckbox && setupShippingCheckbox.checked) {
+                    setupShippingCheckbox.checked = false;
+                    this.updateShipping(false);
+                }
+            }
+
+            if(event.target.closest('#district')){
+                const selectedOption = event.target.closest('#district').options[event.target.closest('#district').selectedIndex];
+                const value = selectedOption.value;
+                const dataCode = selectedOption.dataset.code;
+                this.districtActive = dataCode;
+                this.populateSubDistricts();
+
+                const setupShippingCheckbox = document.querySelector('#setupShipping');
+                if (setupShippingCheckbox && setupShippingCheckbox.checked) {
+                    setupShippingCheckbox.checked = false;
+                    this.updateShipping(false);
+                }
             }
             
+            if(event.target.closest('#subdistrict')){
+                const selectedOption = event.target.closest('#subdistrict').options[event.target.closest('#subdistrict').selectedIndex];
+                const value = selectedOption.value;
+                const dataCode = selectedOption.dataset.code;
+                this.postalCodeActive = dataCode;
+                this.populatePostalCode();
+
+                const setupShippingCheckbox = document.querySelector('#setupShipping');
+                if (setupShippingCheckbox && setupShippingCheckbox.checked) {
+                    setupShippingCheckbox.checked = false;
+                    this.updateShipping(false);
+                }
+            }
             
 
         });

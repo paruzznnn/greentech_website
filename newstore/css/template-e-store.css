@@ -579,8 +579,12 @@ nav[aria-label="Breadcrumb"] {
   margin-bottom: 0.5rem;
 }
 
-.form-group input[readonly] {
+.form-group input[readonly],
+.form-group textarea[readonly],
+.form-group select[readonly] {
   background-color: #e9ecef;
+  pointer-events: none;
+  touch-action: none;
 }
 
 .form-label {
@@ -598,11 +602,11 @@ nav[aria-label="Breadcrumb"] {
 .form-input {
   width: 100%;
   padding: 0.5rem 1rem;
-  padding-right: 2.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   box-sizing: border-box;
 }
+
 
 .form-input:focus {
   outline: none;
