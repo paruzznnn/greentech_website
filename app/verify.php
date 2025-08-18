@@ -40,7 +40,7 @@
         $_SESSION['role_id']  = (int) $role_id;
         $_SESSION['logged_in']  = true;
         
-        $_SESSION['oid']       = $codeoid;
+        $_SESSION['oid']       = $oid;
         header("Location: admin/dashboard.php");
         exit;
     }
