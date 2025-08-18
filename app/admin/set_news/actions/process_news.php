@@ -269,7 +269,7 @@ try {
             $news_id = $news_array['news_id'];
 
             $stmt->bind_param(
-                "sssssssssi",
+                "ssssssssssi",
                 $news_subject,
                 $news_description,
                 $news_content,
@@ -362,6 +362,36 @@ try {
                 }
             }
             
+            // จัดการรูปภาพใน Content (ภาษาอังกฤษ)
+            if (isset($_FILES['image_files_en']) && is_array($_FILES['image_files_en']['name']) && $_FILES['image_files_en']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_en']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$news_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'en'];
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (EN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            // จัดการรูปภาพใน Content (ภาษาจีน)
+            if (isset($_FILES['image_files_cn']) && is_array($_FILES['image_files_cn']['name']) && $_FILES['image_files_cn']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_cn']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$news_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'cn'];
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (CN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
             $response = array('status' => 'success', 'message' => 'edit save');
         }
 

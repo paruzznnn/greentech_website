@@ -282,7 +282,7 @@ try {
             $project_id = $project_array['project_id'];
 
             $stmt->bind_param(
-                "sssssssssi",
+                "ssssssssssi",
                 $project_subject,
                 $project_description,
                 $project_content,

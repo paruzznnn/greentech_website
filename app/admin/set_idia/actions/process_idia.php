@@ -269,7 +269,7 @@ try {
             $idia_id = $idia_array['idia_id'];
 
             $stmt->bind_param(
-                "sssssssssi",
+                "ssssssssssi",
                 $idia_subject,
                 $idia_description,
                 $idia_content,
@@ -358,6 +358,36 @@ try {
                         insertIntoDatabase($conn, 'dn_idia_doc', $fileColumns, $fileValues);
                     } else {
                         throw new Exception('Error uploading content file (TH): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            // จัดการรูปภาพใน Content (ภาษาอังกฤษ)
+            if (isset($_FILES['image_files_en']) && is_array($_FILES['image_files_en']['name']) && $_FILES['image_files_en']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_en']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['idia_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$idia_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'en'];
+                        insertIntoDatabase($conn, 'dn_idia_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (EN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
+            // จัดการรูปภาพใน Content (ภาษาจีน)
+            if (isset($_FILES['image_files_cn']) && is_array($_FILES['image_files_cn']['name']) && $_FILES['image_files_cn']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_cn']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['idia_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$idia_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'cn'];
+                        insertIntoDatabase($conn, 'dn_idia_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (CN): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
                     }
                 }
             }
