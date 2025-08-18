@@ -103,6 +103,33 @@ $decodedId = $_POST['shop_id'];
             width: 4px; /* ปรับขนาดธงให้เล็กลง */
             margin-right: 8px;
         }
+              /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* พื้นหลังโปร่งแสง */
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3; /* สีเทาอ่อน */
+            border-top: 5px solid #3498db; /* สีน้ำเงิน */
+            border-radius: 50%;
+            animation: spin 1s linear infinite; /* ทำให้หมุนตลอด */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -301,11 +328,13 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                    <button type='button' class='btn btn-info' id='copyFromThai'>
-                                        <i class='fas fa-copy'></i> Copy from Thai
-                                    </button>
+                                     <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <div id='loadingIndicator' class='loading-overlay' style='display: none;'>
+                                                            <div class='loading-spinner'></div>
+                                                        </div>
                                 </div>
                                 <div style='margin: 10px;'>
+                                    
                                     <label><span>Subject (EN)</span>:</label>
                                     <input type='text' class='form-control' id='shop_subject_en' name='shop_subject_en' value='" . htmlspecialchars($row['subject_shop_en']) . "'>
                                 </div>
@@ -439,18 +468,72 @@ $stmt->close();
         }
 
         // --- เพิ่มโค้ดสำหรับปุ่ม Copy from Thai ---
-        $('#copyFromThai').on('click', function() {
-            // ดึงค่าจากฟิลด์ภาษาไทย
-            var subjectThai = $('#shop_subject').val();
-            var descriptionThai = $('#shop_description').val();
-            var contentThai = $('#summernote_update').summernote('code');
+        // $('#copyFromThai').on('click', function() {
+        //     // ดึงค่าจากฟิลด์ภาษาไทย
+        //     var subjectThai = $('#shop_subject').val();
+        //     var descriptionThai = $('#shop_description').val();
+        //     var contentThai = $('#summernote_update').summernote('code');
 
-            // กำหนดค่าให้ฟิลด์ภาษาอังกฤษ
-            $('#shop_subject_en').val(subjectThai);
-            $('#shop_description_en').val(descriptionThai);
-            $('#summernote_update_en').summernote('code', contentThai);
-        });
-        // --- สิ้นสุดโค้ดสำหรับปุ่ม Copy from Thai ---
+        //     // กำหนดค่าให้ฟิลด์ภาษาอังกฤษ
+        //     $('#shop_subject_en').val(subjectThai);
+        //     $('#shop_description_en').val(descriptionThai);
+        //     $('#summernote_update_en').summernote('code', contentThai);
+        // });
+
+        $('#copyFromThai').on('click', function () {
+                // 1. แสดง Loading Indicator
+                $('#loadingIndicator').show(); // ให้โชว์ loading animation
+
+                // ดึงค่าจากฟอร์มภาษาไทย
+                var thaiSubject = $('#shop_subject').val();
+                var thaiDescription = $('#shop_description').val();
+                var thaiContent = $('#summernote_update').summernote('code');
+
+                // สร้าง Object สำหรับข้อมูลที่จะส่งไป
+                const dataToSend = {
+                    language: "th",
+                    translate: "en",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
+
+                // ส่งข้อมูลแบบ POST ไปยังไฟล์ actions/translate.php
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        $('#shop_subject_en').val(response.subject);
+                        $('#shop_description_en').val(response.description);
+                        $('#summernote_update_en').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    // 2. ซ่อน Loading Indicator เมื่อเสร็จสิ้นกระบวนการทั้งหมด
+                    $('#loadingIndicator').hide();
+                });
+            });
+
+        
     });
 </script>
 

@@ -95,6 +95,33 @@ $decodedId = $_POST['idia_id'];
             width: 36px;
             margin-right: 8px;
         }
+         /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* พื้นหลังโปร่งแสง */
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3; /* สีเทาอ่อน */
+            border-top: 5px solid #3498db; /* สีน้ำเงิน */
+            border-radius: 50%;
+            animation: spin 1s linear infinite; /* ทำให้หมุนตลอด */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -245,7 +272,10 @@ $decodedId = $_POST['idia_id'];
                                                 </div>
                                                 <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Copy from Thai</button>
+                                                        <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <div id='loadingIndicator' class='loading-overlay' style='display: none;'>
+                                                            <div class='loading-spinner'></div>
+                                                        </div>
                                                         <label><span>Subject (EN)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject_en' name='idia_subject_en' value='" . htmlspecialchars($row['subject_idia_en']) . "'>
                                                     </div>
@@ -330,14 +360,67 @@ $decodedId = $_POST['idia_id'];
             });
 
             // New Copy from Thai button functionality
-            $('#copyFromThai').on('click', function() {
+            // $('#copyFromThai').on('click', function() {
+            //     var thaiSubject = $('#idia_subject').val();
+            //     var thaiDescription = $('#idia_description').val();
+            //     var thaiContent = $('#summernote_update').summernote('code');
+
+            //     $('#idia_subject_en').val(thaiSubject);
+            //     $('#idia_description_en').val(thaiDescription);
+            //     $('#summernote_update_en').summernote('code', thaiContent);
+            // });
+             // New Copy from Thai button functionality
+            $('#copyFromThai').on('click', function () {
+                // 1. แสดง Loading Indicator
+                $('#loadingIndicator').show(); // ให้โชว์ loading animation
+
+                // ดึงค่าจากฟอร์มภาษาไทย
                 var thaiSubject = $('#idia_subject').val();
                 var thaiDescription = $('#idia_description').val();
                 var thaiContent = $('#summernote_update').summernote('code');
 
-                $('#idia_subject_en').val(thaiSubject);
-                $('#idia_description_en').val(thaiDescription);
-                $('#summernote_update_en').summernote('code', thaiContent);
+                // สร้าง Object สำหรับข้อมูลที่จะส่งไป
+                const dataToSend = {
+                    language: "th",
+                    translate: "en",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
+
+                // ส่งข้อมูลแบบ POST ไปยังไฟล์ actions/translate.php
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        $('#idia_subject_en').val(response.subject);
+                        $('#idia_description_en').val(response.description);
+                        $('#summernote_update_en').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    // 2. ซ่อน Loading Indicator เมื่อเสร็จสิ้นกระบวนการทั้งหมด
+                    $('#loadingIndicator').hide();
+                });
             });
             
             $('#fileInput').on('change', function() {
