@@ -579,6 +579,10 @@ nav[aria-label="Breadcrumb"] {
   margin-bottom: 0.5rem;
 }
 
+.form-group input[readonly] {
+  background-color: #e9ecef;
+}
+
 .form-label {
   display: block;
   color: #374151;

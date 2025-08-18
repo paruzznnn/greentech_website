@@ -234,7 +234,7 @@
     -webkit-appearance: none;
     background: transparent;
     position: absolute;
-    top: -2px;
+    top: -3px;
     pointer-events: auto;
     height: 20px;
 }

@@ -32,7 +32,7 @@
 
                                 <!-- เลือกวิธีรับสินค้า -->
                                 <div class="section-card">
-                                    <h2 class="section-header">เลือกวิธีรับสินค้า</h2>
+                                    <h4 class="section-header">เลือกวิธีรับสินค้า</h4>
                                     <div class="selection-options-grid">
                                         <div class="selection-card delivery">
                                             <input class="hidden-radio" type="radio" name="delivery_option" id="delivery_shipping" value="shipping" checked>
@@ -53,13 +53,19 @@
 
                                 <!-- ที่อยู่จัดส่ง -->
                                 <div id="shippingAddressFormSection" class="section-card">
-                                    <h2 class="section-header">กรอกข้อมูลที่อยู่จัดส่ง</h2>
-                                    <form class="form-grid">
-                                        <div>
+                                    <div class="section-header">
+                                        <h4>กรอกข้อมูลที่อยู่จัดส่ง</h4>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="setupShipping"/>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="form-grid">
+                                        <div class="form-group">
                                             <label for="full_name" class="form-label">ชื่อ-นามสกุล:</label>
                                             <input type="text" id="full_name" name="full_name" class="form-input" value="">
                                         </div>
-                                        <div>
+                                        <div class="form-group">
                                             <label for="phone_number" class="form-label">เบอร์โทรศัพท์:</label>
                                             <input type="tel" id="phone_number" name="phone_number" class="form-input" value="">
                                         </div>
@@ -67,24 +73,34 @@
                                             <label for="address_line1" class="form-label">ที่อยู่:</label>
                                             <input type="text" id="address_line1" name="address_line1" class="form-input" value="">
                                         </div>
-                                        <div class="full-width">
-                                            <label for="address_line2" class="form-label">แขวง/เขต:</label>
-                                            <input type="text" id="address_line2" name="address_line2" class="form-input" value="">
-                                        </div>
-                                        <div>
+                                        <div class="form-group">
                                             <label for="province" class="form-label">จังหวัด:</label>
-                                            <input type="text" id="province" name="province" class="form-input" value="">
+                                            <select id="province" name="province" class="form-input" required>
+                                                <option value="">เลือกจังหวัด</option>
+                                            </select>
                                         </div>
-                                        <div>
-                                            <label for="postal_code" class="form-label">รหัสไปรษณีย์:</label>
-                                            <input type="text" id="postal_code" name="postal_code" class="form-input" value="">
+                                        <div class="form-group">
+                                            <label for="district">อำเภอ/เขต</label>
+                                            <select id="district" name="district" class="form-input" required disabled>
+                                                <option value="">เลือกอำเภอ/เขต</option>
+                                            </select>
                                         </div>
-                                    </form>
+                                        <div class="form-group">
+                                            <label for="subdistrict">ตำบล/แขวง</label>
+                                            <select id="subdistrict" name="subdistrict" class="form-input" required disabled>
+                                                <option value="">เลือกตำบล/แขวง</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="postalCode" class="form-label">รหัสไปรษณีย์:</label>
+                                            <input type="text" id="postalCode" name="postalCode" class="form-input" value="" readonly>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- เลือกการชำระเงิน -->
                                 <div class="section-card">
-                                    <h2 class="section-header">เลือกบริการชำระเงิน</h2>
+                                    <h4 class="section-header">เลือกบริการชำระเงิน</h4>
                                     <div class="payment-grid">
                                         <div class="selection-card payment">
                                             <input class="hidden-radio" type="radio" name="payment_method" id="payment_bank_transfer" value="bank_transfer" checked>
@@ -93,7 +109,6 @@
                                                 <span>โอนโดยตรงจากบัญชีธนาคาร</span>
                                             </label>
                                         </div>
-
                                         <div class="selection-card payment">
                                             <input class="hidden-radio" type="radio" name="payment_method" id="payment_promptpay" value="promptpay">
                                             <label for="payment_promptpay">
@@ -103,36 +118,24 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
                             <!-- รายการสินค้า + สรุป -->
                             <div class="col-md-6 col-sm-12">
                                 <div class="section-card">
-                                    <h2 class="section-header">รายการสินค้า</h2>
+                                    <h4 class="section-header">รายการสินค้า</h4>
                                     <div class="product-list-header">
                                         <div>สินค้า</div>
+                                        <div style="text-align: end;">ราคา</div>
                                         <div style="text-align: end;">จำนวน</div>
                                         <div style="text-align: end;">ราคารวม</div>
                                     </div>
-
-                                    <div class="product-items-container">
-                                        <div class="product-item">
-                                            <div><img src="https://placehold.co/80x80/E0E7FF/6366F1?text=Product+A" alt="Product A"></div>
-                                            <div style="text-align: end;">1</div>
-                                            <div style="text-align: end;">500.00 บาท</div>
-                                        </div>
-                                        <div class="product-item">
-                                            <div><img src="https://placehold.co/80x80/DBEAFE/3B82F6?text=Product+B" alt="Product B"></div>
-                                            <div style="text-align: end;">1</div>
-                                            <div style="text-align: end;">800.00 บาท</div>
-                                        </div>
-                                    </div>
+                                    <div id="order-product" class="product-items-container"></div>
                                 </div>
 
                                 <!-- สรุปยอดรวม -->
                                 <div class="summary-card section-card">
-                                    <h2 class="section-header">สรุปยอดรวม</h2>
+                                    <h4 class="section-header">สรุปยอดรวม</h4>
                                     <div class="summary-details">
                                         <div class="summary-row">
                                             <span class="summary-label">ราคารวมสินค้า</span>
@@ -176,12 +179,23 @@
             import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
             import(`${baseWeb}js/payment/paymentRender.js?v=${timeVersion}`)
         ])
-        .then(([formModule, paymentModule]) => {
+        .then(async ([formModule, paymentModule]) => {
             
             const formOrder = document.querySelector("#formOrder");
             formOrder?.addEventListener("submit", formModule.handleFormSubmit);
 
-            paymentModule.CheckoutUI.init();
+            // const serviceSetup = baseWeb + 'service/payment/address-data.php?';
+            // const addressSetup = await paymentModule.fetchAddressData("getAddress", serviceSetup);
+
+            const provinces = await paymentModule.fetchProvincesData(baseWeb + 'locales/provinces.json');
+            const districts = await paymentModule.fetchDistrictsData(baseWeb + 'locales/districts.json');
+            const subdistricts = await paymentModule.fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+
+            paymentModule.CheckoutUI.init(
+                provinces,
+                districts,
+                subdistricts
+            );
         })
         .catch((e) => console.error("Module import failed", e));
     </script>
