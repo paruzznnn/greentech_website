@@ -1,12 +1,12 @@
 <?php
     session_start();
     $auth_url = 'https://www.origami.life/singlesignon/auth/';
-    $code = $_SESSION['code'];
-    $token = $_SESSION['token'];
-    if ($token) {
+    $oid = $_SESSION['oid'];
+  
+    if ($oid) {
         $dataArray = [
-            'token' => $token,
-            'code'  => $code
+            
+            'oid'  => $oid
         ];
         $jsonData = json_encode($dataArray);
         echo '<form id="ssoForm" action="'.$auth_url.'" method="post">';
