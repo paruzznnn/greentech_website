@@ -157,12 +157,15 @@ try {
             'idia_subject_en' => $_POST['idia_subject_en'] ?? '',
             'idia_description_en' => $_POST['idia_description_en'] ?? '',
             'idia_content_en'  => $_POST['idia_content_en'] ?? '',
+            'idia_subject_cn' => $_POST['idia_subject_cn'] ?? '',
+            'idia_description_cn' => $_POST['idia_description_cn'] ?? '',
+            'idia_content_cn'  => $_POST['idia_content_cn'] ?? '',
         ];
 
         if (isset($idia_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_idia 
-                (subject_idia, description_idia, content_idia, subject_idia_en, description_idia_en, content_idia_en, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)");
+                (subject_idia, description_idia, content_idia, subject_idia_en, description_idia_en, content_idia_en, subject_idia_cn, description_idia_cn, content_idia_cn, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $idia_subject = $idia_array['idia_subject'];
             $idia_description = $idia_array['idia_description'];
@@ -170,16 +173,22 @@ try {
             $idia_subject_en = $idia_array['idia_subject_en'];
             $idia_description_en = $idia_array['idia_description_en'];
             $idia_content_en = mb_convert_encoding($idia_array['idia_content_en'], 'UTF-8', 'auto');
+            $idia_subject_cn = $idia_array['idia_subject_cn'];
+            $idia_description_cn = $idia_array['idia_description_cn'];
+            $idia_content_cn = mb_convert_encoding($idia_array['idia_content_cn'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sssssss",
+                "ssssssssss",
                 $idia_subject,
                 $idia_description,
                 $idia_content,
                 $idia_subject_en,
                 $idia_description_en,
                 $idia_content_en,
+                $idia_subject_cn,
+                $idia_description_cn,
+                $idia_content_cn,
                 $current_date
             );
 
@@ -228,6 +237,9 @@ try {
             'idia_subject_en' => $_POST['idia_subject_en'] ?? '',
             'idia_description_en' => $_POST['idia_description_en'] ?? '',
             'idia_content_en'  => $_POST['idia_content_en'] ?? '',
+            'idia_subject_cn' => $_POST['idia_subject_cn'] ?? '',
+            'idia_description_cn' => $_POST['idia_description_cn'] ?? '',
+            'idia_content_cn'  => $_POST['idia_content_cn'] ?? '',
         ];
 
         if (!empty($idia_array['idia_id'])) {
@@ -238,6 +250,9 @@ try {
             subject_idia_en = ?,
             description_idia_en = ?,
             content_idia_en = ?,
+            subject_idia_cn = ?,
+            description_idia_cn = ?,
+            content_idia_cn = ?,
             date_create = ? 
             WHERE idia_id = ?");
 
@@ -247,17 +262,23 @@ try {
             $idia_subject_en = $idia_array['idia_subject_en'];
             $idia_description_en = $idia_array['idia_description_en'];
             $idia_content_en = mb_convert_encoding($idia_array['idia_content_en'], 'UTF-8', 'auto');
+            $idia_subject_cn = $idia_array['idia_subject_cn'];
+            $idia_description_cn = $idia_array['idia_description_cn'];
+            $idia_content_cn = mb_convert_encoding($idia_array['idia_content_cn'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $idia_id = $idia_array['idia_id'];
 
             $stmt->bind_param(
-                "sssssssi",
+                "sssssssssi",
                 $idia_subject,
                 $idia_description,
                 $idia_content,
                 $idia_subject_en,
                 $idia_description_en,
                 $idia_content_en,
+                $idia_subject_cn,
+                $idia_description_cn,
+                $idia_content_cn,
                 $current_date,
                 $idia_id
             );
@@ -382,7 +403,7 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_idia LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_idia LIKE '%$searchValue%' OR subject_idia_en LIKE '%$searchValue%' OR subject_idia_cn LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;

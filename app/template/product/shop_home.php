@@ -5,11 +5,23 @@ global $conn;
 // Check the 'lang' parameter from the URL. The default is 'th'.
 $lang = isset($_GET['lang']) ? $_GET['lang'] : 'th';
 
+// Add 'cn' to the list of supported languages
+$lang = in_array($lang, ['en', 'th', 'cn']) ? $lang : 'th';
+
 // Select the correct columns based on the language.
-// If lang is 'th', use the normal column names. If 'en', use the '_en' columns.
-$subject_col = ($lang === 'en') ? 'subject_shop_en' : 'subject_shop';
-$description_col = ($lang === 'en') ? 'description_shop_en' : 'description_shop';
-$content_col = ($lang === 'en') ? 'content_shop_en' : 'content_shop';
+$subject_col = 'subject_shop';
+$description_col = 'description_shop';
+$content_col = 'content_shop';
+
+if ($lang === 'en') {
+    $subject_col .= '_en';
+    $description_col .= '_en';
+    $content_col .= '_en';
+} elseif ($lang === 'cn') {
+    $subject_col .= '_cn';
+    $description_col .= '_cn';
+    $content_col .= '_cn';
+}
 
 $sql = "SELECT
             dn.shop_id,
@@ -67,7 +79,7 @@ if ($result->num_rows > 0) {
         /* padding-left: 50px;
         padding-right: 50px; */
         /* ลบ overflow: hidden ออกจากที่นี่ */
-        /* overflow: hidden; */ 
+        /* overflow: hidden; */
     }
 
     .shop-scroll {
@@ -98,7 +110,7 @@ if ($result->num_rows > 0) {
         border: none;
         border-radius: 6px;
         /* ย้าย overflow: hidden มาไว้ที่ .card แทน */
-        overflow: hidden; 
+        overflow: hidden;
         background-color: #fff;
         transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -115,7 +127,7 @@ if ($result->num_rows > 0) {
         /* ลบ overflow: hidden ออกจากที่นี่ */
         border-radius: 6px;
     }
-    
+
     .card-img-top {
         position: absolute;
         top: 0;
@@ -222,7 +234,7 @@ if ($result->num_rows > 0) {
     .content-sticky {
     padding-bottom: 0px;
     background-color: #ffffff;
-    
+
     /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
     display: flex;
     justify-content: center;
@@ -233,10 +245,10 @@ if ($result->num_rows > 0) {
 <script>
 function scrollshop(direction) {
     const box = document.getElementById('shop-scroll-box');
-    
-    // หาความกว้างของ card-wrapper ตัวแรก (กล่องสินค้า 1 กล่อง)
-    const cardWidth = document.querySelector('.shop-card').offsetWidth + 32; // 32px คือ 2rem ที่เป็น gap ระหว่างกล่อง
-    
+
+    // Find the width of the first card-wrapper (one product box)
+    const cardWidth = document.querySelector('.shop-card').offsetWidth + 32; // 32px is the 2rem gap between boxes
+
     if (direction === 'left') {
         box.scrollLeft -= cardWidth * 4;
     } else {
@@ -256,10 +268,10 @@ function scrollshop(direction) {
                     <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark">
                         <div class="card">
                             <?php if(empty($box['image'])): ?>
-                                <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
+                                <iframe frameborder="0" src="<?= htmlspecialchars($box['iframe']) ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
                             <?php else: ?>
                                 <div class="card-image-wrapper">
-                                    <img src="<?= $box['image'] ?>" class="card-img-top" alt="สินค้า <?= htmlspecialchars($box['title']) ?>">
+                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="card-img-top" alt="สินค้า <?= htmlspecialchars($box['title']) ?>">
                                 </div>
                             <?php endif; ?>
                             <div class="card-body">

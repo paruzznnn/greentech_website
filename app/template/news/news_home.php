@@ -2,17 +2,21 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+// --- MODIFIED: Check for language preference, now including 'cn'. Default is Thai. ---
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn']) ? $_GET['lang'] : 'th';
 
+// --- MODIFIED: Select all three language columns for news content ---
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
             dn.subject_news_en, 
+            dn.subject_news_cn,
             dn.description_news,
             dn.description_news_en,
+            dn.description_news_cn,
             dn.content_news,
             dn.content_news_en,
+            dn.content_news_cn,
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -34,8 +38,13 @@ $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 
-        // --- MODIFIED: Use English content if lang is 'en' and the English column is not empty. ---
-        $content = ($lang === 'en' && !empty($row['content_news_en'])) ? $row['content_news_en'] : $row['content_news'];
+        // --- MODIFIED: Use the correct language content based on preference ---
+        $content = $row['content_news'];
+        if ($lang === 'en' && !empty($row['content_news_en'])) {
+            $content = $row['content_news_en'];
+        } elseif ($lang === 'cn' && !empty($row['content_news_cn'])) {
+            $content = $row['content_news_cn'];
+        }
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
@@ -48,8 +57,19 @@ if ($result->num_rows > 0) {
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         // --- MODIFIED: Select the correct language for title and description. ---
-        $title = ($lang === 'en' && !empty($row['subject_news_en'])) ? $row['subject_news_en'] : $row['subject_news'];
-        $description = ($lang === 'en' && !empty($row['description_news_en'])) ? $row['description_news_en'] : $row['description_news'];
+        $title = $row['subject_news'];
+        if ($lang === 'en' && !empty($row['subject_news_en'])) {
+            $title = $row['subject_news_en'];
+        } elseif ($lang === 'cn' && !empty($row['subject_news_cn'])) {
+            $title = $row['subject_news_cn'];
+        }
+
+        $description = $row['description_news'];
+        if ($lang === 'en' && !empty($row['description_news_en'])) {
+            $description = $row['description_news_en'];
+        } elseif ($lang === 'cn' && !empty($row['description_news_cn'])) {
+            $description = $row['description_news_cn'];
+        }
 
         $boxesNews[] = [
             'id' => $row['news_id'],
@@ -243,11 +263,11 @@ if ($result->num_rows > 0) {
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
+                    <span class="visually-hidden"><?= ($lang === 'cn' ? '上一页' : ($lang === 'en' ? 'Previous' : 'ก่อนหน้า')) ?></span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
+                    <span class="visually-hidden"><?= ($lang === 'cn' ? '下一页' : ($lang === 'en' ? 'Next' : 'ถัดไป')) ?></span>
                 </button>
             </div>
         </div>

@@ -3,10 +3,29 @@ require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
 // เพิ่มโค้ดนี้: รับค่า lang และกำหนดชื่อคอลัมน์ตามภาษา
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
-$subject_col = $lang === 'en' ? 'subject_blog_en' : 'subject_blog';
-$description_col = $lang === 'en' ? 'description_blog_en' : 'description_blog';
-$content_col = $lang === 'en' ? 'content_blog_en' : 'content_blog'; // เผื่อไว้ใช้ในอนาคต
+$lang = 'th'; // กำหนดค่าเริ่มต้นเป็นภาษาไทย
+if (isset($_GET['lang'])) {
+    if ($_GET['lang'] === 'en') {
+        $lang = 'en';
+    } elseif ($_GET['lang'] === 'cn') {
+        $lang = 'cn';
+    }
+}
+
+// กำหนดชื่อคอลัมน์ตามภาษาที่เลือก
+$subject_col = 'subject_blog';
+$description_col = 'description_blog';
+$content_col = 'content_blog';
+
+if ($lang === 'en') {
+    $subject_col = 'subject_blog_en';
+    $description_col = 'description_blog_en';
+    $content_col = 'content_blog_en';
+} elseif ($lang === 'cn') {
+    $subject_col = 'subject_blog_cn';
+    $description_col = 'description_blog_cn';
+    $content_col = 'content_blog_cn';
+}
 
 // แก้ไข SQL Query ให้ใช้คอลัมน์ตามภาษาที่กำหนด
 $sql = "SELECT 

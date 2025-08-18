@@ -21,9 +21,9 @@ $(document).ready(function () {
                 var data = new FormData();
                 data.append('action', 'upload_image');
                 data.append('image_file', file);
-                
+
                 $.ajax({
-                    url: 'actions/process_service.php', 
+                    url: 'actions/process_service.php',
                     method: 'POST',
                     data: data,
                     processData: false,
@@ -50,7 +50,7 @@ $(document).ready(function () {
         const lang = $(this).data('lang');
         $('.lang-switch-btn').removeClass('active');
         $(this).addClass('active');
-        
+
         $('.lang-section').hide();
         $(`.lang-section.${lang}-lang`).show();
     });
@@ -60,25 +60,28 @@ $(document).ready(function () {
         const blockItem = $(this).closest('.block-item');
         const thaiSection = blockItem.find('.th-lang');
         const englishSection = blockItem.find('.en-lang');
+        const chineseSection = blockItem.find('.cn-lang'); // Select Chinese section
 
         // Copy type
         const thaiType = thaiSection.find('select[name^="types_th"]').val();
         englishSection.find('select[name^="types_en"]').val(thaiType);
+        chineseSection.find('select[name^="types_cn"]').val(thaiType); // Copy to Chinese type
 
         // Copy content from Summernote
         const thaiContent = thaiSection.find('textarea[name^="contents_th"]').summernote('code');
         englishSection.find('textarea[name^="contents_en"]').summernote('code', thaiContent);
-        
+        chineseSection.find('textarea[name^="contents_cn"]').summernote('code', thaiContent); // Copy to Chinese content
+
         // Note: author_en and position_en are not in the table, so we don't copy them
     });
 
     // Handle form submission for ADDING new content (ใช้ AJAX)
     $('#addserviceForm').on('submit', function (e) {
         e.preventDefault();
-        
+
         var formData = new FormData(this);
-        formData.append('action', 'add_new_block'); 
-        
+        formData.append('action', 'add_new_block');
+
         Swal.fire({
             title: 'ยืนยันการเพิ่มเนื้อหา?',
             text: 'คุณต้องการเพิ่มบล็อคเนื้อหาใหม่ใช่หรือไม่?',
@@ -90,7 +93,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: 'actions/process_service.php', 
+                    url: 'actions/process_service.php',
                     method: 'POST',
                     data: formData,
                     processData: false,
@@ -122,7 +125,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         var formData = new FormData(this);
-        formData.append('action', 'save_all_blocks'); 
+        formData.append('action', 'save_all_blocks');
 
         Swal.fire({
             title: 'ยืนยันการบันทึก?',
@@ -135,7 +138,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $('#loading-overlay').fadeIn();
                 $.ajax({
-                    url: 'actions/process_service.php', 
+                    url: 'actions/process_service.php',
                     method: 'POST',
                     data: formData,
                     processData: false,
@@ -154,13 +157,11 @@ $(document).ready(function () {
                         });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-
                         $('#loading-overlay').fadeOut();
                         Swal.fire('Error', 'เกิดข้อผิดพลาดในการบันทึก', 'error');
                         console.error('Error status:', jqXHR.status);
                         console.error('Redirected to:', jqXHR.getResponseHeader('Location'));
                         console.error('Response:',jqXHR.responseText);
-                        
                     }
                 });
             }

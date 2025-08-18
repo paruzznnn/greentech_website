@@ -173,6 +173,10 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                 <img src="https://flagcdn.com/w320/gb.png" alt="English Flag" style=' width: 36px; 
                                         margin-right: 8px;'>
             </button>
+            <button type="button" class="lang-button" data-lang="cn">
+                <img src="https://flagcdn.com/w320/cn.png" alt="Chinese Flag" style=' width: 36px; 
+                                        margin-right: 8px;'>
+            </button>
         </div>
 
         <form id="editFooterForm">
@@ -244,8 +248,8 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
             <div id="form-en" class="language-form" style="display: none;">
                 <div class="form-section">
-                    <label for="bg_color">Footer Background Color:</label>
-                    <input type="text" id="bg_color_en" name="bg_color_en" class="form-control" value="<?= htmlspecialchars($footer_data['bg_color'] ?? '') ?>">
+                    <label for="bg_color_en">Footer Background Color:</label>
+                    <input type="text" id="bg_color_en" name="bg_color_en" class="form-control" value="<?= htmlspecialchars($footer_data['bg_color_en'] ?? '') ?>">
                 </div>
                 <div class="form-section">
                     <label for="footer_top_title_en">Register Title (EN):</label>
@@ -273,11 +277,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                 </div>
                 <div class="form-section">
                     <label for="contact_phone_en">เบอร์โทรศัพท์ (EN):</label>
-                    <input type="text" id="contact_phone_en" name="contact_phone_en" class="form-control" value="<?= htmlspecialchars($footer_data['contact_phone'] ?? '') ?>">
+                    <input type="text" id="contact_phone_en" name="contact_phone_en" class="form-control" value="<?= htmlspecialchars($footer_data['contact_phone_en'] ?? '') ?>">
                 </div>
                 <div class="form-section">
                     <label for="contact_email_en">อีเมล (EN):</label>
-                    <input type="email" id="contact_email_en" name="contact_email_en" class="form-control" value="<?= htmlspecialchars($footer_data['contact_email'] ?? '') ?>">
+                    <input type="email" id="contact_email_en" name="contact_email_en" class="form-control" value="<?= htmlspecialchars($footer_data['contact_email_en'] ?? '') ?>">
                 </div>
                 <div class="form-section">
                     <label for="contact_hours_wk_en">Opening Hours (Mon-Fri) (EN):</label>
@@ -297,10 +301,72 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                 </div>
                 <div class="form-section">
                     <label for="copyright_text_en">Copyright Text (EN):</label>
-                    <input type="text" id="copyright_text_en" name="copyright_text_en" class="form-control" value="<?= htmlspecialchars($footer_data['copyright_text'] ?? '') ?>">
+                    <input type="text" id="copyright_text_en" name="copyright_text_en" class="form-control" value="<?= htmlspecialchars($footer_data['copyright_text_en'] ?? '') ?>">
                 </div>
                 <button type="button" id="copy-th-data" class="btn btn-info">
                     <i class="fas fa-copy"></i> คัดลอกข้อมูลจากภาษาไทย
+                </button>
+            </div>
+            
+            <div id="form-cn" class="language-form" style="display: none;">
+                <div class="form-section">
+                    <label for="bg_color_cn">Footer Background Color (CN):</label>
+                    <input type="text" id="bg_color_cn" name="bg_color_cn" class="form-control" value="<?= htmlspecialchars($footer_data['bg_color_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="footer_top_title_cn">Register Title (CN):</label>
+                    <input type="text" id="footer_top_title_cn" name="footer_top_title_cn" class="form-control" value="<?= htmlspecialchars($footer_data['footer_top_title_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="footer_top_subtitle_cn">Register Subtitle (CN):</label>
+                    <textarea id="footer_top_subtitle_cn" name="footer_top_subtitle_cn" class="form-control" rows="2"><?= htmlspecialchars($footer_data['footer_top_subtitle_cn'] ?? '') ?></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="about_heading_cn">About Us Heading (CN):</label>
+                    <input type="text" id="about_heading_cn" name="about_heading_cn" class="form-control" value="<?= htmlspecialchars($footer_data['about_heading_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="about_text_cn">About Us Text (CN):</label>
+                    <textarea id="about_text_cn" name="about_text_cn" class="form-control" rows="5"><?= htmlspecialchars($footer_data['about_text_cn'] ?? '') ?></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="contact_heading_cn">Contact Us Heading (CN):</label>
+                    <input type="text" id="contact_heading_cn" name="contact_heading_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_heading_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_address_cn">Address (CN):</label>
+                    <input type="text" id="contact_address_cn" name="contact_address_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_address_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_phone_cn">เบอร์โทรศัพท์ (CN):</label>
+                    <input type="text" id="contact_phone_cn" name="contact_phone_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_phone_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_email_cn">อีเมล (CN):</label>
+                    <input type="email" id="contact_email_cn" name="contact_email_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_email_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_hours_wk_cn">Opening Hours (Mon-Fri) (CN):</label>
+                    <input type="text" id="contact_hours_wk_cn" name="contact_hours_wk_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_hours_wk_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_hours_sat_cn">Opening Hours (Sat) (CN):</label>
+                    <input type="text" id="contact_hours_sat_cn" name="contact_hours_sat_cn" class="form-control" value="<?= htmlspecialchars($footer_data['contact_hours_sat_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="social_heading_cn">Social Media Heading (CN):</label>
+                    <input type="text" id="social_heading_cn" name="social_heading_cn" class="form-control" value="<?= htmlspecialchars($footer_data['social_heading_cn'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label>Social Media Links:</label>
+                    <p class="text-muted">Social Media Links are shared for all languages.</p>
+                </div>
+                <div class="form-section">
+                    <label for="copyright_text_cn">Copyright Text (CN):</label>
+                    <input type="text" id="copyright_text_cn" name="copyright_text_cn" class="form-control" value="<?= htmlspecialchars($footer_data['copyright_text_cn'] ?? '') ?>">
+                </div>
+                <button type="button" id="copy-en-data-cn" class="btn btn-info">
+                    <i class="fas fa-copy"></i> คัดลอกข้อมูลจากภาษาอังกฤษ
                 </button>
             </div>
 
@@ -415,6 +481,34 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
         Swal.fire('คัดลอกข้อมูลสำเร็จ!', 'ข้อมูลจากภาษาไทยถูกคัดลอกไปยังฟอร์มภาษาอังกฤษแล้ว', 'success');
     });
+
+    // Copy data from English to Chinese
+    $('#copy-en-data-cn').on('click', function() {
+        const mapping = {
+            'bg_color_en': 'bg_color_cn',
+            'footer_top_title_en': 'footer_top_title_cn',
+            'footer_top_subtitle_en': 'footer_top_subtitle_cn',
+            'about_heading_en': 'about_heading_cn',
+            'about_text_en': 'about_text_cn',
+            'contact_heading_en': 'contact_heading_cn',
+            'contact_address_en': 'contact_address_cn',
+            'contact_phone_en': 'contact_phone_cn',
+            'contact_email_en': 'contact_email_cn',
+            'contact_hours_wk_en': 'contact_hours_wk_cn',
+            'contact_hours_sat_en': 'contact_hours_sat_cn',
+            'social_heading_en': 'social_heading_cn',
+            'copyright_text_en': 'copyright_text_cn'
+        };
+
+        for (const en_field in mapping) {
+            const cn_field = mapping[en_field];
+            const en_value = $(`#${en_field}`).val();
+            $(`#${cn_field}`).val(en_value);
+        }
+
+        Swal.fire('คัดลอกข้อมูลสำเร็จ!', 'ข้อมูลจากภาษาอังกฤษถูกคัดลอกไปยังฟอร์มภาษาจีนแล้ว', 'success');
+    });
+
 
     // Form Submission Handler
     $('#submitEditFooter').on('click', function(e) {

@@ -5,10 +5,17 @@ global $conn;
 // ----------------------------------------------------
 // ส่วนที่ 1: กำหนดภาษาและค่าเริ่มต้น
 // ----------------------------------------------------
-// สมมติว่ามีตัวแปร $lang ที่เก็บภาษาที่เลือกไว้ (เช่น 'th' หรือ 'en')
-// ถ้าไม่มีการกำหนดภาษา ให้ใช้ภาษาไทยเป็นค่าเริ่มต้น
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
-$subjectTitle = ($lang === 'en') ? "Blog" : "บล็อก";
+// รองรับภาษาไทย (th), อังกฤษ (en), และจีน (cn)
+$lang = 'th'; // Set a default value first
+if (isset($_GET['lang'])) {
+    if ($_GET['lang'] === 'en') {
+        $lang = 'en';
+    } elseif ($_GET['lang'] === 'cn') { // Added Chinese language check
+        $lang = 'cn';
+    }
+}
+
+$subjectTitle = ($lang === 'en') ? "Blog" : (($lang === 'cn') ? "博客" : "บล็อก");
 $pageUrl = "";
 
 // ----------------------------------------------------
@@ -22,7 +29,7 @@ if (isset($_GET['id'])) {
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        $subjectColumn = ($lang === 'en') ? 'subject_blog_en' : 'subject_blog';
+        $subjectColumn = ($lang === 'en') ? 'subject_blog_en' : (($lang === 'cn') ? 'subject_blog_cn' : 'subject_blog');
         $stmt = $conn->prepare("SELECT {$subjectColumn} FROM dn_blog WHERE del = 0 AND blog_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
@@ -303,7 +310,7 @@ if (isset($_GET['id'])) {
         <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
+                <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : 'แชร์หน้านี้:'); ?></p>
                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                     <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                 </a>
@@ -322,7 +329,7 @@ if (isset($_GET['id'])) {
                 <a href="https://www.tiktok.com/" target="_blank">
                     <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                 </a>
-                <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
+                <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : 'คัดลอกลิงก์'); ?></button>
                 </div>
 
                 <div class="row">
@@ -332,10 +339,12 @@ if (isset($_GET['id'])) {
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
-                                    $contentColumn = ($lang === 'en') ? 'content_blog_en' : 'content_blog';
+                                    $contentColumn = ($lang === 'en') ? 'content_blog_en' : (($lang === 'cn') ? 'content_blog_cn' : 'content_blog');
                                     $stmt = $conn->prepare("SELECT 
                                         dn.blog_id, 
                                         dn.subject_blog, 
+                                        dn.subject_blog_en,
+                                        dn.subject_blog_cn,
                                         dn.{$contentColumn} AS content_blog, 
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -352,36 +361,32 @@ if (isset($_GET['id'])) {
                                     if ($result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
                                             $content = $row['content_blog'];
-                                            $paths = explode(',', $row['pic_path']);
-                                            $files = explode(',', $row['file_name']);
+                                            $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
+                                            $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
                                             $found = false;
 
                                             foreach ($files as $index => $file) {
                                                 $pattern = '/<img[^>]+data-filename="' . preg_quote($file, '/') . '"[^>]*>/i';
 
                                                 if (preg_match($pattern, $content, $matches)) {
-                                                    $new_src = $paths[$index];
+                                                    $new_src = $paths[$index] ?? ''; // Use null coalescing to avoid errors if index is missing
                                                     $new_img_tag = preg_replace('/(<img[^>]+)(src="[^"]*")/i', '$1 src="' . $new_src . '"', $matches[0]);
                                                     $content = str_replace($matches[0], $new_img_tag, $content);
                                                     $found = true;
                                                 }
                                             }
 
-                                            if (!$found) {
-                                                echo "";
-                                            }
-
                                             echo '<div class="shop-content-display">';
-                                            echo $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+                                            echo mb_convert_encoding($content, 'UTF-8', 'auto');
                                             echo '</div>';
                                         }
                                     } else {
-                                        echo ($lang === 'en') ? "No data found." : "ไม่มีข้อมูล";
+                                        echo ($lang === 'en') ? "No data found." : (($lang === 'cn') ? "未找到数据" : "ไม่มีข้อมูล");
                                     }
 
                                     $stmt->close(); 
                                 } else {
-                                    echo ($lang === 'en') ? "Invalid ID." : "Invalid ID.";
+                                    echo ($lang === 'en') ? "Invalid ID." : (($lang === 'cn') ? "无效ID" : "Invalid ID.");
                                 }
                             }
                         ?>
@@ -390,7 +395,7 @@ if (isset($_GET['id'])) {
                 
                 <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
-                    <p><?php echo $lang === 'en' ? 'Share this page:' : 'แชร์หน้านี้:'; ?></p>
+                    <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : 'แชร์หน้านี้:'); ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -409,12 +414,12 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()"><?php echo $lang === 'en' ? 'Copy Link' : 'คัดลอกลิงก์'; ?></button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : 'คัดลอกลิงก์'); ?></button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p><?= ($lang === 'en') ? "Inquire/Order Trandar Acoustics products at" : "สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่" ?></p>
+                    <p><?= ($lang === 'en') ? "Inquire/Order Trandar Acoustics products at" : (($lang === 'cn') ? "咨询/订购 Trandar Acoustics 产品：" : "สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่") ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -429,8 +434,8 @@ if (isset($_GET['id'])) {
                 if (isset($_GET['id'])) {
                     $decodedId = base64_decode(urldecode($_GET['id']));
                     if ($decodedId !== false) {
-                        $projectSubjectColumn = ($lang === 'en') ? 'dp.subject_project_en' : 'dp.subject_project';
-                        $projectDescColumn = ($lang === 'en') ? 'dp.description_project_en' : 'dp.description_project';
+                        $projectSubjectColumn = ($lang === 'en') ? 'dp.subject_project_en' : (($lang === 'cn') ? 'dp.subject_project_cn' : 'dp.subject_project');
+                        $projectDescColumn = ($lang === 'en') ? 'dp.description_project_en' : (($lang === 'cn') ? 'dp.description_project_cn' : 'dp.description_project');
                         
                         $stmt_project = $conn->prepare("
                             SELECT 
@@ -450,7 +455,7 @@ if (isset($_GET['id'])) {
                         $project_cards_data = $result_project->fetch_all(MYSQLI_ASSOC);
 
                         if ($result_project->num_rows > 0) {
-                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? "Related Projects" : "โปรเจกต์ที่เกี่ยวข้องกับบทความนี้") . '</h3>';
+                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? "Related Projects" : (($lang === 'cn') ? "相关项目" : "โปรเจกต์ที่เกี่ยวข้องกับบทความนี้")) . '</h3>';
                             echo '<div class="project-wrapper-container">';
                             echo '<div class="scroll-btn left" id="project-scroll-left" onclick="scrollProject(\'left\')">&#10094;</div>';
                             echo '<div class="scroll-btn right" id="project-scroll-right" onclick="scrollProject(\'right\')">&#10095;</div>';
@@ -475,8 +480,8 @@ if (isset($_GET['id'])) {
                                 echo '</a>';
                                 
                                 // Start of related shops for this project
-                                $shopSubjectColumn = ($lang === 'en') ? 'ds.subject_shop_en' : 'ds.subject_shop';
-                                $shopDescColumn = ($lang === 'en') ? 'ds.description_shop_en' : 'ds.description_shop';
+                                $shopSubjectColumn = ($lang === 'en') ? 'ds.subject_shop_en' : (($lang === 'cn') ? 'ds.subject_shop_cn' : 'ds.subject_shop');
+                                $shopDescColumn = ($lang === 'en') ? 'ds.description_shop_en' : (($lang === 'cn') ? 'ds.description_shop_cn' : 'ds.description_shop');
                                 $stmt_shop = $conn->prepare("
                                     SELECT 
                                         ds.shop_id, 
@@ -496,7 +501,7 @@ if (isset($_GET['id'])) {
                                 $shop_count = $result_shop->num_rows;
 
                                 if ($shop_count > 0) {
-                                    echo '<h6 class="shop-title">' . ($lang === 'en' ? "Products used in this project" : "สินค้าที่ใช้ในโปรเจกต์นี้") . '</h6>';
+                                    echo '<h6 class="shop-title">' . ($lang === 'en' ? "Products used in this project" : (($lang === 'cn') ? "本项目中使用的产品" : "สินค้าที่ใช้ในโปรเจกต์นี้")) . '</h6>';
                                     echo '<div class="shop-wrapper-container">';
                                     echo '<div class="scroll-btn left" id="shop-scroll-left-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'left\')">&#10094;</div>';
                                     echo '<div class="scroll-btn right" id="shop-scroll-right-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'right\')">&#10095;</div>';
@@ -528,7 +533,7 @@ if (isset($_GET['id'])) {
                                     echo '</div>';
                                 }
                                 $stmt_shop->close();
-                                echo '</div>';
+                                echo '</div>'; // close project-card
                             }
                             echo '</div>'; // close project-scroll
                             echo '</div>'; // close project-wrapper-container
@@ -538,14 +543,14 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? "Comments" : "ความคิดเห็น" ?></h3>
-                <p><?= ($lang === 'en') ? "Your email will not be displayed. Required fields are marked with *" : "อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *" ?></p>
+                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? "Comments" : (($lang === 'cn') ? "评论" : "ความคิดเห็น") ?></h3>
+                <p><?= ($lang === 'en') ? "Your email will not be displayed. Required fields are marked with *" : (($lang === 'cn') ? "您的电子邮件将不会被公开。必填字段标有 *" : "อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *") ?></p>
                 <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? "Comment *" : "ความคิดเห็น *" ?>"
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? "Comment *" : (($lang === 'cn') ? "评论 *" : "ความคิดเห็น *") ?>"
                         style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                     <button type="submit"
                         style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        <?= ($lang === 'en') ? "Post Comment" : "แสดงความคิดเห็น" ?>
+                        <?= ($lang === 'en') ? "Post Comment" : (($lang === 'cn') ? "发表评论" : "แสดงความคิดเห็น") ?>
                     </button>
                 </form>
                 
@@ -584,19 +589,19 @@ if (isset($_GET['id'])) {
                                 .then(res => res.json())
                                 .then(result => {
                                     if (result.status === 'success') {
-                                        alert("<?= ($lang === 'en') ? "Comment saved successfully." : "บันทึกความคิดเห็นเรียบร้อยแล้ว" ?>");
+                                        alert("<?= ($lang === 'en') ? "Comment saved successfully." : (($lang === 'cn') ? "评论保存成功。" : "บันทึกความคิดเห็นเรียบร้อยแล้ว") ?>");
                                         document.getElementById("commentText").value = '';
                                     } else {
-                                        alert("<?= ($lang === 'en') ? "An error occurred: " : "เกิดข้อผิดพลาด: " ?>" + result.message);
+                                        alert("<?= ($lang === 'en') ? "An error occurred: " : (($lang === 'cn') ? "发生错误：" : "เกิดข้อผิดพลาด: ") ?>" + result.message);
                                     }
                                 });
                             } else {
-                                alert("<?= ($lang === 'en') ? "You must be logged in as a viewer to comment." : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น" ?>");
+                                alert("<?= ($lang === 'en') ? "You must be logged in as a viewer to comment." : (($lang === 'cn') ? "您必须以 viewer 身份登录才能发表评论。" : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น") ?>");
                             }
                         })
                         .catch(err => {
                             console.error("Error verifying user:", err);
-                            alert("<?= ($lang === 'en') ? "Error verifying identity." : "เกิดข้อผิดพลาดในการยืนยันตัวตน" ?>");
+                            alert("<?= ($lang === 'en') ? "Error verifying identity." : (($lang === 'cn') ? "身份验证出错。" : "เกิดข้อผิดพลาดในการยืนยันตัวตน") ?>");
                         });
                     });
 
@@ -623,9 +628,9 @@ if (isset($_GET['id'])) {
                     function copyLink() {
                         const pageUrl = "<?= $pageUrl ?>";
                         navigator.clipboard.writeText(pageUrl).then(function() {
-                            alert("<?= ($lang === 'en') ? "Link copied successfully." : "คัดลอกลิงก์เรียบร้อยแล้ว" ?>");
+                            alert("<?= ($lang === 'en') ? "Link copied successfully." : (($lang === 'cn') ? "链接复制成功。" : "คัดลอกลิงก์เรียบร้อยแล้ว") ?>");
                         }, function() {
-                            alert("<?= ($lang === 'en') ? "Could not copy link. Please copy manually." : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง" ?>");
+                            alert("<?= ($lang === 'en') ? "Could not copy link. Please copy manually." : (($lang === 'cn') ? "无法复制链接。请手动复制。" : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง") ?>");
                         });
                     }
 
@@ -648,11 +653,10 @@ if (isset($_GET['id'])) {
                         document.querySelectorAll('.shop-scroll').forEach(shopContainer => {
                             const shopCards = shopContainer.querySelectorAll('.shop-card');
                             const containerId = shopContainer.id;
-                            const projectId = containerId.split('-')[2];
-                            const shopLeftBtn = document.getElementById('shop-scroll-left-' + projectId);
-                            const shopRightBtn = document.getElementById('shop-scroll-right-' + projectId);
-
-                            if (shopCards.length >= 2) {
+                            const shopLeftBtn = document.getElementById('shop-scroll-left-' + containerId.replace('shop-scroll-', ''));
+                            const shopRightBtn = document.getElementById('shop-scroll-right-' + containerId.replace('shop-scroll-', ''));
+                            
+                            if (shopCards.length > 4) { // Check if there are more than 4 cards to enable scrolling on a desktop view
                                 if(shopLeftBtn) shopLeftBtn.classList.add('show');
                                 if(shopRightBtn) shopRightBtn.classList.add('show');
                             } else {
@@ -661,14 +665,14 @@ if (isset($_GET['id'])) {
                             }
                         });
                     }
-
-                    window.addEventListener('load', toggleScrollButtons);
-                    window.addEventListener('resize', toggleScrollButtons);
                     
+                    window.addEventListener('resize', toggleScrollButtons);
+                    window.addEventListener('DOMContentLoaded', toggleScrollButtons);
                 </script>
             </div>
         </div>
     </div>
+
     
     <?php include 'template/footer.php'?>
     <script src="js/index_.js?v=<?php echo time();?>"></script>
