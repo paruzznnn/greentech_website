@@ -55,8 +55,8 @@
 
 .selection-card {
     text-align: center;
-    padding: 1rem;
-    font-size: 1rem;
+    padding: 0.6rem;
+    font-size: 0.9rem;
     background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 0.5rem;
@@ -70,15 +70,28 @@
 }
 
 .selection-card.delivery.active {
-    border: 2px solid #22C55E; 
-    background-color: #ECFDF5;
+    border: 2px solid #f28b20;
+    background-color: #f28b200a;
+    color: #555;
 }
 
 .selection-card.payment.active {
-    border: 2px solid #6366F1;
-    background-color: #EEF2FF;
+    border: 2px solid #f28b20;
+    background-color: #f28b200a;
+    color: #555;
 }
 
+#confirm-order{
+    border-radius: 0.3rem;
+    text-align: center;
+    padding: 0.6rem;
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 15px 0px;
+    border: 2px solid #f28b20;
+    background-color: #f28b20;
+    color: #ffffff;
+}
 
 /* ---- Product List ---- */
 .product-list-header,
@@ -86,6 +99,7 @@
     display: grid;
     grid-template-columns: 3fr 2fr 2fr 2fr;
     align-items: center;
+    gap: 10px;
 }
 
 .product-list-header {
