@@ -3,11 +3,11 @@ $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// --- MODIFIED: Check for language preference, now including 'cn' and 'jp'. Default is Thai. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp']) ? $_GET['lang'] : 'th';
+// --- MODIFIED: Check for language preference, now including 'cn', 'jp', and 'kr'. Default is Thai. ---
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches English, Chinese, and Japanese columns too ---
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches English, Chinese, Japanese, and Korean columns too ---
 $totalQuery = "SELECT COUNT(DISTINCT dn.news_id) as total
                 FROM dn_news dn
                 LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
@@ -15,7 +15,7 @@ $totalQuery = "SELECT COUNT(DISTINCT dn.news_id) as total
                                              AND dnc.status = '1'
                 WHERE dn.del = '0'"; // Filter news entries that are not deleted
 if ($searchQuery) {
-    $totalQuery .= " AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
+    $totalQuery .= " AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -23,21 +23,24 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
-// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation, including English, Chinese, and Japanese columns ---
+// --- MODIFIED: Main SQL query to correctly handle filtering and aggregation, including English, Chinese, Japanese, and Korean columns ---
 $sql = "SELECT
             dn.news_id,
             dn.subject_news,
             dn.subject_news_en,
             dn.subject_news_cn,
             dn.subject_news_jp,
+            dn.subject_news_kr,
             dn.description_news,
             dn.description_news_en,
             dn.description_news_cn,
             dn.description_news_jp,
+            dn.description_news_kr,
             dn.content_news,
             dn.content_news_en,
             dn.content_news_cn,
             dn.content_news_jp,
+            dn.content_news_kr,
             dn.date_create,
             GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
             GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
@@ -52,7 +55,7 @@ $sql = "SELECT
 
 if ($searchQuery) {
     $sql .= "
-    AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
+    AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
     ";
 }
 
@@ -67,7 +70,7 @@ $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 
-        // --- MODIFIED: Select the correct language content ---
+        // --- MODIFIED: Select the correct language content, including 'kr' ---
         $content = $row['content_news'];
         if ($lang === 'en' && !empty($row['content_news_en'])) {
             $content = $row['content_news_en'];
@@ -75,6 +78,8 @@ if ($result->num_rows > 0) {
             $content = $row['content_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['content_news_jp'])) {
             $content = $row['content_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['content_news_kr'])) {
+            $content = $row['content_news_kr'];
         }
 
         $iframeSrc = null;
@@ -88,7 +93,7 @@ if ($result->num_rows > 0) {
 
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
-        // --- MODIFIED: Select the correct language for title and description ---
+        // --- MODIFIED: Select the correct language for title and description, including 'kr' ---
         $title = $row['subject_news'];
         $description = $row['description_news'];
         if ($lang === 'en' && !empty($row['subject_news_en'])) {
@@ -97,6 +102,8 @@ if ($result->num_rows > 0) {
             $title = $row['subject_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['subject_news_jp'])) {
             $title = $row['subject_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['subject_news_kr'])) {
+            $title = $row['subject_news_kr'];
         }
 
         if ($lang === 'en' && !empty($row['description_news_en'])) {
@@ -105,6 +112,8 @@ if ($result->num_rows > 0) {
             $description = $row['description_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['description_news_jp'])) {
             $description = $row['description_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['description_news_kr'])) {
+            $description = $row['description_news_kr'];
         }
 
         $boxesNews[] = [
@@ -117,7 +126,7 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
-    echo ($lang === 'cn' ? '无新闻内容。' : ($lang === 'jp' ? 'ニュースが見つかりません。' : ($lang === 'en' ? 'No news found.' : 'ไม่พบข่าว')));
+    echo ($lang === 'cn' ? '无新闻内容。' : ($lang === 'jp' ? 'ニュースが見つかりません。' : ($lang === 'en' ? 'No news found.' : ($lang === 'kr' ? '뉴스를 찾을 수 없습니다.' : 'ไม่พบข่าว'))));
 }
 ?>
 <div style="display: flex; justify-content: space-between;">
@@ -128,7 +137,7 @@ if ($result->num_rows > 0) {
     <div>
         <form method="GET" action="">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo ($lang === 'cn' ? '搜索新闻...' : ($lang === 'jp' ? 'ニュースを検索...' : ($lang === 'en' ? 'Search news...' : 'ค้นหาข่าว...'))); ?>">
+                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo ($lang === 'cn' ? '搜索新闻...' : ($lang === 'jp' ? 'ニュースを検索...' : ($lang === 'en' ? 'Search news...' : ($lang === 'kr' ? '뉴스 검색...' : 'ค้นหาข่าว...')))); ?>">
                 <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
             </div>
             <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
@@ -174,7 +183,7 @@ if ($result->num_rows > 0) {
 <div class="pagination">
     <?php if ($page > 1): ?>
         <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">
-          <?php echo ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : 'ก่อนหน้า'))); ?>
+          <?php echo ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : ($lang === 'kr' ? '이전' : 'ก่อนหน้า')))); ?>
         </a>
     <?php endif; ?>
 
@@ -186,7 +195,7 @@ if ($result->num_rows > 0) {
 
     <?php if ($page < $totalPages): ?>
         <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">
-          <?php echo ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : 'ถัดไป'))); ?>
+          <?php echo ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : ($lang === 'kr' ? '다음' : 'ถัดไป')))); ?>
         </a>
     <?php endif; ?>
 </div>

@@ -5,8 +5,8 @@ global $conn;
 // Check the 'lang' parameter from the URL. The default is 'th'.
 $lang = isset($_GET['lang']) ? $_GET['lang'] : 'th';
 
-// Add 'cn' and 'jp' to the list of supported languages
-$lang = in_array($lang, ['en', 'th', 'cn', 'jp']) ? $lang : 'th';
+// Add 'cn', 'jp', and 'kr' to the list of supported languages
+$lang = in_array($lang, ['en', 'th', 'cn', 'jp', 'kr']) ? $lang : 'th';
 
 // Select the correct columns based on the language.
 $subject_col = 'subject_shop';
@@ -25,6 +25,10 @@ if ($lang === 'en') {
     $subject_col .= '_jp';
     $description_col .= '_jp';
     $content_col .= '_jp';
+} elseif ($lang === 'kr') {
+    $subject_col .= '_kr';
+    $description_col .= '_kr';
+    $content_col .= '_kr';
 }
 
 $sql = "SELECT

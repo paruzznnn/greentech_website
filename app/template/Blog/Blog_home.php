@@ -11,6 +11,8 @@ if (isset($_GET['lang'])) {
         $lang = 'cn';
     } elseif ($_GET['lang'] === 'jp') { // Added Japanese language check
         $lang = 'jp';
+    } elseif ($_GET['lang'] === 'kr') { // Added Korean language check
+        $lang = 'kr';
     }
 }
 
@@ -31,6 +33,10 @@ if ($lang === 'en') {
     $subject_col = 'subject_blog_jp';
     $description_col = 'description_blog_jp';
     $content_col = 'content_blog_jp';
+} elseif ($lang === 'kr') {
+    $subject_col = 'subject_blog_kr';
+    $description_col = 'description_blog_kr';
+    $content_col = 'content_blog_kr';
 }
 
 // แก้ไข SQL Query ให้ใช้คอลัมน์ตามภาษาที่กำหนด
@@ -38,7 +44,7 @@ $sql = "SELECT
             dn.Blog_id, 
             dn.{$subject_col} AS subject_Blog, 
             dn.{$description_col} AS description_Blog,
-            dn.content_Blog, 
+            dn.{$content_col} AS content_Blog, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -52,7 +58,7 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.Blog_id 
         ORDER BY dn.date_create DESC
-        LIMIT 100"; 
+        LIMIT 100";
 // ... โค้ดส่วนอื่น ๆ ที่เหลือ
 
 $result = $conn->query($sql);
@@ -72,7 +78,7 @@ if ($result->num_rows > 0) {
 
         $boxesBlog[] = [
             'id' => $row['Blog_id'],
-            'image' =>  $paths[0],
+            'image' => $paths[0],
             'title' => $row['subject_Blog'],
             'description' => $row['description_Blog'],
             'iframe' => $iframe
@@ -272,12 +278,14 @@ function scrollBlog(direction) {
                 <div class="blog-card">
                         <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                         <div class="card">
-                            <?php if(empty($box['image'])): ?>
+                            <?php if(!empty($box['iframe'])): ?>
                                 <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
-                            <?php else: ?>
+                            <?php elseif (!empty($box['image'])): ?>
                                 <div class="card-image-wrapper">
                                     <img src="<?= $box['image'] ?>" class="card-img-top" alt="บทความ <?= htmlspecialchars($box['title']) ?>">
                                 </div>
+                            <?php else: ?>
+                                <div style="width: 100%; height: 100%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc;">No Image</div>
                             <?php endif; ?>
                             <div class="card-body">
                                 <h6 class="card-title"><?= htmlspecialchars($box['title']) ?></h6>

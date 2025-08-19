@@ -95,7 +95,7 @@ $decodedId = $_POST['blog_id'];
             width: 36px;
             margin-right: 8px;
         }
-          /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+         /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -152,6 +152,9 @@ $decodedId = $_POST['blog_id'];
                             p.subject_blog_jp,
                             p.description_blog_jp,
                             p.content_blog_jp,
+                            p.subject_blog_kr,
+                            p.description_blog_kr,
+                            p.content_blog_kr,
                             p.date_create,
                             GROUP_CONCAT(DISTINCT d.file_name, ':::', d.api_path, ':::', d.status ORDER BY d.status DESC SEPARATOR '|||') AS files
                         FROM dn_blog p
@@ -174,6 +177,7 @@ $decodedId = $_POST['blog_id'];
                         $content_en = $row['content_blog_en'];
                         $content_cn = $row['content_blog_cn'];
                         $content_jp = $row['content_blog_jp'];
+                        $content_kr = $row['content_blog_kr'];
                         
                         $pic_data = [];
                         $previewImageSrc = '';
@@ -246,6 +250,20 @@ $decodedId = $_POST['blog_id'];
                         }
                         $content_jp_with_correct_paths = $dom_jp->saveHTML();
 
+                        $dom_kr = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_kr = !empty($content_kr) ? mb_convert_encoding($content_kr, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_kr->loadHTML($source_kr, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_kr = $dom_kr->getElementsByTagName('img');
+                        foreach ($images_kr as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_kr_with_correct_paths = $dom_kr->saveHTML();
+
                         $allprojectsQuery = $conn->query("SELECT project_id, subject_project FROM dn_project WHERE del = 0 ORDER BY subject_project ASC");
                         $allprojectsOptions = '';
                         while ($project = $allprojectsQuery->fetch_assoc()) {
@@ -279,7 +297,7 @@ $decodedId = $_POST['blog_id'];
                                              <button type='button' id='backToblogList' class='btn btn-secondary'> 
                                                  <i class='fas fa-arrow-left'></i> Back 
                                              </button>
-                                         </div>
+                                          </div>
                                          <label><span>Cover photo</span>:</label>
                                          <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
                                          <div id='previewContainer' class='previewContainer'>
@@ -323,6 +341,12 @@ $decodedId = $_POST['blog_id'];
                                                      <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
                                                          <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
                                              margin-right: 8px;'>日本語
+                                                     </button>
+                                                 </li>
+                                                 <li class='nav-item' role='presentation'>
+                                                     <button class='nav-link' id='kr-tab' data-bs-toggle='tab' data-bs-target='#kr' type='button' role='tab' aria-controls='kr' aria-selected='false'>
+                                                         <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; 
+                                             margin-right: 8px;'>한국어
                                                      </button>
                                                  </li>
                                              </ul>
@@ -397,15 +421,33 @@ $decodedId = $_POST['blog_id'];
                                                          <textarea class='form-control summernote' id='summernote_update_jp' name='blog_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
+                                                 <div class='tab-pane fade' id='kr' role='tabpanel' aria-labelledby='kr-tab'>
+                                                     <div style='margin: 10px;'>
+                                                         <button type='button' id='copyFromThai-kr' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                         <div id='loadingIndicator_kr' class='loading-overlay' style='display: none;'>
+                                                             <div class='loading-spinner'></div>
+                                                         </div>
+                                                         <label><span>Subject (KR)</span>:</label>
+                                                         <input type='text' class='form-control' id='blog_subject_kr' name='blog_subject_kr' value='" . htmlspecialchars($row['subject_blog_kr']) . "'>
+                                                     </div>
+                                                     <div style='margin: 10px;'>
+                                                         <label><span>Description (KR)</span>:</label>
+                                                         <textarea class='form-control' id='blog_description_kr' name='blog_description_kr'>" . htmlspecialchars($row['description_blog_kr']) . "</textarea>
+                                                     </div>
+                                                     <div style='margin: 10px;'>
+                                                         <label><span>Content (KR)</span>:</label>
+                                                         <textarea class='form-control summernote' id='summernote_update_kr' name='blog_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
+                                                     </div>
+                                                 </div>
                                              </div>
                                          </div>
                                      </div>
-                                     <div style='margin: 10px; text-align: end;'>
-                                         <button type='button' id='submitEditblog' class='btn btn-success'>
-                                             <i class='fas fa-save'></i> Save blog
-                                         </button>
-                                     </div>
-                                 </div>
+                                      <div style='margin: 10px; text-align: end;'>
+                                          <button type='button' id='submitEditblog' class='btn btn-success'>
+                                              <i class='fas fa-save'></i> Save blog
+                                          </button>
+                                      </div>
+                                  </div>
                             </div>
                         </form>
                         ";
@@ -497,6 +539,29 @@ $decodedId = $_POST['blog_id'];
                         $('#summernote_update_jp').summernote('destroy');
                     }
                     $('#summernote_update_jp').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+                 
+                if (target === '#kr') {
+                    if ($('#summernote_update_kr').data('summernote')) {
+                        $('#summernote_update_kr').summernote('destroy');
+                    }
+                    $('#summernote_update_kr').summernote({
                         height: 600,
                         minHeight: 600,
                         maxHeight: 600,
@@ -656,6 +721,53 @@ $decodedId = $_POST['blog_id'];
                     $('#loadingIndicator_jp').hide();
                 });
             });
+
+            $('#copyFromThai-kr').on('click', function () {
+                $('#loadingIndicator_kr').show();
+                var thaiSubject = $('#blog_subject').val();
+                var thaiDescription = $('#blog_description').val();
+                var thaiContent = $('#summernote_update').summernote('code');
+
+                const dataToSend = {
+                    language: "th",
+                    translate: "kr",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
+
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        $('#blog_subject_kr').val(response.subject);
+                        $('#blog_description_kr').val(response.description);
+                        $('#summernote_update_kr').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    $('#loadingIndicator_kr').hide();
+                });
+            });
             
             $('#fileInput').on('change', function() {
                 var input = this;
@@ -682,6 +794,7 @@ $decodedId = $_POST['blog_id'];
                 var contentFromEditor_en = $('#summernote_update_en').summernote('code');
                 var contentFromEditor_cn = $('#summernote_update_cn').summernote('code');
                 var contentFromEditor_jp = $('#summernote_update_jp').summernote('code');
+                var contentFromEditor_kr = $('#summernote_update_kr').summernote('code');
                 var checkIsUrl = false;
                 
                 if (contentFromEditor_th) {
@@ -784,6 +897,31 @@ $decodedId = $_POST['blog_id'];
                     formData.set("blog_content_jp", tempDiv_jp.innerHTML);
                 }
 
+                if (contentFromEditor_kr) {
+                    var tempDiv_kr = document.createElement("div");
+                    tempDiv_kr.innerHTML = contentFromEditor_kr;
+                    var imgTags_kr = tempDiv_kr.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_kr.length; i++) {
+                        var imgSrc_kr = imgTags_kr[i].getAttribute("src");
+                        var filename_kr = imgTags_kr[i].getAttribute("data-filename");
+                        if (!imgSrc_kr) continue;
+
+                        imgSrc_kr = imgSrc_kr.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_kr)) {
+                            var file_kr = base64ToFile(imgSrc_kr, filename_kr);
+                            if (file_kr) {
+                                formData.append("image_files_kr[]", file_kr);
+                            }
+                            if (imgSrc_kr.startsWith("data:image")) {
+                                imgTags_kr[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("blog_content_kr", tempDiv_kr.innerHTML);
+                }
+
                 $(".is-invalid").removeClass("is-invalid");
                 if (!$("#blog_subject").val().trim()) {
                     $("#blog_subject").addClass("is-invalid");
@@ -793,7 +931,7 @@ $decodedId = $_POST['blog_id'];
                     $("#blog_description").addClass("is-invalid");
                     return;
                 }
-                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim()) {
+                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim() && !contentFromEditor_kr.trim()) {
                     alertError("Please fill in content information for at least one language.");
                     return;
                 }
@@ -804,6 +942,8 @@ $decodedId = $_POST['blog_id'];
                 formData.set("blog_description_cn", $("#blog_description_cn").val());
                 formData.set("blog_subject_jp", $("#blog_subject_jp").val());
                 formData.set("blog_description_jp", $("#blog_description_jp").val());
+                formData.set("blog_subject_kr", $("#blog_subject_kr").val());
+                formData.set("blog_description_kr", $("#blog_description_kr").val());
 
                 Swal.fire({
                     title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",

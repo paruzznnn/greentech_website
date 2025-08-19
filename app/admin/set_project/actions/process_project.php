@@ -163,14 +163,17 @@ try {
             'project_subject_jp' => $_POST['project_subject_jp'] ?? '',
             'project_description_jp' => $_POST['project_description_jp'] ?? '',
             'project_content_jp'  => $_POST['project_content_jp'] ?? '',
+            'project_subject_kr' => $_POST['project_subject_kr'] ?? '',
+            'project_description_kr' => $_POST['project_description_kr'] ?? '',
+            'project_content_kr'  => $_POST['project_content_kr'] ?? '',
         ];
         
         $related_shops = $_POST['related_shops'] ?? [];
 
         if (isset($project_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_project 
-                (subject_project, description_project, content_project, subject_project_en, description_project_en, content_project_en, subject_project_cn, description_project_cn, content_project_cn, subject_project_jp, description_project_jp, content_project_jp, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (subject_project, description_project, content_project, subject_project_en, description_project_en, content_project_en, subject_project_cn, description_project_cn, content_project_cn, subject_project_jp, description_project_jp, content_project_jp, subject_project_kr, description_project_kr, content_project_kr, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $project_subject = $project_array['project_subject'];
             $project_description = $project_array['project_description'];
@@ -184,10 +187,13 @@ try {
             $project_subject_jp = $project_array['project_subject_jp'];
             $project_description_jp = $project_array['project_description_jp'];
             $project_content_jp = mb_convert_encoding($project_array['project_content_jp'], 'UTF-8', 'auto');
+            $project_subject_kr = $project_array['project_subject_kr'];
+            $project_description_kr = $project_array['project_description_kr'];
+            $project_content_kr = mb_convert_encoding($project_array['project_content_kr'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sssssssssssss",
+                "ssssssssssssssss",
                 $project_subject,
                 $project_description,
                 $project_content,
@@ -200,6 +206,9 @@ try {
                 $project_subject_jp,
                 $project_description_jp,
                 $project_content_jp,
+                $project_subject_kr,
+                $project_description_kr,
+                $project_content_kr,
                 $current_date
             );
 
@@ -263,6 +272,9 @@ try {
             'project_subject_jp' => $_POST['project_subject_jp'] ?? '',
             'project_description_jp' => $_POST['project_description_jp'] ?? '',
             'project_content_jp'  => $_POST['project_content_jp'] ?? '',
+            'project_subject_kr' => $_POST['project_subject_kr'] ?? '',
+            'project_description_kr' => $_POST['project_description_kr'] ?? '',
+            'project_content_kr'  => $_POST['project_content_kr'] ?? '',
         ];
 
         $related_shops = $_POST['related_shops'] ?? [];
@@ -281,6 +293,9 @@ try {
             subject_project_jp = ?,
             description_project_jp = ?,
             content_project_jp = ?,
+            subject_project_kr = ?,
+            description_project_kr = ?,
+            content_project_kr = ?,
             date_create = ? 
             WHERE project_id = ?");
 
@@ -296,11 +311,14 @@ try {
             $project_subject_jp = $project_array['project_subject_jp'] ?? '';
             $project_description_jp = $project_array['project_description_jp'] ?? '';
             $project_content_jp = mb_convert_encoding($project_array['project_content_jp'] ?? '', 'UTF-8', 'auto');
+            $project_subject_kr = $project_array['project_subject_kr'] ?? '';
+            $project_description_kr = $project_array['project_description_kr'] ?? '';
+            $project_content_kr = mb_convert_encoding($project_array['project_content_kr'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $project_id = $project_array['project_id'];
 
             $stmt->bind_param(
-                "sssssssssssssi",
+                "ssssssssssssssssi",
                 $project_subject,
                 $project_description,
                 $project_content,
@@ -313,6 +331,9 @@ try {
                 $project_subject_jp,
                 $project_description_jp,
                 $project_content_jp,
+                $project_subject_kr,
+                $project_description_kr,
+                $project_content_kr,
                 $current_date,
                 $project_id
             );
@@ -454,6 +475,21 @@ try {
                     }
                 }
             }
+
+            // จัดการรูปภาพใน Content (ภาษาเกาหลี)
+            if (isset($_FILES['image_files_kr']) && is_array($_FILES['image_files_kr']['name']) && $_FILES['image_files_kr']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_kr']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['project_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'kr'];
+                        insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (KR): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
             
             $response = array('status' => 'success', 'message' => 'edit save');
         }
@@ -505,12 +541,12 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_project LIKE '%$searchValue%' OR subject_project_en LIKE '%$searchValue%' OR subject_project_cn LIKE '%$searchValue%' OR subject_project_jp LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_project LIKE '%$searchValue%' OR subject_project_en LIKE '%$searchValue%' OR subject_project_cn LIKE '%$searchValue%' OR subject_project_jp LIKE '%$searchValue%' OR subject_project_kr LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
-        $dataQuery = "SELECT project_id, subject_project, subject_project_en, subject_project_cn, subject_project_jp, date_create FROM dn_project 
+        $dataQuery = "SELECT project_id, subject_project, subject_project_en, subject_project_cn, subject_project_jp, subject_project_kr, date_create FROM dn_project 
                 WHERE $whereClause
                 ORDER BY $orderBy
                 LIMIT $start, $length";

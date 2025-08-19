@@ -3,21 +3,23 @@ $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// Check for language preference, default to Thai
+// Check for language preference, including 'kr'. Default to Thai.
 $lang = 'th'; // Set a default value first
 if (isset($_GET['lang'])) {
     if ($_GET['lang'] === 'en') {
         $lang = 'en';
     } elseif ($_GET['lang'] === 'cn') {
         $lang = 'cn';
-    } elseif ($_GET['lang'] === 'jp') { // Added Japanese language check
+    } elseif ($_GET['lang'] === 'jp') {
         $lang = 'jp';
+    } elseif ($_GET['lang'] === 'kr') { // Added Korean language check
+        $lang = 'kr';
     }
 }
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// --- MODIFIED: Adjust column names based on the selected language for display ---
+// --- MODIFIED: Adjust column names based on the selected language for display, including 'kr' ---
 $subjectCol = 'subject_blog';
 $descriptionCol = 'description_blog';
 $contentCol = 'content_blog';
@@ -33,18 +35,23 @@ if ($lang === 'en') {
     $subjectCol = 'subject_blog_jp';
     $descriptionCol = 'description_blog_jp';
     $contentCol = 'content_blog_jp';
+} elseif ($lang === 'kr') {
+    $subjectCol = 'subject_blog_kr';
+    $descriptionCol = 'description_blog_kr';
+    $contentCol = 'content_blog_kr';
 }
 
-// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches across all language columns ---
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches across all language columns including 'kr' ---
 $totalQuery = "SELECT COUNT(DISTINCT dn.blog_id) as total
                 FROM dn_blog dn
                 WHERE dn.del = '0'"; // Filter blogs that are not deleted
 if ($searchQuery) {
-    // Search across Thai, English, Chinese, and Japanese subject columns
+    // Search across Thai, English, Chinese, Japanese, and Korean subject columns
     $totalQuery .= " AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
                     OR dn.subject_blog_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
                     OR dn.subject_blog_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-                    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
+                    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
+                    OR dn.subject_blog_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -52,21 +59,24 @@ $totalRow = $totalResult->fetch_assoc();
 $totalItems = $totalRow['total'];
 $totalPages = ceil($totalItems / $perPage);
 
-// --- MODIFIED: Main SQL query to select all language columns for dynamic display ---
+// --- MODIFIED: Main SQL query to select all language columns for dynamic display, including 'kr' ---
 $sql = "SELECT
             dn.blog_id,
             dn.subject_blog,
             dn.subject_blog_en,
             dn.subject_blog_cn,
             dn.subject_blog_jp,
+            dn.subject_blog_kr,
             dn.description_blog,
             dn.description_blog_en,
             dn.description_blog_cn,
             dn.description_blog_jp,
+            dn.description_blog_kr,
             dn.content_blog,
             dn.content_blog_en,
             dn.content_blog_cn,
             dn.content_blog_jp,
+            dn.content_blog_kr,
             dn.date_create,
             GROUP_CONCAT(DISTINCT dnc.file_name) AS file_name,
             GROUP_CONCAT(DISTINCT dnc.api_path) AS pic_path
@@ -80,12 +90,13 @@ $sql = "SELECT
             dn.del = '0'"; // Only select blogs where del is 0
 
 if ($searchQuery) {
-    // Search across all language subject columns
+    // Search across all language subject columns, including 'kr'
     $sql .= "
     AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%' 
     OR dn.subject_blog_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
     OR dn.subject_blog_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
+    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
+    OR dn.subject_blog_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
     ";
 }
 
@@ -125,7 +136,7 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
-    echo ($lang === 'en' ? 'No blog found.' : ($lang === 'cn' ? '无博客内容。' : ($lang === 'jp' ? 'ブログが見つかりません。' : 'ไม่พบบทความ')));
+    echo ($lang === 'en' ? 'No blog found.' : ($lang === 'cn' ? '无博客内容。' : ($lang === 'jp' ? 'ブログが見つかりません。' : ($lang === 'kr' ? '블로그를 찾을 수 없습니다.' : 'ไม่พบบทความ'))));
 }
 ?>
 
@@ -135,7 +146,7 @@ if ($result->num_rows > 0) {
         <form method="GET" action="">
             <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?= $lang === 'en' ? 'Search blog...' : ($lang === 'cn' ? '搜索文章...' : ($lang === 'jp' ? 'ブログを検索...' : 'ค้นหาบทความ...')); ?>">
+                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?= $lang === 'en' ? 'Search blog...' : ($lang === 'cn' ? '搜索文章...' : ($lang === 'jp' ? 'ブログを検索...' : ($lang === 'kr' ? '블로그 검색...' : 'ค้นหาบทความ...'))); ?>">
                 <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
             </div>
         </form>
@@ -171,7 +182,7 @@ if ($result->num_rows > 0) {
 <div class="pagination">
     <?php if ($page > 1): ?>
         <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo htmlspecialchars($lang); ?>">
-            <?= $lang === 'en' ? 'Previous' : ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : 'ก่อนหน้า')); ?>
+            <?= $lang === 'en' ? 'Previous' : ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'kr' ? '이전' : 'ก่อนหน้า'))); ?>
         </a>
     <?php endif; ?>
 
@@ -183,7 +194,7 @@ if ($result->num_rows > 0) {
 
     <?php if ($page < $totalPages): ?>
         <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo htmlspecialchars($lang); ?>">
-            <?= $lang === 'en' ? 'Next' : ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : 'ถัดไป')); ?>
+            <?= $lang === 'en' ? 'Next' : ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'kr' ? '다음' : 'ถัดไป'))); ?>
         </a>
     <?php endif; ?>
 </div>

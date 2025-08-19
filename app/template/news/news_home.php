@@ -2,24 +2,27 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// --- MODIFIED: Check for language preference, now including 'cn' and 'jp'. Default is Thai. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp']) ? $_GET['lang'] : 'th';
+// --- MODIFIED: Check for language preference, now including 'cn', 'jp', and 'kr'. Default is Thai. ---
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
 
-// --- MODIFIED: Select all four language columns for news content ---
+// --- MODIFIED: Select all four language columns for news content and ADD 'kr' columns ---
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
             dn.subject_news_en, 
             dn.subject_news_cn,
             dn.subject_news_jp,
+            dn.subject_news_kr,
             dn.description_news,
             dn.description_news_en,
             dn.description_news_cn,
             dn.description_news_jp,
+            dn.description_news_kr,
             dn.content_news,
             dn.content_news_en,
             dn.content_news_cn,
             dn.content_news_jp,
+            dn.content_news_kr,
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -41,7 +44,7 @@ $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 
-        // --- MODIFIED: Use the correct language content based on preference ---
+        // --- MODIFIED: Use the correct language content based on preference, ADD 'kr' ---
         $content = $row['content_news'];
         if ($lang === 'en' && !empty($row['content_news_en'])) {
             $content = $row['content_news_en'];
@@ -49,6 +52,8 @@ if ($result->num_rows > 0) {
             $content = $row['content_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['content_news_jp'])) {
             $content = $row['content_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['content_news_kr'])) {
+            $content = $row['content_news_kr'];
         }
 
         $iframeSrc = null;
@@ -61,7 +66,7 @@ if ($result->num_rows > 0) {
         $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
-        // --- MODIFIED: Select the correct language for title and description. ---
+        // --- MODIFIED: Select the correct language for title and description, ADD 'kr' ---
         $title = $row['subject_news'];
         if ($lang === 'en' && !empty($row['subject_news_en'])) {
             $title = $row['subject_news_en'];
@@ -69,6 +74,8 @@ if ($result->num_rows > 0) {
             $title = $row['subject_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['subject_news_jp'])) {
             $title = $row['subject_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['subject_news_kr'])) {
+            $title = $row['subject_news_kr'];
         }
 
         $description = $row['description_news'];
@@ -78,6 +85,8 @@ if ($result->num_rows > 0) {
             $description = $row['description_news_cn'];
         } elseif ($lang === 'jp' && !empty($row['description_news_jp'])) {
             $description = $row['description_news_jp'];
+        } elseif ($lang === 'kr' && !empty($row['description_news_kr'])) {
+            $description = $row['description_news_kr'];
         }
 
         $boxesNews[] = [
@@ -272,11 +281,11 @@ if ($result->num_rows > 0) {
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden"><?= ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : 'ก่อนหน้า'))) ?></span>
+                    <span class="visually-hidden"><?= ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : ($lang === 'kr' ? '이전' : 'ก่อนหน้า')))) ?></span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden"><?= ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : 'ถัดไป'))) ?></span>
+                    <span class="visually-hidden"><?= ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : ($lang === 'kr' ? '다음' : 'ถัดไป')))) ?></span>
                 </button>
             </div>
         </div>

@@ -2,8 +2,8 @@
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// --- MODIFIED: Allow 'cn' and 'jp' as valid language options.
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp']) ? $_GET['lang'] : 'th';
+// --- MODIFIED: Allow 'cn', 'jp', and 'kr' as valid language options.
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
 
 // สร้างชื่อคอลัมน์ตามภาษาที่เลือก
 $subject_col = 'subject_project';
@@ -18,6 +18,9 @@ if ($lang === 'en') {
 } elseif ($lang === 'jp') {
     $subject_col = 'subject_project_jp';
     $description_col = 'description_project_jp';
+} elseif ($lang === 'kr') {
+    $subject_col = 'subject_project_kr';
+    $description_col = 'description_project_kr';
 }
 
 $sql = "SELECT 
@@ -269,6 +272,8 @@ if ($result->num_rows > 0) {
                                                     echo '了解更多 >';
                                                 } elseif ($lang === 'jp') {
                                                     echo 'もっと見る >';
+                                                } elseif ($lang === 'kr') {
+                                                    echo '더 알아보기 >'; // เพิ่ม kr
                                                 } else {
                                                     echo 'ดูเพิ่มเติม >';
                                                 }

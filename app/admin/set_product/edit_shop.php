@@ -162,7 +162,10 @@ $stmt = $conn->prepare("
         dn.content_shop_cn,
         dn.subject_shop_jp,
         dn.description_shop_jp,
-        dn.content_shop_jp
+        dn.content_shop_jp,
+        dn.subject_shop_kr,
+        dn.description_shop_kr,
+        dn.content_shop_kr
     FROM dn_shop dn
     WHERE dn.shop_id = ?
 ");
@@ -181,6 +184,7 @@ if ($result->num_rows > 0) {
     $content_en = $row['content_shop_en'];
     $content_cn = $row['content_shop_cn'];
     $content_jp = $row['content_shop_jp']; // เพิ่มสำหรับภาษาญี่ปุ่น
+    $content_kr = $row['content_shop_kr']; // เพิ่มสำหรับภาษาเกาหลี
     $current_group_id = $row['group_id'];
 
     // ดึงข้อมูลรูปภาพทั้งหมดที่เกี่ยวข้องกับ shop_id นี้
@@ -263,6 +267,21 @@ if ($result->num_rows > 0) {
         }
     }
     $content_jp_with_correct_paths = $dom_jp->saveHTML();
+
+    // เพิ่มโค้ดสำหรับภาษาเกาหลี
+    $dom_kr = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $source_kr = !empty($content_kr) ? mb_convert_encoding($content_kr, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+    $dom_kr->loadHTML($source_kr, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    $images_kr = $dom_kr->getElementsByTagName('img');
+    foreach ($images_kr as $img) {
+        $data_filename = $img->getAttribute('data-filename');
+        if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+            $img->setAttribute('src', $pic_data[$data_filename]);
+        }
+    }
+    $content_kr_with_correct_paths = $dom_kr->saveHTML();
 
     // ดึงข้อมูลกลุ่มทั้งหมดเพื่อใช้ในการแสดงผล
     $mainGroupQuery = $conn->query("SELECT group_id, group_name FROM dn_shop_groups WHERE parent_group_id IS NULL ORDER BY group_name ASC");
@@ -358,6 +377,12 @@ if ($result->num_rows > 0) {
             margin-right: 8px;'>Japanese
                                 </button>
                             </li>
+                            <li class='nav-item' role='presentation'>
+                                <button class='nav-link' id='kr-tab' data-bs-toggle='tab' data-bs-target='#kr' type='button' role='tab' aria-controls='kr' aria-selected='false'>
+                                    <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; 
+            margin-right: 8px;'>Korean
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div class='card-body'>
@@ -437,6 +462,27 @@ if ($result->num_rows > 0) {
                                 <div style='margin: 10px;'>
                                     <label><span>Content (JP)</span>:</label>
                                     <textarea class='form-control summernote' id='summernote_update_jp' name='shop_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
+                                </div>
+                            </div>
+                            <div class='tab-pane fade' id='kr' role='tabpanel' aria-labelledby='kr-tab'>
+                                <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+                                    <button type='button' id='copyFromThaiKr' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <div id='loadingIndicatorKr' class='loading-overlay' style='display: none;'>
+                                        <div class='loading-spinner'></div>
+                                    </div>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    
+                                    <label><span>Subject (KR)</span>:</label>
+                                    <input type='text' class='form-control' id='shop_subject_kr' name='shop_subject_kr' value='" . htmlspecialchars($row['subject_shop_kr']) . "'>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Description (KR)</span>:</label>
+                                    <textarea class='form-control' id='shop_description_kr' name='shop_description_kr'>" . htmlspecialchars($row['description_shop_kr']) . "</textarea>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Content (KR)</span>:</label>
+                                    <textarea class='form-control summernote' id='summernote_update_kr' name='shop_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
                                 </div>
                             </div>
                         </div>
@@ -524,6 +570,21 @@ $stmt->close();
                     $('#summernote_update_jp').summernote('destroy');
                 }
                 $('#summernote_update_jp').summernote({
+                    height: 600,
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            uploadFile(files[0], $(this));
+                        },
+                        onMediaDelete: function(target) {
+                            deleteFile(target);
+                        }
+                    }
+                });
+            } else if (target === '#kr') { // เพิ่มสำหรับภาษาเกาหลี
+                if ($('#summernote_update_kr').data('summernote')) {
+                    $('#summernote_update_kr').summernote('destroy');
+                }
+                $('#summernote_update_kr').summernote({
                     height: 600,
                     callbacks: {
                         onImageUpload: function(files) {
@@ -769,6 +830,68 @@ $stmt->close();
             })
             .finally(() => {
                 $('#loadingIndicatorJp').hide();
+            });
+        });
+
+        // เพิ่มส่วนสำหรับภาษาเกาหลี (kr)
+        $('#copyFromThaiKr').on('click', function () {
+            $('#loadingIndicatorKr').show(); 
+            var thaiSubject = $('#shop_subject').val();
+            var thaiDescription = $('#shop_description').val();
+            var thaiContent = $('#summernote_update').summernote('code');
+
+            const dataToSend = {
+                language: "th",
+                translate: "kr",
+                company: 2,
+                content: {
+                    subject: thaiSubject,
+                    description: thaiDescription,
+                    content: thaiContent
+                }
+            };
+
+            fetch('actions/translate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log(response);
+
+                if (response.status === 'success') {
+                    $('#shop_subject_kr').val(response.subject);
+                    $('#shop_description_kr').val(response.description);
+                    $('#summernote_update_kr').summernote('code', response.content);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'การแปลสำเร็จแล้ว!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'การแปลล้มเหลว: ' + (response.message || response.error),
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error,
+                });
+            })
+            .finally(() => {
+                $('#loadingIndicatorKr').hide();
             });
         });
     });

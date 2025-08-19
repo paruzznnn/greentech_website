@@ -3,7 +3,7 @@ require_once('../lib/connect.php');
 global $conn;
 
 // 1. กำหนดตัวแปรภาษา
-$supported_langs = ['en', 'th', 'cn', 'jp'];
+$supported_langs = ['en', 'th', 'cn', 'jp', 'kr'];
 $lang = isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs) ? $_GET['lang'] : 'th';
 $lang_suffix = '';
 if ($lang !== 'th') {
@@ -97,6 +97,26 @@ $translations = [
         'copy_success' => 'リンクが正常にコピーされました',
         'copy_fail' => 'リンクをコピーできませんでした。手動でコピーしてください。',
         'contact_us' => 'Trandar Acoustics製品のお問い合わせ・ご注文はこちら'
+    ],
+    'kr' => [
+        'product' => '제품',
+        'share_page' => '이 페이지 공유:',
+        'copy_link' => '링크 복사',
+        'no_data' => '데이터를 찾을 수 없습니다.',
+        'invalid_id' => '잘못된 ID입니다.',
+        'related_projects' => '이 제품과 관련된 프로젝트',
+        'project_image_alt' => '프로젝트 이미지',
+        'no_image_available' => '사용 가능한 이미지가 없습니다',
+        'comments' => '댓글',
+        'email_notice' => '귀하의 이메일 주소는 공개되지 않습니다. 필수 입력란은 *로 표시되어 있습니다',
+        'comment_placeholder' => '댓글 *',
+        'post_comment' => '댓글 게시',
+        'login_to_comment' => '댓글을 작성하려면 로그인하세요',
+        'viewer_only' => '댓글을 작성하려면 뷰어로 로그인해야 합니다.',
+        'error_verify' => '신원 확인 중 오류가 발생했습니다.',
+        'copy_success' => '링크가 성공적으로 복사되었습니다',
+        'copy_fail' => '링크를 복사할 수 없습니다. 수동으로 복사해 주세요.',
+        'contact_us' => 'Trandar Acoustics 제품 문의 및 주문'
     ]
 ];
 $t = $translations[$lang];

@@ -8,7 +8,7 @@ if (!isset($conn)) {
 }
 
 // 1. กำหนดตัวแปรภาษา
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp']) ? $_GET['lang'] : 'th';
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
 
 // 2. สร้างตัวแปรสำหรับชื่อคอลัมน์
 $subject_col = 'subject_shop';
@@ -31,6 +31,11 @@ if ($lang === 'en') {
     $description_col .= '_jp';
     $content_col .= '_jp';
     $group_name_col .= '_jp';
+} elseif ($lang === 'kr') {
+    $subject_col .= '_kr';
+    $description_col .= '_kr';
+    $content_col .= '_kr';
+    $group_name_col .= '_kr';
 }
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
@@ -59,7 +64,7 @@ WHERE dn.del = '0' AND sub_group.parent_group_id IS NOT NULL";
 
 if ($searchQuery) {
     $safeQuery = $conn->real_escape_string($searchQuery);
-    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษและจีนด้วย
+    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษ, จีน, และเกาหลีด้วย
     $sqlAllProducts .= " AND (dn.$subject_col LIKE '%$safeQuery%' OR dn.$description_col LIKE '%$safeQuery%')";
 }
 
@@ -447,6 +452,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 return '搜索产品...';
             case 'jp':
                 return '製品を検索...';
+            case 'kr':
+                return '제품 검색...';
             case 'th':
             default:
                 return 'ค้นหาสินค้า...';
@@ -459,7 +466,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'ผลการค้นหาสำหรับ',
                 'en' => 'Search Results for',
                 'cn' => '搜索结果',
-                'jp' => '検索結果'
+                'jp' => '検索結果',
+                'kr' => '검색 결과'
             ];
             return $text[$lang] . ' "' . htmlspecialchars($searchQuery) . '"';
         } elseif ($selectedSubGroupId > 0) {
@@ -474,7 +482,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"',
                 'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"',
                 'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的子组') . '"',
-                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたサブグループ') . '" の製品'
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたサブグループ') . '" の製品',
+                'kr' => '"' . htmlspecialchars($groupName ?: '선택된 하위 그룹') . '"의 제품'
             ];
             return $text[$lang];
         } elseif ($selectedGroupId > 0) {
@@ -489,7 +498,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"',
                 'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"',
                 'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的主组') . '"',
-                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたメイングループ') . '" の製品'
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたメイングループ') . '" の製品',
+                'kr' => '"' . htmlspecialchars($groupName ?: '선택된 메인 그룹') . '"의 제품'
             ];
             return $text[$lang];
         } else {
@@ -497,7 +507,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'หมวดหมู่สินค้า',
                 'en' => 'Product Categories',
                 'cn' => '产品分类',
-                'jp' => '製品カテゴリ'
+                'jp' => '製品カテゴリ',
+                'kr' => '제품 카테고리'
             ];
             return $text[$lang];
         }
@@ -515,7 +526,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ',
                 'en' => 'No products found for your criteria.',
                 'cn' => '未找到符合您条件的产品',
-                'jp' => '条件に一致する製品が見つかりませんでした。'
+                'jp' => '条件に一致する製品が見つかりませんでした。',
+                'kr' => '귀하의 조건에 맞는 제품을 찾을 수 없습니다.'
             ];
             ?>
             <p><?php echo $noProductsText[$lang]; ?></p>
@@ -535,7 +547,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                                     'th' => 'ไม่มีรูปภาพ',
                                     'en' => 'No image available',
                                     'cn' => '没有图片',
-                                    'jp' => '画像なし'
+                                    'jp' => '画像なし',
+                                    'kr' => '이미지 없음'
                                 ];
                                 ?>
                                 <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $noImageText[$lang]; ?>">
@@ -558,7 +571,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 'th' => 'ไม่พบหมวดหมู่ที่มีสินค้า',
                 'en' => 'No categories found with assigned products.',
                 'cn' => '未找到包含产品的分类',
-                'jp' => '製品が割り当てられているカテゴリが見つかりません。'
+                'jp' => '製品が割り当てられているカテゴリが見つかりません。',
+                'kr' => '제품이 할당된 카테고리를 찾을 수 없습니다.'
             ];
             ?>
             <p><?php echo $noCategoriesText[$lang]; ?></p>
@@ -576,7 +590,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                                 'th' => 'รายการ',
                                 'en' => 'products',
                                 'cn' => '个产品',
-                                'jp' => '製品'
+                                'jp' => '製品',
+                                'kr' => '개 제품'
                             ];
                             ?>
                             <p class="product-count"><?php echo $mainGroupData['total_products'] . ' ' . $productsText[$lang]; ?></p>
