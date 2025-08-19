@@ -113,6 +113,9 @@ export const CheckoutUI = {
     selectors: {
         shippingSection: document.getElementById('shippingAddressFormSection'),
         pickupSection: document.getElementById('pickupAddressFormSection'),
+        bankSection: document.getElementById('bankTransferSection'),
+        promptpaySection: document.getElementById('promptpaySection'),
+
         orderCode: document.getElementById('order-code'),
         orderDate: document.getElementById('order-date'),
 
@@ -154,9 +157,9 @@ export const CheckoutUI = {
         this.lang = 'th';
         this.loadOrder();
 
-        this.initRadioEvents();
-        this.initializeUI();
-        this.initClickEvents();
+        this.radioActive();
+        this.radioEvents();
+        this.initEvents();
 
         this.renderProductItem();
         this.renderPayment();
@@ -294,6 +297,38 @@ export const CheckoutUI = {
         `;
         this.selectors.shippingSection.innerHTML = '';
         this.selectors.pickupSection.innerHTML = pickupHTML;
+    },
+
+    renderBankTransfer() {
+        let bankHTML = `
+        <div class="section-header">
+            <div>
+                <p>ธนาคาร</p>
+            </div>
+        </div>
+        <div>
+        </div>
+        `;
+
+        this.selectors.promptpaySection.innerHTML = '';
+        this.selectors.bankSection.innerHTML = bankHTML;
+    },
+
+    renderPromptpay() {
+        let promptpayHTML = `
+        <div class="section-header">
+            <div>
+                <p>QR CODE</p>
+            </div>
+        </div>
+        <div>
+            
+        </div>
+        `;
+
+        this.selectors.bankSection.innerHTML = '';
+        this.selectors.promptpaySection.innerHTML = promptpayHTML;
+        
     },
 
     populateProvinces() {
@@ -440,10 +475,25 @@ export const CheckoutUI = {
     },
 
     updatePaymentSummary(value) {
+        switch (value) {
+            case "bank_transfer":
+                this.renderBankTransfer();
+                this.selectors.bankSection.style.display = 'block';
+                this.selectors.promptpaySection.style.display = 'none';
+                break;
+            case "promptpay":
+                this.renderPromptpay();
+                this.selectors.promptpaySection.style.display = 'block';
+                this.selectors.bankSection.style.display = 'none';
+                break;
+            default:
+                break;
+        }
+        
         this.selectors.selectedPaymentMethod.textContent = this.paymentMethodNames[value];
     },
 
-    initRadioEvents() {
+    radioEvents() {
         this.selectors.deliveryRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 this.updateDelivery(radio.value);
@@ -457,7 +507,7 @@ export const CheckoutUI = {
         });
     },
 
-    initializeUI() {
+    radioActive() {
         const initialDelivery = document.querySelector('input[name="delivery_option"]:checked');
         const initialPayment = document.querySelector('input[name="payment_method"]:checked');
         if (initialDelivery) {
@@ -489,7 +539,7 @@ export const CheckoutUI = {
         }
     },
 
-    initClickEvents() {
+    initEvents() {
         document.addEventListener('click', (event) => {
             if (event.target.closest('.selection-card.delivery')) {
                 this.handleContainerClick(event, 'delivery', 'delivery_option', this.updateDelivery.bind(this));
