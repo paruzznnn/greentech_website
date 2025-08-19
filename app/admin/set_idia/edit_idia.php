@@ -153,6 +153,9 @@ $decodedId = $_POST['idia_id'];
                             n.subject_idia_jp,
                             n.description_idia_jp,
                             n.content_idia_jp,
+                            n.subject_idia_kr,
+                            n.description_idia_kr,
+                            n.content_idia_kr,
                             GROUP_CONCAT(DISTINCT d.file_name, ':::', d.api_path, ':::', d.status ORDER BY d.status DESC SEPARATOR '|||') AS files
                         FROM dn_idia n
                         LEFT JOIN dn_idia_doc d ON n.idia_id = d.idia_id AND d.del = 0
@@ -174,6 +177,7 @@ $decodedId = $_POST['idia_id'];
                         $content_en = $row['content_idia_en'];
                         $content_cn = $row['content_idia_cn'];
                         $content_jp = $row['content_idia_jp'];
+                        $content_kr = $row['content_idia_kr'];
                         
                         $pic_data = [];
                         $previewImageSrc = '';
@@ -246,6 +250,20 @@ $decodedId = $_POST['idia_id'];
                         }
                         $content_jp_with_correct_paths = $dom_jp->saveHTML();
                         
+                        $dom_kr = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_kr = !empty($content_kr) ? mb_convert_encoding($content_kr, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_kr->loadHTML($source_kr, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_kr = $dom_kr->getElementsByTagName('img');
+                        foreach ($images_kr as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_kr_with_correct_paths = $dom_kr->saveHTML();
+                        
                         echo "
                         <form id='formidia_edit' enctype='multipart/form-data'>
                             <input type='hidden' class='form-control' id='idia_id' name='idia_id' value='" . htmlspecialchars($row['idia_id']) . "'>
@@ -298,6 +316,12 @@ $decodedId = $_POST['idia_id'];
                                                     <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
                                                         <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
                                                 margin-right: 8px;'>ภาษาญี่ปุ่น
+                                                    </button>
+                                                </li>
+                                                <li class='nav-item' role='presentation'>
+                                                    <button class='nav-link' id='kr-tab' data-bs-toggle='tab' data-bs-target='#kr' type='button' role='tab' aria-controls='kr' aria-selected='false'>
+                                                        <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; 
+                                                margin-right: 8px;'>ภาษาเกาหลี
                                                     </button>
                                                 </li>
                                             </ul>
@@ -370,6 +394,24 @@ $decodedId = $_POST['idia_id'];
                                                     <div style='margin: 10px;'>
                                                         <label><span>เนื้อหา (JP)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update_jp' name='idia_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class='tab-pane fade' id='kr' role='tabpanel' aria-labelledby='kr-tab'>
+                                                    <div style='margin: 10px;'>
+                                                        <button type='button' id='copyFromThaiKr' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <div id='loadingIndicatorKr' class='loading-overlay' style='display: none;'>
+                                                            <div class='loading-spinner'></div>
+                                                        </div>
+                                                        <label><span>หัวข้อ (KR)</span>:</label>
+                                                        <input type='text' class='form-control' id='idia_subject_kr' name='idia_subject_kr' value='" . htmlspecialchars($row['subject_idia_kr']) . "'>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>คำอธิบาย (KR)</span>:</label>
+                                                        <textarea class='form-control' id='idia_description_kr' name='idia_description_kr'>" . htmlspecialchars($row['description_idia_kr']) . "</textarea>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <label><span>เนื้อหา (KR)</span>:</label>
+                                                        <textarea class='form-control summernote' id='summernote_update_kr' name='idia_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -482,19 +524,30 @@ $decodedId = $_POST['idia_id'];
                     fontsizeUnits: ['px', 'pt'],
                     fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
                 });
+            } else if (target === '#kr') { // เพิ่มส่วนของ KR
+                if ($('#summernote_update_kr').data('summernote')) {
+                    $('#summernote_update_kr').summernote('destroy');
+                }
+                $('#summernote_update_kr').summernote({
+                    height: 600,
+                    minHeight: 600,
+                    maxHeight: 600,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['fontname', 'fontsize', 'forecolor']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link', 'picture', 'video', 'table']],
+                        ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                        ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                    ],
+                    fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                    fontNamesIgnoreCheck: ['Kanit'],
+                    fontsizeUnits: ['px', 'pt'],
+                    fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                });
             }
         });
 
-        // New Copy from Thai button functionality
-        // $('#copyFromThai').on('click', function() {
-        //     var thaiSubject = $('#idia_subject').val();
-        //     var thaiDescription = $('#idia_description').val();
-        //     var thaiContent = $('#summernote_update').summernote('code');
-
-        //     $('#idia_subject_en').val(thaiSubject);
-        //     $('#idia_description_en').val(thaiDescription);
-        //     $('#summernote_update_en').summernote('code', thaiContent);
-        // });
         // New Copy from Thai button functionality
         $('#copyFromThai').on('click', function () {
             // 1. แสดง Loading Indicator
@@ -657,6 +710,60 @@ $decodedId = $_POST['idia_id'];
             });
         });
 
+        // New Copy from Thai to Korean button functionality
+        $('#copyFromThaiKr').on('click', function () {
+            // 1. แสดง Loading Indicator สำหรับภาษาเกาหลี
+            $('#loadingIndicatorKr').show();
+
+            // ดึงค่าจากฟอร์มภาษาไทย
+            var thaiSubject = $('#idia_subject').val();
+            var thaiDescription = $('#idia_description').val();
+            var thaiContent = $('#summernote_update').summernote('code');
+
+            // สร้าง Object สำหรับข้อมูลที่จะส่งไป
+            const dataToSend = {
+                language: "th",
+                translate: "kr",
+                company: 2,
+                content: {
+                    subject: thaiSubject,
+                    description: thaiDescription,
+                    content: thaiContent
+                }
+            };
+
+            // ส่งข้อมูลแบบ POST ไปยังไฟล์ actions/translate.php
+            fetch('actions/translate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log(response);
+
+                if (response.status === 'success') {
+                    $('#idia_subject_kr').val(response.subject);
+                    $('#idia_description_kr').val(response.description);
+                    $('#summernote_update_kr').summernote('code', response.content);
+                    alert('การแปลสำเร็จ!');
+                } else {
+                    alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                }
+            })
+            .catch(error => {
+                console.error("error:", error);
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+            })
+            .finally(() => {
+                // 2. ซ่อน Loading Indicator เมื่อเสร็จสิ้นกระบวนการทั้งหมด
+                $('#loadingIndicatorKr').hide();
+            });
+        });
+
         $('#fileInput').on('change', function() {
             var input = this;
             if (input.files && input.files[0]) {
@@ -682,6 +789,7 @@ $decodedId = $_POST['idia_id'];
             var contentFromEditor_en = $('#summernote_update_en').summernote('code');
             var contentFromEditor_cn = $('#summernote_update_cn').summernote('code');
             var contentFromEditor_jp = $('#summernote_update_jp').summernote('code');
+            var contentFromEditor_kr = $('#summernote_update_kr').summernote('code');
             var checkIsUrl = false;
             
             if (contentFromEditor_th) {
@@ -783,6 +891,31 @@ $decodedId = $_POST['idia_id'];
                 }
                 formData.set("idia_content_jp", tempDiv_jp.innerHTML);
             }
+            
+            if (contentFromEditor_kr) { // เพิ่มส่วนของ KR
+                var tempDiv_kr = document.createElement("div");
+                tempDiv_kr.innerHTML = contentFromEditor_kr;
+                var imgTags_kr = tempDiv_kr.getElementsByTagName("img");
+                for (var i = 0; i < imgTags_kr.length; i++) {
+                    var imgSrc_kr = imgTags_kr[i].getAttribute("src");
+                    var filename_kr = imgTags_kr[i].getAttribute("data-filename");
+                    if (!imgSrc_kr) continue;
+
+                    imgSrc_kr = imgSrc_kr.replace(/ /g, "%20");
+                    if (!isValidUrl(imgSrc_kr)) {
+                        var file_kr = base64ToFile(imgSrc_kr, filename_kr);
+                        if (file_kr) {
+                            formData.append("image_files_kr[]", file_kr);
+                        }
+                        if (imgSrc_kr.startsWith("data:image")) {
+                            imgTags_kr[i].setAttribute("src", "");
+                        }
+                    } else {
+                        checkIsUrl = true;
+                    }
+                }
+                formData.set("idia_content_kr", tempDiv_kr.innerHTML);
+            }
 
             $(".is-invalid").removeClass("is-invalid");
             if (!$("#idia_subject").val().trim()) {
@@ -793,7 +926,7 @@ $decodedId = $_POST['idia_id'];
                 $("#idia_description").addClass("is-invalid");
                 return;
             }
-            if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim()) {
+            if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim() && !contentFromEditor_kr.trim()) {
                 alertError("กรุณากรอกข้อมูลเนื้อหาอย่างน้อยหนึ่งภาษา");
                 return;
             }
@@ -804,6 +937,8 @@ $decodedId = $_POST['idia_id'];
             formData.set("idia_description_cn", $("#idia_description_cn").val());
             formData.set("idia_subject_jp", $("#idia_subject_jp").val());
             formData.set("idia_description_jp", $("#idia_description_jp").val());
+            formData.set("idia_subject_kr", $("#idia_subject_kr").val()); // เพิ่มส่วนของ KR
+            formData.set("idia_description_kr", $("#idia_description_kr").val()); // เพิ่มส่วนของ KR
 
             Swal.fire({
                 title: checkIsUrl ? "ระบบตรวจพบรูปภาพจากเว็บไซต์อื่น ๆ?" : "คุณแน่ใจหรือไม่?",

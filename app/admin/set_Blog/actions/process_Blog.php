@@ -153,24 +153,27 @@ try {
         $blog_array = [
             'blog_subject' => $_POST['blog_subject'] ?? '',
             'blog_description' => $_POST['blog_description'] ?? '',
-            'blog_content'  => $_POST['blog_content'] ?? '',
+            'blog_content' => $_POST['blog_content'] ?? '',
             'blog_subject_en' => $_POST['blog_subject_en'] ?? '',
             'blog_description_en' => $_POST['blog_description_en'] ?? '',
-            'blog_content_en'  => $_POST['blog_content_en'] ?? '',
+            'blog_content_en' => $_POST['blog_content_en'] ?? '',
             'blog_subject_cn' => $_POST['blog_subject_cn'] ?? '',
             'blog_description_cn' => $_POST['blog_description_cn'] ?? '',
-            'blog_content_cn'  => $_POST['blog_content_cn'] ?? '',
+            'blog_content_cn' => $_POST['blog_content_cn'] ?? '',
             'blog_subject_jp' => $_POST['blog_subject_jp'] ?? '',
             'blog_description_jp' => $_POST['blog_description_jp'] ?? '',
-            'blog_content_jp'  => $_POST['blog_content_jp'] ?? '',
+            'blog_content_jp' => $_POST['blog_content_jp'] ?? '',
+            'blog_subject_kr' => $_POST['blog_subject_kr'] ?? '',
+            'blog_description_kr' => $_POST['blog_description_kr'] ?? '',
+            'blog_content_kr' => $_POST['blog_content_kr'] ?? '',
         ];
         
         $related_projects = $_POST['related_projects'] ?? [];
 
         if (isset($blog_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_blog 
-                (subject_blog, description_blog, content_blog, subject_blog_en, description_blog_en, content_blog_en, subject_blog_cn, description_blog_cn, content_blog_cn, subject_blog_jp, description_blog_jp, content_blog_jp, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (subject_blog, description_blog, content_blog, subject_blog_en, description_blog_en, content_blog_en, subject_blog_cn, description_blog_cn, content_blog_cn, subject_blog_jp, description_blog_jp, content_blog_jp, subject_blog_kr, description_blog_kr, content_blog_kr, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $blog_subject = $blog_array['blog_subject'];
             $blog_description = $blog_array['blog_description'];
@@ -184,10 +187,13 @@ try {
             $blog_subject_jp = $blog_array['blog_subject_jp'];
             $blog_description_jp = $blog_array['blog_description_jp'];
             $blog_content_jp = mb_convert_encoding($blog_array['blog_content_jp'], 'UTF-8', 'auto');
+            $blog_subject_kr = $blog_array['blog_subject_kr'];
+            $blog_description_kr = $blog_array['blog_description_kr'];
+            $blog_content_kr = mb_convert_encoding($blog_array['blog_content_kr'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sssssssssssss",
+                "ssssssssssssssss",
                 $blog_subject,
                 $blog_description,
                 $blog_content,
@@ -200,6 +206,9 @@ try {
                 $blog_subject_jp,
                 $blog_description_jp,
                 $blog_content_jp,
+                $blog_subject_kr,
+                $blog_description_kr,
+                $blog_content_kr,
                 $current_date
             );
 
@@ -253,16 +262,19 @@ try {
             'blog_id' => $_POST['blog_id'] ?? '',
             'blog_subject' => $_POST['blog_subject'] ?? '',
             'blog_description' => $_POST['blog_description'] ?? '',
-            'blog_content'  => $_POST['blog_content'] ?? '',
+            'blog_content' => $_POST['blog_content'] ?? '',
             'blog_subject_en' => $_POST['blog_subject_en'] ?? '',
             'blog_description_en' => $_POST['blog_description_en'] ?? '',
-            'blog_content_en'  => $_POST['blog_content_en'] ?? '',
+            'blog_content_en' => $_POST['blog_content_en'] ?? '',
             'blog_subject_cn' => $_POST['blog_subject_cn'] ?? '',
             'blog_description_cn' => $_POST['blog_description_cn'] ?? '',
-            'blog_content_cn'  => $_POST['blog_content_cn'] ?? '',
+            'blog_content_cn' => $_POST['blog_content_cn'] ?? '',
             'blog_subject_jp' => $_POST['blog_subject_jp'] ?? '',
             'blog_description_jp' => $_POST['blog_description_jp'] ?? '',
-            'blog_content_jp'  => $_POST['blog_content_jp'] ?? '',
+            'blog_content_jp' => $_POST['blog_content_jp'] ?? '',
+            'blog_subject_kr' => $_POST['blog_subject_kr'] ?? '',
+            'blog_description_kr' => $_POST['blog_description_kr'] ?? '',
+            'blog_content_kr' => $_POST['blog_content_kr'] ?? '',
         ];
 
         $related_projects = $_POST['related_projects'] ?? [];
@@ -281,6 +293,9 @@ try {
             subject_blog_jp = ?,
             description_blog_jp = ?,
             content_blog_jp = ?,
+            subject_blog_kr = ?,
+            description_blog_kr = ?,
+            content_blog_kr = ?,
             date_create = ? 
             WHERE blog_id = ?");
 
@@ -296,11 +311,14 @@ try {
             $blog_subject_jp = $blog_array['blog_subject_jp'] ?? '';
             $blog_description_jp = $blog_array['blog_description_jp'] ?? '';
             $blog_content_jp = mb_convert_encoding($blog_array['blog_content_jp'] ?? '', 'UTF-8', 'auto');
+            $blog_subject_kr = $blog_array['blog_subject_kr'] ?? '';
+            $blog_description_kr = $blog_array['blog_description_kr'] ?? '';
+            $blog_content_kr = mb_convert_encoding($blog_array['blog_content_kr'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $blog_id = $blog_array['blog_id'];
 
             $stmt->bind_param(
-                "sssssssssssssi",
+                "ssssssssssssssssi",
                 $blog_subject,
                 $blog_description,
                 $blog_content,
@@ -313,6 +331,9 @@ try {
                 $blog_subject_jp,
                 $blog_description_jp,
                 $blog_content_jp,
+                $blog_subject_kr,
+                $blog_description_kr,
+                $blog_content_kr,
                 $current_date,
                 $blog_id
             );
@@ -366,7 +387,7 @@ try {
                     $checkExistingCoverStmt->close();
 
                     if ($existingCount > 0) {
-                             // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
+                        // 5. ถ้ามีอยู่แล้ว ให้อัปเดตข้อมูล
                         $updateCoverStmt = $conn->prepare("UPDATE dn_blog_doc
                             SET file_name = ?, file_size = ?, file_type = ?, file_path = ?, api_path = ?
                             WHERE blog_id = ? AND status = 1 AND del = 0");
@@ -455,6 +476,21 @@ try {
                 }
             }
 
+            // จัดการรูปภาพใน Content (ภาษาเกาหลี)
+            if (isset($_FILES['image_files_kr']) && is_array($_FILES['image_files_kr']['name']) && $_FILES['image_files_kr']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_kr']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['blog_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang_tag'];
+                        $fileValues = [$blog_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'kr'];
+                        insertIntoDatabase($conn, 'dn_blog_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (KR): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
             $response = array('status' => 'success', 'message' => 'edit save');
         }
 
@@ -505,7 +541,7 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_blog LIKE '%$searchValue%' OR subject_blog_en LIKE '%$searchValue%' OR subject_blog_cn LIKE '%$searchValue%' OR subject_blog_jp LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_blog LIKE '%$searchValue%' OR subject_blog_en LIKE '%$searchValue%' OR subject_blog_cn LIKE '%$searchValue%' OR subject_blog_jp LIKE '%$searchValue%' OR subject_blog_kr LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;

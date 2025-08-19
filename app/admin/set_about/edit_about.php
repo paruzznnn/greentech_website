@@ -90,6 +90,9 @@ include '../check_permission.php';
             <button type="button" class="btn lang-switch-btn" data-lang="jp">
                 <img src="https://flagcdn.com/jp.svg" alt="Japanese" width="24"> JP
             </button>
+            <button type="button" class="btn lang-switch-btn" data-lang="kr">
+                <img src="https://flagcdn.com/kr.svg" alt="Korean" width="24"> KR
+            </button>
         </div>
     </div>
     
@@ -153,6 +156,20 @@ include '../check_permission.php';
                     <label>ตำแหน่ง (Japanese)</label>
                     <input type="text" name="position_jp" class="form-control">
                 </div>
+                <div class="lang-section kr-lang" style="display:none;">
+                    <label>ประเภท (Korean)</label>
+                    <select name="type_kr" class="form-control">
+                        <option value="text">Text</option>
+                        <option value="image">Image + Text</option>
+                        <option value="quote">Quote</option>
+                    </select>
+                    <label>เนื้อหา (HTML) (Korean)</label>
+                    <textarea name="content_kr" class="form-control summernote"></textarea>
+                    <label>ผู้พูด (Korean)</label>
+                    <input type="text" name="author_kr" class="form-control">
+                    <label>ตำแหน่ง (Korean)</label>
+                    <input type="text" name="position_kr" class="form-control">
+                </div>
                 <label>อัปโหลดรูปภาพ (ถ้ามี)</label>
                 <input type="file" name="image_file" class="form-control">
                 <button class="btn btn-primary mt-3" type="submit" id="submitAdd">เพิ่มเนื้อหาใหม่</button>
@@ -173,13 +190,15 @@ include '../check_permission.php';
             $author = htmlspecialchars($row['author'] ?? '');
             $position = htmlspecialchars($row['position'] ?? '');
             
-            // ดึงข้อมูลภาษาอังกฤษและจีน
+            // ดึงข้อมูลภาษาอังกฤษ, จีน, ญี่ปุ่น และเกาหลี
             $type_en = htmlspecialchars($row['type_en'] ?? '');
             $content_en = $row['content_en'] ?? '';
             $type_cn = htmlspecialchars($row['type_cn'] ?? '');
             $content_cn = $row['content_cn'] ?? '';
             $type_jp = htmlspecialchars($row['type_jp'] ?? '');
             $content_jp = $row['content_jp'] ?? '';
+            $type_kr = htmlspecialchars($row['type_kr'] ?? '');
+            $content_kr = $row['content_kr'] ?? '';
         ?>
             <div class="card mb-3 block-item" data-id="<?= $id ?>">
                 <div class="card-body">
@@ -246,6 +265,22 @@ include '../check_permission.php';
                         <input type="text" name="authors_jp[]" class="form-control" value="<?= $author ?>">
                         <label>ตำแหน่ง (Japanese)</label>
                         <input type="text" name="positions_jp[]" class="form-control" value="<?= $position ?>">
+                    </div>
+
+                    <div class="lang-section kr-lang" style="display:none;">
+                        <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
+                        <label>ประเภท (Korean)</label>
+                        <select name="types_kr[]" class="form-control">
+                            <option value="text" <?= $type_kr == 'text' ? 'selected' : '' ?>>Text</option>
+                            <option value="image" <?= $type_kr == 'image' ? 'selected' : '' ?>>Image + Text</option>
+                            <option value="quote" <?= $type_kr == 'quote' ? 'selected' : '' ?>>Quote</option>
+                        </select>
+                        <label>เนื้อหา (HTML) (Korean)</label>
+                        <textarea name="contents_kr[]" class="form-control summernote"><?= $content_kr ?></textarea>
+                        <label>ผู้พูด (Korean)</label>
+                        <input type="text" name="authors_kr[]" class="form-control" value="<?= $author ?>">
+                        <label>ตำแหน่ง (Korean)</label>
+                        <input type="text" name="positions_kr[]" class="form-control" value="<?= $position ?>">
                     </div>
 
                     <div class="image-section mt-3">

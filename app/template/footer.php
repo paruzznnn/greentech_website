@@ -22,19 +22,19 @@ global $conn;
 global $base_path;
 
 // --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp']) ? $_GET['lang'] : 'th';
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
 
 $footer_settings = [];
 $footer_id_for_display = 1;
 
-// --- MODIFIED: Select English, Chinese, and Japanese columns from the database ---
+// --- MODIFIED: Select English, Chinese, Japanese, and Korean columns from the database ---
 $stmt_footer = $conn->prepare("SELECT 
-    bg_color, footer_top_title, footer_top_title_en, footer_top_title_cn, footer_top_title_jp, footer_top_subtitle, footer_top_subtitle_en, footer_top_subtitle_cn, footer_top_subtitle_jp,
-    about_heading, about_heading_en, about_heading_cn, about_heading_jp, about_text, about_text_en, about_text_cn, about_text_jp,
-    contact_heading, contact_heading_en, contact_heading_cn, contact_heading_jp, contact_address, contact_address_en, contact_address_cn, contact_address_jp,
+    bg_color, footer_top_title, footer_top_title_en, footer_top_title_cn, footer_top_title_jp, footer_top_title_kr, footer_top_subtitle, footer_top_subtitle_en, footer_top_subtitle_cn, footer_top_subtitle_jp, footer_top_subtitle_kr,
+    about_heading, about_heading_en, about_heading_cn, about_heading_jp, about_heading_kr, about_text, about_text_en, about_text_cn, about_text_jp, about_text_kr,
+    contact_heading, contact_heading_en, contact_heading_cn, contact_heading_jp, contact_heading_kr, contact_address, contact_address_en, contact_address_cn, contact_address_jp, contact_address_kr,
     contact_phone, contact_email,
-    contact_hours_wk, contact_hours_wk_en, contact_hours_wk_cn, contact_hours_wk_jp, contact_hours_sat, contact_hours_sat_en, contact_hours_sat_cn, contact_hours_sat_jp,
-    social_heading, social_heading_en, social_heading_cn, social_heading_jp, social_links_json,
+    contact_hours_wk, contact_hours_wk_en, contact_hours_wk_cn, contact_hours_wk_jp, contact_hours_wk_kr, contact_hours_sat, contact_hours_sat_en, contact_hours_sat_cn, contact_hours_sat_jp, contact_hours_sat_kr,
+    social_heading, social_heading_en, social_heading_cn, social_heading_jp, social_heading_kr, social_links_json,
     copyright_text
     FROM footer_settings WHERE id = ?");
 $stmt_footer->bind_param("i", $footer_id_for_display);
@@ -51,47 +51,56 @@ if ($data = $result_footer->fetch_assoc()) {
     }
 } else {
     // กำหนดค่า default หากไม่พบข้อมูลใน database (ควรมีการ insert ข้อมูลเริ่มต้นไว้แล้ว)
-    // --- MODIFIED: Added English, Chinese, and Japanese default values ---
+    // --- MODIFIED: Added English, Chinese, Japanese, and Korean default values ---
     $footer_settings = [
         'bg_color' => '#393939',
         'footer_top_title' => 'ลงทะเบียน',
         'footer_top_title_en' => 'Register',
         'footer_top_title_cn' => '注册',
         'footer_top_title_jp' => '登録',
+        'footer_top_title_kr' => '가입하다',
         'footer_top_subtitle' => 'สมัครรับจดหมายข่าวของเราสำหรับข่าวสารล่าสุด และข้อเสนอสุดพิเศษ',
         'footer_top_subtitle_en' => 'Subscribe to our newsletter for the latest news and special offers.',
         'footer_top_subtitle_cn' => '订阅我们的时事通讯，获取最新消息和特别优惠。',
         'footer_top_subtitle_jp' => '最新ニュースや特別オファーのニュースレターを購読してください。',
+        'footer_top_subtitle_kr' => '최신 뉴스 및 특별 행사를 위한 뉴스레터를 구독하세요.',
         'about_heading' => 'เกี่ยวกับเรา',
         'about_heading_en' => 'About Us',
         'about_heading_cn' => '关于我们',
         'about_heading_jp' => '会社概要',
+        'about_heading_kr' => '회사 소개',
         'about_text' => 'บริษัท แทรนดาร์ อินเตอร์เนชั่นแนล จำกัดได้ก่อตั้งขึ้นเมื่อวันที่ 1 มีนาคม 2531 เราเป็นผู้เชี่ยวชาญด้านระบบฝ้าดูดซับเสียง ผนังกั้นเสียงและฝ้าอะคูสติกทุกชนิด เรามีทีมงานและผู้เชี่ยวชาญที่พร้อมให้คำปรึกษาในการออกแบบและติดตั้ง พร้อมทั้งผลิตและจำหน่ายแผ่นอะคูสติก ผนังดูดซับเสียง ซาวน์บอร์ด ผนังกั้นเสียง แผ่นฝ้า ที่ได้มาตรฐานจากทั้งในและต่างประเทศ รวมถึงการให้บริการที่มีประสิทธิภาพจากแทรนดาร์ อะคูสติก',
         'about_text_en' => 'Trandar International Co., Ltd. was founded on March 1, 1988. We are experts in sound-absorbing ceilings, soundproof walls, and all types of acoustic ceilings. We have a team and experts ready to provide advice on design and installation. We also manufacture and distribute acoustic panels, sound-absorbing walls, soundboards, and ceiling panels that meet both domestic and international standards, along with efficient services from Trandar Acoustic.',
         'about_text_cn' => 'Trandar International Co., Ltd. 成立于 1988 年 3 月 1 日。我们是吸音天花板、隔音墙和各种声学天花板系统的专家。我们拥有一支随时可以提供设计和安装咨询的团队和专家。我们还制造和分销符合国内和国际标准的声学板、吸音墙、隔音板和天花板，并提供来自 Trandar Acoustic 的高效服务。',
         'about_text_jp' => 'Trandar International Co., Ltd.は1988年3月1日に設立されました。私たちは、吸音天井、防音壁、およびあらゆる種類のアコースティック天井のシステムを専門としています。設計と設置に関するアドバイスを提供する専門家チームがいます。また、国内外の基準を満たすアコースティックパネル、吸音壁、サウンドボード、および天井パネルを製造・販売しており、Trandar Acousticによる効率的なサービスを提供しています。',
+        'about_text_kr' => 'Trandar International Co., Ltd.는 1988년 3월 1일에 설립되었습니다. 우리는 흡음 천장, 방음벽 및 모든 유형의 음향 천장 시스템을 전문으로 합니다. 우리는 디자인 및 설치에 대한 조언을 제공할 준비가 된 팀과 전문가를 보유하고 있습니다. 또한 국내외 표준을 충족하는 음향 패널, 흡음벽, 사운드보드 및 천장 패널을 제조 및 유통하며, Trandar Acoustic에서 효율적인 서비스를 제공합니다.',
         'contact_heading' => 'ติดต่อเรา',
         'contact_heading_en' => 'Contact Us',
         'contact_heading_cn' => '联系我们',
         'contact_heading_jp' => 'お問い合わせ',
+        'contact_heading_kr' => '문의하기',
         'contact_address' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
         'contact_address_en' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
         'contact_address_cn' => '曼谷 Suan Luang Phatthanakan 40 102号，邮编 10250',
         'contact_address_jp' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
+        'contact_address_kr' => '102 Phatthanakan 40, Suan Luang, Bangkok 10250',
         'contact_phone' => '(+66)2 722 7007',
         'contact_email' => 'info@trandar.com',
         'contact_hours_wk' => 'Monday – Friday 08:30 AM – 05:00 PM',
         'contact_hours_wk_en' => 'Monday – Friday 08:30 AM – 05:00 PM',
         'contact_hours_wk_cn' => '周一至周五 08:30 AM – 05:00 PM',
         'contact_hours_wk_jp' => '月曜日～金曜日 08:30 AM～05:00 PM',
+        'contact_hours_wk_kr' => '월요일 – 금요일 08:30 AM – 05:00 PM',
         'contact_hours_sat' => 'Saturday 08:30 AM – 12:00 PM',
         'contact_hours_sat_en' => 'Saturday 08:30 AM – 12:00 PM',
         'contact_hours_sat_cn' => '周六 08:30 AM – 12:00 PM',
         'contact_hours_sat_jp' => '土曜日 08:30 AM～12:00 PM',
+        'contact_hours_sat_kr' => '토요일 08:30 AM – 12:00 PM',
         'social_heading' => 'Follow Us',
         'social_heading_en' => 'Follow Us',
         'social_heading_cn' => '关注我们',
         'social_heading_jp' => 'フォロー',
+        'social_heading_kr' => '우리를 따르십시오',
         'social_links' => [
             ["icon" => "fab fa-facebook-f", "url" => "https://www.facebook.com/trandaracoustic/", "color" => "#3b5998"],
             ["icon" => "fab fa-instagram", "url" => "https://www.instagram.com/trandaracoustics/", "color" => "#e1306c"],
@@ -110,6 +119,7 @@ function get_text($settings, $field_name, $lang) {
     $field_en = $field_name . '_en';
     $field_cn = $field_name . '_cn';
     $field_jp = $field_name . '_jp';
+    $field_kr = $field_name . '_kr';
     if ($lang === 'en' && !empty($settings[$field_en])) {
         return $settings[$field_en];
     }
@@ -118,6 +128,9 @@ function get_text($settings, $field_name, $lang) {
     }
     if ($lang === 'jp' && !empty($settings[$field_jp])) {
         return $settings[$field_jp];
+    }
+    if ($lang === 'kr' && !empty($settings[$field_kr])) {
+        return $settings[$field_kr];
     }
     return $settings[$field_name];
 }
@@ -138,7 +151,7 @@ function get_text($settings, $field_name, $lang) {
                             <?php echo $item['text']; ?>
                         </span>
                     </aa>
-                <?php endforeach; ?>    
+                <?php endforeach; ?>     
             </div>
         </div>
     </div>
@@ -174,7 +187,8 @@ function get_text($settings, $field_name, $lang) {
                             'th' => 'ยังไม่มี Social Link กำหนดค่า.',
                             'en' => 'No Social Links configured.',
                             'cn' => '未配置社交链接。',
-                            'jp' => 'ソーシャルリンクが設定されていません。'
+                            'jp' => 'ソーシャルリンクが設定されていません。',
+                            'kr' => '구성된 소셜 링크가 없습니다.'
                         ];
                         ?>
                         <p class="text-muted"><?php echo $noSocialText[$lang]; ?></p>

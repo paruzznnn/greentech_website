@@ -578,6 +578,7 @@ a {
             <option value="en" data-flag="https://flagcdn.com/us.svg">English</option>
             <option value="cn" data-flag="https://flagcdn.com/cn.svg">简体中文</option>
             <option value="jp" data-flag="https://flagcdn.com/jp.svg">日本語</option>
+            <option value="kr" data-flag="https://flagcdn.com/kr.svg">한국어</option>
         </select>
     </div>
         <div class="header-social-links">
@@ -646,6 +647,9 @@ a {
                         </a>
                         <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>">
                             <img src="https://flagcdn.com/jp.svg" alt="Japanese Flag" width="24"> 日本語
+                        </a>
+                        <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'kr']); ?>">
+                            <img src="https://flagcdn.com/kr.svg" alt="Korean Flag" width="24"> 한국어
                         </a>
                     </div>
                 </div>
@@ -827,7 +831,8 @@ a {
                 'th': 'https://flagcdn.com/th.svg',
                 'en': 'https://flagcdn.com/us.svg',
                 'cn': 'https://flagcdn.com/cn.svg',
-                'jp': 'https://flagcdn.com/jp.svg'
+                'jp': 'https://flagcdn.com/jp.svg',
+                'kr': 'https://flagcdn.com/kr.svg'
             };
             const flagUrl = flagMap[language] || flagMap['th'];
             
@@ -1018,6 +1023,7 @@ a {
         th: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>",
         en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>",
         cn: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>",
-        jp: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>"
+        jp: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>",
+        kr: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'kr']); ?>"
     };
 </script>

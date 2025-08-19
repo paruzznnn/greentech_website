@@ -90,6 +90,9 @@ include '../check_permission.php';
             <button type="button" class="btn lang-switch-btn" data-lang="jp">
                 <img src="https://flagcdn.com/jp.svg" alt="Japanese" width="24"> JP
             </button>
+            <button type="button" class="btn lang-switch-btn" data-lang="kr">
+                <img src="https://flagcdn.com/kr.svg" alt="Korean" width="24"> KR
+            </button>
         </div>
     </div>
     
@@ -141,6 +144,16 @@ include '../check_permission.php';
                     <label>เนื้อหา (HTML) (Japanese)</label>
                     <textarea name="content_jp" class="form-control summernote"></textarea>
                 </div>
+                <div class="lang-section kr-lang" style="display:none;">
+                    <label>ประเภท (Korean)</label>
+                    <select name="type_kr" class="form-control">
+                        <option value="text">Text</option>
+                        <option value="image">Image + Text</option>
+                        <option value="quote">Quote</option>
+                    </select>
+                    <label>เนื้อหา (HTML) (Korean)</label>
+                    <textarea name="content_kr" class="form-control summernote"></textarea>
+                </div>
                 <label>อัปโหลดรูปภาพ (ถ้ามี)</label>
                 <input type="file" name="image_file" class="form-control">
                 <button class="btn btn-primary mt-3" type="submit" id="submitAdd">เพิ่มเนื้อหาใหม่</button>
@@ -172,6 +185,10 @@ include '../check_permission.php';
             // ดึงข้อมูลภาษาญี่ปุ่นจากคอลัมน์ _jp ถ้ามี
             $type_jp = htmlspecialchars($row['type_jp'] ?? '');
             $content_jp = $row['content_jp'] ?? '';
+            
+            // ดึงข้อมูลภาษาเกาหลีจากคอลัมน์ _kr ถ้ามี
+            $type_kr = htmlspecialchars($row['type_kr'] ?? '');
+            $content_kr = $row['content_kr'] ?? '';
         ?>
             <div class="card mb-3 block-item" data-id="<?= $id ?>">
                 <div class="card-body">
@@ -226,6 +243,18 @@ include '../check_permission.php';
                         </select>
                         <label>เนื้อหา (HTML) (Japanese)</label>
                         <textarea name="contents_jp[]" class="form-control summernote"><?= $content_jp ?></textarea>
+                    </div>
+
+                    <div class="lang-section kr-lang" style="display:none;">
+                        <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
+                        <label>ประเภท (Korean)</label>
+                        <select name="types_kr[]" class="form-control">
+                            <option value="text" <?= $type_kr == 'text' ? 'selected' : '' ?>>Text</option>
+                            <option value="image" <?= $type_kr == 'image' ? 'selected' : '' ?>>Image + Text</option>
+                            <option value="quote" <?= $type_kr == 'quote' ? 'selected' : '' ?>>Quote</option>
+                        </select>
+                        <label>เนื้อหา (HTML) (Korean)</label>
+                        <textarea name="contents_kr[]" class="form-control summernote"><?= $content_kr ?></textarea>
                     </div>
 
                     <div class="image-section mt-3">

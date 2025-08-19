@@ -19,6 +19,11 @@
             "name": "Japanese",
             "abbreviation": "JP",
             "flag": "https://flagcdn.com/w320/jp.png"
+        },
+        {
+            "name": "Korean",
+            "abbreviation": "KR",
+            "flag": "https://flagcdn.com/w320/kr.png"
         }
     ]
 }

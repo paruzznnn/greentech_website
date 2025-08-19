@@ -5,19 +5,21 @@ global $conn;
 // ----------------------------------------------------
 // ส่วนที่ 1: กำหนดภาษาและค่าเริ่มต้น
 // ----------------------------------------------------
-// รองรับภาษาไทย (th), อังกฤษ (en), จีน (cn), และญี่ปุ่น (jp)
+// รองรับภาษาไทย (th), อังกฤษ (en), จีน (cn), ญี่ปุ่น (jp), และเกาหลี (kr)
 $lang = 'th'; // Set a default value first
 if (isset($_GET['lang'])) {
     if ($_GET['lang'] === 'en') {
         $lang = 'en';
     } elseif ($_GET['lang'] === 'cn') {
         $lang = 'cn';
-    } elseif ($_GET['lang'] === 'jp') { // Added Japanese language check
+    } elseif ($_GET['lang'] === 'jp') {
         $lang = 'jp';
+    } elseif ($_GET['lang'] === 'kr') { // Added Korean language check
+        $lang = 'kr';
     }
 }
 
-$subjectTitle = ($lang === 'en') ? "Blog" : (($lang === 'cn') ? "博客" : (($lang === 'jp') ? "ブログ" : "บล็อก"));
+$subjectTitle = ($lang === 'en') ? "Blog" : (($lang === 'cn') ? "博客" : (($lang === 'jp') ? "ブログ" : (($lang === 'kr') ? "블로그" : "บล็อก")));
 $pageUrl = "";
 
 // ----------------------------------------------------
@@ -31,7 +33,7 @@ if (isset($_GET['id'])) {
     $decodedId = base64_decode(urldecode($_GET['id']));
 
     if ($decodedId !== false) {
-        $subjectColumn = ($lang === 'en') ? 'subject_blog_en' : (($lang === 'cn') ? 'subject_blog_cn' : (($lang === 'jp') ? 'subject_blog_jp' : 'subject_blog'));
+        $subjectColumn = ($lang === 'en') ? 'subject_blog_en' : (($lang === 'cn') ? 'subject_blog_cn' : (($lang === 'jp') ? 'subject_blog_jp' : (($lang === 'kr') ? 'subject_blog_kr' : 'subject_blog')));
         $stmt = $conn->prepare("SELECT {$subjectColumn} FROM dn_blog WHERE del = 0 AND blog_id = ?");
         $stmt->bind_param('i', $decodedId);
         $stmt->execute();
@@ -312,7 +314,7 @@ if (isset($_GET['id'])) {
         <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する：' : 'แชร์หน้านี้:')); ?></p>
+                <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する：' : (($lang === 'kr') ? '이 페이지를 공유하기:' : 'แชร์หน้านี้:'))); ?></p>
                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                     <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                 </a>
@@ -331,7 +333,7 @@ if (isset($_GET['id'])) {
                 <a href="https://www.tiktok.com/" target="_blank">
                     <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                 </a>
-                <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : 'คัดลอกลิงก์')); ?></button>
+                <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : (($lang === 'kr') ? '링크 복사' : 'คัดลอกลิงก์'))); ?></button>
                 </div>
 
                 <div class="row">
@@ -341,13 +343,14 @@ if (isset($_GET['id'])) {
                                 $decodedId = base64_decode(urldecode($_GET['id']));
                                 
                                 if ($decodedId !== false) {
-                                    $contentColumn = ($lang === 'en') ? 'content_blog_en' : (($lang === 'cn') ? 'content_blog_cn' : (($lang === 'jp') ? 'content_blog_jp' : 'content_blog'));
+                                    $contentColumn = ($lang === 'en') ? 'content_blog_en' : (($lang === 'cn') ? 'content_blog_cn' : (($lang === 'jp') ? 'content_blog_jp' : (($lang === 'kr') ? 'content_blog_kr' : 'content_blog')));
                                     $stmt = $conn->prepare("SELECT 
                                         dn.blog_id, 
                                         dn.subject_blog, 
                                         dn.subject_blog_en,
                                         dn.subject_blog_cn,
                                         dn.subject_blog_jp,
+                                        dn.subject_blog_kr,
                                         dn.{$contentColumn} AS content_blog, 
                                         dn.date_create, 
                                         GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -384,12 +387,12 @@ if (isset($_GET['id'])) {
                                             echo '</div>';
                                         }
                                     } else {
-                                        echo ($lang === 'en') ? "No data found." : (($lang === 'cn') ? "未找到数据" : (($lang === 'jp') ? "データが見つかりません" : "ไม่มีข้อมูล"));
+                                        echo ($lang === 'en') ? "No data found." : (($lang === 'cn') ? "未找到数据" : (($lang === 'jp') ? "データが見つかりません" : (($lang === 'kr') ? "데이터를 찾을 수 없습니다." : "ไม่มีข้อมูล")));
                                     }
 
                                     $stmt->close(); 
                                 } else {
-                                    echo ($lang === 'en') ? "Invalid ID." : (($lang === 'cn') ? "无效ID" : (($lang === 'jp') ? "無効なID" : "Invalid ID."));
+                                    echo ($lang === 'en') ? "Invalid ID." : (($lang === 'cn') ? "无效ID" : (($lang === 'jp') ? "無効なID" : (($lang === 'kr') ? "유효하지 않은 ID입니다." : "Invalid ID.")));
                                 }
                             }
                         ?>
@@ -398,7 +401,7 @@ if (isset($_GET['id'])) {
                 
                 <hr style="border-top: dashed 1px; margin: 20px 0;">
                 <div class="social-share">
-                    <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する：' : 'แชร์หน้านี้:')); ?></p>
+                    <p><?php echo ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する：' : (($lang === 'kr') ? '이 페이지를 공유하기:' : 'แชร์หน้านี้:'))); ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -417,12 +420,12 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : 'คัดลอกลิงก์')); ?></button>
+                    <button class="copy-link-btn" onclick="copyLink()"><?php echo ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : (($lang === 'kr') ? '링크 복사' : 'คัดลอกลิงก์'))); ?></button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p><?= ($lang === 'en') ? "Inquire/Order Trandar Acoustics products at" : (($lang === 'cn') ? "咨询/订购 Trandar Acoustics 产品：" : (($lang === 'jp') ? "Trandar Acoustics製品に関するお問い合わせ・ご注文はこちら" : "สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่")) ?></p>
+                    <p><?= ($lang === 'en') ? "Inquire/Order Trandar Acoustics products at" : (($lang === 'cn') ? "咨询/订购 Trandar Acoustics 产品：" : (($lang === 'jp') ? "Trandar Acoustics製品に関するお問い合わせ・ご注文はこちら" : (($lang === 'kr') ? "Trandar Acoustics 제품 문의/주문:" : "สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่"))) ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -431,14 +434,14 @@ if (isset($_GET['id'])) {
                         <aa href="https://lin.ee/xJr661u" target="_blank">https://lin.ee/xJr661u</aa>
                     </p>
                     <p>☎️ Tel : 02-722-7007</p> 
-                </div> 
+                </div>
 
-                <?php
+<?php
                 if (isset($_GET['id'])) {
                     $decodedId = base64_decode(urldecode($_GET['id']));
                     if ($decodedId !== false) {
-                        $projectSubjectColumn = ($lang === 'en') ? 'dp.subject_project_en' : (($lang === 'cn') ? 'dp.subject_project_cn' : (($lang === 'jp') ? 'dp.subject_project_jp' : 'dp.subject_project'));
-                        $projectDescColumn = ($lang === 'en') ? 'dp.description_project_en' : (($lang === 'cn') ? 'dp.description_project_cn' : (($lang === 'jp') ? 'dp.description_project_jp' : 'dp.description_project'));
+                        $projectSubjectColumn = ($lang === 'en') ? 'dp.subject_project_en' : (($lang === 'cn') ? 'dp.subject_project_cn' : (($lang === 'jp') ? 'dp.subject_project_jp' : (($lang === 'kr') ? 'dp.subject_project_kr' : 'dp.subject_project')));
+                        $projectDescColumn = ($lang === 'en') ? 'dp.description_project_en' : (($lang === 'cn') ? 'dp.description_project_cn' : (($lang === 'jp') ? 'dp.description_project_jp' : (($lang === 'kr') ? 'dp.description_project_kr' : 'dp.description_project')));
                         
                         $stmt_project = $conn->prepare("
                             SELECT 
@@ -458,7 +461,7 @@ if (isset($_GET['id'])) {
                         $project_cards_data = $result_project->fetch_all(MYSQLI_ASSOC);
 
                         if ($result_project->num_rows > 0) {
-                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? "Related Projects" : (($lang === 'cn') ? "相关项目" : (($lang === 'jp') ? "関連プロジェクト" : "โปรเจกต์ที่เกี่ยวข้องกับบทความนี้"))) . '</h3>';
+                            echo '<h3 style="padding-top: 40px;">' . ($lang === 'en' ? "Related Projects" : (($lang === 'cn') ? "相关项目" : (($lang === 'jp') ? "関連プロジェクト" : (($lang === 'kr') ? "관련 프로젝트" : "โปรเจกต์ที่เกี่ยวข้องกับบทความนี้")))) . '</h3>';
                             echo '<div class="project-wrapper-container">';
                             echo '<div class="scroll-btn left" id="project-scroll-left" onclick="scrollProject(\'left\')">&#10094;</div>';
                             echo '<div class="scroll-btn right" id="project-scroll-right" onclick="scrollProject(\'right\')">&#10095;</div>';
@@ -483,8 +486,8 @@ if (isset($_GET['id'])) {
                                 echo '</a>';
                                 
                                 // Start of related shops for this project
-                                $shopSubjectColumn = ($lang === 'en') ? 'ds.subject_shop_en' : (($lang === 'cn') ? 'ds.subject_shop_cn' : (($lang === 'jp') ? 'ds.subject_shop_jp' : 'ds.subject_shop'));
-                                $shopDescColumn = ($lang === 'en') ? 'ds.description_shop_en' : (($lang === 'cn') ? 'ds.description_shop_cn' : (($lang === 'jp') ? 'ds.description_shop_jp' : 'ds.description_shop'));
+                                $shopSubjectColumn = ($lang === 'en') ? 'ds.subject_shop_en' : (($lang === 'cn') ? 'ds.subject_shop_cn' : (($lang === 'jp') ? 'ds.subject_shop_jp' : (($lang === 'kr') ? 'ds.subject_shop_kr' : 'ds.subject_shop')));
+                                $shopDescColumn = ($lang === 'en') ? 'ds.description_shop_en' : (($lang === 'cn') ? 'ds.description_shop_cn' : (($lang === 'jp') ? 'ds.description_shop_jp' : (($lang === 'kr') ? 'ds.description_shop_kr' : 'ds.description_shop')));
                                 $stmt_shop = $conn->prepare("
                                     SELECT 
                                         ds.shop_id, 
@@ -504,7 +507,7 @@ if (isset($_GET['id'])) {
                                 $shop_count = $result_shop->num_rows;
 
                                 if ($shop_count > 0) {
-                                    echo '<h6 class="shop-title">' . ($lang === 'en' ? "Products used in this project" : (($lang === 'cn') ? "本项目中使用的产品" : (($lang === 'jp') ? "このプロジェクトで使用された製品" : "สินค้าที่ใช้ในโปรเจกต์นี้"))) . '</h6>';
+                                    echo '<h6 class="shop-title">' . ($lang === 'en' ? "Products used in this project" : (($lang === 'cn') ? "本项目中使用的产品" : (($lang === 'jp') ? "このプロジェクトで使用された製品" : (($lang === 'kr') ? "이 프로젝트에서 사용된 제품" : "สินค้าที่ใช้ในโปรเจกต์นี้")))) . '</h6>';
                                     echo '<div class="shop-wrapper-container">';
                                     echo '<div class="scroll-btn left" id="shop-scroll-left-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'left\')">&#10094;</div>';
                                     echo '<div class="scroll-btn right" id="shop-scroll-right-' . $row_project['project_id'] . '" onclick="scrollShop(\'shop-scroll-' . $row_project['project_id'] . '\', \'right\')">&#10095;</div>';
@@ -546,14 +549,14 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? "Comments" : (($lang === 'cn') ? "评论" : (($lang === 'jp') ? "コメント" : "ความคิดเห็น")) ?></h3>
-                <p><?= ($lang === 'en') ? "Your email will not be displayed. Required fields are marked with *" : (($lang === 'cn') ? "您的电子邮件将不会被公开。必填字段标有 *" : (($lang === 'jp') ? "メールアドレスは公開されません。必須フィールドには * が付いています" : "อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *")) ?></p>
+                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? "Comments" : (($lang === 'cn') ? "评论" : (($lang === 'jp') ? "コメント" : (($lang === 'kr') ? "댓글" : "ความคิดเห็น"))) ?></h3>
+                <p><?= ($lang === 'en') ? "Your email will not be displayed. Required fields are marked with *" : (($lang === 'cn') ? "您的电子邮件将不会被公开。必填字段标有 *" : (($lang === 'jp') ? "メールアドレスは公開されません。必須フィールドには * が付いています" : (($lang === 'kr') ? "이메일은 공개되지 않습니다. 필수 필드는 * 로 표시됩니다" : "อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *"))) ?></p>
                 <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? "Comment *" : (($lang === 'cn') ? "评论 *" : (($lang === 'jp') ? "コメント *" : "ความคิดเห็น *")) ?>"
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? "Comment *" : (($lang === 'cn') ? "评论 *" : (($lang === 'jp') ? "コメント *" : (($lang === 'kr') ? "댓글 *" : "ความคิดเห็น *"))) ?>"
                         style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                     <button type="submit"
                         style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        <?= ($lang === 'en') ? "Post Comment" : (($lang === 'cn') ? "发表评论" : (($lang === 'jp') ? "コメントを投稿" : "แสดงความคิดเห็น")) ?>
+                        <?= ($lang === 'en') ? "Post Comment" : (($lang === 'cn') ? "发表评论" : (($lang === 'jp') ? "コメントを投稿" : (($lang === 'kr') ? "댓글 달기" : "แสดงความคิดเห็น"))) ?>
                     </button>
                 </form>
                 
@@ -592,19 +595,19 @@ if (isset($_GET['id'])) {
                 .then(res => res.json())
                 .then(result => {
                     if (result.status === 'success') {
-                        alert("<?= ($lang === 'en') ? "Comment saved successfully." : (($lang === 'cn') ? "评论保存成功。" : (($lang === 'jp') ? "コメントを保存しました。" : "บันทึกความคิดเห็นเรียบร้อยแล้ว")) ?>");
+                        alert("<?= ($lang === 'en') ? "Comment saved successfully." : (($lang === 'cn') ? "评论保存成功。" : (($lang === 'jp') ? "コメントを保存しました。" : (($lang === 'kr') ? "댓글이 성공적으로 저장되었습니다." : "บันทึกความคิดเห็นเรียบร้อยแล้ว"))) ?>");
                         document.getElementById("commentText").value = '';
                     } else {
-                        alert("<?= ($lang === 'en') ? "An error occurred: " : (($lang === 'cn') ? "发生错误：" : (($lang === 'jp') ? "エラーが発生しました：" : "เกิดข้อผิดพลาด: ")) ?>" + result.message);
+                        alert("<?= ($lang === 'en') ? "An error occurred: " : (($lang === 'cn') ? "发生错误：" : (($lang === 'jp') ? "エラーが発生しました：" : (($lang === 'kr') ? "오류가 발생했습니다:" : "เกิดข้อผิดพลาด: "))) ?>" + result.message);
                     }
                 });
             } else {
-                alert("<?= ($lang === 'en') ? "You must be logged in as a viewer to comment." : (($lang === 'cn') ? "您必须以 viewer 身份登录才能发表评论。" : (($lang === 'jp') ? "コメントするにはビューアとしてログインする必要があります。" : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น")) ?>");
+                alert("<?= ($lang === 'en') ? "You must be logged in as a viewer to comment." : (($lang === 'cn') ? "您必须以 viewer 身份登录才能发表评论。" : (($lang === 'jp') ? "コメントするにはビューアとしてログインする必要があります。" : (($lang === 'kr') ? "댓글을 달려면 뷰어로 로그인해야 합니다." : "ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น"))) ?>");
             }
         })
         .catch(err => {
             console.error("Error verifying user:", err);
-            alert("<?= ($lang === 'en') ? "Error verifying identity." : (($lang === 'cn') ? "身份验证出错。" : (($lang === 'jp') ? "身元確認エラー。" : "เกิดข้อผิดพลาดในการยืนยันตัวตน")) ?>");
+            alert("<?= ($lang === 'en') ? "Error verifying identity." : (($lang === 'cn') ? "身份验证出错。" : (($lang === 'jp') ? "身元確認エラー。" : (($lang === 'kr') ? "신원 확인 오류." : "เกิดข้อผิดพลาดในการยืนยันตัวตน"))) ?>");
         });
     });
 
@@ -631,9 +634,9 @@ if (isset($_GET['id'])) {
     function copyLink() {
         const pageUrl = "<?= $pageUrl ?>";
         navigator.clipboard.writeText(pageUrl).then(function() {
-            alert("<?= ($lang === 'en') ? "Link copied successfully." : (($lang === 'cn') ? "链接复制成功。" : (($lang === 'jp') ? "リンクが正常にコピーされました。" : "คัดลอกลิงก์เรียบร้อยแล้ว")) ?>");
+            alert("<?= ($lang === 'en') ? "Link copied successfully." : (($lang === 'cn') ? "链接复制成功。" : (($lang === 'jp') ? "リンクが正常にコピーされました。" : (($lang === 'kr') ? "링크가 성공적으로 복사되었습니다." : "คัดลอกลิงก์เรียบร้อยแล้ว"))) ?>");
         }, function() {
-            alert("<?= ($lang === 'en') ? "Could not copy link. Please copy manually." : (($lang === 'cn') ? "无法复制链接。请手动复制。" : (($lang === 'jp') ? "リンクをコピーできませんでした。手動でコピーしてください。" : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง")) ?>");
+            alert("<?= ($lang === 'en') ? "Could not copy link. Please copy manually." : (($lang === 'cn') ? "无法复制链接。请手动复制。" : (($lang === 'jp') ? "リンクをコピーできませんでした。手動でコピーしてください。" : (($lang === 'kr') ? "링크를 복사할 수 없습니다. 수동으로 복사하십시오." : "ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง"))) ?>");
         });
     }
 

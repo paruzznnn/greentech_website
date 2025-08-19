@@ -63,17 +63,17 @@ $(document).ready(function () {
 
         // Copy type
         const thaiType = thaiSection.find('select[name^="types_th"]').val();
-        targetLangSection.find('select[name^="types_en"], select[name^="types_cn"], select[name^="types_jp"]').val(thaiType);
+        targetLangSection.find('select[name^="types_en"], select[name^="types_cn"], select[name^="types_jp"], select[name^="types_kr"]').val(thaiType);
 
         // Copy content from Summernote
         const thaiContent = thaiSection.find('textarea[name^="contents_th"]').summernote('code');
-        targetLangSection.find('textarea[name^="contents_en"], textarea[name^="contents_cn"], textarea[name^="contents_jp"]').summernote('code', thaiContent);
+        targetLangSection.find('textarea[name^="contents_en"], textarea[name^="contents_cn"], textarea[name^="contents_jp"], textarea[name^="contents_kr"]').summernote('code', thaiContent);
         
         // Copy author and position
         const thaiAuthor = thaiSection.find('input[name^="authors"]').val();
         const thaiPosition = thaiSection.find('input[name^="positions"]').val();
-        targetLangSection.find('input[name^="authors_en"], input[name^="authors_cn"], input[name^="authors_jp"]').val(thaiAuthor);
-        targetLangSection.find('input[name^="positions_en"], input[name^="positions_cn"], input[name^="positions_jp"]').val(thaiPosition);
+        targetLangSection.find('input[name^="authors_en"], input[name^="authors_cn"], input[name^="authors_jp"], input[name^="authors_kr"]').val(thaiAuthor);
+        targetLangSection.find('input[name^="positions_en"], input[name^="positions_cn"], input[name^="positions_jp"], input[name^="positions_kr"]').val(thaiPosition);
     });
 
     // Handle form submission for ADDING new content (ใช้ AJAX)

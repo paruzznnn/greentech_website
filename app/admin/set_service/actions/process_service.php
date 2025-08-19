@@ -80,10 +80,14 @@ try {
         $content_cn = $_POST['content_cn'] ?? ''; // Chinese is optional
         $type_jp = $_POST['type_jp'] ?? ''; // Japanese is optional
         $content_jp = $_POST['content_jp'] ?? ''; // Japanese is optional
+        
+        // Add Korean (kr) fields
+        $type_kr = $_POST['type_kr'] ?? ''; // Korean is optional
+        $content_kr = $_POST['content_kr'] ?? ''; // Korean is optional
 
         $image_url = null;
 
-        if (!empty($content_th) || !empty($content_en) || !empty($content_cn) || !empty($content_jp)) {
+        if (!empty($content_th) || !empty($content_en) || !empty($content_cn) || !empty($content_jp) || !empty($content_kr)) {
             // Handle image file if uploaded
             if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
                 $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
@@ -96,8 +100,8 @@ try {
                 }
             }
 
-            $stmt = $conn->prepare("INSERT INTO service_content (type, content, type_en, content_en, type_cn, content_cn, type_jp, content_jp, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssssss", $type_th, $content_th, $type_en, $content_en, $type_cn, $content_cn, $type_jp, $content_jp, $image_url, $author_th, $position_th);
+            $stmt = $conn->prepare("INSERT INTO service_content (type, content, type_en, content_en, type_cn, content_cn, type_jp, content_jp, type_kr, content_kr, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssssssss", $type_th, $content_th, $type_en, $content_en, $type_cn, $content_cn, $type_jp, $content_jp, $type_kr, $content_kr, $image_url, $author_th, $position_th);
 
             if ($stmt->execute()) {
                 $response = ['status' => 'success', 'message' => 'เพิ่มเนื้อหาใหม่เรียบร้อย'];
@@ -127,6 +131,10 @@ try {
         $contents_cn = $_POST['contents_cn'] ?? [];
         $types_jp = $_POST['types_jp'] ?? [];
         $contents_jp = $_POST['contents_jp'] ?? [];
+        
+        // Add Korean (kr) fields
+        $types_kr = $_POST['types_kr'] ?? [];
+        $contents_kr = $_POST['contents_kr'] ?? [];
 
         $uploaded_files = $_FILES['image_files'] ?? null;
 
@@ -164,8 +172,12 @@ try {
             $type_jp_val = $types_jp[$i] ?? '';
             $content_jp_val = $contents_jp[$i] ?? '';
 
-            $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, type_en=?, content_en=?, type_cn=?, content_cn=?, type_jp=?, content_jp=?, image_url=?, author=?, position=? WHERE id=?");
-            $stmt->bind_param("sssssssssssi",
+            // Assign Korean values
+            $type_kr_val = $types_kr[$i] ?? '';
+            $content_kr_val = $contents_kr[$i] ?? '';
+
+            $stmt = $conn->prepare("UPDATE service_content SET type=?, content=?, type_en=?, content_en=?, type_cn=?, content_cn=?, type_jp=?, content_jp=?, type_kr=?, content_kr=?, image_url=?, author=?, position=? WHERE id=?");
+            $stmt->bind_param("sssssssssssssi",
                 $types_th[$i],
                 $contents_th[$i],
                 $type_en_val,
@@ -174,6 +186,8 @@ try {
                 $content_cn_val,
                 $type_jp_val,
                 $content_jp_val,
+                $type_kr_val, // Add kr type value
+                $content_kr_val, // Add kr content value
                 $current_image_url,
                 $authors[$i],
                 $positions[$i],

@@ -163,12 +163,15 @@ try {
             'news_subject_jp' => $_POST['news_subject_jp'] ?? '',
             'news_description_jp' => $_POST['news_description_jp'] ?? '',
             'news_content_jp' => $_POST['news_content_jp'] ?? '',
+            'news_subject_kr' => $_POST['news_subject_kr'] ?? '',
+            'news_description_kr' => $_POST['news_description_kr'] ?? '',
+            'news_content_kr' => $_POST['news_content_kr'] ?? '',
         ];
 
         if (isset($news_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_news 
-                (subject_news, description_news, content_news, subject_news_en, description_news_en, content_news_en, subject_news_cn, description_news_cn, content_news_cn, subject_news_jp, description_news_jp, content_news_jp, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (subject_news, description_news, content_news, subject_news_en, description_news_en, content_news_en, subject_news_cn, description_news_cn, content_news_cn, subject_news_jp, description_news_jp, content_news_jp, subject_news_kr, description_news_kr, content_news_kr, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $news_subject = $news_array['news_subject'];
             $news_description = $news_array['news_description'];
@@ -182,10 +185,13 @@ try {
             $news_subject_jp = $news_array['news_subject_jp'];
             $news_description_jp = $news_array['news_description_jp'];
             $news_content_jp = mb_convert_encoding($news_array['news_content_jp'], 'UTF-8', 'auto');
+            $news_subject_kr = $news_array['news_subject_kr'];
+            $news_description_kr = $news_array['news_description_kr'];
+            $news_content_kr = mb_convert_encoding($news_array['news_content_kr'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "sssssssssssss",
+                "ssssssssssssssss",
                 $news_subject,
                 $news_description,
                 $news_content,
@@ -198,6 +204,9 @@ try {
                 $news_subject_jp,
                 $news_description_jp,
                 $news_content_jp,
+                $news_subject_kr,
+                $news_description_kr,
+                $news_content_kr,
                 $current_date
             );
 
@@ -252,6 +261,9 @@ try {
             'news_subject_jp' => $_POST['news_subject_jp'] ?? '',
             'news_description_jp' => $_POST['news_description_jp'] ?? '',
             'news_content_jp' => $_POST['news_content_jp'] ?? '',
+            'news_subject_kr' => $_POST['news_subject_kr'] ?? '',
+            'news_description_kr' => $_POST['news_description_kr'] ?? '',
+            'news_content_kr' => $_POST['news_content_kr'] ?? '',
         ];
 
         if (!empty($news_array['news_id'])) {
@@ -268,6 +280,9 @@ try {
             subject_news_jp = ?,
             description_news_jp = ?,
             content_news_jp = ?,
+            subject_news_kr = ?,
+            description_news_kr = ?,
+            content_news_kr = ?,
             date_create = ? 
             WHERE news_id = ?");
 
@@ -283,11 +298,15 @@ try {
             $news_subject_jp = $news_array['news_subject_jp'];
             $news_description_jp = $news_array['news_description_jp'];
             $news_content_jp = mb_convert_encoding($news_array['news_content_jp'], 'UTF-8', 'auto');
+            $news_subject_kr = $news_array['news_subject_kr'];
+            $news_description_kr = $news_array['news_description_kr'];
+            $news_content_kr = mb_convert_encoding($news_array['news_content_kr'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $news_id = $news_array['news_id'];
 
+            // แก้ไขตรงนี้: เพิ่ม 'i' สำหรับ news_id
             $stmt->bind_param(
-                "sssssssssssssi",
+                "ssssssssssssssssi",
                 $news_subject,
                 $news_description,
                 $news_content,
@@ -300,6 +319,9 @@ try {
                 $news_subject_jp,
                 $news_description_jp,
                 $news_content_jp,
+                $news_subject_kr,
+                $news_description_kr,
+                $news_content_kr,
                 $current_date,
                 $news_id
             );
@@ -428,6 +450,21 @@ try {
                 }
             }
 
+            // จัดการรูปภาพใน Content (ภาษาเกาหลี)
+            if (isset($_FILES['image_files_kr']) && is_array($_FILES['image_files_kr']['name']) && $_FILES['image_files_kr']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_kr']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['news_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$news_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'kr'];
+                        insertIntoDatabase($conn, 'dn_news_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (KR): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+
 
             $response = array('status' => 'success', 'message' => 'edit save');
         }
@@ -470,15 +507,15 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_news LIKE '%$searchValue%' OR subject_news_en LIKE '%$searchValue%' OR subject_news_cn LIKE '%$searchValue%' OR subject_news_jp LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_news LIKE '%$searchValue%' OR subject_news_en LIKE '%$searchValue%' OR subject_news_cn LIKE '%$searchValue%' OR subject_news_jp LIKE '%$searchValue%' OR subject_news_kr LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
         $dataQuery = "SELECT news_id, subject_news, date_create FROM dn_news 
-                     WHERE $whereClause
-                     ORDER BY $orderBy
-                     LIMIT $start, $length";
+                        WHERE $whereClause
+                        ORDER BY $orderBy
+                        LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];

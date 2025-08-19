@@ -70,6 +70,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $contact_hours_wk_jp = $_POST['contact_hours_wk_jp'] ?? '';
     $contact_hours_sat_jp = $_POST['contact_hours_sat_jp'] ?? '';
     $social_heading_jp = $_POST['social_heading_jp'] ?? '';
+
+    // เพิ่ม kr
+    $footer_top_title_kr = $_POST['footer_top_title_kr'] ?? '';
+    $footer_top_subtitle_kr = $_POST['footer_top_subtitle_kr'] ?? '';
+    $about_heading_kr = $_POST['about_heading_kr'] ?? '';
+    $about_text_kr = $_POST['about_text_kr'] ?? '';
+    $contact_heading_kr = $_POST['contact_heading_kr'] ?? '';
+    $contact_address_kr = $_POST['contact_address_kr'] ?? '';
+    $contact_hours_wk_kr = $_POST['contact_hours_wk_kr'] ?? '';
+    $contact_hours_sat_kr = $_POST['contact_hours_sat_kr'] ?? '';
+    $social_heading_kr = $_POST['social_heading_kr'] ?? '';
     
     // Social links มาในรูปแบบ JSON string
     $social_links_json_string = $_POST['social_links_json'] ?? '[]';
@@ -129,6 +140,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             contact_hours_sat_jp = ?,
             social_heading_jp = ?,
             
+            -- เพิ่ม kr ที่นี่
+            footer_top_title_kr = ?,
+            footer_top_subtitle_kr = ?,
+            about_heading_kr = ?,
+            about_text_kr = ?,
+            contact_heading_kr = ?,
+            contact_address_kr = ?,
+            contact_hours_wk_kr = ?,
+            contact_hours_sat_kr = ?,
+            social_heading_kr = ?,
+
             updated_at = NOW()
             WHERE id = ?");
 
@@ -137,10 +159,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // คอลัมน์ภาษาอังกฤษ: 9 ตัว
         // คอลัมน์ภาษาจีน: 9 ตัว
         // คอลัมน์ภาษาญี่ปุ่น: 9 ตัว
-        // รวมทั้งหมด 14 + 9 + 9 + 9 = 41 ตัวที่เป็น string
+        // เพิ่มคอลัมน์ภาษาเกาหลี: 9 ตัว
+        // รวมทั้งหมด 14 + 9 + 9 + 9 + 9 = 50 ตัวที่เป็น string
         // + id 1 ตัว (integer)
-        // รวมทั้งหมด 41 's' และ 1 'i'
-        $bind_types = "sssssssssssssssssssssssssssssssssssssssssi";
+        // รวมทั้งหมด 50 's' และ 1 'i'
+        $bind_types = "ssssssssssssssssssssssssssssssssssssssssssssssssssi";
 
         $stmt->bind_param($bind_types,
             $bg_color,
@@ -187,6 +210,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $contact_hours_wk_jp,
             $contact_hours_sat_jp,
             $social_heading_jp,
+
+            // เพิ่ม kr ที่นี่
+            $footer_top_title_kr,
+            $footer_top_subtitle_kr,
+            $about_heading_kr,
+            $about_text_kr,
+            $contact_heading_kr,
+            $contact_address_kr,
+            $contact_hours_wk_kr,
+            $contact_hours_sat_kr,
+            $social_heading_kr,
 
             $footer_id
         );
