@@ -87,6 +87,9 @@ include '../check_permission.php';
             <button type="button" class="btn lang-switch-btn" data-lang="cn">
                 <img src="https://flagcdn.com/cn.svg" alt="Chinese" width="24"> CN
             </button>
+            <button type="button" class="btn lang-switch-btn" data-lang="jp">
+                <img src="https://flagcdn.com/jp.svg" alt="Japanese" width="24"> JP
+            </button>
         </div>
     </div>
     
@@ -136,6 +139,20 @@ include '../check_permission.php';
                     <label>ตำแหน่ง (Chinese)</label>
                     <input type="text" name="position_cn" class="form-control">
                 </div>
+                <div class="lang-section jp-lang" style="display:none;">
+                    <label>ประเภท (Japanese)</label>
+                    <select name="type_jp" class="form-control">
+                        <option value="text">Text</option>
+                        <option value="image">Image + Text</option>
+                        <option value="quote">Quote</option>
+                    </select>
+                    <label>เนื้อหา (HTML) (Japanese)</label>
+                    <textarea name="content_jp" class="form-control summernote"></textarea>
+                    <label>ผู้พูด (Japanese)</label>
+                    <input type="text" name="author_jp" class="form-control">
+                    <label>ตำแหน่ง (Japanese)</label>
+                    <input type="text" name="position_jp" class="form-control">
+                </div>
                 <label>อัปโหลดรูปภาพ (ถ้ามี)</label>
                 <input type="file" name="image_file" class="form-control">
                 <button class="btn btn-primary mt-3" type="submit" id="submitAdd">เพิ่มเนื้อหาใหม่</button>
@@ -161,6 +178,8 @@ include '../check_permission.php';
             $content_en = $row['content_en'] ?? '';
             $type_cn = htmlspecialchars($row['type_cn'] ?? '');
             $content_cn = $row['content_cn'] ?? '';
+            $type_jp = htmlspecialchars($row['type_jp'] ?? '');
+            $content_jp = $row['content_jp'] ?? '';
         ?>
             <div class="card mb-3 block-item" data-id="<?= $id ?>">
                 <div class="card-body">
@@ -211,6 +230,22 @@ include '../check_permission.php';
                         <input type="text" name="authors_cn[]" class="form-control" value="<?= $author ?>">
                         <label>ตำแหน่ง (Chinese)</label>
                         <input type="text" name="positions_cn[]" class="form-control" value="<?= $position ?>">
+                    </div>
+                    
+                    <div class="lang-section jp-lang" style="display:none;">
+                        <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
+                        <label>ประเภท (Japanese)</label>
+                        <select name="types_jp[]" class="form-control">
+                            <option value="text" <?= $type_jp == 'text' ? 'selected' : '' ?>>Text</option>
+                            <option value="image" <?= $type_jp == 'image' ? 'selected' : '' ?>>Image + Text</option>
+                            <option value="quote" <?= $type_jp == 'quote' ? 'selected' : '' ?>>Quote</option>
+                        </select>
+                        <label>เนื้อหา (HTML) (Japanese)</label>
+                        <textarea name="contents_jp[]" class="form-control summernote"><?= $content_jp ?></textarea>
+                        <label>ผู้พูด (Japanese)</label>
+                        <input type="text" name="authors_jp[]" class="form-control" value="<?= $author ?>">
+                        <label>ตำแหน่ง (Japanese)</label>
+                        <input type="text" name="positions_jp[]" class="form-control" value="<?= $position ?>">
                     </div>
 
                     <div class="image-section mt-3">

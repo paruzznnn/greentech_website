@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $contact_hours_sat = $_POST['contact_hours_sat'] ?? '';
     $social_heading = $_POST['social_heading'] ?? '';
     $copyright_text = $_POST['copyright_text'] ?? '';
-    
+
     // ดึงข้อมูลจาก POST (ภาษาอังกฤษ)
     $footer_top_title_en = $_POST['footer_top_title_en'] ?? '';
     $footer_top_subtitle_en = $_POST['footer_top_subtitle_en'] ?? '';
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $contact_hours_wk_en = $_POST['contact_hours_wk_en'] ?? '';
     $contact_hours_sat_en = $_POST['contact_hours_sat_en'] ?? '';
     $social_heading_en = $_POST['social_heading_en'] ?? '';
-    
+
     // ดึงข้อมูลจาก POST (ภาษาจีน)
     $footer_top_title_cn = $_POST['footer_top_title_cn'] ?? '';
     $footer_top_subtitle_cn = $_POST['footer_top_subtitle_cn'] ?? '';
@@ -60,9 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $contact_hours_sat_cn = $_POST['contact_hours_sat_cn'] ?? '';
     $social_heading_cn = $_POST['social_heading_cn'] ?? '';
     
+    // ดึงข้อมูลจาก POST (ภาษาญี่ปุ่น)
+    $footer_top_title_jp = $_POST['footer_top_title_jp'] ?? '';
+    $footer_top_subtitle_jp = $_POST['footer_top_subtitle_jp'] ?? '';
+    $about_heading_jp = $_POST['about_heading_jp'] ?? '';
+    $about_text_jp = $_POST['about_text_jp'] ?? '';
+    $contact_heading_jp = $_POST['contact_heading_jp'] ?? '';
+    $contact_address_jp = $_POST['contact_address_jp'] ?? '';
+    $contact_hours_wk_jp = $_POST['contact_hours_wk_jp'] ?? '';
+    $contact_hours_sat_jp = $_POST['contact_hours_sat_jp'] ?? '';
+    $social_heading_jp = $_POST['social_heading_jp'] ?? '';
+    
     // Social links มาในรูปแบบ JSON string
     $social_links_json_string = $_POST['social_links_json'] ?? '[]';
-    
+
     $social_links_array = json_decode($social_links_json_string, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         $response['message'] = 'Invalid Social Links JSON data: ' . json_last_error_msg();
@@ -72,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $social_links_json_for_db = json_encode($social_links_array);
 
     try {
-        $stmt = $conn->prepare("UPDATE footer_settings SET 
+        $stmt = $conn->prepare("UPDATE footer_settings SET
             bg_color = ?,
             footer_top_title = ?,
             footer_top_subtitle = ?,
@@ -87,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             social_heading = ?,
             social_links_json = ?,
             copyright_text = ?,
-            
+
             footer_top_title_en = ?,
             footer_top_subtitle_en = ?,
             about_heading_en = ?,
@@ -97,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             contact_hours_wk_en = ?,
             contact_hours_sat_en = ?,
             social_heading_en = ?,
-            
+
             footer_top_title_cn = ?,
             footer_top_subtitle_cn = ?,
             about_heading_cn = ?,
@@ -108,24 +119,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             contact_hours_sat_cn = ?,
             social_heading_cn = ?,
 
+            footer_top_title_jp = ?,
+            footer_top_subtitle_jp = ?,
+            about_heading_jp = ?,
+            about_text_jp = ?,
+            contact_heading_jp = ?,
+            contact_address_jp = ?,
+            contact_hours_wk_jp = ?,
+            contact_hours_sat_jp = ?,
+            social_heading_jp = ?,
+            
             updated_at = NOW()
             WHERE id = ?");
-        
+
         // จำนวนคอลัมน์ที่ถูกอัปเดต:
-        // คอลัมน์ภาษาไทย: bg_color, footer_top_title, footer_top_subtitle, about_heading, about_text, 
-        //                 contact_heading, contact_address, contact_phone, contact_email, contact_hours_wk, 
-        //                 contact_hours_sat, social_heading, social_links_json, copyright_text (14 ตัว)
-        // คอลัมน์ภาษาอังกฤษ: footer_top_title_en, footer_top_subtitle_en, about_heading_en, about_text_en, 
-        //                   contact_heading_en, contact_address_en, contact_hours_wk_en, contact_hours_sat_en, 
-        //                   social_heading_en (9 ตัว)
-        // คอลัมน์ภาษาจีน: footer_top_title_cn, footer_top_subtitle_cn, about_heading_cn, about_text_cn, 
-        //                  contact_heading_cn, contact_address_cn, contact_hours_wk_cn, contact_hours_sat_cn, 
-        //                  social_heading_cn (9 ตัว)
-        // รวมทั้งหมด 14 + 9 + 9 = 32 ตัวที่เป็น string
+        // คอลัมน์ภาษาไทย: 14 ตัว
+        // คอลัมน์ภาษาอังกฤษ: 9 ตัว
+        // คอลัมน์ภาษาจีน: 9 ตัว
+        // คอลัมน์ภาษาญี่ปุ่น: 9 ตัว
+        // รวมทั้งหมด 14 + 9 + 9 + 9 = 41 ตัวที่เป็น string
         // + id 1 ตัว (integer)
-        // รวมทั้งหมด 32 's' และ 1 'i'
-        $bind_types = "ssssssssssssssssssssssssssssssssi";
-        
+        // รวมทั้งหมด 41 's' และ 1 'i'
+        $bind_types = "sssssssssssssssssssssssssssssssssssssssssi";
+
         $stmt->bind_param($bind_types,
             $bg_color,
             $footer_top_title,
@@ -161,6 +177,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $contact_hours_wk_cn,
             $contact_hours_sat_cn,
             $social_heading_cn,
+            
+            $footer_top_title_jp,
+            $footer_top_subtitle_jp,
+            $about_heading_jp,
+            $about_text_jp,
+            $contact_heading_jp,
+            $contact_address_jp,
+            $contact_hours_wk_jp,
+            $contact_hours_sat_jp,
+            $social_heading_jp,
 
             $footer_id
         );

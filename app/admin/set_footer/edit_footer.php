@@ -166,16 +166,20 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
         <div class="language-switcher">
             <button type="button" class="lang-button active" data-lang="th">
-                <img src="https://flagcdn.com/w320/th.png" alt="Thai Flag" style=' width: 36px; 
-                                        margin-right: 8px;'>
+                <img src="https://flagcdn.com/w320/th.png" alt="Thai Flag" style=' width: 36px;
+                                         margin-right: 8px;'>
             </button>
             <button type="button" class="lang-button" data-lang="en">
-                <img src="https://flagcdn.com/w320/gb.png" alt="English Flag" style=' width: 36px; 
-                                        margin-right: 8px;'>
+                <img src="https://flagcdn.com/w320/gb.png" alt="English Flag" style=' width: 36px;
+                                         margin-right: 8px;'>
             </button>
             <button type="button" class="lang-button" data-lang="cn">
-                <img src="https://flagcdn.com/w320/cn.png" alt="Chinese Flag" style=' width: 36px; 
-                                        margin-right: 8px;'>
+                <img src="https://flagcdn.com/w320/cn.png" alt="Chinese Flag" style=' width: 36px;
+                                         margin-right: 8px;'>
+            </button>
+            <button type="button" class="lang-button" data-lang="jp">
+                <img src="https://flagcdn.com/w320/jp.png" alt="Japanese Flag" style=' width: 36px;
+                                         margin-right: 8px;'>
             </button>
         </div>
 
@@ -235,7 +239,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                 <div class="form-section">
                     <label>Social Media Links:</label>
                     <div id="socialLinksContainer">
-                        </div>
+                    </div>
                     <button type="button" class="btn btn-success mt-3" id="addSocialLink">
                         <i class="fas fa-plus"></i> เพิ่ม Social Link
                     </button>
@@ -248,7 +252,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
             <div id="form-en" class="language-form" style="display: none;">
                 <div class="form-section">
-                    <label for="bg_color_en">Footer Background Color:</label>
+                    <label for="bg_color_en">Footer Background Color (EN):</label>
                     <input type="text" id="bg_color_en" name="bg_color_en" class="form-control" value="<?= htmlspecialchars($footer_data['bg_color_en'] ?? '') ?>">
                 </div>
                 <div class="form-section">
@@ -366,6 +370,68 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                     <input type="text" id="copyright_text_cn" name="copyright_text_cn" class="form-control" value="<?= htmlspecialchars($footer_data['copyright_text_cn'] ?? '') ?>">
                 </div>
                 <button type="button" id="copy-en-data-cn" class="btn btn-info">
+                    <i class="fas fa-copy"></i> คัดลอกข้อมูลจากภาษาอังกฤษ
+                </button>
+            </div>
+            
+            <div id="form-jp" class="language-form" style="display: none;">
+                <div class="form-section">
+                    <label for="bg_color_jp">Footer Background Color (JP):</label>
+                    <input type="text" id="bg_color_jp" name="bg_color_jp" class="form-control" value="<?= htmlspecialchars($footer_data['bg_color_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="footer_top_title_jp">Register Title (JP):</label>
+                    <input type="text" id="footer_top_title_jp" name="footer_top_title_jp" class="form-control" value="<?= htmlspecialchars($footer_data['footer_top_title_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="footer_top_subtitle_jp">Register Subtitle (JP):</label>
+                    <textarea id="footer_top_subtitle_jp" name="footer_top_subtitle_jp" class="form-control" rows="2"><?= htmlspecialchars($footer_data['footer_top_subtitle_jp'] ?? '') ?></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="about_heading_jp">About Us Heading (JP):</label>
+                    <input type="text" id="about_heading_jp" name="about_heading_jp" class="form-control" value="<?= htmlspecialchars($footer_data['about_heading_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="about_text_jp">About Us Text (JP):</label>
+                    <textarea id="about_text_jp" name="about_text_jp" class="form-control" rows="5"><?= htmlspecialchars($footer_data['about_text_jp'] ?? '') ?></textarea>
+                </div>
+                <div class="form-section">
+                    <label for="contact_heading_jp">Contact Us Heading (JP):</label>
+                    <input type="text" id="contact_heading_jp" name="contact_heading_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_heading_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_address_jp">Address (JP):</label>
+                    <input type="text" id="contact_address_jp" name="contact_address_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_address_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_phone_jp">เบอร์โทรศัพท์ (JP):</label>
+                    <input type="text" id="contact_phone_jp" name="contact_phone_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_phone_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_email_jp">อีเมล (JP):</label>
+                    <input type="email" id="contact_email_jp" name="contact_email_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_email_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_hours_wk_jp">Opening Hours (Mon-Fri) (JP):</label>
+                    <input type="text" id="contact_hours_wk_jp" name="contact_hours_wk_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_hours_wk_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="contact_hours_sat_jp">Opening Hours (Sat) (JP):</label>
+                    <input type="text" id="contact_hours_sat_jp" name="contact_hours_sat_jp" class="form-control" value="<?= htmlspecialchars($footer_data['contact_hours_sat_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label for="social_heading_jp">Social Media Heading (JP):</label>
+                    <input type="text" id="social_heading_jp" name="social_heading_jp" class="form-control" value="<?= htmlspecialchars($footer_data['social_heading_jp'] ?? '') ?>">
+                </div>
+                <div class="form-section">
+                    <label>Social Media Links:</label>
+                    <p class="text-muted">Social Media Links are shared for all languages.</p>
+                </div>
+                <div class="form-section">
+                    <label for="copyright_text_jp">Copyright Text (JP):</label>
+                    <input type="text" id="copyright_text_jp" name="copyright_text_jp" class="form-control" value="<?= htmlspecialchars($footer_data['copyright_text_jp'] ?? '') ?>">
+                </div>
+                <button type="button" id="copy-en-data-jp" class="btn btn-info">
                     <i class="fas fa-copy"></i> คัดลอกข้อมูลจากภาษาอังกฤษ
                 </button>
             </div>
@@ -507,6 +573,33 @@ if (json_last_error() !== JSON_ERROR_NONE) {
         }
 
         Swal.fire('คัดลอกข้อมูลสำเร็จ!', 'ข้อมูลจากภาษาอังกฤษถูกคัดลอกไปยังฟอร์มภาษาจีนแล้ว', 'success');
+    });
+
+    // Copy data from English to Japanese (jp) - New function
+    $('#copy-en-data-jp').on('click', function() {
+        const mapping = {
+            'bg_color_en': 'bg_color_jp',
+            'footer_top_title_en': 'footer_top_title_jp',
+            'footer_top_subtitle_en': 'footer_top_subtitle_jp',
+            'about_heading_en': 'about_heading_jp',
+            'about_text_en': 'about_text_jp',
+            'contact_heading_en': 'contact_heading_jp',
+            'contact_address_en': 'contact_address_jp',
+            'contact_phone_en': 'contact_phone_jp',
+            'contact_email_en': 'contact_email_jp',
+            'contact_hours_wk_en': 'contact_hours_wk_jp',
+            'contact_hours_sat_en': 'contact_hours_sat_jp',
+            'social_heading_en': 'social_heading_jp',
+            'copyright_text_en': 'copyright_text_jp'
+        };
+
+        for (const en_field in mapping) {
+            const jp_field = mapping[en_field];
+            const en_value = $(`#${en_field}`).val();
+            $(`#${jp_field}`).val(en_value);
+        }
+
+        Swal.fire('คัดลอกข้อมูลสำเร็จ!', 'ข้อมูลจากภาษาอังกฤษถูกคัดลอกไปยังฟอร์มภาษาญี่ปุ่นแล้ว', 'success');
     });
 
 

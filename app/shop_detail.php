@@ -3,7 +3,7 @@ require_once('../lib/connect.php');
 global $conn;
 
 // 1. กำหนดตัวแปรภาษา
-$supported_langs = ['en', 'th', 'cn'];
+$supported_langs = ['en', 'th', 'cn', 'jp'];
 $lang = isset($_GET['lang']) && in_array($_GET['lang'], $supported_langs) ? $_GET['lang'] : 'th';
 $lang_suffix = '';
 if ($lang !== 'th') {
@@ -77,6 +77,26 @@ $translations = [
         'copy_success' => '链接复制成功',
         'copy_fail' => '无法复制链接，请手动复制。',
         'contact_us' => '联系和订购Trandar Acoustics产品'
+    ],
+    'jp' => [
+        'product' => '製品',
+        'share_page' => 'このページを共有:',
+        'copy_link' => 'リンクをコピー',
+        'no_data' => 'データが見つかりませんでした。',
+        'invalid_id' => '無効なIDです。',
+        'related_projects' => 'この製品に関連するプロジェクト',
+        'project_image_alt' => 'プロジェクト画像',
+        'no_image_available' => '利用可能な画像はありません',
+        'comments' => 'コメント',
+        'email_notice' => 'メールアドレスが公開されることはありません。必須項目は * でマークされています',
+        'comment_placeholder' => 'コメント *',
+        'post_comment' => 'コメントを投稿',
+        'login_to_comment' => 'コメントするにはログインしてください',
+        'viewer_only' => 'コメントするにはビューアとしてログインする必要があります。',
+        'error_verify' => '身元確認中にエラーが発生しました。',
+        'copy_success' => 'リンクが正常にコピーされました',
+        'copy_fail' => 'リンクをコピーできませんでした。手動でコピーしてください。',
+        'contact_us' => 'Trandar Acoustics製品のお問い合わせ・ご注文はこちら'
     ]
 ];
 $t = $translations[$lang];

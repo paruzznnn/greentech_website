@@ -149,6 +149,9 @@ $decodedId = $_POST['blog_id'];
                             p.subject_blog_cn,
                             p.description_blog_cn,
                             p.content_blog_cn,
+                            p.subject_blog_jp,
+                            p.description_blog_jp,
+                            p.content_blog_jp,
                             p.date_create,
                             GROUP_CONCAT(DISTINCT d.file_name, ':::', d.api_path, ':::', d.status ORDER BY d.status DESC SEPARATOR '|||') AS files
                         FROM dn_blog p
@@ -170,6 +173,7 @@ $decodedId = $_POST['blog_id'];
                         $content_th = $row['content_blog'];
                         $content_en = $row['content_blog_en'];
                         $content_cn = $row['content_blog_cn'];
+                        $content_jp = $row['content_blog_jp'];
                         
                         $pic_data = [];
                         $previewImageSrc = '';
@@ -227,6 +231,20 @@ $decodedId = $_POST['blog_id'];
                             }
                         }
                         $content_cn_with_correct_paths = $dom_cn->saveHTML();
+
+                        $dom_jp = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_jp = !empty($content_jp) ? mb_convert_encoding($content_jp, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_jp->loadHTML($source_jp, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_jp = $dom_jp->getElementsByTagName('img');
+                        foreach ($images_jp as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_jp_with_correct_paths = $dom_jp->saveHTML();
 
                         $allprojectsQuery = $conn->query("SELECT project_id, subject_project FROM dn_project WHERE del = 0 ORDER BY subject_project ASC");
                         $allprojectsOptions = '';
@@ -301,6 +319,12 @@ $decodedId = $_POST['blog_id'];
                                              margin-right: 8px;'>中文
                                                      </button>
                                                  </li>
+                                                 <li class='nav-item' role='presentation'>
+                                                     <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
+                                                         <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
+                                             margin-right: 8px;'>日本語
+                                                     </button>
+                                                 </li>
                                              </ul>
                                          </div>
                                          <div class='card-body'>
@@ -355,6 +379,24 @@ $decodedId = $_POST['blog_id'];
                                                          <textarea class='form-control summernote' id='summernote_update_cn' name='blog_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
+                                                 <div class='tab-pane fade' id='jp' role='tabpanel' aria-labelledby='jp-tab'>
+                                                     <div style='margin: 10px;'>
+                                                         <button type='button' id='copyFromThai-jp' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                         <div id='loadingIndicator_jp' class='loading-overlay' style='display: none;'>
+                                                             <div class='loading-spinner'></div>
+                                                         </div>
+                                                         <label><span>Subject (JP)</span>:</label>
+                                                         <input type='text' class='form-control' id='blog_subject_jp' name='blog_subject_jp' value='" . htmlspecialchars($row['subject_blog_jp']) . "'>
+                                                     </div>
+                                                     <div style='margin: 10px;'>
+                                                         <label><span>Description (JP)</span>:</label>
+                                                         <textarea class='form-control' id='blog_description_jp' name='blog_description_jp'>" . htmlspecialchars($row['description_blog_jp']) . "</textarea>
+                                                     </div>
+                                                     <div style='margin: 10px;'>
+                                                         <label><span>Content (JP)</span>:</label>
+                                                         <textarea class='form-control summernote' id='summernote_update_jp' name='blog_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
+                                                     </div>
+                                                 </div>
                                              </div>
                                          </div>
                                      </div>
@@ -378,7 +420,7 @@ $decodedId = $_POST['blog_id'];
         </div>
     </div>
     
-    <script>
+<script>
         $(document).ready(function() {
             $('.select2-multiple').select2();
             var relatedprojects = <?php echo $relatedprojectsJSON; ?>;
@@ -432,6 +474,29 @@ $decodedId = $_POST['blog_id'];
                         $('#summernote_update_cn').summernote('destroy');
                     }
                     $('#summernote_update_cn').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+
+                if (target === '#jp') {
+                    if ($('#summernote_update_jp').data('summernote')) {
+                        $('#summernote_update_jp').summernote('destroy');
+                    }
+                    $('#summernote_update_jp').summernote({
                         height: 600,
                         minHeight: 600,
                         maxHeight: 600,
@@ -544,6 +609,53 @@ $decodedId = $_POST['blog_id'];
                     $('#loadingIndicator_cn').hide();
                 });
             });
+
+            $('#copyFromThai-jp').on('click', function () {
+                $('#loadingIndicator_jp').show();
+                var thaiSubject = $('#blog_subject').val();
+                var thaiDescription = $('#blog_description').val();
+                var thaiContent = $('#summernote_update').summernote('code');
+
+                const dataToSend = {
+                    language: "th",
+                    translate: "jp",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
+
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        $('#blog_subject_jp').val(response.subject);
+                        $('#blog_description_jp').val(response.description);
+                        $('#summernote_update_jp').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    $('#loadingIndicator_jp').hide();
+                });
+            });
             
             $('#fileInput').on('change', function() {
                 var input = this;
@@ -569,6 +681,7 @@ $decodedId = $_POST['blog_id'];
                 var contentFromEditor_th = $("#summernote_update").summernote('code');
                 var contentFromEditor_en = $('#summernote_update_en').summernote('code');
                 var contentFromEditor_cn = $('#summernote_update_cn').summernote('code');
+                var contentFromEditor_jp = $('#summernote_update_jp').summernote('code');
                 var checkIsUrl = false;
                 
                 if (contentFromEditor_th) {
@@ -645,6 +758,31 @@ $decodedId = $_POST['blog_id'];
                     }
                     formData.set("blog_content_cn", tempDiv_cn.innerHTML);
                 }
+                
+                if (contentFromEditor_jp) {
+                    var tempDiv_jp = document.createElement("div");
+                    tempDiv_jp.innerHTML = contentFromEditor_jp;
+                    var imgTags_jp = tempDiv_jp.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_jp.length; i++) {
+                        var imgSrc_jp = imgTags_jp[i].getAttribute("src");
+                        var filename_jp = imgTags_jp[i].getAttribute("data-filename");
+                        if (!imgSrc_jp) continue;
+
+                        imgSrc_jp = imgSrc_jp.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_jp)) {
+                            var file_jp = base64ToFile(imgSrc_jp, filename_jp);
+                            if (file_jp) {
+                                formData.append("image_files_jp[]", file_jp);
+                            }
+                            if (imgSrc_jp.startsWith("data:image")) {
+                                imgTags_jp[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("blog_content_jp", tempDiv_jp.innerHTML);
+                }
 
                 $(".is-invalid").removeClass("is-invalid");
                 if (!$("#blog_subject").val().trim()) {
@@ -655,7 +793,7 @@ $decodedId = $_POST['blog_id'];
                     $("#blog_description").addClass("is-invalid");
                     return;
                 }
-                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim()) {
+                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim()) {
                     alertError("Please fill in content information for at least one language.");
                     return;
                 }
@@ -664,6 +802,8 @@ $decodedId = $_POST['blog_id'];
                 formData.set("blog_description_en", $("#blog_description_en").val());
                 formData.set("blog_subject_cn", $("#blog_subject_cn").val());
                 formData.set("blog_description_cn", $("#blog_description_cn").val());
+                formData.set("blog_subject_jp", $("#blog_subject_jp").val());
+                formData.set("blog_description_jp", $("#blog_description_jp").val());
 
                 Swal.fire({
                     title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",

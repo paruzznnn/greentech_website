@@ -61,16 +61,19 @@ $(document).ready(function () {
         const thaiSection = blockItem.find('.th-lang');
         const englishSection = blockItem.find('.en-lang');
         const chineseSection = blockItem.find('.cn-lang'); // Select Chinese section
+        const japaneseSection = blockItem.find('.jp-lang'); // Select Japanese section
 
         // Copy type
         const thaiType = thaiSection.find('select[name^="types_th"]').val();
         englishSection.find('select[name^="types_en"]').val(thaiType);
         chineseSection.find('select[name^="types_cn"]').val(thaiType); // Copy to Chinese type
+        japaneseSection.find('select[name^="types_jp"]').val(thaiType); // Copy to Japanese type
 
         // Copy content from Summernote
         const thaiContent = thaiSection.find('textarea[name^="contents_th"]').summernote('code');
         englishSection.find('textarea[name^="contents_en"]').summernote('code', thaiContent);
         chineseSection.find('textarea[name^="contents_cn"]').summernote('code', thaiContent); // Copy to Chinese content
+        japaneseSection.find('textarea[name^="contents_jp"]').summernote('code', thaiContent); // Copy to Japanese content
 
         // Note: author_en and position_en are not in the table, so we don't copy them
     });
