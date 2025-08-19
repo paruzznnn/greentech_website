@@ -6,12 +6,10 @@ function genOrderId() {
     return `ORD-${timestamp}-${randomNum}`;
 }
 
-
 // Object Literal --------------------------------------
 export const ShoppingCart = {
     cartItems: [],
     CART_STORAGE_KEY: 'shoppingCart',
-    // SHIPPING_COST: 50.00,
     SHIPPING_COST: 0,
     VAT_RATE: 0.07,
     currentDiscount: 0,

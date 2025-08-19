@@ -56,7 +56,6 @@
 
                                 <!-- ที่อยู่จัดส่ง -->
                                 <div id="shippingAddressFormSection" class="section-card"></div>
-
                                 <div id="pickupAddressFormSection" class="section-card"></div>
 
                                 <!-- เลือกการชำระเงิน -->
@@ -95,6 +94,10 @@
                                     <div id="order-product" class="product-items-container"></div>
                                     <input type="text" id="product_item" name="product_item" value="" hidden>
                                 </div>
+
+                                <!-- จ่ายที่ -->
+                                <div id="bankTransferSection" class="section-card"></div>
+                                <div id="promptpaySection" class="section-card"></div>
 
                                 <!-- สรุปยอดรวม -->
                                 <div class="summary-card section-card">
