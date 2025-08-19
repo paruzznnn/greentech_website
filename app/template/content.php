@@ -252,12 +252,12 @@ body, html {
             <div class="col-md-12 text-end" style="padding-top: 30px;">
                 <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
                     <p data-translate="share" lang="th" style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
                         <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                             <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                         </a>
                         <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                            <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                             <img style="height: 37px; border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
                         </a>
                         <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                             <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
@@ -334,7 +334,7 @@ body, html {
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
                     <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                        <img style="height: 37px; border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
                     </a>
                     <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">

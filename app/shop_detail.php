@@ -281,7 +281,7 @@ if (isset($_GET['id'])) {
             text-decoration: none;
         }
         .social-share img {
-            width: 40px;
+            /* width: 40px; */
             height: 40px;
             transition: transform 0.2s ease;
         }
@@ -311,27 +311,31 @@ if (isset($_GET['id'])) {
     <div class="content-sticky" id="">
         <div class="container" style="max-width: 90%;">
             <div class="box-content">
-                <div class="social-share">
-                    <p><?= htmlspecialchars($t['share_page']); ?></p>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
-                    </a>
-                    <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
-                    </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
-                    </a>
-                    <a href="https://www.tiktok.com/" target="_blank">
-                        <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
-                    </a>
-                    <button class="copy-link-btn" onclick="copyLink()"><?= htmlspecialchars($t['copy_link']); ?></button>
+                <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                    <p data-translate="share" lang="th" style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
+                             <img style="height: 33px;  border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
+                        </a>
+                        <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
+                        </a>
+                        <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>" target="_blank">
+                            <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
+                        </a>
+                        <a href="https://www.instagram.com/" target="_blank">
+                            <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Share on Instagram">
+                        </a>
+                        <a href="https://www.tiktok.com/" target="_blank">
+                            <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
+                        </a>
+                        <button class="copy-link-btn" onclick="copyLink()">
+                            <i class="fas fa-link"></i> 
+                        </button>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="">
@@ -386,18 +390,22 @@ if (isset($_GET['id'])) {
                 </div>
 
                 <hr style="border-top: dashed 1px; margin: 20px 0;">
-                <div class="social-share">
-                    <p><?= htmlspecialchars($t['share_page']); ?></p>
+                 <div class="col-md-12 text-start" style="padding-bottom:3em;">
+                <p data-translate="share" lang="th" style="margin: 0; padding-bottom: 10px; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
+                <div class="social-share" style="display: flex; align-items: center; gap: 10px;">
+                    <button class="copy-link-btn" onclick="copyLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
                     <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" alt="Share on Twitter">
+                        <img style="height: 33px; border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
                     </a>
                     <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
                     </a>
-                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>&description=<?= urlencode($subjectTitle) ?>" target="_blank">
+                    <a href="https://pinterest.com/pin/create/button/?url=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/pinterest--v1.png" alt="Share on Pinterest">
                     </a>
                     <a href="https://www.instagram.com/" target="_blank">
@@ -406,8 +414,9 @@ if (isset($_GET['id'])) {
                     <a href="https://www.tiktok.com/" target="_blank">
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
-                    <button class="copy-link-btn" onclick="copyLink()"><?= htmlspecialchars($t['copy_link']); ?></button>
+                    
                 </div>
+            </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     <p><?= htmlspecialchars($t['contact_us']); ?></p>
