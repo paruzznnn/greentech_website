@@ -20,6 +20,8 @@
             <section id="section_payment" class="section-space">
                 <div class="container">
                     <form id="formOrder" data-url="<?php echo $BASE_WEB ?>service/payment/payment-data.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="pay">
+                        <input type="text" name="action" value="payOrder" hidden>
+                        <input type="text" name="order_id" id="order_id" value="" hidden>
                         <div class="row">
 
                             <div class="col-md-6 col-sm-12">
@@ -53,56 +55,9 @@
                                 </div>
 
                                 <!-- ที่อยู่จัดส่ง -->
-                                <div id="shippingAddressFormSection" class="section-card">
-                                    <div class="section-header">
-                                        <div>
-                                            <p>กรอกข้อมูลที่อยู่จัดส่ง</p>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-size: 0.8rem;">ตามการตั้งค่า</span>
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="setupShipping"/>
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label for="full_name" class="form-label">ชื่อ-นามสกุล:</label>
-                                            <input type="text" id="full_name" name="full_name" class="form-input" value="">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="phone_number" class="form-label">เบอร์โทรศัพท์:</label>
-                                            <input type="tel" id="phone_number" name="phone_number" class="form-input" value="">
-                                        </div>
-                                        <div class="full-width form-group">
-                                            <label for="address_detail" class="form-label">ที่อยู่:</label>
-                                            <textarea id="address_detail" name="address_detail" class="form-input" style="min-height: 60px !important;"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="province" class="form-label">จังหวัด:</label>
-                                            <select id="province" name="province" class="form-input" required>
-                                                <option value="">เลือกจังหวัด</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="district" class="form-label">อำเภอ/เขต</label>
-                                            <select id="district" name="district" class="form-input" required disabled>
-                                                <option value="">เลือกอำเภอ/เขต</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="subdistrict" class="form-label">ตำบล/แขวง</label>
-                                            <select id="subdistrict" name="subdistrict" class="form-input" required disabled>
-                                                <option value="">เลือกตำบล/แขวง</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="postalCode" class="form-label">รหัสไปรษณีย์:</label>
-                                            <input type="text" id="postalCode" name="postalCode" class="form-input" value="" readonly>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div id="shippingAddressFormSection" class="section-card"></div>
+
+                                <div id="pickupAddressFormSection" class="section-card"></div>
 
                                 <!-- เลือกการชำระเงิน -->
                                 <div class="section-card">
@@ -138,11 +93,8 @@
                                         <div style="text-align: end;">ราคารวม</div>
                                     </div>
                                     <div id="order-product" class="product-items-container"></div>
+                                    <input type="text" id="product_item" name="product_item" value="" hidden>
                                 </div>
-
-                                <!-- <div class="section-card">
-                                    <h5 class="section-header">คูปอง</h5>
-                                </div> -->
 
                                 <!-- สรุปยอดรวม -->
                                 <div class="summary-card section-card">
@@ -151,18 +103,22 @@
                                         <div class="summary-row">
                                             <span class="summary-label">ราคารวมสินค้า</span>
                                             <span class="summary-value" id="subtotal">-</span>
+                                            <input type="text" id="sub_total" name="sub_total" value="" hidden>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-label">ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
                                             <span class="summary-value" id="vat-amount">-</span>
+                                            <input type="text" id="vat_amount" name="vat_amount" value="" hidden>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-label">ค่าจัดส่ง</span>
                                             <span class="summary-value" id="shipping-cost-value">-</span>
+                                            <input type="text" id="shipping_amount" name="shipping_amount" value="" hidden>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-label">ส่วนลด</span>
                                             <span class="summary-value" id="discount-value">-</span>
+                                            <input type="text" id="discount_amount" name="discount_amount" value="" hidden>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-label">วิธีรับสินค้า</span>
@@ -175,6 +131,7 @@
                                         <div class="total-row summary-row">
                                             <span class="total-label">ยอดรวมทั้งหมด</span>
                                             <span class="total-value" id="total-amount">-</span>
+                                            <input type="text" id="total_amount" name="total_amount" value="" hidden>
                                         </div>
                                     </div>
                                     <button id="confirm-order" type="submit">ยืนยันการสั่งซื้อ</button>

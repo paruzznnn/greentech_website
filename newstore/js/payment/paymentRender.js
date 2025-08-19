@@ -86,7 +86,7 @@ export async function fetchSubdistricts(call) {
 
 export const CheckoutUI = {
     lang: null,
-    shippingCost: 500.00,
+    shippingCost: 1500.00,
     ORDER_STORAGE_KEY: 'orderProduct',
     orderItems: [],
 
@@ -111,33 +111,43 @@ export const CheckoutUI = {
     },
 
     selectors: {
-        deliveryRadios: document.querySelectorAll('.delivery input[name="delivery_option"]'),
-        paymentRadios: document.querySelectorAll('.payment input[name="payment_method"]'),
         shippingSection: document.getElementById('shippingAddressFormSection'),
-
+        pickupSection: document.getElementById('pickupAddressFormSection'),
         orderCode: document.getElementById('order-code'),
         orderDate: document.getElementById('order-date'),
 
         subtotal: document.getElementById('subtotal'),
-        shippingCostValue: document.getElementById('shipping-cost-value'),
-        discountValue: document.getElementById('discount-value'),
         vatAmount: document.getElementById('vat-amount'),
         totalAmount: document.getElementById('total-amount'),
+
+        shippingCostValue: document.getElementById('shipping-cost-value'),
+        discountValue: document.getElementById('discount-value'),
+
+        //====== INPUT FROM ======================================
+        deliveryRadios: document.querySelectorAll('.delivery input[name="delivery_option"]'),
+        paymentRadios: document.querySelectorAll('.payment input[name="payment_method"]'),
+        orderInput: document.getElementById('order_id'),
+        productInput: document.getElementById('product_item'),
+        subtotalInput: document.getElementById('sub_total'),
+
+        shippingAmountInput: document.getElementById('shipping_amount'),
+        discountAmountInput: document.getElementById('discount_amount'),
+        vatAmountInput: document.getElementById('vat_amount'),
+        totalAmountInput: document.getElementById('total_amount'),
 
         selectedPaymentMethod: document.getElementById('selected-payment-method'),
         selectedDeliveryMethod: document.getElementById('selected-delivery-method'),
 
-        //Shipping Address
-        selectedFullname: document.getElementById('full_name'),
-        selectedPhoneNumber: document.getElementById('phone_number'),
-        selectedAddressDetail: document.getElementById('address_detail'),
+        //====== Default Shipping Address =================================
+        selectedFullname: null,
+        selectedPhoneNumber: null,
+        selectedAddressDetail: null,
 
-        selectedProvince: document.getElementById('province'),
-        selectedDistrict: document.getElementById('district'),
-        selectedSubdistrict: document.getElementById('subdistrict'),
-        selectedPostalCode: document.getElementById('postalCode')
+        selectedProvince: null,
+        selectedDistrict: null,
+        selectedSubdistrict: null,
+        selectedPostalCode: null
     },
-
 
     init(provinces, districts, subdistricts, address) {
 
@@ -148,9 +158,8 @@ export const CheckoutUI = {
         this.initializeUI();
         this.initClickEvents();
 
-        // this.loadOrder();
         this.renderProductItem();
-        this.renderPaymentUI();
+        this.renderPayment();
 
         this.addressData = address;
         this.provincesData = provinces;
@@ -160,7 +169,7 @@ export const CheckoutUI = {
         this.populateProvinces();
         this.populateDistricts();
         this.populateSubDistricts();
-        
+
     },
 
     loadOrder() {
@@ -186,14 +195,105 @@ export const CheckoutUI = {
             `;
         });
         document.getElementById("order-product").innerHTML = productHtml;
+        this.selectors.productInput.value = JSON.stringify(orderItems);
     },
 
-    renderPaymentUI() {
-        this.selectors.subtotal.textContent = this.orderItems.subtotal ?? '-';
-        this.selectors.vatAmount.textContent = this.orderItems.vat ?? '-';
+    renderPayment() {
+        this.selectors.subtotal.textContent = formatPrice("THB", parseFloat(this.orderItems.subtotal));
+        this.selectors.vatAmount.textContent = formatPrice("THB", parseFloat(this.orderItems.vat));
+        this.selectors.discountValue.textContent = formatPrice("THB", parseFloat(this.orderItems.discount));
         this.selectors.orderCode.textContent = this.orderItems.orderId;
         this.selectors.orderDate.textContent = formatDateToYYYYMMDD(this.orderItems.createdAt);
-        // console.log('orderItems', this.orderItems);
+
+        this.selectors.orderInput.value = this.orderItems.orderId;
+    },
+
+    renderShipping() {
+        let shippingHTML = `
+        <div class="section-header">
+            <div>
+                <p>กรอกข้อมูลที่อยู่จัดส่ง</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.8rem;">ตามการตั้งค่า</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="setupShipping"/>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="full_name" class="form-label">ชื่อ-นามสกุล:</label>
+                <input type="text" id="full_name" name="full_name" class="form-input" value="" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number" class="form-label">เบอร์โทรศัพท์:</label>
+                <input type="tel" id="phone_number" name="phone_number" class="form-input" value="" required>
+            </div>
+            <div class="full-width form-group">
+                <label for="address_detail" class="form-label">ที่อยู่:</label>
+                <textarea id="address_detail" name="address_detail" class="form-input" style="min-height: 60px !important;" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="province" class="form-label">จังหวัด:</label>
+                <select id="province" name="province" class="form-input" required>
+                    <option value="">เลือกจังหวัด</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="district" class="form-label">อำเภอ/เขต</label>
+                <select id="district" name="district" class="form-input" required disabled>
+                    <option value="">เลือกอำเภอ/เขต</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="subdistrict" class="form-label">ตำบล/แขวง</label>
+                <select id="subdistrict" name="subdistrict" class="form-input" required disabled>
+                    <option value="">เลือกตำบล/แขวง</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="postalCode" class="form-label">รหัสไปรษณีย์:</label>
+                <input type="text" id="postalCode" name="postalCode" class="form-input" value="" readonly>
+            </div>
+        </div>
+        `;
+        this.selectors.pickupSection.innerHTML = '';
+        this.selectors.shippingSection.innerHTML = shippingHTML;
+
+        // ===== REBIND THE NEWLY CREATED DOM ELEMENTS TO `this.selectors` =====
+        this.selectors.selectedFullname = document.getElementById('full_name');
+        this.selectors.selectedPhoneNumber = document.getElementById('phone_number');
+        this.selectors.selectedAddressDetail = document.getElementById('address_detail');
+
+        this.selectors.selectedProvince = document.getElementById('province');
+        this.selectors.selectedDistrict = document.getElementById('district');
+        this.selectors.selectedSubdistrict = document.getElementById('subdistrict');
+        this.selectors.selectedPostalCode = document.getElementById('postalCode');
+
+    },
+
+    renderPickup() {
+        let pickupHTML = `
+        <div class="section-header">
+            <div>
+                <p>กรอกข้อมูลผู้มาติดต่อ</p>
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="full_name" class="form-label">ชื่อ-นามสกุล:</label>
+                <input type="text" id="full_name" name="full_name" class="form-input" value="" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number" class="form-label">เบอร์โทรศัพท์:</label>
+                <input type="tel" id="phone_number" name="phone_number" class="form-input" value="" required>
+            </div>
+        </div>
+        `;
+        this.selectors.shippingSection.innerHTML = '';
+        this.selectors.pickupSection.innerHTML = pickupHTML;
     },
 
     populateProvinces() {
@@ -206,33 +306,33 @@ export const CheckoutUI = {
     },
 
     populateDistricts() {
-        if(this.provinceActive){
-            this.selectors.selectedDistrict.disabled = false;
-        }else{
-            this.selectors.selectedDistrict.disabled = true;
+        if (this.provinceActive) {
+            this.selectors.selectedDistrict.removeAttribute("disabled");
+        } else {
+            this.selectors.selectedDistrict.setAttribute("disabled", true);
         }
         const districtOption = this.districtsData
-        .filter(item => item.provinceCode == this.provinceActive)
-        .map(item => {
-            const districtName = this.lang === 'en' ? item.districtNameEn : item.districtNameTh;
-            return `<option value="${item.districtCode}" data-code="${item.districtCode}">${districtName}</option>`;
-        });
+            .filter(item => item.provinceCode == this.provinceActive)
+            .map(item => {
+                const districtName = this.lang === 'en' ? item.districtNameEn : item.districtNameTh;
+                return `<option value="${item.districtCode}" data-code="${item.districtCode}">${districtName}</option>`;
+            });
         const defaultOption = `<option value="">${this.lang === 'en' ? 'Select District' : 'เลือกอำเภอ/เขต'}</option>`;
         this.selectors.selectedDistrict.innerHTML = defaultOption + districtOption.join('');
     },
 
     populateSubDistricts() {
-        if(this.districtActive){
-            this.selectors.selectedSubdistrict.disabled = false;
-        }else{
-            this.selectors.selectedSubdistrict.disabled = true;
+        if (this.districtActive) {
+            this.selectors.selectedSubdistrict.removeAttribute("disabled");
+        } else {
+            this.selectors.selectedSubdistrict.setAttribute("disabled", true);
         }
         const subdistrictOption = this.subdistrictsData
-        .filter(item => item.districtCode == this.districtActive)
-        .map(item => {
-            const subdistrictName = this.lang === 'en' ? item.subdistrictNameEn : item.subdistrictNameTh;
-            return `<option value="${item.subdistrictCode}" data-code="${item.postalCode}">${subdistrictName}</option>`;
-        });
+            .filter(item => item.districtCode == this.districtActive)
+            .map(item => {
+                const subdistrictName = this.lang === 'en' ? item.subdistrictNameEn : item.subdistrictNameTh;
+                return `<option value="${item.subdistrictCode}" data-code="${item.postalCode}">${subdistrictName}</option>`;
+            });
         const defaultOption = `<option value="">${this.lang === 'en' ? 'Select Subdistrict' : 'เลือกตำบล/แขวง'}</option>`;
         this.selectors.selectedSubdistrict.innerHTML = defaultOption + subdistrictOption.join('');
     },
@@ -244,9 +344,9 @@ export const CheckoutUI = {
     updateShipping(isChecked) {
         if (isChecked) {
 
-            this.selectors.selectedFullname.setAttribute("readonly", "");
-            this.selectors.selectedPhoneNumber.setAttribute("readonly", "");
-            this.selectors.selectedAddressDetail.setAttribute("readonly", "");
+            this.selectors.selectedFullname.setAttribute("readonly", true);
+            this.selectors.selectedPhoneNumber.setAttribute("readonly", true);
+            this.selectors.selectedAddressDetail.setAttribute("readonly", true);
 
             this.selectors.selectedFullname.value = this.addressData.fullname;
             this.selectors.selectedPhoneNumber.value = this.addressData.phoneNumber;
@@ -254,28 +354,29 @@ export const CheckoutUI = {
 
             this.populateProvinces();
             const province = this.provincesData.find(p => p.provinceCode == this.addressData.province_id);
-            if(province){
+            if (province) {
                 this.selectors.selectedProvince.value = province.provinceCode;
                 this.provinceActive = province.provinceCode
             }
             this.populateDistricts();
             const district = this.districtsData.find(d => d.districtCode == this.addressData.district_id);
-            if(district){
+            if (district) {
                 this.selectors.selectedDistrict.value = district.districtCode;
                 this.districtActive = district.districtCode;
             }
             this.populateSubDistricts();
             const subdistrict = this.subdistrictsData.find(s => s.subdistrictCode == this.addressData.sub_district_id);
-            if(subdistrict){
+            if (subdistrict) {
                 this.selectors.selectedSubdistrict.value = subdistrict.subdistrictCode;
                 this.postalCodeActive = subdistrict.postalCode;
             }
             this.populatePostalCode();
 
-            this.selectors.selectedProvince.setAttribute("readonly", "");
-            this.selectors.selectedDistrict.setAttribute("readonly", "");
-            this.selectors.selectedSubdistrict.setAttribute("readonly", "");
-            this.selectors.selectedPostalCode.setAttribute("readonly", "");
+            this.selectors.selectedProvince.setAttribute("readonly", true);
+            this.selectors.selectedDistrict.setAttribute("readonly", true);
+            this.selectors.selectedSubdistrict.setAttribute("readonly", true);
+            this.selectors.selectedPostalCode.setAttribute("readonly", true);
+
 
         } else {
 
@@ -309,24 +410,43 @@ export const CheckoutUI = {
 
     },
 
-    updateDeliveryUI(value) {
-        const isShipping = value === 'shipping';
-        const cost = isShipping ? this.shippingCost : 0;
+    updateDelivery(value) {
+        let transportCost = 0;
+        switch (value) {
+            case "shipping":
+                this.renderShipping();
+                this.selectors.shippingSection.style.display = 'block';
+                this.selectors.pickupSection.style.display = 'none';
+                transportCost = this.shippingCost;
+                break;
+            case "pickup":
+                this.renderPickup();
+                this.selectors.pickupSection.style.display = 'block';
+                this.selectors.shippingSection.style.display = 'none';
+                transportCost = 0;
+                break;
+            default:
+                break;
+        }
 
-        this.selectors.shippingSection.style.display = isShipping ? 'block' : 'none';
-        this.selectors.shippingCostValue.textContent = `${cost.toFixed(2)}`;
-        this.selectors.totalAmount.textContent = `${formatPrice("THB", (parseFloat(this.orderItems.totalAmount) + cost))}`;
-        this.selectors.selectedDeliveryMethod.textContent = this.deliveryMethodNames[value] || '-';
+        this.selectors.selectedDeliveryMethod.textContent = this.deliveryMethodNames[value];
+        this.selectors.shippingCostValue.textContent = formatPrice("THB", parseFloat(transportCost));
+
+        const total = parseFloat(this.orderItems?.totalAmount || 0);
+        const finalAmount = total + transportCost;
+
+        this.selectors.totalAmount.textContent = formatPrice("THB", parseFloat(finalAmount));
+        this.selectors.shippingAmountInput.value = transportCost;
     },
 
     updatePaymentSummary(value) {
-        this.selectors.selectedPaymentMethod.textContent = this.paymentMethodNames[value] || '-';
+        this.selectors.selectedPaymentMethod.textContent = this.paymentMethodNames[value];
     },
 
     initRadioEvents() {
         this.selectors.deliveryRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                this.updateDeliveryUI(radio.value);
+                this.updateDelivery(radio.value);
             });
         });
 
@@ -341,7 +461,7 @@ export const CheckoutUI = {
         const initialDelivery = document.querySelector('input[name="delivery_option"]:checked');
         const initialPayment = document.querySelector('input[name="payment_method"]:checked');
         if (initialDelivery) {
-            this.updateDeliveryUI(initialDelivery.value);
+            this.updateDelivery(initialDelivery.value);
             document.querySelectorAll('.selection-card.delivery').forEach(card => card.classList.remove('active'));
             const selectedCard = initialDelivery.closest('.selection-card.delivery');
             if (selectedCard) selectedCard.classList.add('active');
@@ -372,7 +492,7 @@ export const CheckoutUI = {
     initClickEvents() {
         document.addEventListener('click', (event) => {
             if (event.target.closest('.selection-card.delivery')) {
-                this.handleContainerClick(event, 'delivery', 'delivery_option', this.updateDeliveryUI.bind(this));
+                this.handleContainerClick(event, 'delivery', 'delivery_option', this.updateDelivery.bind(this));
             }
             if (event.target.closest('.selection-card.payment')) {
                 this.handleContainerClick(event, 'payment', 'payment_method', this.updatePaymentSummary.bind(this));
@@ -387,7 +507,7 @@ export const CheckoutUI = {
                 }
             }
 
-            if(event.target.closest('#province')){
+            if (event.target.closest('#province')) {
                 const selectedOption = event.target.closest('#province').options[event.target.closest('#province').selectedIndex];
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
@@ -405,7 +525,7 @@ export const CheckoutUI = {
                 }
             }
 
-            if(event.target.closest('#district')){
+            if (event.target.closest('#district')) {
                 const selectedOption = event.target.closest('#district').options[event.target.closest('#district').selectedIndex];
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
@@ -418,8 +538,8 @@ export const CheckoutUI = {
                     this.updateShipping(false);
                 }
             }
-            
-            if(event.target.closest('#subdistrict')){
+
+            if (event.target.closest('#subdistrict')) {
                 const selectedOption = event.target.closest('#subdistrict').options[event.target.closest('#subdistrict').selectedIndex];
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
@@ -432,8 +552,6 @@ export const CheckoutUI = {
                     this.updateShipping(false);
                 }
             }
-            
-
         });
 
     }
@@ -441,14 +559,14 @@ export const CheckoutUI = {
 };
 
 function formatPrice(currency, price) {
-    if(price){
+    if (price) {
         return Number(price).toLocaleString("th-TH", {
-        style: "currency",
-        currency: currency || "THB",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+            style: "currency",
+            currency: currency || "THB",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         });
-    }else{
-        return '-';
+    } else {
+        return '';
     }
 }
