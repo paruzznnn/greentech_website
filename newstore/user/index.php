@@ -202,15 +202,12 @@
                 import(`${base}js/user/cartRender.js?v=${timestamp}`)
             ])
             .then(async ([menuBuilder, orderListRender, wishlistRender, cartRender]) => {
-
                 const { setupTabs } = menuBuilder;
                 const { fetchOrders, displayOrders, displayTabOrders } = orderListRender;
                 const { LikedProducts } = wishlistRender;
                 const { ShoppingCart } = cartRender;
-
                 window.ShoppingCart = ShoppingCart;
                 const service = base + 'service/user/user-data.php?';
-
                 setupTabs();
                 displayTabOrders('tab-order-list');
                 let orders = await fetchOrders("getOrdersItems", service);
@@ -227,11 +224,9 @@
                 };
                 tabButtonsHandler();
                 displayOrders('All', 'orders-list', orders);
-                ShoppingCart.init();
+                ShoppingCart.init(base);
                 LikedProducts.init();
                 LikedProducts.renderProducts(ShoppingCart);
-
-
             })
             .catch((e) => {
                 console.error("One or more module imports failed", e);
