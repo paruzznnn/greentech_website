@@ -1,4 +1,6 @@
 
+import { formatDateToYYYYMMDD } from '../formHandler.js';
+
 export async function fetchAddressData(req, call) {
     try {
         const params = new URLSearchParams({
@@ -84,8 +86,7 @@ export async function fetchSubdistricts(call) {
 
 export const CheckoutUI = {
     lang: null,
-    baseTotal: 1500.00,
-    shippingFee: 50.00,
+    shippingCost: 500.00,
     ORDER_STORAGE_KEY: 'orderProduct',
     orderItems: [],
 
@@ -113,8 +114,16 @@ export const CheckoutUI = {
         deliveryRadios: document.querySelectorAll('.delivery input[name="delivery_option"]'),
         paymentRadios: document.querySelectorAll('.payment input[name="payment_method"]'),
         shippingSection: document.getElementById('shippingAddressFormSection'),
+
+        orderCode: document.getElementById('order-code'),
+        orderDate: document.getElementById('order-date'),
+
+        subtotal: document.getElementById('subtotal'),
         shippingCostValue: document.getElementById('shipping-cost-value'),
+        discountValue: document.getElementById('discount-value'),
+        vatAmount: document.getElementById('vat-amount'),
         totalAmount: document.getElementById('total-amount'),
+
         selectedPaymentMethod: document.getElementById('selected-payment-method'),
         selectedDeliveryMethod: document.getElementById('selected-delivery-method'),
 
@@ -133,13 +142,15 @@ export const CheckoutUI = {
     init(provinces, districts, subdistricts, address) {
 
         this.lang = 'th';
+        this.loadOrder();
 
         this.initRadioEvents();
         this.initializeUI();
         this.initClickEvents();
 
-        this.loadOrder();
+        // this.loadOrder();
         this.renderProductItem();
+        this.renderPaymentUI();
 
         this.addressData = address;
         this.provincesData = provinces;
@@ -175,6 +186,14 @@ export const CheckoutUI = {
             `;
         });
         document.getElementById("order-product").innerHTML = productHtml;
+    },
+
+    renderPaymentUI() {
+        this.selectors.subtotal.textContent = this.orderItems.subtotal ?? '-';
+        this.selectors.vatAmount.textContent = this.orderItems.vat ?? '-';
+        this.selectors.orderCode.textContent = this.orderItems.orderId;
+        this.selectors.orderDate.textContent = formatDateToYYYYMMDD(this.orderItems.createdAt);
+        // console.log('orderItems', this.orderItems);
     },
 
     populateProvinces() {
@@ -292,11 +311,11 @@ export const CheckoutUI = {
 
     updateDeliveryUI(value) {
         const isShipping = value === 'shipping';
-        const cost = isShipping ? this.shippingFee : 0;
+        const cost = isShipping ? this.shippingCost : 0;
 
         this.selectors.shippingSection.style.display = isShipping ? 'block' : 'none';
-        this.selectors.shippingCostValue.textContent = `${cost.toFixed(2)} บาท`;
-        this.selectors.totalAmount.textContent = `${(this.baseTotal + cost).toFixed(2)} บาท`;
+        this.selectors.shippingCostValue.textContent = `${cost.toFixed(2)}`;
+        this.selectors.totalAmount.textContent = `${formatPrice("THB", (parseFloat(this.orderItems.totalAmount) + cost))}`;
         this.selectors.selectedDeliveryMethod.textContent = this.deliveryMethodNames[value] || '-';
     },
 
@@ -321,14 +340,12 @@ export const CheckoutUI = {
     initializeUI() {
         const initialDelivery = document.querySelector('input[name="delivery_option"]:checked');
         const initialPayment = document.querySelector('input[name="payment_method"]:checked');
-
         if (initialDelivery) {
             this.updateDeliveryUI(initialDelivery.value);
             document.querySelectorAll('.selection-card.delivery').forEach(card => card.classList.remove('active'));
             const selectedCard = initialDelivery.closest('.selection-card.delivery');
             if (selectedCard) selectedCard.classList.add('active');
         }
-
         if (initialPayment) {
             this.updatePaymentSummary(initialPayment.value);
             document.querySelectorAll('.selection-card.payment').forEach(card => card.classList.remove('active'));
@@ -346,7 +363,6 @@ export const CheckoutUI = {
                 radio.dispatchEvent(new Event('change', {
                     bubbles: true
                 }));
-
                 document.querySelectorAll(`.selection-card.${className}`).forEach(card => card.classList.remove('active'));
                 target.classList.add('active');
             }
@@ -358,7 +374,6 @@ export const CheckoutUI = {
             if (event.target.closest('.selection-card.delivery')) {
                 this.handleContainerClick(event, 'delivery', 'delivery_option', this.updateDeliveryUI.bind(this));
             }
-
             if (event.target.closest('.selection-card.payment')) {
                 this.handleContainerClick(event, 'payment', 'payment_method', this.updatePaymentSummary.bind(this));
             }
@@ -426,10 +441,14 @@ export const CheckoutUI = {
 };
 
 function formatPrice(currency, price) {
-    return Number(price).toLocaleString("th-TH", {
-    style: "currency",
-    currency: currency || "THB",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    });
+    if(price){
+        return Number(price).toLocaleString("th-TH", {
+        style: "currency",
+        currency: currency || "THB",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        });
+    }else{
+        return '-';
+    }
 }

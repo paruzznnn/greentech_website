@@ -1522,7 +1522,7 @@ textarea.form-input {
 
   /* LG */
   .bottom-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .coupon-grid {
@@ -1534,7 +1534,7 @@ textarea.form-input {
 
   /* XL */
   .bottom-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .coupon-grid {

@@ -43,10 +43,45 @@
                   <span>เข้าสู่ระบบ / ลงทะเบียน</span>
                 </button>
             </div>
-            <?php } else { ?>
-            <div>
-                <span><?php echo $_SESSION['user']['username']?></span>
+            <?php } else if(!empty($_SESSION['user']) && $_SESSION['user']['role'] == "user") { ?>
+            <div id="box-notify-panel" class="notify-panel">
+              <!-- <div class="notify-item">
+                <div class="notify-icon-wrapper">
+                  <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
+                    <i class="bi bi-person"></i>
+                  </a>
+                </div>
+              </div> -->
+              <div class="notify-item">
+                <span id="cartCount" class="notify-count">0</span>
+                <div class="notify-icon-wrapper">
+                  <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
+                    <i class="bi bi-cart3"></i>
+                  </a>
+                </div>
+              </div>
+
+              <div class="notify-item">
+                <span id="wishlistCount" class="notify-count">0</span>
+                <div class="notify-icon-wrapper">
+                  <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
+                    <i class="bi bi-clipboard-heart"></i>
+                  </a>
+                </div>
+              </div>
+
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  setInterval(() => {
+                    const countCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+                    const countWishlist = JSON.parse(localStorage.getItem('likedProducts')) || [];
+
+                    document.querySelector("#wishlistCount").textContent = countWishlist.length;
+                    document.querySelector("#cartCount").textContent = countCart.length;
+                  }, 1000);
+                });
+            </script>
             <?php } ?>
             <div>
               <span id="menu-open-store1" style="font-size:20px;cursor:pointer">
@@ -253,45 +288,6 @@
     <div id="notificationMessage" class="notification-message"></div>
 </div>
 
-<?php if(!empty($_SESSION['user']) && $_SESSION['user']['role'] == "user") { ?>
-<div id="box-notify-panel" class="notify-panel">
-  <div class="notify-item border-bottom">
-    <div class="notify-icon-wrapper">
-      <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
-        <i class="bi bi-person"></i>
-      </a>
-    </div>
-  </div>
-  <div class="notify-item border-bottom">
-    <span id="wishlistCount" class="notify-count">0</span>
-    <div class="notify-icon-wrapper">
-      <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
-        <i class="bi bi-clipboard-heart"></i>
-      </a>
-    </div>
-  </div>
-  <div class="notify-item">
-    <span id="cartCount" class="notify-count">0</span>
-    <div class="notify-icon-wrapper">
-      <a href="<?php echo $BASE_WEB?>user/" class="notify-icon-button">
-        <i class="bi bi-cart3"></i>
-      </a>
-    </div>
-  </div>
-
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-      setInterval(() => {
-        const countCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        const countWishlist = JSON.parse(localStorage.getItem('likedProducts')) || [];
-
-        document.querySelector("#wishlistCount").textContent = countWishlist.length;
-        document.querySelector("#cartCount").textContent = countCart.length;
-      }, 1000);
-    });
-</script>
-<?php } ?>
 
 <!-- sidenav 1 -->
 <aside id="sidenav-store1" class="sidenav">

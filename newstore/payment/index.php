@@ -26,8 +26,8 @@
 
                                 <!-- ข้อมูลสั่งซื้อ -->
                                 <div class="section-card">
-                                    <h5><span>เลขที่สั่งซื้อ:</span> <span>ORD-20250814-12345</span></h5>
-                                    <div><span>วันที่สั่งซื้อ:</span> <span>14 สิงหาคม 2568</span></div>
+                                    <h5><span>เลขที่สั่งซื้อ:</span> <span id="order-code"></span></h5>
+                                    <div><span>วันที่สั่งซื้อ:</span> <span id="order-date"></span></div>
                                 </div>
 
                                 <!-- เลือกวิธีรับสินค้า -->
@@ -124,6 +124,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                
                             </div>
 
                             <!-- รายการสินค้า + สรุป -->
@@ -139,17 +140,29 @@
                                     <div id="order-product" class="product-items-container"></div>
                                 </div>
 
+                                <!-- <div class="section-card">
+                                    <h5 class="section-header">คูปอง</h5>
+                                </div> -->
+
                                 <!-- สรุปยอดรวม -->
                                 <div class="summary-card section-card">
                                     <h5 class="section-header">สรุปยอดรวม</h5>
                                     <div class="summary-details">
                                         <div class="summary-row">
                                             <span class="summary-label">ราคารวมสินค้า</span>
-                                            <span class="summary-value">1,500.00 บาท</span>
+                                            <span class="summary-value" id="subtotal">-</span>
                                         </div>
                                         <div class="summary-row">
-                                            <span class="summary-label" id="shipping-cost-label">ค่าจัดส่ง</span>
-                                            <span class="summary-value" id="shipping-cost-value">50.00 บาท</span>
+                                            <span class="summary-label">ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+                                            <span class="summary-value" id="vat-amount">-</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span class="summary-label">ค่าจัดส่ง</span>
+                                            <span class="summary-value" id="shipping-cost-value">-</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span class="summary-label">ส่วนลด</span>
+                                            <span class="summary-value" id="discount-value">-</span>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-label">วิธีรับสินค้า</span>
@@ -161,7 +174,7 @@
                                         </div>
                                         <div class="total-row summary-row">
                                             <span class="total-label">ยอดรวมทั้งหมด</span>
-                                            <span class="total-value" id="total-amount">1,550.00 บาท</span>
+                                            <span class="total-value" id="total-amount">-</span>
                                         </div>
                                     </div>
                                     <button id="confirm-order" type="submit">ยืนยันการสั่งซื้อ</button>
