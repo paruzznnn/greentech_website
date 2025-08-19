@@ -83,7 +83,7 @@ if (isset($_GET['id'])) {
             text-decoration: none;
         }
         .social-share img {
-            width: 40px;
+            /* width: 40px; */
             height: 40px;
             transition: transform 0.2s ease;
         }
@@ -142,7 +142,7 @@ if (isset($_GET['id'])) {
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="row">
 
                     <div class="">
