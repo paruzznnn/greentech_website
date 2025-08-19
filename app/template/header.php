@@ -572,21 +572,14 @@ a {
             </a>
         </div>
 
-         <div>
-        <select id="language-select" class="language-select"></select>
+          <div>
+        <select id="language-select" class="language-select">
+            <option value="th" data-flag="https://flagcdn.com/th.svg">ไทย</option>
+            <option value="en" data-flag="https://flagcdn.com/us.svg">English</option>
+            <option value="cn" data-flag="https://flagcdn.com/cn.svg">简体中文</option>
+            <option value="jp" data-flag="https://flagcdn.com/jp.svg">日本語</option>
+        </select>
     </div>
-        <!-- <div class="language-select-container">
-            <img id="current-flag-desktop" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
-                onclick="toggleFlagDropdown('desktop')">
-            <div id="flag-dropdown-desktop" class="flag-dropdown">
-                <a href="?<?php if(isset($_GET['id'])) echo 'id=' . urlencode($_GET['id']) . '&'; ?>lang=th">
-                    <img src="https://flagcdn.com/th.svg" alt="Thai Flag" width="24"> ไทย
-                </a>
-                <a href="?<?php if(isset($_GET['id'])) echo 'id=' . urlencode($_GET['id']) . '&'; ?>lang=en">
-                    <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24"> English
-                </a>
-            </div>
-        </div> -->
         <div class="header-social-links">
             <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
                 <i class="fab fa-facebook-square"></i>
@@ -650,6 +643,9 @@ a {
                         </a>
                         <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>">
                             <img src="https://flagcdn.com/cn.svg" alt="Chinese Flag" width="24"> 中文
+                        </a>
+                        <a href="<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>">
+                            <img src="https://flagcdn.com/jp.svg" alt="Japanese Flag" width="24"> 日本語
                         </a>
                     </div>
                 </div>
@@ -830,7 +826,8 @@ a {
             const flagMap = {
                 'th': 'https://flagcdn.com/th.svg',
                 'en': 'https://flagcdn.com/us.svg',
-                'cn': 'https://flagcdn.com/cn.svg' // เพิ่ม URL ธงจีน
+                'cn': 'https://flagcdn.com/cn.svg',
+                'jp': 'https://flagcdn.com/jp.svg'
             };
             const flagUrl = flagMap[language] || flagMap['th'];
             
@@ -1020,19 +1017,7 @@ a {
     const langLinks = {
         th: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>",
         en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>",
-        cn: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>" // เพิ่มภาษาจีน
+        cn: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>",
+        jp: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>"
     };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-

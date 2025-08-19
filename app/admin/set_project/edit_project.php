@@ -163,6 +163,9 @@ $decodedId = $_POST['project_id'];
                             p.subject_project_cn,
                             p.description_project_cn,
                             p.content_project_cn,
+                            p.subject_project_jp,
+                            p.description_project_jp,
+                            p.content_project_jp,
                             p.date_create,
                             GROUP_CONCAT(DISTINCT d.file_name, ':::', d.api_path, ':::', d.status ORDER BY d.status DESC SEPARATOR '|||') AS files
                         FROM dn_project p
@@ -184,6 +187,7 @@ $decodedId = $_POST['project_id'];
                         $content_th = $row['content_project'];
                         $content_en = $row['content_project_en'];
                         $content_cn = $row['content_project_cn'];
+                        $content_jp = $row['content_project_jp'];
 
                         $pic_data = [];
                         $previewImageSrc = '';
@@ -241,6 +245,20 @@ $decodedId = $_POST['project_id'];
                             }
                         }
                         $content_cn_with_correct_paths = $dom_cn->saveHTML();
+
+                        $dom_jp = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        $source_jp = !empty($content_jp) ? mb_convert_encoding($content_jp, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+                        $dom_jp->loadHTML($source_jp, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        libxml_clear_errors();
+                        $images_jp = $dom_jp->getElementsByTagName('img');
+                        foreach ($images_jp as $img) {
+                            $data_filename = $img->getAttribute('data-filename');
+                            if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+                                $img->setAttribute('src', $pic_data[$data_filename]);
+                            }
+                        }
+                        $content_jp_with_correct_paths = $dom_jp->saveHTML();
 
                         $allShopsQuery = $conn->query("SELECT shop_id, subject_shop FROM dn_shop WHERE del = 0 ORDER BY subject_shop ASC");
                         $allShopsOptions = '';
@@ -314,6 +332,12 @@ $decodedId = $_POST['project_id'];
                                                 margin-right: 8px;'>Chinese
                                                     </button>
                                                 </li>
+                                                <li class='nav-item' role='presentation'>
+                                                    <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
+                                                        <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
+                                                margin-right: 8px;'>Japanese
+                                                    </button>
+                                                </li>
                                             </ul>
                                         </div>
                                         <div class='card-body'>
@@ -368,6 +392,24 @@ $decodedId = $_POST['project_id'];
                                                         <textarea class='form-control summernote' id='summernote_update_cn' name='project_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
+                                                <div class='tab-pane fade' id='jp' role='tabpanel' aria-labelledby='jp-tab'>
+                                                    <div style='margin: 10px;'>
+                                                        <button type='button' id='copyFromChinese' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <div id='loadingIndicator_jp' class='loading-overlay' style='display: none;'>
+                                                            <div class='loading-spinner'></div>
+                                                        </div>
+                                                        <div><span>Subject (JP)</span>:</div>
+                                                        <input type='text' class='form-control' id='project_subject_jp' name='project_subject_jp' value='" . htmlspecialchars($row['subject_project_jp']) . "'>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <div><span>Description (JP)</span>:</div>
+                                                        <textarea class='form-control' id='project_description_jp' name='project_description_jp'>" . htmlspecialchars($row['description_project_jp']) . "</textarea>
+                                                    </div>
+                                                    <div style='margin: 10px;'>
+                                                        <div><span>Content (JP)</span>:</div>
+                                                        <textarea class='form-control summernote' id='summernote_update_jp' name='project_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -392,352 +434,473 @@ $decodedId = $_POST['project_id'];
     </div>
 
     <script>
-        $(document).ready(function () {
-            $('.select2-multiple').select2();
-            var relatedShops = <?php echo $relatedShopsJSON; ?>;
-            $('#related_shops_edit').val(relatedShops).trigger('change');
+        $(document).ready(function () {
+            $('.select2-multiple').select2();
+            var relatedShops = <?php echo $relatedShopsJSON; ?>;
+            $('#related_shops_edit').val(relatedShops).trigger('change');
 
-            $('#summernote_update').summernote({
-                height: 600,
-                minHeight: 600,
-                maxHeight: 600,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['fontname', 'fontsize', 'forecolor']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link', 'picture', 'video', 'table']],
-                    ['view', ['fullscreen', ['codeview', 'fullscreen']]],
-                    ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-                ],
-                fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
-                fontNamesIgnoreCheck: ['Kanit'],
-                fontsizeUnits: ['px', 'pt'],
-                fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-            });
+            $('#summernote_update').summernote({
+                height: 600,
+                minHeight: 600,
+                maxHeight: 600,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['fontname', 'fontsize', 'forecolor']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture', 'video', 'table']],
+                    ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                    ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                ],
+                fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                fontNamesIgnoreCheck: ['Kanit'],
+                fontsizeUnits: ['px', 'pt'],
+                fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+            });
 
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var target = $(e.target).attr("data-bs-target");
-                if (target === '#en') {
-                    if ($('#summernote_update_en').data('summernote')) {
-                        $('#summernote_update_en').summernote('destroy');
-                    }
-                    $('#summernote_update_en').summernote({
-                        height: 600,
-                        minHeight: 600,
-                        maxHeight: 600,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['font', ['fontname', 'fontsize', 'forecolor']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['insert', ['link', 'picture', 'video', 'table']],
-                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
-                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-                        ],
-                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
-                        fontNamesIgnoreCheck: ['Kanit'],
-                        fontsizeUnits: ['px', 'pt'],
-                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-                    });
-                }
-                if (target === '#cn') {
-                    if ($('#summernote_update_cn').data('summernote')) {
-                        $('#summernote_update_cn').summernote('destroy');
-                    }
-                    $('#summernote_update_cn').summernote({
-                        height: 600,
-                        minHeight: 600,
-                        maxHeight: 600,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['font', ['fontname', 'fontsize', 'forecolor']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['insert', ['link', 'picture', 'video', 'table']],
-                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
-                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
-                        ],
-                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
-                        fontNamesIgnoreCheck: ['Kanit'],
-                        fontsizeUnits: ['px', 'pt'],
-                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
-                    });
-                }
-            });
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("data-bs-target");
+                if (target === '#en') {
+                    if ($('#summernote_update_en').data('summernote')) {
+                        $('#summernote_update_en').summernote('destroy');
+                    }
+                    $('#summernote_update_en').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+                if (target === '#cn') {
+                    if ($('#summernote_update_cn').data('summernote')) {
+                        $('#summernote_update_cn').summernote('destroy');
+                    }
+                    $('#summernote_update_cn').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+                if (target === '#jp') {
+                    if ($('#summernote_update_jp').data('summernote')) {
+                        $('#summernote_update_jp').summernote('destroy');
+                    }
+                    $('#summernote_update_jp').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+                if (target === '#cn') {
+                    if ($('#summernote_update_cn').data('summernote')) {
+                        $('#summernote_update_cn').summernote('destroy');
+                    }
+                    $('#summernote_update_cn').summernote({
+                        height: 600,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['font', ['fontname', 'fontsize', 'forecolor']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['insert', ['link', 'picture', 'video', 'table']],
+                            ['view', ['fullscreen', ['codeview', 'fullscreen']]],
+                            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter']]
+                        ],
+                        fontNames: ['Kanit', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'sans-serif'],
+                        fontNamesIgnoreCheck: ['Kanit'],
+                        fontsizeUnits: ['px', 'pt'],
+                        fontsize: ['8', '10', '12', '14', '16', '18', '24', '36'],
+                    });
+                }
+            });
 
-            // New Copy from Thai button functionality
-            $('#copyFromThai').on('click', function () {
-                $('#loadingIndicator_en').show();
+            // New Copy from Thai button functionality
+            $('#copyFromThai').on('click', function () {
+                $('#loadingIndicator_en').show();
 
-                var thaiSubject = $('#project_subject').val();
-                var thaiDescription = $('#project_description').val();
-                var thaiContent = $('#summernote_update').summernote('code');
+                var thaiSubject = $('#project_subject').val();
+                var thaiDescription = $('#project_description').val();
+                var thaiContent = $('#summernote_update').summernote('code');
 
-                const dataToSend = {
-                    language: "th",
-                    translate: "en",
-                    company: 2,
-                    content: {
-                        subject: thaiSubject,
-                        description: thaiDescription,
-                        content: thaiContent
-                    }
-                };
+                const dataToSend = {
+                    language: "th",
+                    translate: "en",
+                    company: 2,
+                    content: {
+                        subject: thaiSubject,
+                        description: thaiDescription,
+                        content: thaiContent
+                    }
+                };
 
-                fetch('actions/translate.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer',
-                    },
-                    body: JSON.stringify(dataToSend),
-                })
-                .then(res => res.json())
-                .then(response => {
-                    console.log(response);
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
 
-                    if (response.status === 'success') {
-                        $('#project_subject_en').val(response.subject);
-                        $('#project_description_en').val(response.description);
-                        $('#summernote_update_en').summernote('code', response.content);
-                        alert('การแปลสำเร็จ!');
-                    } else {
-                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
-                    }
-                })
-                .catch(error => {
-                    console.error("error:", error);
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
-                })
-                .finally(() => {
-                    $('#loadingIndicator_en').hide();
-                });
-            });
+                    if (response.status === 'success') {
+                        $('#project_subject_en').val(response.subject);
+                        $('#project_description_en').val(response.description);
+                        $('#summernote_update_en').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    $('#loadingIndicator_en').hide();
+                });
+            });
 
-            // New Copy from English button functionality
-            $('#copyFromEnglish').on('click', function () {
-                $('#loadingIndicator_cn').show();
+            // New Copy from English button functionality
+            $('#copyFromEnglish').on('click', function () {
+                $('#loadingIndicator_cn').show();
 
-                var englishSubject = $('#project_subject_en').val();
-                var englishDescription = $('#project_description_en').val();
-                var englishContent = $('#summernote_update_en').summernote('code');
+                var englishSubject = $('#project_subject_en').val();
+                var englishDescription = $('#project_description_en').val();
+                var englishContent = $('#summernote_update_en').summernote('code');
 
-                const dataToSend = {
-                    language: "en",
-                    translate: "cn",
-                    company: 2,
-                    content: {
-                        subject: englishSubject,
-                        description: englishDescription,
-                        content: englishContent
-                    }
-                };
+                const dataToSend = {
+                    language: "en",
+                    translate: "cn",
+                    company: 2,
+                    content: {
+                        subject: englishSubject,
+                        description: englishDescription,
+                        content: englishContent
+                    }
+                };
 
-                fetch('actions/translate.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer',
-                    },
-                    body: JSON.stringify(dataToSend),
-                })
-                .then(res => res.json())
-                .then(response => {
-                    console.log(response);
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
 
-                    if (response.status === 'success') {
-                        $('#project_subject_cn').val(response.subject);
-                        $('#project_description_cn').val(response.description);
-                        $('#summernote_update_cn').summernote('code', response.content);
-                        alert('การแปลสำเร็จ!');
-                    } else {
-                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
-                    }
-                })
-                .catch(error => {
-                    console.error("error:", error);
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
-                })
-                .finally(() => {
-                    $('#loadingIndicator_cn').hide();
-                });
-            });
+                    if (response.status === 'success') {
+                        $('#project_subject_cn').val(response.subject);
+                        $('#project_description_cn').val(response.description);
+                        $('#summernote_update_cn').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    $('#loadingIndicator_cn').hide();
+                });
+            });
 
 
-            $('#fileInput').on('change', function () {
-                var input = this;
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#previewImage').attr('src', e.target.result);
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            });
+            // New Copy from Chinese button functionality
+            $('#copyFromChinese').on('click', function () {
+                $('#loadingIndicator_jp').show();
 
-            $('#backToProjectList').on('click', function () {
-                window.location.href = "list_project.php";
-            });
+                var chineseSubject = $('#project_subject_cn').val();
+                var chineseDescription = $('#project_description_cn').val();
+                var chineseContent = $('#summernote_update_cn').summernote('code');
 
-            $("#submitEditproject").on("click", function (event) {
-                event.preventDefault();
-                var formproject = $("#formproject_edit")[0];
-                var formData = new FormData(formproject);
-                formData.set("action", "editproject");
-                formData.set("project_id", $("#project_id").val());
-                var contentFromEditor_th = $("#summernote_update").summernote('code');
-                var contentFromEditor_en = $('#summernote_update_en').summernote('code');
-                var contentFromEditor_cn = $('#summernote_update_cn').summernote('code');
-                var checkIsUrl = false;
+                const dataToSend = {
+                    language: "cn",
+                    translate: "jp",
+                    company: 2,
+                    content: {
+                        subject: chineseSubject,
+                        description: chineseDescription,
+                        content: chineseContent
+                    }
+                };
 
-                if (contentFromEditor_th) {
-                    var tempDiv = document.createElement("div");
-                    tempDiv.innerHTML = contentFromEditor_th;
-                    var imgTags = tempDiv.getElementsByTagName("img");
-                    for (var i = 0; i < imgTags.length; i++) {
-                        var imgSrc = imgTags[i].getAttribute("src");
-                        var filename = imgTags[i].getAttribute("data-filename");
-                        if (!imgSrc) continue;
+                fetch('actions/translate.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                .then(res => res.json())
+                .then(response => {
+                    console.log(response);
 
-                        imgSrc = imgSrc.replace(/ /g, "%20");
-                        if (!isValidUrl(imgSrc)) {
-                            var file = base64ToFile(imgSrc, filename);
-                            if (file) {
-                                formData.append("image_files_th[]", file);
-                            }
-                            if (imgSrc.startsWith("data:image")) {
-                                imgTags[i].setAttribute("src", "");
-                            }
-                        } else {
-                            checkIsUrl = true;
-                        }
-                    }
-                    formData.set("project_content", tempDiv.innerHTML);
-                }
+                    if (response.status === 'success') {
+                        $('#project_subject_jp').val(response.subject);
+                        $('#project_description_jp').val(response.description);
+                        $('#summernote_update_jp').summernote('code', response.content);
+                        alert('การแปลสำเร็จ!');
+                    } else {
+                        alert('การแปลล้มเหลว: ' + (response.message || response.error));
+                    }
+                })
+                .catch(error => {
+                    console.error("error:", error);
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                })
+                .finally(() => {
+                    $('#loadingIndicator_jp').hide();
+                });
+            });
 
-                if (contentFromEditor_en) {
-                    var tempDiv_en = document.createElement("div");
-                    tempDiv_en.innerHTML = contentFromEditor_en;
-                    var imgTags_en = tempDiv_en.getElementsByTagName("img");
-                    for (var i = 0; i < imgTags_en.length; i++) {
-                        var imgSrc_en = imgTags_en[i].getAttribute("src");
-                        var filename_en = imgTags_en[i].getAttribute("data-filename");
-                        if (!imgSrc_en) continue;
+            $('#fileInput').on('change', function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewImage').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
 
-                        imgSrc_en = imgSrc_en.replace(/ /g, "%20");
-                        if (!isValidUrl(imgSrc_en)) {
-                            var file_en = base64ToFile(imgSrc_en, filename_en);
-                            if (file_en) {
-                                formData.append("image_files_en[]", file_en);
-                            }
-                            if (imgSrc_en.startsWith("data:image")) {
-                                imgTags_en[i].setAttribute("src", "");
-                            }
-                        } else {
-                            checkIsUrl = true;
-                        }
-                    }
-                    formData.set("project_content_en", tempDiv_en.innerHTML);
-                }
-                
-                if (contentFromEditor_cn) {
-                    var tempDiv_cn = document.createElement("div");
-                    tempDiv_cn.innerHTML = contentFromEditor_cn;
-                    var imgTags_cn = tempDiv_cn.getElementsByTagName("img");
-                    for (var i = 0; i < imgTags_cn.length; i++) {
-                        var imgSrc_cn = imgTags_cn[i].getAttribute("src");
-                        var filename_cn = imgTags_cn[i].getAttribute("data-filename");
-                        if (!imgSrc_cn) continue;
+            $('#backToProjectList').on('click', function () {
+                window.location.href = "list_project.php";
+            });
 
-                        imgSrc_cn = imgSrc_cn.replace(/ /g, "%20");
-                        if (!isValidUrl(imgSrc_cn)) {
-                            var file_cn = base64ToFile(imgSrc_cn, filename_cn);
-                            if (file_cn) {
-                                formData.append("image_files_cn[]", file_cn);
-                            }
-                            if (imgSrc_cn.startsWith("data:image")) {
-                                imgTags_cn[i].setAttribute("src", "");
-                            }
-                        } else {
-                            checkIsUrl = true;
-                        }
-                    }
-                    formData.set("project_content_cn", tempDiv_cn.innerHTML);
-                }
+            $("#submitEditproject").on("click", function (event) {
+                event.preventDefault();
+                var formproject = $("#formproject_edit")[0];
+                var formData = new FormData(formproject);
+                formData.set("action", "editproject");
+                formData.set("project_id", $("#project_id").val());
+                var contentFromEditor_th = $("#summernote_update").summernote('code');
+                var contentFromEditor_en = $('#summernote_update_en').summernote('code');
+                var contentFromEditor_cn = $('#summernote_update_cn').summernote('code');
+                var contentFromEditor_jp = $('#summernote_update_jp').summernote('code');
+                var checkIsUrl = false;
 
-                $(".is-invalid").removeClass("is-invalid");
-                if (!$("#project_subject").val().trim()) {
-                    $("#project_subject").addClass("is-invalid");
-                    return;
-                }
-                if (!$("#project_description").val().trim()) {
-                    $("#project_description").addClass("is-invalid");
-                    return;
-                }
-                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim()) {
-                    alertError("Please fill in content information for at least one language.");
-                    return;
-                }
+                if (contentFromEditor_th) {
+                    var tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = contentFromEditor_th;
+                    var imgTags = tempDiv.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags.length; i++) {
+                        var imgSrc = imgTags[i].getAttribute("src");
+                        var filename = imgTags[i].getAttribute("data-filename");
+                        if (!imgSrc) continue;
 
-                formData.set("project_subject_en", $("#project_subject_en").val());
-                formData.set("project_description_en", $("#project_description_en").val());
-                formData.set("project_subject_cn", $("#project_subject_cn").val());
-                formData.set("project_description_cn", $("#project_description_cn").val());
+                        imgSrc = imgSrc.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc)) {
+                            var file = base64ToFile(imgSrc, filename);
+                            if (file) {
+                                formData.append("image_files_th[]", file);
+                            }
+                            if (imgSrc.startsWith("data:image")) {
+                                imgTags[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("project_content", tempDiv.innerHTML);
+                }
 
-                Swal.fire({
-                    title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
-                    text: "Do you want to edit project?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4CAF50",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Accept"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $('#loading-overlay').fadeIn();
-                        $.ajax({
-                            url: "actions/process_project.php",
-                            type: "POST",
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                try {
-                                    var json = (typeof response === "string") ? JSON.parse(response) : response;
-                                    if (json.status === 'success') {
-                                        location.reload();
-                                    } else {
-                                        Swal.fire('Error', json.message || 'Unknown error', 'error');
-                                    }
-                                } catch (e) {
-                                    console.error("❌ JSON parse error:", e);
-                                    Swal.fire('Error', 'Invalid response from server', 'error');
-                                }
-                            },
-                            error: function (xhr) {
-                                console.error("❌ AJAX error:", xhr.responseText);
-                                Swal.fire('Error', 'AJAX request failed', 'error');
-                                $('#loading-overlay').fadeOut();
-                            },
-                        });
-                    } else {
-                        $('#loading-overlay').fadeOut();
-                    }
-                });
-            });
-        });
+                if (contentFromEditor_en) {
+                    var tempDiv_en = document.createElement("div");
+                    tempDiv_en.innerHTML = contentFromEditor_en;
+                    var imgTags_en = tempDiv_en.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_en.length; i++) {
+                        var imgSrc_en = imgTags_en[i].getAttribute("src");
+                        var filename_en = imgTags_en[i].getAttribute("data-filename");
+                        if (!imgSrc_en) continue;
 
-        function base64ToFile(base64, fileName) {
-            // ... (Your existing base64ToFile function) ...
-        }
+                        imgSrc_en = imgSrc_en.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_en)) {
+                            var file_en = base64ToFile(imgSrc_en, filename_en);
+                            if (file_en) {
+                                formData.append("image_files_en[]", file_en);
+                            }
+                            if (imgSrc_en.startsWith("data:image")) {
+                                imgTags_en[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("project_content_en", tempDiv_en.innerHTML);
+                }
+                
+                if (contentFromEditor_cn) {
+                    var tempDiv_cn = document.createElement("div");
+                    tempDiv_cn.innerHTML = contentFromEditor_cn;
+                    var imgTags_cn = tempDiv_cn.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_cn.length; i++) {
+                        var imgSrc_cn = imgTags_cn[i].getAttribute("src");
+                        var filename_cn = imgTags_cn[i].getAttribute("data-filename");
+                        if (!imgSrc_cn) continue;
 
-        function alertError(textAlert) {
-            // ... (Your existing alertError function) ...
-        }
+                        imgSrc_cn = imgSrc_cn.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_cn)) {
+                            var file_cn = base64ToFile(imgSrc_cn, filename_cn);
+                            if (file_cn) {
+                                formData.append("image_files_cn[]", file_cn);
+                            }
+                            if (imgSrc_cn.startsWith("data:image")) {
+                                imgTags_cn[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("project_content_cn", tempDiv_cn.innerHTML);
+                }
 
-        function isValidUrl(str) {
-            // ... (Your existing isValidUrl function) ...
-        }
-    </script>
-    <script src='js/project_.js?v=<?php echo time(); ?>'></script>
+                if (contentFromEditor_jp) {
+                    var tempDiv_jp = document.createElement("div");
+                    tempDiv_jp.innerHTML = contentFromEditor_jp;
+                    var imgTags_jp = tempDiv_jp.getElementsByTagName("img");
+                    for (var i = 0; i < imgTags_jp.length; i++) {
+                        var imgSrc_jp = imgTags_jp[i].getAttribute("src");
+                        var filename_jp = imgTags_jp[i].getAttribute("data-filename");
+                        if (!imgSrc_jp) continue;
+
+                        imgSrc_jp = imgSrc_jp.replace(/ /g, "%20");
+                        if (!isValidUrl(imgSrc_jp)) {
+                            var file_jp = base64ToFile(imgSrc_jp, filename_jp);
+                            if (file_jp) {
+                                formData.append("image_files_jp[]", file_jp);
+                            }
+                            if (imgSrc_jp.startsWith("data:image")) {
+                                imgTags_jp[i].setAttribute("src", "");
+                            }
+                        } else {
+                            checkIsUrl = true;
+                        }
+                    }
+                    formData.set("project_content_jp", tempDiv_jp.innerHTML);
+                }
+
+                $(".is-invalid").removeClass("is-invalid");
+                if (!$("#project_subject").val().trim()) {
+                    $("#project_subject").addClass("is-invalid");
+                    return;
+                }
+                if (!$("#project_description").val().trim()) {
+                    $("#project_description").addClass("is-invalid");
+                    return;
+                }
+                if (!contentFromEditor_th.trim() && !contentFromEditor_en.trim() && !contentFromEditor_cn.trim() && !contentFromEditor_jp.trim()) {
+                    alertError("Please fill in content information for at least one language.");
+                    return;
+                }
+
+                formData.set("project_subject_en", $("#project_subject_en").val());
+                formData.set("project_description_en", $("#project_description_en").val());
+                formData.set("project_subject_cn", $("#project_subject_cn").val());
+                formData.set("project_description_cn", $("#project_description_cn").val());
+                formData.set("project_subject_jp", $("#project_subject_jp").val());
+                formData.set("project_description_jp", $("#project_description_jp").val());
+
+                Swal.fire({
+                    title: checkIsUrl ? "Image detection system from other websites?" : "Are you sure?",
+                    text: "Do you want to edit project?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4CAF50",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Accept"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#loading-overlay').fadeIn();
+                        $.ajax({
+                            url: "actions/process_project.php",
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                try {
+                                    var json = (typeof response === "string") ? JSON.parse(response) : response;
+                                    if (json.status === 'success') {
+                                        location.reload();
+                                    } else {
+                                        Swal.fire('Error', json.message || 'Unknown error', 'error');
+                                    }
+                                } catch (e) {
+                                    console.error("❌ JSON parse error:", e);
+                                    Swal.fire('Error', 'Invalid response from server', 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                console.error("❌ AJAX error:", xhr.responseText);
+                                Swal.fire('Error', 'AJAX request failed', 'error');
+                                $('#loading-overlay').fadeOut();
+                            },
+                        });
+                    } else {
+                        $('#loading-overlay').fadeOut();
+                    }
+                });
+            });
+        });
+
+        function base64ToFile(base64, fileName) {
+            // ... (Your existing base64ToFile function) ...
+        }
+
+        function alertError(textAlert) {
+            // ... (Your existing alertError function) ...
+        }
+
+        function isValidUrl(str) {
+            // ... (Your existing isValidUrl function) ...
+        }
+    </script>
+    <script src='js/project_.js?v=<?php echo time(); ?>'></script>
 </body>
 
 </html>

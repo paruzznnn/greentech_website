@@ -103,7 +103,7 @@ $decodedId = $_POST['shop_id'];
             width: 4px; /* ปรับขนาดธงให้เล็กลง */
             margin-right: 8px;
         }
-             /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+            /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -159,7 +159,10 @@ $stmt = $conn->prepare("
         dn.content_shop_en,
         dn.subject_shop_cn,
         dn.description_shop_cn,
-        dn.content_shop_cn
+        dn.content_shop_cn,
+        dn.subject_shop_jp,
+        dn.description_shop_jp,
+        dn.content_shop_jp
     FROM dn_shop dn
     WHERE dn.shop_id = ?
 ");
@@ -177,6 +180,7 @@ if ($result->num_rows > 0) {
     $content_th = $row['content_shop'];
     $content_en = $row['content_shop_en'];
     $content_cn = $row['content_shop_cn'];
+    $content_jp = $row['content_shop_jp']; // เพิ่มสำหรับภาษาญี่ปุ่น
     $current_group_id = $row['group_id'];
 
     // ดึงข้อมูลรูปภาพทั้งหมดที่เกี่ยวข้องกับ shop_id นี้
@@ -230,7 +234,7 @@ if ($result->num_rows > 0) {
     }
     $content_en_with_correct_paths = $dom_en->saveHTML();
     
-     // แทนที่ src ของรูปภาพใน content ภาษาจีนด้วย api_path ที่ถูกต้องจาก $pic_data
+    // แทนที่ src ของรูปภาพใน content ภาษาจีนด้วย api_path ที่ถูกต้องจาก $pic_data
     $dom_cn = new DOMDocument();
     libxml_use_internal_errors(true);
     $source_cn = !empty($content_cn) ? mb_convert_encoding($content_cn, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
@@ -244,6 +248,21 @@ if ($result->num_rows > 0) {
         }
     }
     $content_cn_with_correct_paths = $dom_cn->saveHTML();
+    
+    // เพิ่มโค้ดสำหรับภาษาญี่ปุ่น
+    $dom_jp = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $source_jp = !empty($content_jp) ? mb_convert_encoding($content_jp, 'HTML-ENTITIES', 'UTF-8') : '<div></div>';
+    $dom_jp->loadHTML($source_jp, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    $images_jp = $dom_jp->getElementsByTagName('img');
+    foreach ($images_jp as $img) {
+        $data_filename = $img->getAttribute('data-filename');
+        if (!empty($data_filename) && isset($pic_data[$data_filename])) {
+            $img->setAttribute('src', $pic_data[$data_filename]);
+        }
+    }
+    $content_jp_with_correct_paths = $dom_jp->saveHTML();
 
     // ดึงข้อมูลกลุ่มทั้งหมดเพื่อใช้ในการแสดงผล
     $mainGroupQuery = $conn->query("SELECT group_id, group_name FROM dn_shop_groups WHERE parent_group_id IS NULL ORDER BY group_name ASC");
@@ -333,6 +352,12 @@ if ($result->num_rows > 0) {
             margin-right: 8px;'>Chinese
                                 </button>
                             </li>
+                            <li class='nav-item' role='presentation'>
+                                <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
+                                    <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
+            margin-right: 8px;'>Japanese
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div class='card-body'>
@@ -353,10 +378,10 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                     <button type='button' id='copyFromThaiEn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
-                                     <div id='loadingIndicatorEn' class='loading-overlay' style='display: none;'>
+                                    <button type='button' id='copyFromThaiEn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <div id='loadingIndicatorEn' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
-                                     </div>
+                                    </div>
                                 </div>
                                 <div style='margin: 10px;'>
                                     
@@ -374,10 +399,10 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='cn' role='tabpanel' aria-labelledby='cn-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                     <button type='button' id='copyFromThaiCn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
-                                     <div id='loadingIndicatorCn' class='loading-overlay' style='display: none;'>
+                                    <button type='button' id='copyFromThaiCn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <div id='loadingIndicatorCn' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
-                                     </div>
+                                    </div>
                                 </div>
                                 <div style='margin: 10px;'>
                                     
@@ -391,6 +416,27 @@ if ($result->num_rows > 0) {
                                 <div style='margin: 10px;'>
                                     <label><span>Content (CN)</span>:</label>
                                     <textarea class='form-control summernote' id='summernote_update_cn' name='shop_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
+                                </div>
+                            </div>
+                            <div class='tab-pane fade' id='jp' role='tabpanel' aria-labelledby='jp-tab'>
+                                <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+                                    <button type='button' id='copyFromThaiJp' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <div id='loadingIndicatorJp' class='loading-overlay' style='display: none;'>
+                                        <div class='loading-spinner'></div>
+                                    </div>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    
+                                    <label><span>Subject (JP)</span>:</label>
+                                    <input type='text' class='form-control' id='shop_subject_jp' name='shop_subject_jp' value='" . htmlspecialchars($row['subject_shop_jp']) . "'>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Description (JP)</span>:</label>
+                                    <textarea class='form-control' id='shop_description_jp' name='shop_description_jp'>" . htmlspecialchars($row['description_shop_jp']) . "</textarea>
+                                </div>
+                                <div style='margin: 10px;'>
+                                    <label><span>Content (JP)</span>:</label>
+                                    <textarea class='form-control summernote' id='summernote_update_jp' name='shop_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
                                 </div>
                             </div>
                         </div>
@@ -463,6 +509,21 @@ $stmt->close();
                     $('#summernote_update_cn').summernote('destroy');
                 }
                 $('#summernote_update_cn').summernote({
+                    height: 600,
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            uploadFile(files[0], $(this));
+                        },
+                        onMediaDelete: function(target) {
+                            deleteFile(target);
+                        }
+                    }
+                });
+            } else if (target === '#jp') { // เพิ่มสำหรับภาษาญี่ปุ่น
+                if ($('#summernote_update_jp').data('summernote')) {
+                    $('#summernote_update_jp').summernote('destroy');
+                }
+                $('#summernote_update_jp').summernote({
                     height: 600,
                     callbacks: {
                         onImageUpload: function(files) {
@@ -650,6 +711,66 @@ $stmt->close();
             });
         });
         
+        $('#copyFromThaiJp').on('click', function () {
+            $('#loadingIndicatorJp').show(); 
+            var thaiSubject = $('#shop_subject').val();
+            var thaiDescription = $('#shop_description').val();
+            var thaiContent = $('#summernote_update').summernote('code');
+
+            const dataToSend = {
+                language: "th",
+                translate: "jp",
+                company: 2,
+                content: {
+                    subject: thaiSubject,
+                    description: thaiDescription,
+                    content: thaiContent
+                }
+            };
+
+            fetch('actions/translate.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log(response);
+
+                if (response.status === 'success') {
+                    $('#shop_subject_jp').val(response.subject);
+                    $('#shop_description_jp').val(response.description);
+                    $('#summernote_update_jp').summernote('code', response.content);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'การแปลสำเร็จแล้ว!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'การแปลล้มเหลว: ' + (response.message || response.error),
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error,
+                });
+            })
+            .finally(() => {
+                $('#loadingIndicatorJp').hide();
+            });
+        });
     });
 </script>
 

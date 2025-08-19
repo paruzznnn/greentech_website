@@ -2,8 +2,8 @@
 require_once('../lib/connect.php');
 global $conn;
 
-// --- MODIFIED: Allow 'cn' as a valid language option.
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn']) ? $_GET['lang'] : 'th';
+// --- MODIFIED: Allow 'cn' and 'jp' as valid language options.
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp']) ? $_GET['lang'] : 'th';
 
 // สร้างชื่อคอลัมน์ตามภาษาที่เลือก
 $subject_col = 'subject_project';
@@ -14,9 +14,12 @@ if ($lang === 'en') {
 } elseif ($lang === 'cn') {
     $subject_col = 'subject_project_cn';
     $content_col = 'content_project_cn';
+} elseif ($lang === 'jp') {
+    $subject_col = 'subject_project_jp';
+    $content_col = 'content_project_jp';
 }
 
-$subjectTitle = ($lang === 'en') ? "Project" : (($lang === 'cn') ? "项目" : "โปรเจกต์"); // Fallback title
+$subjectTitle = ($lang === 'en') ? "Project" : (($lang === 'cn') ? "项目" : (($lang === 'jp') ? "プロジェクト" : "โปรเจกต์")); // Fallback title
 $pageUrl = "";
 
 if (isset($_GET['id'])) {
@@ -222,7 +225,7 @@ if (isset($_GET['id'])) {
         <div class="container" style="max-width: 90%;">
             <div class="box-content">
                 <div class="social-share">
-                    <p><?= ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : 'แชร์หน้านี้:'); ?></p>
+                    <p><?= ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する:' : 'แชร์หน้านี้:')); ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -242,7 +245,7 @@ if (isset($_GET['id'])) {
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
                     <button class="copy-link-btn" onclick="copyLink()">
-                        <?= ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : 'คัดลอกลิงก์'); ?>
+                        <?= ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : 'คัดลอกลิงก์')); ?>
                     </button>
                 </div>
 
@@ -298,12 +301,12 @@ if (isset($_GET['id'])) {
                                             echo '</div>';
                                         }
                                     } else {
-                                        echo ($lang === 'en') ? "No data found." : (($lang === 'cn') ? "找不到数据。" : "ไม่มีข้อมูล");
+                                        echo ($lang === 'en') ? "No data found." : (($lang === 'cn') ? "找不到数据。" : (($lang === 'jp') ? "データが見つかりません。" : "ไม่มีข้อมูล"));
                                     }
 
                                     $stmt->close(); 
                                 } else {
-                                    echo ($lang === 'en') ? "Invalid ID." : (($lang === 'cn') ? "无效ID。" : "รหัสไม่ถูกต้อง");
+                                    echo ($lang === 'en') ? "Invalid ID." : (($lang === 'cn') ? "无效ID。" : (($lang === 'jp') ? "無効なIDです。" : "รหัสไม่ถูกต้อง"));
                                 }
                             }
                         ?>
@@ -312,7 +315,7 @@ if (isset($_GET['id'])) {
                 <hr style="border-top: dashed 1px; margin: 20px 0;">
                 
                 <div class="social-share">
-                    <p><?= ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : 'แชร์หน้านี้:'); ?></p>
+                    <p><?= ($lang === 'en') ? 'Share this page:' : (($lang === 'cn') ? '分享此页面：' : (($lang === 'jp') ? 'このページを共有する:' : 'แชร์หน้านี้:')); ?></p>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($pageUrl) ?>" target="_blank">
                         <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                     </a>
@@ -332,13 +335,13 @@ if (isset($_GET['id'])) {
                         <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="Share on TikTok">
                     </a>
                     <button class="copy-link-btn" onclick="copyLink()">
-                        <?= ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : 'คัดลอกลิงก์'); ?>
+                        <?= ($lang === 'en') ? 'Copy Link' : (($lang === 'cn') ? '复制链接' : (($lang === 'jp') ? 'リンクをコピー' : 'คัดลอกลิงก์')); ?>
                     </button>
                 </div>
                 <div style="padding-left:50px;">
                     <hr style="border-top: dashed 1px; margin: 20px 0;">
                     
-                    <p><?= ($lang === 'en') ? 'Inquire/order Trandar Acoustics products at' : (($lang === 'cn') ? '在以下位置咨询/订购 Trandar Acoustics 产品：' : 'สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่'); ?></p>
+                    <p><?= ($lang === 'en') ? 'Inquire/order Trandar Acoustics products at' : (($lang === 'cn') ? '在以下位置咨询/订购 Trandar Acoustics 产品：' : (($lang === 'jp') ? 'Trandar Acoustics製品のお問い合わせ・ご注文はこちらから' : 'สอบถาม/สั่งซื้อผลิตภัณฑ์ Trandar Acoustics ได้ที่')); ?></p>
                     <p>🛒 Website : <aa href="https://www.trandar.com/store/app/index.php" target="_blank">www.trandar.com/store/</aa></p>
                     <p>📱 Line OA : @Trandaraocoustic 
                         <aa href="https://lin.ee/yoSCNwF" target="_blank">https://lin.ee/yoSCNwF</aa>
@@ -366,6 +369,10 @@ if (isset($_GET['id'])) {
                             $subject_shop_col = 'subject_shop_cn';
                             $description_shop_col = 'description_shop_cn';
                             $content_shop_col = 'content_shop_cn';
+                        } elseif ($lang === 'jp') {
+                            $subject_shop_col = 'subject_shop_jp';
+                            $description_shop_col = 'description_shop_jp';
+                            $content_shop_col = 'content_shop_jp';
                         }
                         
                         $stmt_shop = $conn->prepare("
@@ -386,7 +393,7 @@ if (isset($_GET['id'])) {
                         $result_shop = $stmt_shop->get_result();
 
                         if ($result_shop->num_rows > 0) {
-                            echo '<h3 style="padding-top: 40px;">' . (($lang === 'en') ? 'Related Products' : (($lang === 'cn') ? '相关产品' : 'สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้')) . '</h3>';
+                            echo '<h3 style="padding-top: 40px;">' . (($lang === 'en') ? 'Related Products' : (($lang === 'cn') ? '相关产品' : (($lang === 'jp') ? '関連製品' : 'สินค้าที่เกี่ยวข้องกับโปรเจกต์นี้'))) . '</h3>';
                             echo '<div class="shop-wrapper-container">';
                             echo '<div class="scroll-btn left" onclick="scrollshop(\'left\')">&#10094;</div>';
                             echo '<div class="scroll-btn right" onclick="scrollshop(\'right\')">&#10095;</div>';
@@ -406,7 +413,7 @@ if (isset($_GET['id'])) {
                                 $paths = !empty($row_shop['pic_path']) ? explode(',', $row_shop['pic_path']) : [];
                                 $image_path = !empty($paths) ? $paths[0] : null;
                                 
-                                $placeholder_text = ($lang === 'en') ? 'Shop+Image' : (($lang === 'cn') ? '产品图片' : 'รูปภาพสินค้า');
+                                $placeholder_text = ($lang === 'en') ? 'Shop+Image' : (($lang === 'cn') ? '产品图片' : (($lang === 'jp') ? '製品画像' : 'รูปภาพสินค้า'));
                                 $placeholder_image = 'https://via.placeholder.com/300x220.png?text=' . $placeholder_text;
 
                                 echo '<div class="shop-card">';
@@ -420,7 +427,7 @@ if (isset($_GET['id'])) {
                                     echo '</div>';
                                 } else {
                                     echo '<div class="card-image-wrapper">';
-                                    echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="' . (($lang === 'en') ? 'No image available' : (($lang === 'cn') ? '没有可用的图像' : 'ไม่มีรูปภาพ')) . '">';
+                                    echo '<img src="' . htmlspecialchars($placeholder_image) . '" class="card-img-top" alt="' . (($lang === 'en') ? 'No image available' : (($lang === 'cn') ? '没有可用的图像' : (($lang === 'jp') ? '画像がありません' : 'ไม่มีรูปภาพ'))) . '">';
                                     echo '</div>';
                                 }
 
@@ -439,14 +446,14 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 
-                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? 'Comments' : (($lang === 'cn') ? '评论' : 'ความคิดเห็น'); ?></h3>
-                <p><?= ($lang === 'en') ? 'Your email will not be displayed to others. Required fields are marked *' : (($lang === 'cn') ? '您的电子邮件不会显示给其他人。必填字段已标记 *' : 'อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *'); ?></p>
+                <h3 style ="padding-top: 40px;"><?= ($lang === 'en') ? 'Comments' : (($lang === 'cn') ? '评论' : (($lang === 'jp') ? 'コメント' : 'ความคิดเห็น')); ?></h3>
+                <p><?= ($lang === 'en') ? 'Your email will not be displayed to others. Required fields are marked *' : (($lang === 'cn') ? '您的电子邮件不会显示给其他人。必填字段已标记 *' : (($lang === 'jp') ? 'あなたのメールアドレスが他の人に表示されることはありません。必須項目は*でマークされています' : 'อีเมลของคุณจะไม่แสดงให้คนอื่นเห็น ช่องข้อมูลจำเป็นถูกทำเครื่องหมาย *')); ?></p>
                 <form id="commentForm" style="max-width: 600px;">
-                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? 'Comment *' : (($lang === 'cn') ? '评论 *' : 'ความคิดเห็น *'); ?>"
+                    <textarea id="commentText" name="comment" rows="5" required placeholder="<?= ($lang === 'en') ? 'Comment *' : (($lang === 'cn') ? '评论 *' : (($lang === 'jp') ? 'コメント *' : 'ความคิดเห็น *')); ?>"
                         style="width: 100%; padding: 12px; margin-bottom: 3px; border: 1px solid #ccc; border-radius: 6px;"></textarea><br>
                     <button type="submit"
                         style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        <?= ($lang === 'en') ? 'Submit Comment' : (($lang === 'cn') ? '提交评论' : 'แสดงความคิดเห็น'); ?>
+                        <?= ($lang === 'en') ? 'Submit Comment' : (($lang === 'cn') ? '提交评论' : (($lang === 'jp') ? 'コメントを送信' : 'แสดงความคิดเห็น')); ?>
                     </button>
                 </form>
 
@@ -488,20 +495,20 @@ if (isset($_GET['id'])) {
                             .then(result => {
                                 let alertMessage = "";
                                 if (result.status === 'success') {
-                                    alertMessage = "<?= ($lang === 'en') ? 'Comment saved successfully.' : (($lang === 'cn') ? '评论已成功保存。' : 'บันทึกความคิดเห็นเรียบร้อยแล้ว'); ?>";
+                                    alertMessage = "<?= ($lang === 'en') ? 'Comment saved successfully.' : (($lang === 'cn') ? '评论已成功保存。' : (($lang === 'jp') ? 'コメントが正常に保存されました。' : 'บันทึกความคิดเห็นเรียบร้อยแล้ว')); ?>";
                                     document.getElementById("commentText").value = '';
                                 } else {
-                                    alertMessage = "<?= ($lang === 'en') ? 'Error: ' : (($lang === 'cn') ? '错误：' : 'เกิดข้อผิดพลาด: '); ?>" + result.message;
+                                    alertMessage = "<?= ($lang === 'en') ? 'Error: ' : (($lang === 'cn') ? '错误：' : (($lang === 'jp') ? 'エラー：' : 'เกิดข้อผิดพลาด: ')); ?>" + result.message;
                                 }
                                 alert(alertMessage);
                             });
                         } else {
-                            alert("<?= ($lang === 'en') ? 'You must be logged in as a viewer to comment.' : (($lang === 'cn') ? '您必须以查看者身份登录才能发表评论。' : 'ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น'); ?>");
+                            alert("<?= ($lang === 'en') ? 'You must be logged in as a viewer to comment.' : (($lang === 'cn') ? '您必须以查看者身份登录才能发表评论。' : (($lang === 'jp') ? 'コメントするには視聴者としてログインする必要があります。' : 'ต้องเข้าสู่ระบบในฐานะ viewer เท่านั้น')); ?>");
                         }
                     })
                     .catch(err => {
                         console.error("Error verifying user:", err);
-                        alert("<?= ($lang === 'en') ? 'Authentication error occurred.' : (($lang === 'cn') ? '发生身份验证错误。' : 'เกิดข้อผิดพลาดในการยืนยันตัวตน'); ?>");
+                        alert("<?= ($lang === 'en') ? 'Authentication error occurred.' : (($lang === 'cn') ? '发生身份验证错误。' : (($lang === 'jp') ? '認証エラーが発生しました。' : 'เกิดข้อผิดพลาดในการยืนยันตัวตน')); ?>");
                     });
                 });
                 
@@ -519,9 +526,9 @@ if (isset($_GET['id'])) {
                 function copyLink() {
                     const pageUrl = "<?= $pageUrl ?>";
                     navigator.clipboard.writeText(pageUrl).then(function() {
-                        alert("<?= ($lang === 'en') ? 'Link copied successfully!' : (($lang === 'cn') ? '链接复制成功！' : 'คัดลอกลิงก์เรียบร้อยแล้ว'); ?>");
+                        alert("<?= ($lang === 'en') ? 'Link copied successfully!' : (($lang === 'cn') ? '链接复制成功！' : (($lang === 'jp') ? 'リンクが正常にコピーされました！' : 'คัดลอกลิงก์เรียบร้อยแล้ว')); ?>");
                     }, function() {
-                        alert("<?= ($lang === 'en') ? 'Unable to copy link. Please copy it manually.' : (($lang === 'cn') ? '无法复制链接。请手动复制。' : 'ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง'); ?>");
+                        alert("<?= ($lang === 'en') ? 'Unable to copy link. Please copy it manually.' : (($lang === 'cn') ? '无法复制链接。请手动复制。' : (($lang === 'jp') ? 'リンクをコピーできません。手動でコピーしてください。' : 'ไม่สามารถคัดลอกลิงก์ได้ กรุณาคัดลอกด้วยตนเอง')); ?>");
                     });
                 }
                 </script>

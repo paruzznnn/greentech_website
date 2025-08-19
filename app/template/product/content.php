@@ -8,7 +8,7 @@ if (!isset($conn)) {
 }
 
 // 1. กำหนดตัวแปรภาษา
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn']) ? $_GET['lang'] : 'th';
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp']) ? $_GET['lang'] : 'th';
 
 // 2. สร้างตัวแปรสำหรับชื่อคอลัมน์
 $subject_col = 'subject_shop';
@@ -26,6 +26,11 @@ if ($lang === 'en') {
     $description_col .= '_cn';
     $content_col .= '_cn';
     $group_name_col .= '_cn';
+} elseif ($lang === 'jp') {
+    $subject_col .= '_jp';
+    $description_col .= '_jp';
+    $content_col .= '_jp';
+    $group_name_col .= '_jp';
 }
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
@@ -440,6 +445,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                 return 'Search product...';
             case 'cn':
                 return '搜索产品...';
+            case 'jp':
+                return '製品を検索...';
             case 'th':
             default:
                 return 'ค้นหาสินค้า...';
@@ -451,7 +458,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             $text = [
                 'th' => 'ผลการค้นหาสำหรับ',
                 'en' => 'Search Results for',
-                'cn' => '搜索结果'
+                'cn' => '搜索结果',
+                'jp' => '検索結果'
             ];
             return $text[$lang] . ' "' . htmlspecialchars($searchQuery) . '"';
         } elseif ($selectedSubGroupId > 0) {
@@ -465,7 +473,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             $text = [
                 'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"',
                 'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"',
-                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的子组') . '"'
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的子组') . '"',
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたサブグループ') . '" の製品'
             ];
             return $text[$lang];
         } elseif ($selectedGroupId > 0) {
@@ -479,14 +488,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             $text = [
                 'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"',
                 'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"',
-                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的主组') . '"'
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的主组') . '"',
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたメイングループ') . '" の製品'
             ];
             return $text[$lang];
         } else {
             $text = [
                 'th' => 'หมวดหมู่สินค้า',
                 'en' => 'Product Categories',
-                'cn' => '产品分类'
+                'cn' => '产品分类',
+                'jp' => '製品カテゴリ'
             ];
             return $text[$lang];
         }
@@ -503,7 +514,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             $noProductsText = [
                 'th' => 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ',
                 'en' => 'No products found for your criteria.',
-                'cn' => '未找到符合您条件的产品'
+                'cn' => '未找到符合您条件的产品',
+                'jp' => '条件に一致する製品が見つかりませんでした。'
             ];
             ?>
             <p><?php echo $noProductsText[$lang]; ?></p>
@@ -522,7 +534,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                                 $noImageText = [
                                     'th' => 'ไม่มีรูปภาพ',
                                     'en' => 'No image available',
-                                    'cn' => '没有图片'
+                                    'cn' => '没有图片',
+                                    'jp' => '画像なし'
                                 ];
                                 ?>
                                 <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $noImageText[$lang]; ?>">
@@ -544,7 +557,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             $noCategoriesText = [
                 'th' => 'ไม่พบหมวดหมู่ที่มีสินค้า',
                 'en' => 'No categories found with assigned products.',
-                'cn' => '未找到包含产品的分类'
+                'cn' => '未找到包含产品的分类',
+                'jp' => '製品が割り当てられているカテゴリが見つかりません。'
             ];
             ?>
             <p><?php echo $noCategoriesText[$lang]; ?></p>
@@ -561,7 +575,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                             $productsText = [
                                 'th' => 'รายการ',
                                 'en' => 'products',
-                                'cn' => '个产品'
+                                'cn' => '个产品',
+                                'jp' => '製品'
                             ];
                             ?>
                             <p class="product-count"><?php echo $mainGroupData['total_products'] . ' ' . $productsText[$lang]; ?></p>

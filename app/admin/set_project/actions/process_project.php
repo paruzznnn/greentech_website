@@ -160,14 +160,17 @@ try {
             'project_subject_cn' => $_POST['project_subject_cn'] ?? '',
             'project_description_cn' => $_POST['project_description_cn'] ?? '',
             'project_content_cn'  => $_POST['project_content_cn'] ?? '',
+            'project_subject_jp' => $_POST['project_subject_jp'] ?? '',
+            'project_description_jp' => $_POST['project_description_jp'] ?? '',
+            'project_content_jp'  => $_POST['project_content_jp'] ?? '',
         ];
         
         $related_shops = $_POST['related_shops'] ?? [];
 
         if (isset($project_array)) {
             $stmt = $conn->prepare("INSERT INTO dn_project 
-                (subject_project, description_project, content_project, subject_project_en, description_project_en, content_project_en, subject_project_cn, description_project_cn, content_project_cn, date_create) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (subject_project, description_project, content_project, subject_project_en, description_project_en, content_project_en, subject_project_cn, description_project_cn, content_project_cn, subject_project_jp, description_project_jp, content_project_jp, date_create) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             $project_subject = $project_array['project_subject'];
             $project_description = $project_array['project_description'];
@@ -178,10 +181,13 @@ try {
             $project_subject_cn = $project_array['project_subject_cn'];
             $project_description_cn = $project_array['project_description_cn'];
             $project_content_cn = mb_convert_encoding($project_array['project_content_cn'], 'UTF-8', 'auto');
+            $project_subject_jp = $project_array['project_subject_jp'];
+            $project_description_jp = $project_array['project_description_jp'];
+            $project_content_jp = mb_convert_encoding($project_array['project_content_jp'], 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
 
             $stmt->bind_param(
-                "ssssssssss",
+                "sssssssssssss",
                 $project_subject,
                 $project_description,
                 $project_content,
@@ -191,6 +197,9 @@ try {
                 $project_subject_cn,
                 $project_description_cn,
                 $project_content_cn,
+                $project_subject_jp,
+                $project_description_jp,
+                $project_content_jp,
                 $current_date
             );
 
@@ -251,6 +260,9 @@ try {
             'project_subject_cn' => $_POST['project_subject_cn'] ?? '',
             'project_description_cn' => $_POST['project_description_cn'] ?? '',
             'project_content_cn'  => $_POST['project_content_cn'] ?? '',
+            'project_subject_jp' => $_POST['project_subject_jp'] ?? '',
+            'project_description_jp' => $_POST['project_description_jp'] ?? '',
+            'project_content_jp'  => $_POST['project_content_jp'] ?? '',
         ];
 
         $related_shops = $_POST['related_shops'] ?? [];
@@ -266,6 +278,9 @@ try {
             subject_project_cn = ?,
             description_project_cn = ?,
             content_project_cn = ?,
+            subject_project_jp = ?,
+            description_project_jp = ?,
+            content_project_jp = ?,
             date_create = ? 
             WHERE project_id = ?");
 
@@ -278,11 +293,14 @@ try {
             $project_subject_cn = $project_array['project_subject_cn'] ?? '';
             $project_description_cn = $project_array['project_description_cn'] ?? '';
             $project_content_cn = mb_convert_encoding($project_array['project_content_cn'] ?? '', 'UTF-8', 'auto');
+            $project_subject_jp = $project_array['project_subject_jp'] ?? '';
+            $project_description_jp = $project_array['project_description_jp'] ?? '';
+            $project_content_jp = mb_convert_encoding($project_array['project_content_jp'] ?? '', 'UTF-8', 'auto');
             $current_date = date('Y-m-d H:i:s');
             $project_id = $project_array['project_id'];
 
             $stmt->bind_param(
-                "ssssssssssi",
+                "sssssssssssssi",
                 $project_subject,
                 $project_description,
                 $project_content,
@@ -292,6 +310,9 @@ try {
                 $project_subject_cn,
                 $project_description_cn,
                 $project_content_cn,
+                $project_subject_jp,
+                $project_description_jp,
+                $project_content_jp,
                 $current_date,
                 $project_id
             );
@@ -419,6 +440,21 @@ try {
                 }
             }
             
+            // จัดการรูปภาพใน Content (ภาษาญี่ปุ่น)
+            if (isset($_FILES['image_files_jp']) && is_array($_FILES['image_files_jp']['name']) && $_FILES['image_files_jp']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                $fileInfos = handleFileUpload($_FILES['image_files_jp']);
+                foreach ($fileInfos as $fileInfo) {
+                    if ($fileInfo['success']) {
+                        $picPath = $base_path . '/public/news_img/' . $fileInfo['fileName'];
+                        $fileColumns = ['project_id', 'file_name', 'file_size', 'file_type', 'file_path', 'api_path', 'lang'];
+                        $fileValues = [$project_id, $fileInfo['fileName'], $fileInfo['fileSize'], $fileInfo['fileType'], $fileInfo['filePath'], $picPath, 'jp'];
+                        insertIntoDatabase($conn, 'dn_project_doc', $fileColumns, $fileValues);
+                    } else {
+                        throw new Exception('Error uploading content file (JP): ' . ($fileInfo['fileName'] ?? 'unknown') . ' - ' . $fileInfo['error']);
+                    }
+                }
+            }
+            
             $response = array('status' => 'success', 'message' => 'edit save');
         }
 
@@ -469,12 +505,12 @@ try {
         $whereClause = "del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (subject_project LIKE '%$searchValue%' OR subject_project_en LIKE '%$searchValue%' OR subject_project_cn LIKE '%$searchValue%')";
+            $whereClause .= " AND (subject_project LIKE '%$searchValue%' OR subject_project_en LIKE '%$searchValue%' OR subject_project_cn LIKE '%$searchValue%' OR subject_project_jp LIKE '%$searchValue%')";
         }
 
         $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
-        $dataQuery = "SELECT project_id, subject_project, subject_project_en, subject_project_cn, date_create FROM dn_project 
+        $dataQuery = "SELECT project_id, subject_project, subject_project_en, subject_project_cn, subject_project_jp, date_create FROM dn_project 
                 WHERE $whereClause
                 ORDER BY $orderBy
                 LIMIT $start, $length";

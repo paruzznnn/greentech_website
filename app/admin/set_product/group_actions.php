@@ -32,7 +32,7 @@ define('PUBLIC_BASE_URL', $root_url . 'public/'); // ทำให้เป็น
 require_once(ROOT_DIR . '/lib/connect.php'); // ใช้ ROOT_DIR เพื่อความชัดเจน
 require_once(ROOT_DIR . '/inc/getFunctions.php');
 
-$response = ['status' => 'error', 'message' => 'Invalid action.', 'message_en' => 'Invalid action.', 'message_cn' => '无效的操作.'];
+$response = ['status' => 'error', 'message' => 'Invalid action.', 'message_en' => 'Invalid action.', 'message_cn' => '无效的操作.', 'message_jp' => '無効な操作.'];
 
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -42,12 +42,13 @@ if (isset($_POST['action'])) {
             $group_name = trim($conn->real_escape_string($_POST['group_name']));
             $group_name_en = trim($conn->real_escape_string($_POST['group_name_en']));
             $group_name_cn = trim($conn->real_escape_string($_POST['group_name_cn']));
+            $group_name_jp = trim($conn->real_escape_string($_POST['group_name_jp']));
             // รับค่า parent_group_id ให้เป็น int หรือ NULL
             $parent_group_id = !empty($_POST['parent_group_id']) ? (int)$_POST['parent_group_id'] : null;
             $image_path = null;
 
             if (empty($group_name)) {
-                $response = ['status' => 'error', 'message' => 'กรุณากรอกชื่อหมวดหมู่.', 'message_en' => 'Please enter a group name.', 'message_cn' => '请输入群组名称.'];
+                $response = ['status' => 'error', 'message' => 'กรุณากรอกชื่อหมวดหมู่.', 'message_en' => 'Please enter a group name.', 'message_cn' => '请输入群组名称.', 'message_jp' => 'グループ名を入力してください.'];
                 echo json_encode($response);
                 exit();
             }
@@ -69,13 +70,13 @@ if (isset($_POST['action'])) {
                 $stmt_check->execute();
                 $check_result = $stmt_check->get_result();
                 if ($check_result && $check_result->fetch_assoc()['count'] > 0) {
-                    $response = ['status' => 'error', 'message' => 'ชื่อหมวดหมู่นี้มีอยู่แล้วในหมวดหมู่เดียวกัน!', 'message_en' => 'This group name already exists in the same category!', 'message_cn' => '此群组名称在同一类别中已存在！'];
+                    $response = ['status' => 'error', 'message' => 'ชื่อหมวดหมู่นี้มีอยู่แล้วในหมวดหมู่เดียวกัน!', 'message_en' => 'This group name already exists in the same category!', 'message_cn' => '此群组名称在同一类别中已存在！', 'message_jp' => 'このグループ名は同じカテゴリにすでに存在します！'];
                     echo json_encode($response);
                     exit();
                 }
                 $stmt_check->close();
             } else {
-                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการตรวจสอบชื่อหมวดหมู่: ' . $conn->error, 'message_en' => 'An error occurred while checking the group name: ' . $conn->error, 'message_cn' => '检查群组名称时出错：' . $conn->error];
+                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการตรวจสอบชื่อหมวดหมู่: ' . $conn->error, 'message_en' => 'An error occurred while checking the group name: ' . $conn->error, 'message_cn' => '检查群组名称时出错：' . $conn->error, 'message_jp' => 'グループ名の確認中にエラーが発生しました：' . $conn->error];
                 echo json_encode($response);
                 exit();
             }
@@ -93,20 +94,20 @@ if (isset($_POST['action'])) {
 
                     $check = getimagesize($_FILES['group_image']['tmp_name']);
                     if ($check === false) {
-                        $response = ['status' => 'error', 'message' => 'ไฟล์ที่อัปโหลดไม่ใช่รูปภาพ.', 'message_en' => 'The uploaded file is not an image.', 'message_cn' => '上传的文件不是图片.'];
+                        $response = ['status' => 'error', 'message' => 'ไฟล์ที่อัปโหลดไม่ใช่รูปภาพ.', 'message_en' => 'The uploaded file is not an image.', 'message_cn' => '上传的文件不是图片.', 'message_jp' => 'アップロードされたファイルは画像ではありません.'];
                         echo json_encode($response);
                         exit();
                     }
 
                     $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
                     if (!in_array($file_type, $allowed_types)) {
-                        $response = ['status' => 'error', 'message' => 'ขออภัย, อนุญาตเฉพาะ JPG, JPEG, PNG & GIF files เท่านั้น.', 'message_en' => 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.', 'message_cn' => '抱歉，只允许JPG, JPEG, PNG和GIF文件.'];
+                        $response = ['status' => 'error', 'message' => 'ขออภัย, อนุญาตเฉพาะ JPG, JPEG, PNG & GIF files เท่านั้น.', 'message_en' => 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.', 'message_cn' => '抱歉，只允许JPG, JPEG, PNG和GIF文件.', 'message_jp' => '申し訳ありませんが、JPG、JPEG、PNG、GIFファイルのみが許可されています.'];
                         echo json_encode($response);
                         exit();
                     }
 
                     if ($_FILES['group_image']['size'] > 5 * 1024 * 1024) {
-                        $response = ['status' => 'error', 'message' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB.', 'message_en' => 'Image file size must not exceed 5MB.', 'message_cn' => '图片文件大小不得超过5MB.'];
+                        $response = ['status' => 'error', 'message' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB.', 'message_en' => 'Image file size must not exceed 5MB.', 'message_cn' => '图片文件大小不得超过5MB.', 'message_jp' => '画像ファイルサイズは5MBを超えてはいけません.'];
                         echo json_encode($response);
                         exit();
                     }
@@ -114,35 +115,35 @@ if (isset($_POST['action'])) {
                     if (move_uploaded_file($_FILES['group_image']['tmp_name'], $target_file)) {
                         $image_path = PUBLIC_BASE_URL . 'uploads/group_images/' . $file_name; 
                     } else {
-                        $response = ['status' => 'error', 'message' => 'ไม่สามารถอัปโหลดรูปภาพได้.', 'message_en' => 'Could not upload the image.', 'message_cn' => '无法上传图片.'];
+                        $response = ['status' => 'error', 'message' => 'ไม่สามารถอัปโหลดรูปภาพได้.', 'message_en' => 'Could not upload the image.', 'message_cn' => '无法上传图片.', 'message_jp' => '画像をアップロードできませんでした.'];
                         echo json_encode($response);
                         exit();
                     }
                 }
             } elseif ($parent_group_id !== null && isset($_FILES['group_image']) && $_FILES['group_image']['error'] == 0) {
                 // หากพยายามอัปโหลดรูปภาพสำหรับกลุ่มย่อย ให้เกิดข้อผิดพลาด
-                $response = ['status' => 'error', 'message' => 'กลุ่มย่อยไม่สามารถมีรูปภาพได้.', 'message_en' => 'Subgroups cannot have images.', 'message_cn' => '子群组不能有图片.'];
+                $response = ['status' => 'error', 'message' => 'กลุ่มย่อยไม่สามารถมีรูปภาพได้.', 'message_en' => 'Subgroups cannot have images.', 'message_cn' => '子群组不能有图片.', 'message_jp' => 'サブグループには画像を含めることはできません.'];
                 echo json_encode($response);
                 exit();
             }
 
             // ใช้ NULL สำหรับ parent_group_id เมื่อเป็น NULL
             // **แก้ไขตรงนี้**: เพิ่มคอลัมน์ status และค่า '1' และคอลัมน์ภาษาอื่น
-            $sql = "INSERT INTO dn_shop_groups (group_name, group_name_en, group_name_cn, parent_group_id, image_path, date_create, del, status) VALUES (?, ?, ?, ?, ?, NOW(), '0', '1')";
+            $sql = "INSERT INTO dn_shop_groups (group_name, group_name_en, group_name_cn, group_name_jp, parent_group_id, image_path, date_create, del, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), '0', '1')";
             $stmt = $conn->prepare($sql);
             if ($stmt) {
                 // เปลี่ยนการ bind_param ให้รองรับ NULL ได้อย่างถูกต้องโดยใช้ "s" สำหรับ int และ "s" สำหรับ string ที่เป็น NULL
                 // MySQL จะแปลง NULL string เป็น NULL ในคอลัมน์ INT หรือ TEXT โดยอัตโนมัติ
-                $stmt->bind_param("sssss", $group_name, $group_name_en, $group_name_cn, $parent_group_id, $image_path);
+                $stmt->bind_param("ssssss", $group_name, $group_name_en, $group_name_cn, $group_name_jp, $parent_group_id, $image_path);
 
                 if ($stmt->execute()) {
-                    $response = ['status' => 'success', 'message' => 'เพิ่มหมวดหมู่สำเร็จ!', 'message_en' => 'Group added successfully!', 'message_cn' => '群组添加成功！'];
+                    $response = ['status' => 'success', 'message' => 'เพิ่มหมวดหมู่สำเร็จ!', 'message_en' => 'Group added successfully!', 'message_cn' => '群组添加成功！', 'message_jp' => 'グループが正常に追加されました！'];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: ' . $stmt->error, 'message_en' => 'An error occurred while adding the group: ' . $stmt->error, 'message_cn' => '添加群组时出错：' . $stmt->error];
+                    $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: ' . $stmt->error, 'message_en' => 'An error occurred while adding the group: ' . $stmt->error, 'message_cn' => '添加群组时出错：' . $stmt->error, 'message_jp' => 'グループの追加中にエラーが発生しました：' . $stmt->error];
                 }
                 $stmt->close();
             } else {
-                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเตรียมคำสั่ง SQL: ' . $conn->error, 'message_en' => 'An error occurred while preparing the SQL statement: ' . $conn->error, 'message_cn' => '准备SQL语句时出错：' . $conn->error];
+                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเตรียมคำสั่ง SQL: ' . $conn->error, 'message_en' => 'An error occurred while preparing the SQL statement: ' . $conn->error, 'message_cn' => '准备SQL语句时出错：' . $conn->error, 'message_jp' => 'SQLステートメントの準備中にエラーが発生しました：' . $conn->error];
             }
             break;
 
@@ -152,15 +153,17 @@ if (isset($_POST['action'])) {
             // เพิ่มตัวแปรสำหรับคอลัมน์ที่ต้องการแก้ไข
             $group_name_en = trim($conn->real_escape_string($_POST['group_name_en']));
             $group_name_cn = trim($conn->real_escape_string($_POST['group_name_cn']));
+            $group_name_jp = trim($conn->real_escape_string($_POST['group_name_jp']));
             $description = trim($conn->real_escape_string($_POST['description']));
             $description_en = trim($conn->real_escape_string($_POST['description_en']));
             $description_cn = trim($conn->real_escape_string($_POST['description_cn']));
+            $description_jp = trim($conn->real_escape_string($_POST['description_jp']));
 
             $group_type = $_POST['group_type']; // 'main' or 'sub'
             $parent_group_id = null; // Default for main groups
 
             if (empty($group_name)) {
-                $response = ['status' => 'error', 'message' => 'กรุณากรอกชื่อหมวดหมู่.', 'message_en' => 'Please enter a group name.', 'message_cn' => '请输入群组名称.'];
+                $response = ['status' => 'error', 'message' => 'กรุณากรอกชื่อหมวดหมู่.', 'message_en' => 'Please enter a group name.', 'message_cn' => '请输入群组名称.', 'message_jp' => 'グループ名を入力してください.'];
                 echo json_encode($response);
                 exit();
             }
@@ -189,13 +192,13 @@ if (isset($_POST['action'])) {
                 $stmt_check->execute();
                 $check_result = $stmt_check->get_result();
                 if ($check_result && $check_result->fetch_assoc()['count'] > 0) {
-                    $response = ['status' => 'error', 'message' => 'ชื่อหมวดหมู่นี้มีอยู่แล้วในหมวดหมู่เดียวกัน!', 'message_en' => 'This group name already exists in the same category!', 'message_cn' => '此群组名称在同一类别中已存在！'];
+                    $response = ['status' => 'error', 'message' => 'ชื่อหมวดหมู่นี้มีอยู่แล้วในหมวดหมู่เดียวกัน!', 'message_en' => 'This group name already exists in the same category!', 'message_cn' => '此群组名称在同一类别中已存在！', 'message_jp' => 'このグループ名は同じカテゴリにすでに存在します！'];
                     echo json_encode($response);
                     exit();
                 }
                 $stmt_check->close();
             } else {
-                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการตรวจสอบชื่อหมวดหมู่: ' . $conn->error, 'message_en' => 'An error occurred while checking the group name: ' . $conn->error, 'message_cn' => '检查群组名称时出错：' . $conn->error];
+                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการตรวจสอบชื่อหมวดหมู่: ' . $conn->error, 'message_en' => 'An error occurred while checking the group name: ' . $conn->error, 'message_cn' => '检查群组名称时出错：' . $conn->error, 'message_jp' => 'グループ名の確認中にエラーが発生しました：' . $conn->error];
                 echo json_encode($response);
                 exit();
             }
@@ -224,18 +227,18 @@ if (isset($_POST['action'])) {
 
                     $check = getimagesize($_FILES['group_image']['tmp_name']);
                     if ($check === false) {
-                        $response = ['status' => 'error', 'message' => 'ไฟล์ที่อัปโหลดไม่ใช่รูปภาพ.', 'message_en' => 'The uploaded file is not an image.', 'message_cn' => '上传的文件不是图片.'];
+                        $response = ['status' => 'error', 'message' => 'ไฟล์ที่อัปโหลดไม่ใช่รูปภาพ.', 'message_en' => 'The uploaded file is not an image.', 'message_cn' => '上传的文件不是图片.', 'message_jp' => 'アップロードされたファイルは画像ではありません.'];
                         echo json_encode($response);
                         exit();
                     }
                     $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
                     if (!in_array($file_type, $allowed_types)) {
-                        $response = ['status' => 'error', 'message' => 'ขออภัย, อนุญาตเฉพาะ JPG, JPEG, PNG & GIF files เท่านั้น.', 'message_en' => 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.', 'message_cn' => '抱歉，只允许JPG, JPEG, PNG和GIF文件.'];
+                        $response = ['status' => 'error', 'message' => 'ขออภัย, อนุญาตเฉพาะ JPG, JPEG, PNG & GIF files เท่านั้น.', 'message_en' => 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.', 'message_cn' => '抱歉，只允许JPG, JPEG, PNG和GIF文件.', 'message_jp' => '申し訳ありませんが、JPG、JPEG、PNG、GIFファイルのみが許可されています.'];
                         echo json_encode($response);
                         exit();
                     }
                     if ($_FILES['group_image']['size'] > 5 * 1024 * 1024) {
-                        $response = ['status' => 'error', 'message' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB.', 'message_en' => 'Image file size must not exceed 5MB.', 'message_cn' => '图片文件大小不得超过5MB.'];
+                        $response = ['status' => 'error', 'message' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 5MB.', 'message_en' => 'Image file size must not exceed 5MB.', 'message_cn' => '图片文件大小不得超过5MB.', 'message_jp' => '画像ファイルサイズは5MBを超えてはいけません.'];
                         echo json_encode($response);
                         exit();
                     }
@@ -244,7 +247,7 @@ if (isset($_POST['action'])) {
                         $new_image_path = PUBLIC_BASE_URL . 'uploads/group_images/' . $file_name;
                         deleteOldImage($current_image_path); // เรียกใช้ฟังก์ชันที่กำหนดในไฟล์นี้
                     } else {
-                        $response = ['status' => 'error', 'message' => 'ไม่สามารถอัปโหลดรูปภาพได้.', 'message_en' => 'Could not upload the image.', 'message_cn' => '无法上传图片.'];
+                        $response = ['status' => 'error', 'message' => 'ไม่สามารถอัปโหลดรูปภาพได้.', 'message_en' => 'Could not upload the image.', 'message_cn' => '无法上传图片.', 'message_jp' => '画像をアップロードできませんでした.'];
                         echo json_encode($response);
                         exit();
                     }
@@ -256,21 +259,19 @@ if (isset($_POST['action'])) {
             }
 
             // คำสั่ง SQL ที่แก้ไขแล้ว: เพิ่มคอลัมน์ group_name_en, group_name_cn, description, description_en, description_cn
-            $sql = "UPDATE dn_shop_groups SET group_name = ?, group_name_en = ?, group_name_cn = ?, description = ?, description_en = ?, description_cn = ?, parent_group_id = ?, image_path = ? WHERE group_id = ?";
-            $stmt = $conn->prepare($sql);
-            if ($stmt) {
-                // bind_param ที่แก้ไขแล้ว: เพิ่ม type และตัวแปรสำหรับคอลัมน์ใหม่
-                // ssssssssi -> 8 string, 1 integer
-                $stmt->bind_param("ssssssssi", $group_name, $group_name_en, $group_name_cn, $description, $description_en, $description_cn, $parent_group_id, $new_image_path, $group_id);
+           $sql = "UPDATE dn_shop_groups SET group_name = ?, group_name_en = ?, group_name_cn = ?, group_name_jp = ?, description = ?, description_en = ?, description_cn = ?, description_jp = ?, parent_group_id = ?, image_path = ? WHERE group_id = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->bind_param("ssssssssssi", $group_name, $group_name_en, $group_name_cn, $group_name_jp, $description, $description_en, $description_cn, $description_jp, $parent_group_id, $new_image_path, $group_id);
 
                 if ($stmt->execute()) {
-                    $response = ['status' => 'success', 'message' => 'แก้ไขหมวดหมู่สำเร็จ!', 'message_en' => 'Group updated successfully!', 'message_cn' => '群组更新成功！'];
+                    $response = ['status' => 'success', 'message' => 'แก้ไขหมวดหมู่สำเร็จ!', 'message_en' => 'Group updated successfully!', 'message_cn' => '群组更新成功！', 'message_jp' => 'グループが正常に更新されました！'];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่: ' . $stmt->error, 'message_en' => 'An error occurred while updating the group: ' . $stmt->error, 'message_cn' => '更新群组时出错：' . $stmt->error];
+                    $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่: ' . $stmt->error, 'message_en' => 'An error occurred while updating the group: ' . $stmt->error, 'message_cn' => '更新群组时出错：' . $stmt->error, 'message_jp' => 'グループの更新中にエラーが発生しました：' . $stmt->error];
                 }
                 $stmt->close();
             } else {
-                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเตรียมคำสั่ง SQL: ' . $conn->error, 'message_en' => 'An error occurred while preparing the SQL statement: ' . $conn->error, 'message_cn' => '准备SQL语句时出错：' . $conn->error];
+                $response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการเตรียมคำสั่ง SQL: ' . $conn->error, 'message_en' => 'An error occurred while preparing the SQL statement: ' . $conn->error, 'message_cn' => '准备SQL语句时出错：' . $conn->error, 'message_jp' => 'SQLステートメントの準備中にエラーが発生しました：' . $conn->error];
             }
             break;
 
@@ -317,7 +318,7 @@ if (isset($_POST['action'])) {
                     $stmt->bind_param("i", $group_id);
                     if ($stmt->execute()) {
                         $conn->commit();
-                        $response = ['status' => 'success', 'message' => 'ลบหมวดหมู่สำเร็จ!', 'message_en' => 'Group deleted successfully!', 'message_cn' => '群组删除成功！'];
+                        $response = ['status' => 'success', 'message' => 'ลบหมวดหมู่สำเร็จ!', 'message_en' => 'Group deleted successfully!', 'message_cn' => '群组删除成功！', 'message_jp' => 'グループは正常に削除されました！'];
                         // ลบไฟล์รูปภาพหลังจากลบใน DB สำเร็จ
                         deleteOldImage($image_to_delete); // เรียกใช้ฟังก์ชันที่กำหนดในไฟล์นี้
                     } else {
@@ -329,7 +330,7 @@ if (isset($_POST['action'])) {
                 }
             } catch (Exception $e) {
                 $conn->rollback();
-                $response = ['status' => 'error', 'message' => 'ไม่สามารถลบหมวดหมู่ได้: ' . $e->getMessage(), 'message_en' => 'Could not delete the group: ' . $e->getMessage(), 'message_cn' => '无法删除群组：' . $e->getMessage()];
+                $response = ['status' => 'error', 'message' => 'ไม่สามารถลบหมวดหมู่ได้: ' . $e->getMessage(), 'message_en' => 'Could not delete the group: ' . $e->getMessage(), 'message_cn' => '无法删除群组：' . $e->getMessage(), 'message_jp' => 'グループを削除できませんでした：' . $e->getMessage()];
             }
             break;
     }

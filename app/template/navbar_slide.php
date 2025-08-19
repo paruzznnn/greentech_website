@@ -1,5 +1,5 @@
 <?php
-// ตรวจสอบภาษาจาก URL ถ้ามี `?lang=en` หรือ `?lang=cn` จะกำหนดตามค่าที่ได้รับ
+// ตรวจสอบภาษาจาก URL ถ้ามี `?lang=en` หรือ `?lang=cn` หรือ `?lang=jp` จะกำหนดตามค่าที่ได้รับ
 // ถ้าไม่มี หรือเป็นค่าอื่น จะกำหนดให้เป็นภาษาไทย
 $lang = 'th'; // กำหนดค่าเริ่มต้นเป็นภาษาไทย
 if (isset($_GET['lang'])) {
@@ -7,6 +7,8 @@ if (isset($_GET['lang'])) {
         $lang = 'en';
     } elseif ($_GET['lang'] === 'cn') {
         $lang = 'cn';
+    } elseif ($_GET['lang'] === 'jp') {
+        $lang = 'jp';
     }
 }
 
@@ -16,6 +18,8 @@ if ($lang === 'en') {
     $subjectColumn = 'subject_news_en';
 } elseif ($lang === 'cn') {
     $subjectColumn = 'subject_news_cn';
+} elseif ($lang === 'jp') {
+    $subjectColumn = 'subject_news_jp';
 }
 
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
@@ -39,7 +43,7 @@ if (isset($conn)) {
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
-// ข้อมูลเมนูสำหรับ Navbar ทั้งสามภาษา
+// ข้อมูลเมนูสำหรับ Navbar ทั้งสี่ภาษา
 $navbarItems = [
     'th' => [
         ['icon' => '', 'text' => 'หน้าแรก', 'translate' => 'Home', 'link' => 'index' . $isFile],
@@ -74,9 +78,20 @@ $navbarItems = [
         ['icon' => '', 'text' => '新闻', 'translate' => 'News', 'link' => 'news' . $isFile],
         ['icon' => '', 'text' => '联系我们', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
     ],
+    'jp' => [
+        ['icon' => '', 'text' => 'ホームページ', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => '私たちについて', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => 'サービス', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => '製品', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => 'プロジェクト', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => '記事', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => 'ニュース', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => 'お問い合わせ', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
 ];
 
-// ข้อมูลเมนูย่อย (Dropdown) สำหรับ Navbar ทั้งสามภาษา
+// ข้อมูลเมนูย่อย (Dropdown) สำหรับ Navbar ทั้งสี่ภาษา
 $dropdownItems = [
     'dropdown3' => [
         'th' => [
@@ -94,6 +109,11 @@ $dropdownItems = [
             ['icon' => '', 'text' => '下载', 'translate' => 'Download', 'link' => 'Download' . $isFile],
             ['icon' => '', 'text' => '使用说明', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
         ],
+        'jp' => [
+            ['icon' => '', 'text' => 'INSUL ソフトウェア', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => 'ダウンロード', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => '説明書', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
     ],
     'dropdown4' => [
         'th' => [
@@ -110,6 +130,11 @@ $dropdownItems = [
             ['icon' => '', 'text' => '文章', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
             ['icon' => '', 'text' => '声学知识', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
             ['icon' => '', 'text' => '视频', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
+        'jp' => [
+            ['icon' => '', 'text' => '記事', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => '音響知識', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => 'ビデオ', 'translate' => 'video', 'link' => 'Video' . $isFile],
         ],
     ],
 ];
@@ -400,7 +425,8 @@ document.addEventListener('click', function(event) {
                 $newsText = [
                     'th' => 'ข่าวประจำวัน',
                     'en' => 'Daily News',
-                    'cn' => '每日新闻'
+                    'cn' => '每日新闻',
+                    'jp' => 'デイリーニュース'
                 ];
                 echo $newsText[$lang] ?? 'ข่าวประจำวัน'; // ใช้ ?? เพื่อป้องกัน error ถ้า $lang ไม่มีค่า
                 ?>

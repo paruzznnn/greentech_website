@@ -76,10 +76,12 @@ try {
         $content_en = $_POST['content_en'] ?? ''; // English is optional
         $type_cn = $_POST['type_cn'] ?? ''; // Chinese is optional
         $content_cn = $_POST['content_cn'] ?? ''; // Chinese is optional
+        $type_jp = $_POST['type_jp'] ?? ''; // Japanese is optional
+        $content_jp = $_POST['content_jp'] ?? ''; // Japanese is optional
         
         $image_url = null;
 
-        if (!empty($content_th) || !empty($content_en) || !empty($content_cn)) {
+        if (!empty($content_th) || !empty($content_en) || !empty($content_cn) || !empty($content_jp)) {
             // Handle image file if uploaded
             if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == UPLOAD_ERR_OK) {
                 $uploadResult = handleSingleFileUpload($_FILES['image_file'], $base_path);
@@ -92,8 +94,8 @@ try {
                 }
             }
             
-            $stmt = $conn->prepare("INSERT INTO about_content (type, content, type_en, content_en, type_cn, content_cn, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssss", $type_th, $content_th, $type_en, $content_en, $type_cn, $content_cn, $image_url, $author_th, $position_th);
+            $stmt = $conn->prepare("INSERT INTO about_content (type, content, type_en, content_en, type_cn, content_cn, type_jp, content_jp, image_url, author, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssssss", $type_th, $content_th, $type_en, $content_en, $type_cn, $content_cn, $type_jp, $content_jp, $image_url, $author_th, $position_th);
 
             if ($stmt->execute()) {
                 $response = ['status' => 'success', 'message' => 'เพิ่มเนื้อหาใหม่เรียบร้อย'];
@@ -120,6 +122,9 @@ try {
         
         $types_cn = $_POST['types_cn'] ?? [];
         $contents_cn = $_POST['contents_cn'] ?? [];
+        
+        $types_jp = $_POST['types_jp'] ?? [];
+        $contents_jp = $_POST['contents_jp'] ?? [];
         
         $uploaded_files = $_FILES['image_files'] ?? null;
         
@@ -152,15 +157,19 @@ try {
             $content_en_val = $contents_en[$i] ?? '';
             $type_cn_val = $types_cn[$i] ?? '';
             $content_cn_val = $contents_cn[$i] ?? '';
+            $type_jp_val = $types_jp[$i] ?? '';
+            $content_jp_val = $contents_jp[$i] ?? '';
             
-            $stmt = $conn->prepare("UPDATE about_content SET type=?, content=?, type_en=?, content_en=?, type_cn=?, content_cn=?, image_url=?, author=?, position=? WHERE id=?");
-            $stmt->bind_param("sssssssssi",
+            $stmt = $conn->prepare("UPDATE about_content SET type=?, content=?, type_en=?, content_en=?, type_cn=?, content_cn=?, type_jp=?, content_jp=?, image_url=?, author=?, position=? WHERE id=?");
+            $stmt->bind_param("sssssssssssi",
                 $types_th[$i],
                 $contents_th[$i],
                 $type_en_val,
                 $content_en_val,
                 $type_cn_val,
                 $content_cn_val,
+                $type_jp_val,
+                $content_jp_val,
                 $current_image_url,
                 $authors[$i],
                 $positions[$i],

@@ -9,6 +9,8 @@ if (isset($_GET['lang'])) {
         $lang = 'en';
     } elseif ($_GET['lang'] === 'cn') {
         $lang = 'cn';
+    } elseif ($_GET['lang'] === 'jp') { // Added Japanese language check
+        $lang = 'jp';
     }
 }
 
@@ -25,6 +27,10 @@ if ($lang === 'en') {
     $subject_col = 'subject_blog_cn';
     $description_col = 'description_blog_cn';
     $content_col = 'content_blog_cn';
+} elseif ($lang === 'jp') {
+    $subject_col = 'subject_blog_jp';
+    $description_col = 'description_blog_jp';
+    $content_col = 'content_blog_jp';
 }
 
 // แก้ไข SQL Query ให้ใช้คอลัมน์ตามภาษาที่กำหนด
