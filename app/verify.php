@@ -15,6 +15,7 @@
     } 
   
     $oid       = trim($data['oid']        ?? '');
+    $redirect_url       = trim($data['redirect_url']        ?? '');
     $firstname  = trim($data['firstname']   ?? '');
     $lastname   = trim($data['lastname']    ?? '');
     $email      = trim($data['email']       ?? '');
@@ -41,6 +42,7 @@
         $_SESSION['logged_in']  = true;
         
         $_SESSION['oid']       = $oid;
+        $_SESSION['redirect_url']       = $redirect_url;
         header("Location: admin/dashboard.php");
         exit;
     }
@@ -74,6 +76,7 @@
     $_SESSION['logged_in']  = true;
     
     $_SESSION['oid']       = $oid;
+    $_SESSION['redirect_url']       = $redirect_url;
     header("Location: admin/dashboard.php");
     exit;
 ?>

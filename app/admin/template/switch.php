@@ -1,6 +1,6 @@
 <?php
     session_start();
-    $auth_url = 'https://www.origami.life/singlesignon/auth/';
+    $auth_url = $_SESSION['redirect_url'];
     $oid = $_SESSION['oid'];
   
     if ($oid) {
