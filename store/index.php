@@ -1,16 +1,76 @@
-<?php
-header("Location: app/index.php");
-exit();
-?>
+<?php include 'routes.php'; ?>
 
-<?php
+<html lang="en">
 
-// // Determine the request protocol
-// $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-// // Set the file extension based on the protocol
-// $isFile = ($isProtocol === 'http') ? '.php' : '';
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>E-STORE</title>
+  <?php include 'inc-meta.php'; ?>
+  <link href="css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+  <?php include 'inc-cdn.php'; ?>
+</head>
 
-// // Redirect to the specified URL with the correct file extension
-// header("Location: ../newstore/index" . $isFile);
-// exit();
-?>
+<body>
+
+  <?php include 'template/head-bar.php'; ?>
+  <main>
+    <div id="sections_root_store"></div>
+  </main>
+  <?php include 'template/footer-bar.php'; ?>
+
+  <script type="module">
+    import(`${pathConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
+      .then(async ({ 
+        fetchIndexData, 
+        renderSections, 
+        renderIntroduce, 
+        renderBanners, 
+        renderCarouselSM, 
+        renderCarouselMD, 
+        renderCarouselLG 
+      }) => {
+
+        const service = pathConfig.BASE_WEB + 'service/index-data.php?';
+        const sections = await fetchIndexData("getSectionItems", service);
+        sections.data.sort((a, b) => a.sort - b.sort);
+        renderSections("#sections_root_store", sections.data);
+
+        for (const section of sections.data) {
+            switch (section.type) {
+              case "crssm":
+                const popularItems = await fetchIndexData("getPopularItems", service);
+                renderCarouselSM("#" + section.carouselId, popularItems.data);
+                break;
+              case "crsmd":
+                const productItems = await fetchIndexData("getProductItems", service);
+
+                const configData = {
+                  BASE_WEB: pathConfig.BASE_WEB,
+                  user: productItems.member
+                }
+
+                renderCarouselMD("#" + section.carouselId, productItems.data, configData);
+                break;
+              case "crslg":
+                const newsItems = await fetchIndexData("getNewsItems", service);
+                renderCarouselLG("#" + section.carouselId, newsItems.data);
+                break;
+              case "bbn":
+                const banners = await fetchIndexData("getBannersItems", service);
+                renderBanners("#" + section.carouselId, banners.data);
+                break;
+              case "intd":
+                const introItems = await fetchIndexData("getIntroItems", service);
+                renderIntroduce("#" + section.carouselId, introItems.data);
+                break;
+            }
+        }
+        
+      })
+      .catch((e) => console.error("Module import failed", e));
+  </script>
+
+</body>
+
+</html>
