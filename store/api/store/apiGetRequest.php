@@ -70,7 +70,10 @@ function handleChangeSync($apiGetData) {
 function insertPhotoDetail($stmt, $apiGetData, $matID) {
     global $conn;
 
-    $photos = $apiGetData['pic_detail']; // สมมติว่าเป็น array ของรูปภาพ
+    if(empty($apiGetData)){
+        return;
+    }
+    $photos = json_decode($apiGetData['product_item'], true);
 
     // ตรวจสอบว่ามี photo_id นี้อยู่หรือยัง
     $checkSql = "SELECT id FROM `ecm_product_photos` WHERE material_id = ?";
