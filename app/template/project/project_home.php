@@ -1,32 +1,34 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์เสมอ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(0);
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// --- MODIFIED: Allow 'cn', 'jp', and 'kr' as valid language options.
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
-
-// สร้างชื่อคอลัมน์ตามภาษาที่เลือก
-$subject_col = 'subject_project';
-$description_col = 'description_project';
-
-if ($lang === 'en') {
-    $subject_col = 'subject_project_en';
-    $description_col = 'description_project_en';
-} elseif ($lang === 'cn') {
-    $subject_col = 'subject_project_cn';
-    $description_col = 'description_project_cn';
-} elseif ($lang === 'jp') {
-    $subject_col = 'subject_project_jp';
-    $description_col = 'description_project_jp';
-} elseif ($lang === 'kr') {
-    $subject_col = 'subject_project_kr';
-    $description_col = 'description_project_kr';
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'th', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
 }
 
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+
+// ดึงข้อมูลทั้งหมดในทุกภาษาเพื่อความยืดหยุ่นในการแสดงผล
 $sql = "SELECT 
             dn.project_id, 
-            dn.{$subject_col} AS subject_project, 
-            dn.{$description_col} AS description_project,
+            dn.subject_project, 
+            dn.subject_project_en, 
+            dn.subject_project_cn, 
+            dn.subject_project_jp, 
+            dn.subject_project_kr,
+            dn.description_project, 
+            dn.description_project_en,
+            dn.description_project_cn,
+            dn.description_project_jp,
+            dn.description_project_kr,
             dn.content_project, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -41,30 +43,35 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.project_id 
         ORDER BY dn.date_create DESC
-        LIMIT 10"; // เปลี่ยนเป็น LIMIT 10 เพื่อให้มีข้อมูลสำหรับเลื่อน
+        LIMIT 10";
 
 $result = $conn->query($sql);
 $boxesproject = [];
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // ใช้ตัวแปรภาษาเพื่อเลือกคอลัมน์ที่ถูกต้อง และใช้ภาษาไทยเป็นค่าสำรอง
+        $subject = $row['subject_project' . ($lang !== 'th' ? '_' . $lang : '')];
+        $description = $row['description_project' . ($lang !== 'th' ? '_' . $lang : '')];
+        $content = $row['content_project' . ($lang !== 'th' ? '_' . $lang : '')];
 
-        $content = $row['content_project'];
+        $subject = !empty($subject) ? $subject : $row['subject_project'];
+        $description = !empty($description) ? $description : $row['description_project'];
+        $content = !empty($content) ? $content : $row['content_project'];
+
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        // Handle cases where pic_path might be NULL if no valid documents
         $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
-        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesproject[] = [
             'id' => $row['project_id'],
             'image' => !empty($paths) ? $paths[0] : null,
-            'title' => $row['subject_project'],
-            'description' => $row['description_project'],
+            'title' => $subject,
+            'description' => $description,
             'iframe' => $iframe
         ];
     }

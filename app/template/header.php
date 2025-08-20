@@ -822,11 +822,12 @@ a {
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Get language from URL or localStorage, default to 'th'
         const urlParams = new URLSearchParams(window.location.search);
-        const lang = urlParams.get('lang') || 'th';
+        let lang = urlParams.get('lang') || localStorage.getItem('selectedLanguage') || 'th';
         
-        // ฟังก์ชันสำหรับอัปเดตธงตามภาษา
-        function updateFlags(language) {
+        // Function to update the flags and save the language
+        function updateFlagsAndLanguage(language) {
             const flagMap = {
                 'th': 'https://flagcdn.com/th.svg',
                 'en': 'https://flagcdn.com/us.svg',
@@ -845,82 +846,88 @@ a {
             if (currentFlagMobile) {
                 currentFlagMobile.src = flagUrl;
             }
+
+            // Save the selected language to localStorage
+            localStorage.setItem('selectedLanguage', language);
         }
         
-        // อัปเดตธงเมื่อหน้าเว็บโหลด
-        updateFlags(lang);
+        // Update flags when the page loads
+        updateFlagsAndLanguage(lang);
 
-        // เพิ่มการจัดการเมื่อคลิกที่ลิงก์ใน dropdown
+        // Add event listener for flag links
         const flagLinks = document.querySelectorAll('.flag-dropdown a');
         flagLinks.forEach(link => {
             link.addEventListener('click', function (event) {
                 event.preventDefault();
                 const newLang = new URLSearchParams(this.href.split('?')[1]).get('lang');
-                updateFlags(newLang);
+                
+                // Update flags and save language before navigating
+                updateFlagsAndLanguage(newLang);
+                
+                // Navigate to the new page with the language parameter
                 window.location.href = this.href;
             });
         });
-    });
 
-    // โค้ด JavaScript สำหรับ Mobile Menu, Modal และ JWT ที่คุณมีอยู่
-    const mobileMenu = document.getElementById("mobileMenu");
-    const hamburger = document.querySelector(".hamburger");
+        // Set up other functionalities (Mobile Menu, Modal, JWT)
+        const mobileMenu = document.getElementById("mobileMenu");
+        const hamburger = document.querySelector(".hamburger");
 
-    function toggleMobileNav() {
-        mobileMenu.classList.toggle("open");
-    }
-
-    function toggleMobileDropdown(id) {
-        const dropdown = document.getElementById(id + "_mobile");
-        if (dropdown) {
-            dropdown.classList.toggle("show");
+        function toggleMobileNav() {
+            mobileMenu.classList.toggle("open");
         }
-    }
 
-    document.addEventListener('click', function (event) {
-        const isClickInsideMenu = mobileMenu.contains(event.target);
-        const isClickOnHamburger = hamburger.contains(event.target);
-        const closeBtn = document.querySelector(".close-btn");
-
-        if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger && closeBtn && !closeBtn.contains(event.target)) {
-            toggleMobileNav();
-        }
-    });
-
-    window.toggleFlagDropdown = function(type) {
-        const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
-        const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
-        
-        if (type === 'desktop') {
-            const isDropdownOpen = flagDropdownDesktop.style.display === 'block';
-            flagDropdownDesktop.style.display = isDropdownOpen ? 'none' : 'block';
-            if (flagDropdownMobile) {
-                flagDropdownMobile.style.display = 'none';
+        function toggleMobileDropdown(id) {
+            const dropdown = document.getElementById(id + "_mobile");
+            if (dropdown) {
+                dropdown.classList.toggle("show");
             }
-        } else if (type === 'mobile') {
-            const isDropdownOpen = flagDropdownMobile.style.display === 'block';
-            flagDropdownMobile.style.display = isDropdownOpen ? 'none' : 'block';
-            if (flagDropdownDesktop) {
+        }
+
+        document.addEventListener('click', function (event) {
+            const isClickInsideMenu = mobileMenu.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+            const closeBtn = document.querySelector(".close-btn");
+
+            if (mobileMenu.classList.contains("open") && !isClickInsideMenu && !isClickOnHamburger && closeBtn && !closeBtn.contains(event.target)) {
+                toggleMobileNav();
+            }
+        });
+
+        window.toggleFlagDropdown = function(type) {
+            const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+            const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+            
+            if (type === 'desktop') {
+                const isDropdownOpen = flagDropdownDesktop.style.display === 'block';
+                flagDropdownDesktop.style.display = isDropdownOpen ? 'none' : 'block';
+                if (flagDropdownMobile) {
+                    flagDropdownMobile.style.display = 'none';
+                }
+            } else if (type === 'mobile') {
+                const isDropdownOpen = flagDropdownMobile.style.display === 'block';
+                flagDropdownMobile.style.display = isDropdownOpen ? 'none' : 'block';
+                if (flagDropdownDesktop) {
+                    flagDropdownDesktop.style.display = 'none';
+                }
+            }
+        };
+        
+        document.addEventListener('click', function(e) {
+            const currentFlagDesktop = document.getElementById('current-flag-desktop');
+            const currentFlagMobile = document.getElementById('current-flag-mobile');
+            const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
+            const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+
+            if (flagDropdownDesktop && !flagDropdownDesktop.contains(e.target) && e.target !== currentFlagDesktop) {
                 flagDropdownDesktop.style.display = 'none';
             }
-        }
-    };
-    
-    document.addEventListener('click', function(e) {
-        const currentFlagDesktop = document.getElementById('current-flag-desktop');
-        const currentFlagMobile = document.getElementById('current-flag-mobile');
-        const flagDropdownDesktop = document.getElementById('flag-dropdown-desktop');
-        const flagDropdownMobile = document.getElementById('flag-dropdown-mobile');
+            if (flagDropdownMobile && !flagDropdownMobile.contains(e.target) && e.target !== currentFlagMobile) {
+                flagDropdownMobile.style.display = 'none';
+            }
+        });
 
-        if (flagDropdownDesktop && !flagDropdownDesktop.contains(e.target) && e.target !== currentFlagDesktop) {
-            flagDropdownDesktop.style.display = 'none';
-        }
-        if (flagDropdownMobile && !flagDropdownMobile.contains(e.target) && e.target !== currentFlagMobile) {
-            flagDropdownMobile.style.display = 'none';
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
+        // JWT related code
         const jwt = sessionStorage.getItem("jwt");
         const authButtonsDesktop = document.getElementById("auth-buttons");
         const logoutBtnDesktop = document.getElementById("logout-btn");
@@ -1017,13 +1024,4 @@ a {
         });
 
     });
-</script>
-<script>
-    const langLinks = {
-        th: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'th']); ?>",
-        en: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'en']); ?>",
-        cn: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'cn']); ?>",
-        jp: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'jp']); ?>",
-        kr: "<?php echo generateLink(basename($_SERVER['PHP_SELF'], '.php'), ['lang' => 'kr']); ?>"
-    };
 </script>

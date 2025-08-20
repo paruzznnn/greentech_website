@@ -1,20 +1,20 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// เพิ่มโค้ดนี้: รับค่า lang และกำหนดชื่อคอลัมน์ตามภาษา
-$lang = 'th'; // กำหนดค่าเริ่มต้นเป็นภาษาไทย
-if (isset($_GET['lang'])) {
-    if ($_GET['lang'] === 'en') {
-        $lang = 'en';
-    } elseif ($_GET['lang'] === 'cn') {
-        $lang = 'cn';
-    } elseif ($_GET['lang'] === 'jp') { // Added Japanese language check
-        $lang = 'jp';
-    } elseif ($_GET['lang'] === 'kr') { // Added Korean language check
-        $lang = 'kr';
-    }
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr'])) {
+    $_SESSION['lang'] = $_GET['lang'];
 }
+
+// กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
 
 // กำหนดชื่อคอลัมน์ตามภาษาที่เลือก
 $subject_col = 'subject_blog';
@@ -276,7 +276,7 @@ function scrollBlog(direction) {
         <div class="blog-scroll" id="blog-scroll-box">
             <?php foreach ($boxesBlog as $box): ?>
                 <div class="blog-card">
-                        <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
+                    <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                         <div class="card">
                             <?php if(!empty($box['iframe'])): ?>
                                 <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>

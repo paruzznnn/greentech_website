@@ -1,41 +1,40 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์เสมอ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// Check the 'lang' parameter from the URL. The default is 'th'.
-$lang = isset($_GET['lang']) ? $_GET['lang'] : 'th';
-
-// Add 'cn', 'jp', and 'kr' to the list of supported languages
-$lang = in_array($lang, ['en', 'th', 'cn', 'jp', 'kr']) ? $lang : 'th';
-
-// Select the correct columns based on the language.
-$subject_col = 'subject_shop';
-$description_col = 'description_shop';
-$content_col = 'content_shop';
-
-if ($lang === 'en') {
-    $subject_col .= '_en';
-    $description_col .= '_en';
-    $content_col .= '_en';
-} elseif ($lang === 'cn') {
-    $subject_col .= '_cn';
-    $description_col .= '_cn';
-    $content_col .= '_cn';
-} elseif ($lang === 'jp') {
-    $subject_col .= '_jp';
-    $description_col .= '_jp';
-    $content_col .= '_jp';
-} elseif ($lang === 'kr') {
-    $subject_col .= '_kr';
-    $description_col .= '_kr';
-    $content_col .= '_kr';
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'th', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
 }
 
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+
+
+// ดึงข้อมูลทั้งหมดในทุกภาษาเพื่อความยืดหยุ่นในการแสดงผล
 $sql = "SELECT
             dn.shop_id,
-            dn.$subject_col AS subject_shop,
-            dn.$description_col AS description_shop,
-            dn.$content_col AS content_shop,
+            dn.subject_shop,
+            dn.subject_shop_en,
+            dn.subject_shop_cn,
+            dn.subject_shop_jp,
+            dn.subject_shop_kr,
+            dn.description_shop,
+            dn.description_shop_en,
+            dn.description_shop_cn,
+            dn.description_shop_jp,
+            dn.description_shop_kr,
+            dn.content_shop,
+            dn.content_shop_en,
+            dn.content_shop_cn,
+            dn.content_shop_jp,
+            dn.content_shop_kr,
             dn.date_create,
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -55,22 +54,29 @@ $boxesshop = [];
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // ใช้ตัวแปรภาษาเพื่อเลือกคอลัมน์ที่ถูกต้อง
+        $subject = $row['subject_shop' . ($lang !== 'th' ? '_' . $lang : '')];
+        $description = $row['description_shop' . ($lang !== 'th' ? '_' . $lang : '')];
+        $content = $row['content_shop' . ($lang !== 'th' ? '_' . $lang : '')];
 
-        $content = $row['content_shop'];
+        // ในกรณีที่ข้อมูลในภาษาที่เลือกเป็นค่าว่าง ให้ใช้ข้อมูลภาษาไทยเป็นค่าสำรอง
+        $subject = !empty($subject) ? $subject : $row['subject_shop'];
+        $description = !empty($description) ? $description : $row['description_shop'];
+        $content = !empty($content) ? $content : $row['content_shop'];
+        
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
-            $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
+            $iframeSrc = isset($matches[1]) ? $matches[1] : null;
         }
 
         $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
-        $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
+        $iframe = isset($iframeSrc) ? $iframeSrc : null;
 
         $boxesshop[] = [
             'id' => $row['shop_id'],
-            'image' =>  $paths[0],
-            'title' => $row['subject_shop'],
-            'description' => $row['description_shop'],
+            'image' => $paths[0],
+            'title' => $subject,
+            'description' => $description,
             'iframe' => $iframe
         ];
     }
@@ -240,13 +246,13 @@ if ($result->num_rows > 0) {
         }
     }
     .content-sticky {
-    padding-bottom: 0px;
-    background-color: #ffffff;
+        padding-bottom: 0px;
+        background-color: #ffffff;
 
-    /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
-    display: flex;
-    justify-content: center;
-}
+        /* เพิ่มโค้ด 2 บรรทัดนี้เพื่อจัดให้อยู่กึ่งกลาง */
+        display: flex;
+        justify-content: center;
+    }
 
 </style>
 
@@ -273,7 +279,7 @@ function scrollshop(direction) {
         <div class="shop-scroll" id="shop-scroll-box">
             <?php foreach ($boxesshop as $box): ?>
                 <div class="shop-card">
-                    <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark">
+                    <a href="shop_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                         <div class="card">
                             <?php if(empty($box['image'])): ?>
                                 <iframe frameborder="0" src="<?= htmlspecialchars($box['iframe']) ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
