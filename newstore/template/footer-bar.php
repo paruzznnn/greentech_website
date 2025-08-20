@@ -184,10 +184,10 @@
         </nav>
         <div class="footer-social">
             <span>ติดตามเรา: </span>
-            <a href="https://www.facebook.com/yourpage" target="_blank">Facebook</a> |
-            <a href="https://twitter.com/yourprofile" target="_blank">Twitter</a> |
-            <a href="https://www.instagram.com/yourprofile" target="_blank">Instagram</a> |
-            <a href="mailto:contact@trandarstore.com">Email</a>
+            <a href="#" target="_blank">Facebook</a> |
+            <a href="#" target="_blank">Twitter</a> |
+            <a href="#" target="_blank">Instagram</a> |
+            <a href="#">Email</a>
         </div>
     </div>
 </footer>
