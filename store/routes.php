@@ -15,7 +15,7 @@ function getBasePath() {
 
     $scheme = $isHttps ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
-    $path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
+    $path = $isHttps ? '/store/' : '/trandar_website/store/';
     $base_path = $scheme . '://' . $host . $path;
     return $base_path;
 }
