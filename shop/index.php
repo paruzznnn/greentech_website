@@ -6,6 +6,6 @@ $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : '
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
 // Redirect to the specified URL with the correct file extension
-header("Location: ../newstore/index" . $isFile);
+header("Location: ../store/index" . $isFile);
 exit();
 ?>
