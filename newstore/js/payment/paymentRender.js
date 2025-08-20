@@ -1,5 +1,5 @@
 
-import { formatDateToYYYYMMDD } from '../formHandler.js';
+import { formatDateToYYYYMMDD, formatPrice } from '../formHandler.js';
 
 export async function fetchAddressData(req, call) {
     try {
@@ -120,9 +120,9 @@ export const CheckoutUI = {
     BankNumber: '3201137028',
     PromptPayNumber: '0988971593',
     totalPrice: null,
+    countProduct: null,
 
     orderItems: [],
-
     addressData: [],
     provincesData: [],
     districtsData: [],
@@ -249,7 +249,6 @@ export const CheckoutUI = {
         this.selectors.vatAmountInput.value = parseFloat(this.orderItems.vat).toFixed(2);
         this.selectors.discountAmountInput.value = parseFloat(this.orderItems.discount).toFixed(2);
         
-        
     },
 
     renderShipping() {
@@ -315,6 +314,11 @@ export const CheckoutUI = {
         this.selectors.selectedDistrict = document.getElementById('district');
         this.selectors.selectedSubdistrict = document.getElementById('subdistrict');
         this.selectors.selectedPostalCode = document.getElementById('postalCode');
+
+        // ===== LOAD =====
+        this.populateProvinces();
+        this.populateDistricts();
+        this.populateSubDistricts();
 
     },
 
@@ -691,16 +695,3 @@ export const CheckoutUI = {
     }
 
 };
-
-function formatPrice(currency, price) {
-    if (price) {
-        return Number(price).toLocaleString("th-TH", {
-            style: "currency",
-            currency: currency || "THB",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    } else {
-        return '';
-    }
-}

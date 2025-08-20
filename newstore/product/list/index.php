@@ -32,28 +32,7 @@
                                     <input type="range" id="maxPrice" min="0" max="10000" step="100" value="10000" class="range-slider" style=" border: none !important;" />
                                 </div>
 
-                                <div id="filters-container"></div>
-
-                                <!-- <div class="filter-group">
-                                    <h6>สี (Color)</h6>
-                                    <label><input type="checkbox" class="filter-color" value="Red" /> แดง</label><br />
-                                    <label><input type="checkbox" class="filter-color" value="Blue" /> น้ำเงิน</label><br />
-                                    <label><input type="checkbox" class="filter-color" value="Green" /> เขียว</label><br />
-                                </div>
-
-                                <div class="filter-group">
-                                    <h6>ขนาด (Size)</h6>
-                                    <label><input type="checkbox" class="filter-size" value="S" /> S</label><br />
-                                    <label><input type="checkbox" class="filter-size" value="M" /> M</label><br />
-                                    <label><input type="checkbox" class="filter-size" value="L" /> L</label><br />
-                                </div>
-
-                                <div class="filter-group">
-                                    <h6>วัสดุ (Material)</h6>
-                                    <label><input type="checkbox" class="filter-material" value="Cotton" /> ฝ้าย</label><br />
-                                    <label><input type="checkbox" class="filter-material" value="Leather" /> หนัง</label><br />
-                                    <label><input type="checkbox" class="filter-material" value="Plastic" /> พลาสติก</label><br />
-                                </div> -->
+                                <!-- <div id="filters-container"></div> -->
 
                             </div>
                         </div>
@@ -78,7 +57,7 @@
     </main>
     <?php include '../../template/footer-bar.php'; ?>
 
-    <script>
+    <!-- <script>
         const filters = [{
                 label: "สี (Color)",
                 className: "filter-color",
@@ -158,7 +137,7 @@
 
             container.appendChild(groupDiv);
         });
-    </script>
+    </script> -->
 
     <script type="module">
         import(`${pathConfig.BASE_WEB}js/product/productListRender.js?v=<?= time() ?>`)

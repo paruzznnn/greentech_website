@@ -42,7 +42,7 @@ export function handleFormSubmit(event) {
               if (storedOrder) {
                   localStorage.removeItem('orderProduct');
               }
-              redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
+              redirectGet(fromRedirect, { notify: 'pay'});
               break;
             default:
               break;
@@ -117,6 +117,18 @@ redirectGet('/search', { q: 'keyword', page: 2 });
 Exsample GET form
 redirectGetForm('/download', { file: 'report.pdf' }, '_blank');
 =======================================================================*/
+
+export function formatPrice(currency = "THB", price = 0) {
+  const numericPrice = isNaN(parseFloat(price)) ? 0 : parseFloat(price);
+  const validCurrency = typeof currency === "string" && currency.trim() !== "" ? currency : "THB";
+
+  return numericPrice.toLocaleString("th-TH", {
+    style: "currency",
+    currency: validCurrency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 //============ Notify Alert ========================================
 let notificationTimeout;

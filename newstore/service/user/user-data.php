@@ -97,34 +97,71 @@ if ($action == 'getOrdersItems') {
 
     // $conditions = [
     //     [
-    //         'column' => 'comp_id', 
-    //         'operator' => '=', 
-    //         'value' => '2'
+    //         'column' => 'is_del',
+    //         'operator' => '=',
+    //         'value' => 0
     //     ]
     // ];
 
     // $items = selectData(
-    //     $conn_cloudpanel, 
-    //     'ecm_product', 
-    //     $conditions, 
-    //     'id, pic_icon, category_name, category_id', 
-    //     'id DESC'
+    //     $conn_cloudpanel,
+    //     'ecm_orders',
+    //     $conditions,
+    //     '*'
     // );
 
+    //[
+    //         'id' => 'ORD001',
+    //         'date' => '2023-07-20',
+    //         'total' => 1250.00,
+    //         'status' => 'Delivered',
+    //         'items' => [
+    //             [
+    //                 'name' => 'Trandar Mineral Fiber AMF',
+    //                 'quantity' => 2,
+    //                 'price' => 300,
+    //                 'imageUrl' => 'https://www.trandar.com//public/shop_img/6883336b6606d_______________________AMF-_________.jpg'
+    //             ],
+    //             [
+    //                 'name' => 'Trandar AMF Mercure',
+    //                 'quantity' => 1,
+    //                 'price' => 650,
+    //                 'imageUrl' => 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
+    //             ]
+    //         ]
+    //     ],
+
+    // echo '<pre>';
+    // print_r($items);
+    // echo '</pre>';
+
     // $data = [];
-    // $seen_category_ids = [];
+    // $orderMap = [];
+
     // foreach ($items as $item) {
-    //     if (in_array($item['category_id'], $seen_category_ids)) {
-    //         continue; // check duplicate
-    //     }
-    //     $data[] = [
-    //         'id' => $item['id'],
-    //         'image' => $item['pic_icon'],
-    //         'category' => $item['category_name'],
-    //         'category_id' => $item['category_id']
+    //     $orderId = $item['order_id'];
+
+    //     $product = [
+    //         'name' => $item['product_name'] ?? '',
+    //         'quantity' => $item['quantity'] ?? 0,
+    //         'price' => $item['price'] ?? 0,
+    //         'imageUrl' => $item['image_url'] ?? ''
     //     ];
-    //     //keep category_id 
-    //     $seen_category_ids[] = $item['category_id'];
+
+    //     if (isset($orderMap[$orderId])) {
+    //         $data[$orderMap[$orderId]]['items'][] = $product;
+    //     } else {
+    //         // ถ้ายังไม่มี order นี้ ให้สร้างใหม่
+    //         $data[] = [
+    //             'id' => $orderId,
+    //             'date' => $item['created_at'],
+    //             'total' => $item['total_price'],
+    //             'status' => $item['is_status'],
+    //             'items' => [$product]
+    //         ];
+    //         // เก็บ index ของ order นี้ใน map
+    //         $orderMap[$orderId] = array_key_last($data);
+    //     }
     // }
 
     $response = [
@@ -133,10 +170,9 @@ if ($action == 'getOrdersItems') {
 
     http_response_code(200);
     echo json_encode($response);
-    // $conn_cloudpanel->close();
+    $conn_cloudpanel->close();
     exit;
-} 
-else {
+} else {
 
     http_response_code(400);
     echo json_encode([

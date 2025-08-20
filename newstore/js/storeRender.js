@@ -1,4 +1,4 @@
-import { redirectGet, showNotification } from './formHandler.js';
+import { redirectGet, showNotification, formatPrice } from './formHandler.js';
 
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
@@ -323,15 +323,6 @@ function addWishlist(product) {
   }
 
   localStorage.setItem("likedProducts", JSON.stringify(existingWishlist));
-}
-
-function formatPrice(currency, price) {
-  return Number(price).toLocaleString("th-TH", {
-    style: "currency",
-    currency: currency || "THB",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
 }
 
 // ---------- RENDER INTRODUCE ----------------

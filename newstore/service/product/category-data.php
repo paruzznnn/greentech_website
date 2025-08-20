@@ -34,112 +34,112 @@ if ($action == 'getCategoryItems') {
             "label" => "หมวดสินค้า",
             "href" => "#",
             "icon" => ""
-        ],
-        [
-            "label" => "วัสดุดูดซับเสียง",
-            "href" => "#",
-            "icon" => "",
-            "children" => [
-                [
-                    "label" => "Trandar Acoustics Mineral Fiber",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "Trandar Acoustics Soft Fiber",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "Trandar ZIVANA",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "Trandar Seamless Acoustics",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "Trandar Solo",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "Trandar AFIBUS",
-                    "href" => "#",
-                    "icon" => ""
-                ]
-            ]
-        ],
-        [
-            "label" => "วัสดุกันเสียง",
-            "href" => "#",
-            "icon" => "",
-            "children" => [
-                [
-                    "label" => "ตัวอย่าง A",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "ตัวอย่าง B",
-                    "href" => "#",
-                    "icon" => ""
-                ]
-            ]
-        ],
-        [
-            "label" => "โครงคร่าวฝ้า",
-            "href" => "#",
-            "icon" => "",
-            "children" => [
-                [
-                    "label" => "อื่นๆ 1",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "อื่นๆ 2",
-                    "href" => "#",
-                    "icon" => ""
-                ]
-            ]
-        ],
-        [
-            "label" => "Trandar Solution",
-            "href" => "#",
-            "icon" => "",
-            "children" => [
-                [
-                    "label" => "อื่นๆ 1",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "อื่นๆ 2",
-                    "href" => "#",
-                    "icon" => ""
-                ]
-            ]
-        ],
-        [
-            "label" => "อื่นๆ",
-            "href" => "#",
-            "icon" => "",
-            "children" => [
-                [
-                    "label" => "อื่นๆ 1",
-                    "href" => "#",
-                    "icon" => ""
-                ],
-                [
-                    "label" => "อื่นๆ 2",
-                    "href" => "#",
-                    "icon" => ""
-                ]
-            ]
         ]
+        // [
+        //     "label" => "วัสดุดูดซับเสียง",
+        //     "href" => "#",
+        //     "icon" => "",
+        //     "children" => [
+        //         [
+        //             "label" => "Trandar Acoustics Mineral Fiber",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "Trandar Acoustics Soft Fiber",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "Trandar ZIVANA",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "Trandar Seamless Acoustics",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "Trandar Solo",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "Trandar AFIBUS",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ]
+        //     ]
+        // ],
+        // [
+        //     "label" => "วัสดุกันเสียง",
+        //     "href" => "#",
+        //     "icon" => "",
+        //     "children" => [
+        //         [
+        //             "label" => "ตัวอย่าง A",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "ตัวอย่าง B",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ]
+        //     ]
+        // ],
+        // [
+        //     "label" => "โครงคร่าวฝ้า",
+        //     "href" => "#",
+        //     "icon" => "",
+        //     "children" => [
+        //         [
+        //             "label" => "อื่นๆ 1",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "อื่นๆ 2",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ]
+        //     ]
+        // ],
+        // [
+        //     "label" => "Trandar Solution",
+        //     "href" => "#",
+        //     "icon" => "",
+        //     "children" => [
+        //         [
+        //             "label" => "อื่นๆ 1",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "อื่นๆ 2",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ]
+        //     ]
+        // ],
+        // [
+        //     "label" => "อื่นๆ",
+        //     "href" => "#",
+        //     "icon" => "",
+        //     "children" => [
+        //         [
+        //             "label" => "อื่นๆ 1",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ],
+        //         [
+        //             "label" => "อื่นๆ 2",
+        //             "href" => "#",
+        //             "icon" => ""
+        //         ]
+        //     ]
+        // ]
     ];
 
 

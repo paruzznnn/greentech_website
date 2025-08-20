@@ -4,11 +4,11 @@ header('Content-Type: application/json');
 require_once '../../lib/connect.php';
 require_once '../../lib/base_directory.php';
 
-echo '<pre>';
-print_r($_GET);
-print_r($_POST);
-echo '</pre>';
-exit;
+// echo '<pre>';
+// print_r($_GET);
+// print_r($_POST);
+// echo '</pre>';
+// exit;
 
 // approve_order
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -69,7 +69,7 @@ function handleChangeSync($apiGetData) {
         insertProduct($stmt, $apiGetData, $syncSt, $matID);
     }
 
-    // insertPhotoDetail($stmt, $apiGetData, $matID);
+    insertPhotoDetail($stmt, $apiGetData, $matID);
 
     $stmt->close();
 }
