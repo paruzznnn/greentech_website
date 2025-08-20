@@ -4,6 +4,12 @@ header('Content-Type: application/json');
 require_once '../../lib/connect.php';
 require_once '../../lib/base_directory.php';
 
+echo '<pre>';
+print_r($_GET);
+print_r($_POST);
+echo '</pre>';
+exit;
+
 // approve_order
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $apiAction = $_GET['action'] ?? null;
@@ -63,8 +69,51 @@ function handleChangeSync($apiGetData) {
         insertProduct($stmt, $apiGetData, $syncSt, $matID);
     }
 
+    insertPhotoDetail($stmt, $apiGetData, $matID);
+
     $stmt->close();
 }
+
+function insertPhotoDetail($stmt, $apiGetData, $matID) {
+    global $conn;
+
+    $photos = $apiGetData['pic_detail']; // สมมติว่าเป็น array ของรูปภาพ
+
+    // ตรวจสอบว่ามี photo_id นี้อยู่หรือยัง
+    $checkSql = "SELECT id FROM `ecm_product_photos` WHERE material_id = ?";
+    $stmt = $conn->prepare($checkSql);
+    $stmt->bind_param('s', $matID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // ลบรายการเดิมก่อน
+        $deleteSql = "DELETE FROM `ecm_product_photos` WHERE material_id = ?";
+        $deleteStmt = $conn->prepare($deleteSql);
+        $deleteStmt->bind_param('s', $matID);
+        $deleteStmt->execute();
+    }
+
+    // Insert รูปใหม่ทั้งหมด
+    $insertSql = "INSERT INTO `ecm_product_photos` (photo_id, material_id, comp_id, pic_url) VALUES (?, ?, ?, ?)";
+    $insertStmt = $conn->prepare($insertSql);
+
+    // photo_id int(11) NOT NULL,
+    // material_id varchar(40) NOT NULL,
+    // company_id int(5) NOT NULL,
+    // attachment_url varchar(255) NOT NULL,
+
+    foreach ($photos as $key => $photo) {
+
+        $photo_id = $photo['photo_id'];
+        $attachment_url = $photo['attachment_url'];
+        $company_id = $photo['company_id'];
+
+        $insertStmt->bind_param('ssss', $photo_id, $matID, $attachment_url, $company_id);
+        $insertStmt->execute();
+    }
+}
+
 
 function updateProduct($stmt, $apiGetData, $syncSt, $matID) {
     global $conn;
