@@ -28,7 +28,7 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
-$userId = $_SESSION['user']['id'];
+$userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 
 if ($action == 'getAddress') {
 
@@ -37,6 +37,11 @@ if ($action == 'getAddress') {
             'column' => 'member_id', 
             'operator' => '=', 
             'value' => $userId
+        ],
+        [
+            'column' => 'is_default', 
+            'operator' => '=', 
+            'value' => 1
         ]
     ];
 

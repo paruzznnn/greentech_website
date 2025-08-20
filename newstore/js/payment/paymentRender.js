@@ -115,10 +115,11 @@ function generateQRPromptpay(phoneNumber, amount, url) {
 export const CheckoutUI = {
     lang: null,
     QRCodeUrl: null,
-    shippingCost: 1500.00,
+    shippingCost: 1000.00,
     ORDER_STORAGE_KEY: 'orderProduct',
     BankNumber: '3201137028',
     PromptPayNumber: '0988971593',
+    totalPrice: null,
 
     orderItems: [],
 
@@ -243,6 +244,12 @@ export const CheckoutUI = {
         this.selectors.orderDate.textContent = formatDateToYYYYMMDD(this.orderItems.createdAt);
 
         this.selectors.orderInput.value = this.orderItems.orderId;
+
+        this.selectors.subtotalInput.value = parseFloat(this.orderItems.subtotal).toFixed(2);
+        this.selectors.vatAmountInput.value = parseFloat(this.orderItems.vat).toFixed(2);
+        this.selectors.discountAmountInput.value = parseFloat(this.orderItems.discount).toFixed(2);
+        
+        
     },
 
     renderShipping() {
@@ -344,7 +351,7 @@ export const CheckoutUI = {
                 <p>ธ.กรุงศรีอยุธยา <span>320-1-13702-8</span> <i class="bi bi-copy"></i></p>
                 <div class="mt-1" style="border-top: 2px dashed #cccccc;">
                     <div class="mt-1" style="font-size: 0.9rem;">ท่านสามารถส่งหลักฐานการชำระเงินภายหลังได้</div>
-                    <p style="font-size: 0.8rem; color: #666;">(ถ้าไม่ส่งหลักฐานภายใน 15 นาทีระบบจะทำการยกเลิกคำสั่งซื้อโดยอัตโนมัติ)</p>
+                    <p style="font-size: 0.8rem; color: #666;">(ถ้ามีการสั่งซื้อแล้วจะมีเจ้าหน้าที่ติดต่อท่านเพื่อยืนยันคำสั่งซื้อ)</p>
                 </div>
             </div>
         </div>
@@ -369,7 +376,7 @@ export const CheckoutUI = {
                 <h6>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</h6>
                 <div class="mt-1" style="border-top: 2px dashed #cccccc;">
                     <div class="mt-1" style="font-size: 0.9rem;">ท่านสามารถส่งหลักฐานการชำระเงินภายหลังได้</div>
-                    <p style="font-size: 0.8rem; color: #666;">(ถ้าไม่ส่งหลักฐานภายใน 15 นาทีระบบจะทำการยกเลิกคำสั่งซื้อโดยอัตโนมัติ)</p>
+                    <p style="font-size: 0.8rem; color: #666;">(ถ้ามีการสั่งซื้อแล้วจะมีเจ้าหน้าที่ติดต่อท่านเพื่อยืนยันคำสั่งซื้อ)</p>
                 </div>
             </div>
         </div>
@@ -378,7 +385,7 @@ export const CheckoutUI = {
         this.selectors.bankSection.innerHTML = '';
         this.selectors.promptpaySection.innerHTML = promptpayHTML;
 
-        generateQRPromptpay(this.PromptPayNumber, 150.00, this.QRCodeUrl)
+        generateQRPromptpay(this.PromptPayNumber, this.totalPrice, this.QRCodeUrl)
             .then(data => {
 
                 if (data.qrCodeImageBase64) {
@@ -441,7 +448,8 @@ export const CheckoutUI = {
     },
 
     updateShipping(isChecked) {
-        if (isChecked) {
+
+        if (isChecked && this.addressData) {
 
             this.selectors.selectedFullname.setAttribute("readonly", true);
             this.selectors.selectedPhoneNumber.setAttribute("readonly", true);
@@ -537,6 +545,7 @@ export const CheckoutUI = {
         const finalAmount = total + transportCost;
 
         this.selectors.totalAmount.textContent = formatPrice("THB", parseFloat(finalAmount));
+        this.totalPrice = parseFloat(finalAmount);
         this.selectors.shippingAmountInput.value = transportCost;
     },
 
@@ -616,7 +625,16 @@ export const CheckoutUI = {
         });
 
         document.addEventListener('change', (event) => {
+
+
             if (event.target.closest('#setupShipping')) {
+
+                if (this.addressData == null || this.addressData == undefined) {
+                    event.target.checked = !event.target.checked;
+                    alert('ไม่มีข้อมูลที่ตั้งค่าไว้');
+                    return;
+                }
+
                 if (event.target.type === 'checkbox') {
                     const isChecked = event.target.checked;
                     this.updateShipping(isChecked);

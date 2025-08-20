@@ -13,11 +13,11 @@ export function handleFormSubmit(event) {
         data[key] = value;
     });
 
-    console.log('data', data);
-    console.log('fromUrl', fromUrl);
-    console.log('fromRedirect', fromRedirect);
-    console.log('fromType', fromType);
-    return;
+    // console.log('data', data);
+    // console.log('fromUrl', fromUrl);
+    // console.log('fromRedirect', fromRedirect);
+    // console.log('fromType', fromType);
+    // return;
 
     fetch(fromUrl, {
         method: "POST",
@@ -35,6 +35,13 @@ export function handleFormSubmit(event) {
               
               break;
             case "login":
+              redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
+              break;
+            case "pay":
+              const storedOrder = localStorage.getItem('orderProduct');
+              if (storedOrder) {
+                  localStorage.removeItem('orderProduct');
+              }
               redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
               break;
             default:

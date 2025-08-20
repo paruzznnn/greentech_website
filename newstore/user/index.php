@@ -41,9 +41,9 @@
                                 <li class="active" data-tab="orders">
                                     <span><i class="bi bi-tag"></i> รายการสั่งซื้อ</span>
                                 </li>
-                                <li data-tab="addresses">
+                                <!-- <li data-tab="addresses">
                                     <span><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</span>
-                                </li>
+                                </li> -->
                                 <li data-tab="wishlist">
                                     <span><i class="bi bi-heart"></i> สินค้าที่ถูกใจ</span>
                                 </li>
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                             <!-- <div class="tabContent" id="payment">
-                            </div> -->
+                            </div>
                             <div class="tabContent" id="addresses">
                                 <div class="main-container">
                                     <form id="shippingAddressForm" class="mb-4">
@@ -90,7 +90,7 @@
                                         <button id="copyAllAddressesBtn" class="btn btn-secondary mt-3 ms-0">คัดลอกที่อยู่ทั้งหมด</button>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="tabContent" id="wishlist">
                                 <div class="main-container">
                                     <div id="likedProductsGrid" class="products-grid"></div>
@@ -244,13 +244,13 @@
         });
     </script>
 
-    <script type="module">
+    <!-- <script type="module">
         import { createAddressCard } from '../js/user/addressRender.js?v=<?php echo time() ?>';
         document.getElementById('addAddressCardBtn').addEventListener('click', () => {
             createAddressCard();
         });
         createAddressCard();
-    </script>
+    </script> -->
 
     <!-- <script>
         const initialMyCouponsData = [{
