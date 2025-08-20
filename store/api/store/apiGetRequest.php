@@ -69,7 +69,7 @@ function handleChangeSync($apiGetData) {
         insertProduct($stmt, $apiGetData, $syncSt, $matID);
     }
 
-    insertPhotoDetail($stmt, $apiGetData, $matID);
+    // insertPhotoDetail($stmt, $apiGetData, $matID);
 
     $stmt->close();
 }
