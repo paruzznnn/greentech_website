@@ -1,4 +1,9 @@
 <?php
+// ต้องแน่ใจว่าได้เปิดใช้งาน Session ก่อนการแสดงผลใดๆ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // header-top-right (โค้ดส่วนนี้ไม่ได้แก้ไข)
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
@@ -21,8 +26,19 @@ $menuItems = [
 global $conn;
 global $base_path;
 
-// --- ADDED: Check for language preference from the URL, default to Thai if not specified. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
+// --- MODIFIED: Check for language preference from the URL, or Session, default to Thai if not specified. ---
+$lang = 'th'; // กำหนดค่าเริ่มต้นเป็นภาษาไทย
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['en', 'cn', 'jp', 'kr'];
+    if (in_array($_GET['lang'], $supportedLangs)) {
+        $_SESSION['lang'] = $_GET['lang'];
+        $lang = $_GET['lang'];
+    } else {
+        unset($_SESSION['lang']); // ล้างค่าถ้าไม่ถูกต้อง
+    }
+} elseif (isset($_SESSION['lang'])) {
+    $lang = $_SESSION['lang'];
+}
 
 $footer_settings = [];
 $footer_id_for_display = 1;
@@ -151,7 +167,7 @@ function get_text($settings, $field_name, $lang) {
                             <?php echo $item['text']; ?>
                         </span>
                     </aa>
-                <?php endforeach; ?>     
+                <?php endforeach; ?>    
             </div>
         </div>
     </div>

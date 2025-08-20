@@ -1,9 +1,27 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// --- MODIFIED: Check for language preference, now including 'cn', 'jp', and 'kr'. Default is Thai. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+// --- สิ้นสุดส่วนที่แก้ไข ---
+
+// --- กำหนดชื่อคอลัมน์ตามภาษาที่เลือก ---
+$subjectCol = 'subject_news' . ($lang !== 'th' ? '_' . $lang : '');
+$descriptionCol = 'description_news' . ($lang !== 'th' ? '_' . $lang : '');
+$contentCol = 'content_news' . ($lang !== 'th' ? '_' . $lang : '');
 
 // --- MODIFIED: Select all four language columns for news content and ADD 'kr' columns ---
 $sql = "SELECT 
@@ -43,51 +61,17 @@ $boxesNews = [];
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
-        // --- MODIFIED: Use the correct language content based on preference, ADD 'kr' ---
-        $content = $row['content_news'];
-        if ($lang === 'en' && !empty($row['content_news_en'])) {
-            $content = $row['content_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['content_news_cn'])) {
-            $content = $row['content_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['content_news_jp'])) {
-            $content = $row['content_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['content_news_kr'])) {
-            $content = $row['content_news_kr'];
-        }
+        $content = $row[$contentCol] ?: $row['content_news'];
+        $title = $row[$subjectCol] ?: $row['subject_news'];
+        $description = $row[$descriptionCol] ?: $row['description_news'];
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        // --- MODIFIED: Ensure paths and files are not empty before exploding. ---
         $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
-        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
-
-        // --- MODIFIED: Select the correct language for title and description, ADD 'kr' ---
-        $title = $row['subject_news'];
-        if ($lang === 'en' && !empty($row['subject_news_en'])) {
-            $title = $row['subject_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['subject_news_cn'])) {
-            $title = $row['subject_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['subject_news_jp'])) {
-            $title = $row['subject_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['subject_news_kr'])) {
-            $title = $row['subject_news_kr'];
-        }
-
-        $description = $row['description_news'];
-        if ($lang === 'en' && !empty($row['description_news_en'])) {
-            $description = $row['description_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['description_news_cn'])) {
-            $description = $row['description_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['description_news_jp'])) {
-            $description = $row['description_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['description_news_kr'])) {
-            $description = $row['description_news_kr'];
-        }
 
         $boxesNews[] = [
             'id' => $row['news_id'],
@@ -109,15 +93,15 @@ if ($result->num_rows > 0) {
         background-color: #ffffff;
         color: #333;
         transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
         height: 100%;
         display: flex;
         flex-direction: column;
     }
 
     .card-premium:hover {
-       transform: translateY(-8px);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-8px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.1);
     }
 
     .sub-news-image-wrapper {
@@ -268,7 +252,7 @@ if ($result->num_rows > 0) {
                     <div class="carousel-inner flex-grow-1">
                         <?php foreach (array_slice($boxesNews, 0, 4) as $i => $box): ?>
                             <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
-                                <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark">
+                                <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                                     <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px 6px 0 0; height: 450px; object-fit: cover;">
                                 </a>
                                 <div class="p-3 bg-light">
@@ -281,11 +265,11 @@ if ($result->num_rows > 0) {
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden"><?= ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : ($lang === 'kr' ? '이전' : 'ก่อนหน้า')))) ?></span>
+                    <span class="visually-hidden"><?= match ($lang) { 'cn' => '上一页', 'jp' => '前へ', 'en' => 'Previous', 'kr' => '이전', default => 'ก่อนหน้า', }; ?></span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#mainNewsCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden"><?= ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : ($lang === 'kr' ? '다음' : 'ถัดไป')))) ?></span>
+                    <span class="visually-hidden"><?= match ($lang) { 'cn' => '下一页', 'jp' => '次へ', 'en' => 'Next', 'kr' => '다음', default => 'ถัดไป', }; ?></span>
                 </button>
             </div>
         </div>
@@ -294,7 +278,7 @@ if ($result->num_rows > 0) {
             <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
                 <?php foreach (array_slice($boxesNews, offset: 1) as $box): ?>
                     <div class="col d-flex">
-                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= $lang ?>" class="text-decoration-none text-dark w-100">
+                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
                             <div class="card-premium p-0 d-flex flex-column">
                                 <div class="sub-news-image-wrapper flex-shrink-0">
                                     <img src="<?= htmlspecialchars($box['image']) ?>" class="sub-news-img">

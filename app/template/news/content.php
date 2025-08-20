@@ -1,19 +1,38 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once(__DIR__ . '/../../../lib/connect.php');
+global $conn;
+
 $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// --- MODIFIED: Check for language preference, now including 'cn', 'jp', and 'kr'. Default is Thai. ---
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr']) ? $_GET['lang'] : 'th';
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+// --- สิ้นสุดส่วนที่แก้ไข ---
+
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches English, Chinese, Japanese, and Korean columns too ---
+// --- กำหนดชื่อคอลัมน์ตามภาษาที่เลือก ---
+$subjectCol = 'subject_news' . ($lang !== 'th' ? '_' . $lang : '');
+$descriptionCol = 'description_news' . ($lang !== 'th' ? '_' . $lang : '');
+$contentCol = 'content_news' . ($lang !== 'th' ? '_' . $lang : '');
+
+// --- MODIFIED: Ensure totalQuery also respects 'del' status and searches all language columns including 'kr' ---
 $totalQuery = "SELECT COUNT(DISTINCT dn.news_id) as total
                 FROM dn_news dn
-                LEFT JOIN dn_news_doc dnc ON dn.news_id = dnc.news_id
-                                             AND dnc.del = '0'
-                                             AND dnc.status = '1'
-                WHERE dn.del = '0'"; // Filter news entries that are not deleted
+                WHERE dn.del = '0'";
 if ($searchQuery) {
     $totalQuery .= " AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
 }
@@ -48,15 +67,13 @@ $sql = "SELECT
             dn_news dn
         LEFT JOIN
             dn_news_doc dnc ON dn.news_id = dnc.news_id
-                               AND dnc.del = '0'
-                               AND dnc.status = '1'
+                             AND dnc.del = '0'
+                             AND dnc.status = '1'
         WHERE
-            dn.del = '0'"; // Only select news entries where del is 0
+            dn.del = '0'";
 
 if ($searchQuery) {
-    $sql .= "
-    AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
-    ";
+    $sql .= " AND (dn.subject_news LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%' OR dn.subject_news_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
 }
 
 $sql .= "
@@ -69,56 +86,22 @@ $result = $conn->query($sql);
 $boxesNews = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-
-        // --- MODIFIED: Select the correct language content, including 'kr' ---
-        $content = $row['content_news'];
-        if ($lang === 'en' && !empty($row['content_news_en'])) {
-            $content = $row['content_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['content_news_cn'])) {
-            $content = $row['content_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['content_news_jp'])) {
-            $content = $row['content_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['content_news_kr'])) {
-            $content = $row['content_news_kr'];
-        }
+        $title = $row[$subjectCol] ?: $row['subject_news'];
+        $description = $row[$descriptionCol] ?: $row['description_news'];
+        $content = $row[$contentCol] ?: $row['content_news'];
 
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        // Handle cases where pic_path or file_name might be NULL if no valid documents
         $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
-        $files = !empty($row['file_name']) ? explode(',', $row['file_name']) : [];
 
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
-        // --- MODIFIED: Select the correct language for title and description, including 'kr' ---
-        $title = $row['subject_news'];
-        $description = $row['description_news'];
-        if ($lang === 'en' && !empty($row['subject_news_en'])) {
-            $title = $row['subject_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['subject_news_cn'])) {
-            $title = $row['subject_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['subject_news_jp'])) {
-            $title = $row['subject_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['subject_news_kr'])) {
-            $title = $row['subject_news_kr'];
-        }
-
-        if ($lang === 'en' && !empty($row['description_news_en'])) {
-            $description = $row['description_news_en'];
-        } elseif ($lang === 'cn' && !empty($row['description_news_cn'])) {
-            $description = $row['description_news_cn'];
-        } elseif ($lang === 'jp' && !empty($row['description_news_jp'])) {
-            $description = $row['description_news_jp'];
-        } elseif ($lang === 'kr' && !empty($row['description_news_kr'])) {
-            $description = $row['description_news_kr'];
-        }
-
         $boxesNews[] = [
             'id' => $row['news_id'],
-            'image' => !empty($paths) ? $paths[0] : null, // Set to null if no valid image path
+            'image' => !empty($paths) ? $paths[0] : null,
             'date_time' => $row['date_create'],
             'title' => $title,
             'description' => $description,
@@ -126,64 +109,70 @@ if ($result->num_rows > 0) {
         ];
     }
 } else {
-    echo ($lang === 'cn' ? '无新闻内容。' : ($lang === 'jp' ? 'ニュースが見つかりません。' : ($lang === 'en' ? 'No news found.' : ($lang === 'kr' ? '뉴스를 찾을 수 없습니다.' : 'ไม่พบข่าว'))));
+    echo match ($lang) {
+        'en' => 'No news found.',
+        'cn' => '无新闻内容。',
+        'jp' => 'ニュースが見つかりません。',
+        'kr' => '뉴스를 찾을 수 없습니다.',
+        default => 'ไม่พบข่าว',
+    };
 }
 ?>
+
 <div style="display: flex; justify-content: space-between;">
-
-    <div>
-        </div>
-
+    <div></div>
     <div>
         <form method="GET" action="">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo ($lang === 'cn' ? '搜索新闻...' : ($lang === 'jp' ? 'ニュースを検索...' : ($lang === 'en' ? 'Search news...' : ($lang === 'kr' ? '뉴스 검색...' : 'ค้นหาข่าว...')))); ?>">
+                <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo match ($lang) {
+                    'en' => 'Search news...',
+                    'cn' => '搜索新闻...',
+                    'jp' => 'ニュースを検索...',
+                    'kr' => '뉴스 검색...',
+                    default => 'ค้นหาข่าว...',
+                }; ?>">
                 <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
             </div>
             <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
         </form>
     </div>
-
 </div>
+
 <div class="content-news">
     <?php foreach ($boxesNews as $index => $box): ?>
-
         <div class="box-news">
             <div class="box-image">
-                <?php
-                    $encodedId = urlencode(base64_encode($box['id']));
-                ?>
+                <?php $encodedId = urlencode(base64_encode($box['id'])); ?>
                 <a href="news_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
-
-                    <?php
-                    // Display iframe if available, otherwise image if available, otherwise a placeholder/nothing
-                    if(!empty($box['iframe'])){
-                        echo '<iframe frameborder="0" src="' . $box['iframe'] . '" width="100%" height="100%" class="note-video-clip"></iframe>';
-                    } else if (!empty($box['image'])){
-                        echo '<img src="' . $box['image'] . '" alt="Image for ' . htmlspecialchars($box['title']) . '">';
-                    } else {
-                        // Optionally, display a default placeholder image or leave empty
-                        echo '<img src="path/to/default/news_placeholder.jpg" alt="No image available">';
-                    }
-                    ?>
-
+                    <?php if(!empty($box['iframe'])): ?>
+                        <iframe frameborder="0" src="<?= htmlspecialchars($box['iframe']); ?>" width="100%" height="100%" class="note-video-clip"></iframe>
+                    <?php elseif (!empty($box['image'])): ?>
+                        <img src="<?= htmlspecialchars($box['image']); ?>" alt="Image for <?= htmlspecialchars($box['title']); ?>">
+                    <?php else: ?>
+                        <div style="width: 100%; height: 100%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc;">No Image</div>
+                    <?php endif; ?>
                 </a>
             </div>
             <div class="box-content">
                 <a href="news_detail.php?id=<?php echo $encodedId; ?>&lang=<?php echo $lang; ?>" class="text-news">
-                    <h5 class="line-clamp"><?php echo htmlspecialchars($box['title']); ?></h5>
-                    <p class="line-clamp"><?php echo htmlspecialchars($box['description']); ?></p>
+                    <h5 class="line-clamp"><?= htmlspecialchars($box['title']); ?></h5>
+                    <p class="line-clamp"><?= htmlspecialchars($box['description']); ?></p>
                 </a>
             </div>
         </div>
     <?php endforeach; ?>
 </div>
 
-
 <div class="pagination">
     <?php if ($page > 1): ?>
         <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">
-          <?php echo ($lang === 'cn' ? '上一页' : ($lang === 'jp' ? '前へ' : ($lang === 'en' ? 'Previous' : ($lang === 'kr' ? '이전' : 'ก่อนหน้า')))); ?>
+            <?php echo match ($lang) {
+                'en' => 'Previous',
+                'cn' => '上一页',
+                'jp' => '前へ',
+                'kr' => '이전',
+                default => 'ก่อนหน้า',
+            }; ?>
         </a>
     <?php endif; ?>
 
@@ -195,7 +184,13 @@ if ($result->num_rows > 0) {
 
     <?php if ($page < $totalPages): ?>
         <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($searchQuery); ?>&lang=<?php echo $lang; ?>">
-          <?php echo ($lang === 'cn' ? '下一页' : ($lang === 'jp' ? '次へ' : ($lang === 'en' ? 'Next' : ($lang === 'kr' ? '다음' : 'ถัดไป')))); ?>
+            <?php echo match ($lang) {
+                'en' => 'Next',
+                'cn' => '下一页',
+                'jp' => '次へ',
+                'kr' => '다음',
+                default => 'ถัดไป',
+            }; ?>
         </a>
     <?php endif; ?>
 </div>

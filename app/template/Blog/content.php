@@ -1,21 +1,26 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once(__DIR__ . '/../../../lib/connect.php');
+global $conn;
+
 $perPage = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// Check for language preference, including 'kr'. Default to Thai.
-$lang = 'th'; // Set a default value first
-if (isset($_GET['lang'])) {
-    if ($_GET['lang'] === 'en') {
-        $lang = 'en';
-    } elseif ($_GET['lang'] === 'cn') {
-        $lang = 'cn';
-    } elseif ($_GET['lang'] === 'jp') {
-        $lang = 'jp';
-    } elseif ($_GET['lang'] === 'kr') { // Added Korean language check
-        $lang = 'kr';
-    }
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
 }
+
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+// --- สิ้นสุดส่วนที่แก้ไข ---
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
@@ -23,22 +28,10 @@ $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $subjectCol = 'subject_blog';
 $descriptionCol = 'description_blog';
 $contentCol = 'content_blog';
-if ($lang === 'en') {
-    $subjectCol = 'subject_blog_en';
-    $descriptionCol = 'description_blog_en';
-    $contentCol = 'content_blog_en';
-} elseif ($lang === 'cn') {
-    $subjectCol = 'subject_blog_cn';
-    $descriptionCol = 'description_blog_cn';
-    $contentCol = 'content_blog_cn';
-} elseif ($lang === 'jp') {
-    $subjectCol = 'subject_blog_jp';
-    $descriptionCol = 'description_blog_jp';
-    $contentCol = 'content_blog_jp';
-} elseif ($lang === 'kr') {
-    $subjectCol = 'subject_blog_kr';
-    $descriptionCol = 'description_blog_kr';
-    $contentCol = 'content_blog_kr';
+if ($lang !== 'th') {
+    $subjectCol .= '_' . $lang;
+    $descriptionCol .= '_' . $lang;
+    $contentCol .= '_' . $lang;
 }
 
 // --- MODIFIED: Ensure totalQuery also respects 'del' status and searches across all language columns including 'kr' ---
@@ -47,11 +40,11 @@ $totalQuery = "SELECT COUNT(DISTINCT dn.blog_id) as total
                 WHERE dn.del = '0'"; // Filter blogs that are not deleted
 if ($searchQuery) {
     // Search across Thai, English, Chinese, Japanese, and Korean subject columns
-    $totalQuery .= " AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-                    OR dn.subject_blog_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-                    OR dn.subject_blog_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-                    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-                    OR dn.subject_blog_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')";
+    $totalQuery .= " AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    foreach ($supportedLangs as $slang) {
+        $totalQuery .= " OR dn.subject_blog_" . $slang . " LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    }
+    $totalQuery .= ")";
 }
 
 $totalResult = $conn->query($totalQuery);
@@ -84,20 +77,19 @@ $sql = "SELECT
             dn_blog dn
         LEFT JOIN
             dn_blog_doc dnc ON dn.blog_id = dnc.blog_id
-                               AND dnc.del = '0'
-                               AND dnc.status = '1'
+                             AND dnc.del = '0'
+                             AND dnc.status = '1'
         WHERE
             dn.del = '0'"; // Only select blogs where del is 0
 
 if ($searchQuery) {
     // Search across all language subject columns, including 'kr'
     $sql .= "
-    AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%' 
-    OR dn.subject_blog_en LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-    OR dn.subject_blog_cn LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-    OR dn.subject_blog_jp LIKE '%" . $conn->real_escape_string($searchQuery) . "%'
-    OR dn.subject_blog_kr LIKE '%" . $conn->real_escape_string($searchQuery) . "%')
-    ";
+    AND (dn.subject_blog LIKE '%" . $conn->real_escape_string($searchQuery) . "%' ";
+    foreach ($supportedLangs as $slang) {
+        $sql .= " OR dn.subject_blog_" . $slang . " LIKE '%" . $conn->real_escape_string($searchQuery) . "%'";
+    }
+    $sql .= ")";
 }
 
 $sql .= "

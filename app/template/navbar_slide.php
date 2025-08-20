@@ -1,18 +1,26 @@
 <?php
-// ตรวจสอบภาษาจาก URL ถ้ามี `?lang=en` หรือ `?lang=cn` หรือ `?lang=jp` หรือ `?lang=kr` จะกำหนดตามค่าที่ได้รับ
-// ถ้าไม่มี หรือเป็นค่าอื่น จะกำหนดให้เป็นภาษาไทย
-$lang = 'th'; // กำหนดค่าเริ่มต้นเป็นภาษาไทย
+// ต้องแน่ใจว่าได้เปิดใช้งาน Session ก่อนการแสดงผลใดๆ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// ตรวจสอบภาษาจาก URL
 if (isset($_GET['lang'])) {
-    if ($_GET['lang'] === 'en') {
-        $lang = 'en';
-    } elseif ($_GET['lang'] === 'cn') {
-        $lang = 'cn';
-    } elseif ($_GET['lang'] === 'jp') {
-        $lang = 'jp';
-    } elseif ($_GET['lang'] === 'kr') {
-        $lang = 'kr';
+    $supportedLangs = ['en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        // ถ้าเป็นภาษาที่รองรับ ให้บันทึกใน Session
+        $_SESSION['lang'] = $newLang;
+    } else {
+        // ถ้าเป็นค่าที่ไม่ถูกต้อง ให้ล้างค่าใน Session เพื่อใช้ค่าเริ่มต้น
+        unset($_SESSION['lang']);
     }
 }
+
+// กำหนดภาษาที่จะใช้งาน
+// ถ้ามีค่าใน Session ให้ใช้ค่าจาก Session
+// ถ้าไม่มี ให้ใช้ค่าเริ่มต้นเป็น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
 
 // กำหนดชื่อคอลัมน์ที่ต้องการดึงข้อมูลตามภาษาที่เลือก
 $subjectColumn = 'subject_news';
