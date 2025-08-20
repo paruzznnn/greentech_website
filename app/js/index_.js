@@ -133,13 +133,13 @@ $(document).ready(function () {
     $('#language-select').on('change', function () {
         const newLang = $(this).val().toLowerCase();
         // Change the language on the current page immediately
-        changeLanguage(newLang);
-        // Update the flag immediately
-        updateSelectedLanguageFlag(newLang);
-        
-        // Update the URL to reflect the new language without redirecting,
-        // unless you specifically need to redirect. This line is optional.
-        history.pushState(null, '', `?lang=${newLang}`);
+       
+    // สร้าง URL ใหม่ที่มีพารามิเตอร์ lang
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('lang', newLang);
+    
+    // สั่งให้รีโหลดหน้าไปยัง URL ใหม่
+    window.location.href = currentUrl.toString();
     });
 
     setupModal("myModal-sign-in", "myBtn-sign-in", "modal-close-sign-in");
