@@ -52,6 +52,13 @@
                                             </label>
                                         </div>
                                     </div>
+                                    <div id="deliveryService" class="mt-3" style="border-top: 2px dashed #cccccc;">
+                                        <h6 class="mt-1">(บริการจัดส่ง)</h6>
+                                        <p style="font-size: 0.8rem; color: #666;">
+                                            อาจมีการคิดค่าบริการในการจัดส่งเพิ่ม
+                                            เนื่องจากเราคำนวนจากความจุของขนาดรถและระยะทางการจัดส่ง เราจะให้แอดมินติดต่อไป
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <!-- ที่อยู่จัดส่ง -->
@@ -167,12 +174,14 @@
             const provinces = await paymentModule.fetchProvincesData(baseWeb + 'locales/provinces.json');
             const districts = await paymentModule.fetchDistrictsData(baseWeb + 'locales/districts.json');
             const subdistricts = await paymentModule.fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+            const service = pathConfig.BASE_WEB + 'service/payment/payment-data.php';
 
             paymentModule.CheckoutUI.init(
                 provinces,
                 districts,
                 subdistricts,
-                address.data[0]
+                address.data[0],
+                service
             );
         })
         .catch((e) => console.error("Module import failed", e));

@@ -50,12 +50,14 @@
                                 <li data-tab="cart">
                                     <span><i class="bi bi-cart3"></i> สินค้าในตะกร้า</span>
                                 </li>
-                                <li data-tab="coupon">
+
+                                <!-- <li data-tab="coupon">
                                     <span><i class="bi bi-lightning-charge"></i> ส่วนลด</span>
                                 </li>
                                 <li data-tab="reviews">
                                     <span><i class="bi bi-chat-right-text"></i> รีวิวของฉัน</span>
-                                </li>
+                                </li> -->
+                                
                                 <li data-tab="logout">
                                     <span><i class="bi bi-door-open"></i> ออกจากระบบ</span>
                                 </li>
@@ -100,7 +102,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tabContent" id="coupon">
+
+                            <!-- <div class="tabContent" id="coupon">
                                 <div class="main-container">
                                     <div class="mb-5">
                                         <h2 class="section-heading">คูปองที่ฉันมี</h2>
@@ -116,7 +119,8 @@
                                 <div class="main-container">
                                     <div id="review-cards-container" class="review-cards-container"></div>
                                 </div>
-                            </div>
+                            </div> -->
+
                             <div class="tabContent" id="info">
                                 <div class="profile-card">
                                     <div class="profile-header-section">

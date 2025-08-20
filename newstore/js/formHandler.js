@@ -13,11 +13,11 @@ export function handleFormSubmit(event) {
         data[key] = value;
     });
 
-    // console.log('data', data);
-    // console.log('fromUrl', fromUrl);
-    // console.log('fromRedirect', fromRedirect);
-    // console.log('fromType', fromType);
-    // return;
+    console.log('data', data);
+    console.log('fromUrl', fromUrl);
+    console.log('fromRedirect', fromRedirect);
+    console.log('fromType', fromType);
+    return;
 
     fetch(fromUrl, {
         method: "POST",

@@ -84,10 +84,42 @@ export async function fetchSubdistricts(call) {
     }
 }
 
+function generateQRPromptpay(phoneNumber, amount, url) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer my_secure_token_123',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'getQRPromptPay',
+            phone: phoneNumber,
+            amount: amount
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            throw error;
+        });
+}
+
 export const CheckoutUI = {
     lang: null,
+    QRCodeUrl: null,
     shippingCost: 1500.00,
     ORDER_STORAGE_KEY: 'orderProduct',
+    BankNumber: '3201137028',
+    PromptPayNumber: '0988971593',
+
     orderItems: [],
 
     addressData: [],
@@ -115,6 +147,7 @@ export const CheckoutUI = {
         pickupSection: document.getElementById('pickupAddressFormSection'),
         bankSection: document.getElementById('bankTransferSection'),
         promptpaySection: document.getElementById('promptpaySection'),
+        deliveryService: document.getElementById('deliveryService'),
 
         orderCode: document.getElementById('order-code'),
         orderDate: document.getElementById('order-date'),
@@ -152,9 +185,10 @@ export const CheckoutUI = {
         selectedPostalCode: null
     },
 
-    init(provinces, districts, subdistricts, address) {
+    init(provinces, districts, subdistricts, address, apiUrl) {
 
         this.lang = 'th';
+        this.QRCodeUrl = apiUrl;
         this.loadOrder();
 
         this.radioActive();
@@ -301,14 +335,22 @@ export const CheckoutUI = {
 
     renderBankTransfer() {
         let bankHTML = `
-        <div class="section-header">
+        <div style="display: grid; grid-template-columns: 1fr 2fr; align-items: center;">
             <div>
-                <p>ธนาคาร</p>
+                <img src="../bankPay.png" style="width: 100%;" alt="" />
+            </div>
+            <div>
+                <h6>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</h6>
+                <p>ธ.กรุงศรีอยุธยา <span>320-1-13702-8</span> <i class="bi bi-copy"></i></p>
+                <div class="mt-1" style="border-top: 2px dashed #cccccc;">
+                    <div class="mt-1" style="font-size: 0.9rem;">ท่านสามารถส่งหลักฐานการชำระเงินภายหลังได้</div>
+                    <p style="font-size: 0.8rem; color: #666;">(ถ้าไม่ส่งหลักฐานภายใน 15 นาทีระบบจะทำการยกเลิกคำสั่งซื้อโดยอัตโนมัติ)</p>
+                </div>
             </div>
         </div>
-        <div>
-        </div>
         `;
+
+        // <span>${this.BankNumber}</span>
 
         this.selectors.promptpaySection.innerHTML = '';
         this.selectors.bankSection.innerHTML = bankHTML;
@@ -316,19 +358,41 @@ export const CheckoutUI = {
 
     renderPromptpay() {
         let promptpayHTML = `
-        <div class="section-header">
+        <div style="display: grid; grid-template-columns: 1fr 2fr; align-items: center;">
             <div>
-                <p>QR CODE</p>
+                <div id="qr-placeholder">กำลังโหลด...</div>
             </div>
-        </div>
-        <div>
-            
+            <div>
+                <div>
+                    <img src="../promptPay.png" style="width: 28%;" alt="" />
+                </div>
+                <h6>บจก.แทรนดาร์ อินเตอร์เนชั่นแนล</h6>
+                <div class="mt-1" style="border-top: 2px dashed #cccccc;">
+                    <div class="mt-1" style="font-size: 0.9rem;">ท่านสามารถส่งหลักฐานการชำระเงินภายหลังได้</div>
+                    <p style="font-size: 0.8rem; color: #666;">(ถ้าไม่ส่งหลักฐานภายใน 15 นาทีระบบจะทำการยกเลิกคำสั่งซื้อโดยอัตโนมัติ)</p>
+                </div>
+            </div>
         </div>
         `;
 
         this.selectors.bankSection.innerHTML = '';
         this.selectors.promptpaySection.innerHTML = promptpayHTML;
-        
+
+        generateQRPromptpay(this.PromptPayNumber, 150.00, this.QRCodeUrl)
+            .then(data => {
+
+                if (data.qrCodeImageBase64) {
+                    const qrPlaceholder = this.selectors.promptpaySection.querySelector('#qr-placeholder');
+                    if (qrPlaceholder) {
+                        qrPlaceholder.innerHTML = `<img src="${data.qrCodeImageBase64}" style="width: 100%;" alt="QR Code" />`;
+                    }
+                } else {
+                    this.selectors.promptpaySection.querySelector('#qr-placeholder').innerHTML = 'ไม่พบ QR Code';
+                }
+            })
+            .catch(error => {
+                console.error('error load QR:', error);
+            });
     },
 
     populateProvinces() {
@@ -450,12 +514,14 @@ export const CheckoutUI = {
         switch (value) {
             case "shipping":
                 this.renderShipping();
+                this.selectors.deliveryService.style.display = 'block';
                 this.selectors.shippingSection.style.display = 'block';
                 this.selectors.pickupSection.style.display = 'none';
                 transportCost = this.shippingCost;
                 break;
             case "pickup":
                 this.renderPickup();
+                this.selectors.deliveryService.style.display = 'none';
                 this.selectors.pickupSection.style.display = 'block';
                 this.selectors.shippingSection.style.display = 'none';
                 transportCost = 0;
@@ -489,7 +555,7 @@ export const CheckoutUI = {
             default:
                 break;
         }
-        
+
         this.selectors.selectedPaymentMethod.textContent = this.paymentMethodNames[value];
     },
 
