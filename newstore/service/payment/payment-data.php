@@ -1,6 +1,7 @@
 <?php
 require_once '../../server/connect_sqli.php';
 require_once '../../server/select_sqli.php';
+require_once '../../server/insert_sqli.php';
 require_once '../../PromptPay/lib/PromptPayQR.php';
 header('Content-Type: application/json');
 
@@ -36,6 +37,7 @@ if ($dataJson == null) {
     exit;
 }
 $action = $dataJson['action'];
+$userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 
 if($action == 'getQRPromptPay'){
 
@@ -55,52 +57,71 @@ if($action == 'getQRPromptPay'){
 
 } else if ($action == 'payOrder') {
 
-    $product_item_json = $dataJson['product_item'];
-    $product_items = json_decode($product_item_json, true);
+    $order_code = isset($dataJson['order_id']) ? (string) $dataJson['order_id'] : '';
+    $delivery_option = isset($dataJson['delivery_option']) ? (string) $dataJson['delivery_option'] : '';
 
-    echo '<pre>';
-    print_r($dataJson);
-    echo '</pre>';
-    exit;
+    $full_name = isset($dataJson['full_name']) ? (string) $dataJson['full_name'] : '';
+    $phone_number = isset($dataJson['phone_number']) ? (string) $dataJson['phone_number'] : '';
+    $address_detail = isset($dataJson['address_detail']) ? (string) $dataJson['address_detail'] : '';
+
+    $province = isset($dataJson['province']) ? (int) $dataJson['province'] : '';
+    $district = isset($dataJson['district']) ? (int) $dataJson['district'] : '';
+    $subdistrict = isset($dataJson['subdistrict']) ? (int) $dataJson['subdistrict'] : '';
+    $postalCode = isset($dataJson['postalCode']) ? (string) $dataJson['postalCode'] : '';
+    $payment_method = isset($dataJson['payment_method']) ? (string) $dataJson['payment_method'] : '';
+
+    $product_items = isset($dataJson['product_item']) ? json_decode($dataJson['product_item'], true) : null;
+    if (!is_array($product_items)) {
+        die("Invalid product_item format.");
+    }
+
+    $sub_total = isset($dataJson['sub_total']) ? (float) $dataJson['sub_total'] : 0;
+    $vat_amount = isset($dataJson['vat_amount']) ? (float) $dataJson['vat_amount'] : 0;
+    $shipping_amount = isset($dataJson['shipping_amount']) ? (float) $dataJson['shipping_amount'] : 0;
+    $discount_amount = isset($dataJson['discount_amount']) ? (float) $dataJson['discount_amount'] : 0;
+    $total_amount = isset($dataJson['total_amount']) ? (float) $dataJson['total_amount'] : 0;
 
 
-    // $conditions = [
-    //     [
-    //         'column' => 'member_id', 
-    //         'operator' => '=', 
-    //         'value' => $userId
-    //     ]
-    // ];
+    $checkIns = false;
+    foreach ($product_items as $item) {
+        $product_id = (int)$item['id'];
+        $name = $item['name'];
+        $price = (float)$item['price'];
+        $quantity = (int)$item['quantity'];
+        $image = $item['imageUrl'];
+        // 'created_at' => date('Y-m-d H:i:s')
+        $totalPrice = $price * $quantity;
 
-    // $items = selectData(
-    //     $conn_cloudpanel, 
-    //     'ecm_address', 
-    //     $conditions, 
-    //     '*'
-    // );
+        $ins_data = [
+            'member_id' => $userId,
+            'order_id' => time(),
+            'order_code' => $order_code,
+            'order_key' => $product_id,
+            'pro_id' => $product_id,
+            'pic' => $image,
+            'price' => $price,
+            'quantity' => $quantity,
+            'total_price' => $totalPrice,
+            'currency' => "THB",
+            'pay_type' => 0,
+            'vehicle_id' => 0
+        ];
 
-    // $data = [];
-    // $seen_category_ids = [];
-    // foreach ($items as $item) {
-    //     $data[] = [
-    //         'id' => $item['address_id'],
-    //         'fullname' => $item['firstname'] . ' ' . $item['lastname'],
-    //         'phoneNumber' => $item['phone_number'],
-    //         'addressDetail' => $item['detail'],
-    //         'province_id' => $item['province_id'],
-    //         'district_id' => $item['district_id'],
-    //         'sub_district_id' => $item['sub_district_id'],
-    //         'postcode_id' => $item['postcode_id']
-    //     ];
-    // }
+        if (insertData($conn_cloudpanel, 'ecm_orders', $ins_data)) {
+            $checkIns = true;
+        } else {
+            $checkIns = false;
+        }
 
-    // $response = [
-    //     "data" => $data
-    // ];
+    }
 
-    // http_response_code(200);
-    // echo json_encode($response);
-    // $conn_cloudpanel->close();
+    $response = [
+        "status" => $checkIns
+    ];
+
+    http_response_code(200);
+    echo json_encode($response);
+    $conn_cloudpanel->close();
     exit;
 } else {
 
