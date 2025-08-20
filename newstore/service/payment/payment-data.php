@@ -1,6 +1,7 @@
 <?php
 require_once '../../server/connect_sqli.php';
 require_once '../../server/select_sqli.php';
+require_once '../../PromptPay/lib/PromptPayQR.php';
 header('Content-Type: application/json');
 
 
@@ -36,7 +37,23 @@ if ($dataJson == null) {
 }
 $action = $dataJson['action'];
 
-if ($action == 'payOrder') {
+if($action == 'getQRPromptPay'){
+
+    $PromptPayQR = new PromptPayQR();
+    $PromptPayQR->size = 8;
+    $PromptPayQR->id = $dataJson['phone'];
+    $PromptPayQR->amount = $dataJson['amount'];
+    $QRCode = $PromptPayQR->generate('../../PromptPay/TMP_FILE_QRCODE_PROMPTPAY.png');
+
+    $response = [
+        "qrCodeImageBase64" => $QRCode
+    ];
+
+    http_response_code(200);
+    echo json_encode($response);
+    exit;
+
+} else if ($action == 'payOrder') {
 
     $product_item_json = $dataJson['product_item'];
     $product_items = json_decode($product_item_json, true);
