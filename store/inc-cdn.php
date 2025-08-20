@@ -4,7 +4,7 @@ $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
 
 $scheme = $isHttps ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$path = $isHttps ? '/newstore/' : '/trandar_website/newstore/';
+$path = $isHttps ? '/store/' : '/trandar_website/store/';
 
 define('BASE_PATH', $scheme . '://' . $host . $path);
 ?>
