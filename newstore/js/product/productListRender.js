@@ -80,6 +80,10 @@ export async function initCardUI({
             return;
         }
 
+        // <p><b>Color:</b> ${card.color}</p>
+        // <p><b>Size:</b> ${card.size}</p>
+        // <p><b>Material:</b> ${card.material}</p>
+
         cardsToDisplay.forEach(card => {
             const col = document.createElement('div');
             col.className = 'col-md-12 col-sm-6 mb-4';
@@ -91,9 +95,6 @@ export async function initCardUI({
             <div class="product-info">
                 <h6>${card.title}</h6>
                 <p>${card.description}</p>
-                <p><b>Color:</b> ${card.color}</p>
-                <p><b>Size:</b> ${card.size}</p>
-                <p><b>Material:</b> ${card.material}</p>
             </div>
             <div class="product-extra">
                 ${renderPriceProgress(card.price)}

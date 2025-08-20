@@ -47,7 +47,6 @@
                                             <input class="hidden-radio" type="radio" name="delivery_option" id="delivery_pickup" value="pickup">
                                             <label for="delivery_pickup">
                                                 <i class="fas fa-truck-pickup"></i>
-                                                <!-- <i class="bi bi-person-walking"></i> -->
                                                 <span>รับสินค้าที่สาขา</span>
                                             </label>
                                         </div>

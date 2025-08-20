@@ -32,9 +32,9 @@
                     <div class="profile-layout">
                         <div class="sidebar">
                             <ul id="profileMenu">
-                                <li data-tab="info">
+                                <!-- <li data-tab="info">
                                     <span><i class="bi bi-person-gear"></i> บัญชีของฉัน</span>
-                                </li>
+                                </li> -->
                                 <!-- <li data-tab="payment">
                                     <span><i class="bi bi-cash-coin"></i>ชำระเงิน</span>
                                 </li> -->
@@ -58,9 +58,9 @@
                                     <span><i class="bi bi-chat-right-text"></i> รีวิวของฉัน</span>
                                 </li> -->
                                 
-                                <li data-tab="logout">
+                                <!-- <li data-tab="logout">
                                     <span><i class="bi bi-door-open"></i> ออกจากระบบ</span>
-                                </li>
+                                </li> -->
                             </ul>
                         </div>
                         <div class="content">
@@ -121,7 +121,7 @@
                                 </div>
                             </div> -->
 
-                            <div class="tabContent" id="info">
+                            <!-- <div class="tabContent" id="info">
                                 <div class="profile-card">
                                     <div class="profile-header-section">
                                         <div class="profile-picture-container">
@@ -174,14 +174,12 @@
                                                 <option value="other">อื่นๆ</option>
                                             </select>
                                         </div>
-
-                                        <!-- Save Changes Button -->
                                         <div class="save-button-container">
                                             <button type="submit" class="save-button">บันทึกการเปลี่ยนแปลง</button>
                                         </div>
                                     </form>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="tabContent" id="logout">
                                 <!-- <h2>Logout</h2>
                                 <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
@@ -195,6 +193,26 @@
         </div>
     </main>
     <?php include '../template/footer-bar.php'; ?>
+
+    <!-- <script type="module">
+        const timeVersion = "<?= time() ?>";
+        const baseWeb = `${pathConfig.BASE_WEB}`;
+
+        Promise.all([
+            import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
+            import(`${baseWeb}js/user/orderListRender.js?v=${timeVersion}`)
+        ])
+        .then(async ([formModule, orderListModule]) => {
+
+            const service = baseWeb + 'service/user/user-data.php?';
+            const orders = await orderListModule.fetchOrders("getOrdersItems", service);
+            orderListModule.OrderListUI.init(
+                orders
+            );
+            
+        })
+        .catch((e) => console.error("Module import failed", e));
+    </script> -->
 
     <script type="module">
         const base = pathConfig.BASE_WEB;
@@ -237,12 +255,12 @@
             });
     </script>
 
-    <script type="module">
+    <!-- <script type="module">
         import { setupProfileImageUpload } from '../js/user/userRender.js?v=<?php echo time() ?>';
         document.addEventListener('DOMContentLoaded', () => {
             setupProfileImageUpload();
         });
-    </script>
+    </script> -->
 
     <!-- <script type="module">
         import { createAddressCard } from '../js/user/addressRender.js?v=<?php echo time() ?>';

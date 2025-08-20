@@ -175,9 +175,9 @@ if ($action == 'getSectionItems') {
 
     $conditions = [
         [
-            'column' => 'comp_id', 
+            'column' => 'sync_status', 
             'operator' => '=', 
-            'value' => '2'
+            'value' => '1'
         ]
     ];
 

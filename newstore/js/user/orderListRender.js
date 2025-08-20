@@ -24,6 +24,22 @@ export async function fetchOrders(req, call) {
     }
 }
 
+// export const OrderListUI = {
+//     orderItems: [],
+//     selectors: {},
+
+//     init(orders) {
+//         this.orderItems = orders;
+//         this.createOrderCard();
+//     },
+
+//     createOrderCard() {
+//         console.log('this.orderItems', this.orderItems);
+//     }
+
+
+
+// }
 
 export function getThaiStatus(status) {
     switch (status) {
@@ -38,6 +54,9 @@ export function getThaiStatus(status) {
 }
 
 export function createOrderCard(order) {
+
+    console.log('order', order);
+
     const orderCard = document.createElement('div');
     orderCard.className = 'order-card';
 

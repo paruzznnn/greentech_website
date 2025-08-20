@@ -40,17 +40,14 @@ $action = $dataJson['action'];
 $userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 
 if($action == 'getQRPromptPay'){
-
     $PromptPayQR = new PromptPayQR();
     $PromptPayQR->size = 8;
     $PromptPayQR->id = $dataJson['phone'];
     $PromptPayQR->amount = $dataJson['amount'];
     $QRCode = $PromptPayQR->generate('../../PromptPay/TMP_FILE_QRCODE_PROMPTPAY.png');
-
     $response = [
         "qrCodeImageBase64" => $QRCode
     ];
-
     http_response_code(200);
     echo json_encode($response);
     exit;
@@ -81,42 +78,73 @@ if($action == 'getQRPromptPay'){
     $discount_amount = isset($dataJson['discount_amount']) ? (float) $dataJson['discount_amount'] : 0;
     $total_amount = isset($dataJson['total_amount']) ? (float) $dataJson['total_amount'] : 0;
 
+    // switch ($payment_method) {
+    //     case 'bank_transfer':
+    //         $payMethod = 1;
+    //         break;
+    //     case 'promptpay':
+    //         $payMethod = 2;
+    //         break;
+    //     default:
+    //         $payMethod = 0;
+    //         break;
+    // }
 
-    $checkIns = false;
-    foreach ($product_items as $item) {
-        $product_id = (int)$item['id'];
-        $name = $item['name'];
-        $price = (float)$item['price'];
-        $quantity = (int)$item['quantity'];
-        $image = $item['imageUrl'];
-        // 'created_at' => date('Y-m-d H:i:s')
-        $totalPrice = $price * $quantity;
+    // switch ($delivery_option) {
+    //     case 'shipping':
+    //         $deliveryMethod = 1;
+    //         break;
+    //     case 'pickup':
+    //         $deliveryMethod = 2;
+    //         break;
+    //     default:
+    //         $deliveryMethod = 0;
+    //         break;
+    // }
 
-        $ins_data = [
-            'member_id' => $userId,
-            'order_id' => time(),
-            'order_code' => $order_code,
-            'order_key' => $product_id,
-            'pro_id' => $product_id,
-            'pic' => $image,
-            'price' => $price,
-            'quantity' => $quantity,
-            'total_price' => $totalPrice,
-            'currency' => "THB",
-            'pay_type' => 0,
-            'vehicle_id' => 0
-        ];
-
-        if (insertData($conn_cloudpanel, 'ecm_orders', $ins_data)) {
-            $checkIns = true;
-        } else {
-            $checkIns = false;
-        }
-
-    }
+    // $orderKey = time();
+    // $dateNow = date('Y-m-d H:i:s');
+    // $insdata = [
+    //     'member_id' => $userId,
+    //     'order_id' => $orderKey,
+    //     'order_code' => $order_code,
+    //     'payment_method' => $payMethod,
+    //     'sub_total' => $sub_total,
+    //     'vat_amount' => $vat_amount,
+    //     'shipping_amount' => $shipping_amount,
+    //     'discount_amount' => $discount_amount,
+    //     'delivery_method' => $deliveryMethod,
+    //     'created_at' => $dateNow
+    // ];
+    // if (insertData($conn_cloudpanel, 'ecm_orders', $insdata)) {
+    //     $checkIns = true;
+    //     foreach ($product_items as $item) {
+    //         $product_id = (int)$item['id'];
+    //         $name = $item['name'];
+    //         $price = (float)$item['price'];
+    //         $quantity = (int)$item['quantity'];
+    //         $image = $item['imageUrl'];
+    //         $totalPrice = $price * $quantity;
+    //         $ins_data = [
+    //             'member_id' => $userId,
+    //             'order_id' => $orderKey,
+    //             'order_code' => $order_code,
+    //             'product_id' => $product_id,
+    //             'product_pic' => $image,
+    //             'price' => $price,
+    //             'quantity' => $quantity,
+    //             'total_price' => $totalPrice,
+    //             'currency' => "THB"
+    //         ];
+    //         insertData($conn_cloudpanel, 'ecm_orders_detail', $ins_data);
+    //     }
+    // } else {
+    //     $checkIns = false;
+    // }
 
     $response = [
-        "status" => $checkIns
+        // "status" => $checkIns
+        "status" => true
     ];
 
     http_response_code(200);

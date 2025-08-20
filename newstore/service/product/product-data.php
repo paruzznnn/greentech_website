@@ -28,17 +28,14 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
-// echo '<pre>';
-// print_r($_GET);
-// echo '</pre>';
-// exit;
+
 if ($action == 'getProductItems') {
 
     $conditions = [
         [
-            'column' => 'comp_id', 
+            'column' => 'sync_status', 
             'operator' => '=', 
-            'value' => '2'
+            'value' => '1'
         ]
     ];
 
@@ -78,9 +75,9 @@ if ($action == 'getProductItems') {
 
     $conditions = [
         [
-            'column' => 'comp_id', 
+            'column' => 'sync_status', 
             'operator' => '=', 
-            'value' => '2'
+            'value' => '1'
         ]
     ];
 
@@ -124,9 +121,9 @@ if ($action == 'getProductItems') {
 
     $conditions = [
         [
-            'column' => 'comp_id', 
+            'column' => 'sync_status', 
             'operator' => '=', 
-            'value' => '2'
+            'value' => '1'
         ],
         [
             'column' => 'material_id', 

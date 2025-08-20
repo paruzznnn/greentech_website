@@ -104,29 +104,32 @@ export const ProductDetailModule = {
                             <i class="bi bi-cart3"></i>
                             <span>เพิ่มลงตะกร้า</span>
                         </button>
-                        <button class="product-detail-button btn-add-order" data-id="${productId}" data-action="addOrder">
-                            <span>ซื้อสินค้า</span>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
+        
 
         <div class="product-detail-tabs-section">
             <div class="product-detail-tab-buttons-container">
                 <button class="product-detail-tab-button active" data-tab="description">รายละเอียด</button>
-                <button class="product-detail-tab-button" data-tab="features">คุณสมบัติ</button>
-                <button class="product-detail-tab-button" data-tab="review">รีวิว</button>
             </div>
             <div id="tab-content-description" class="product-detail-tab-content active">
                 <p class="product-detail-description-text">${description || ""}</p>
             </div>
-            <div id="tab-content-features" class="product-detail-tab-content">
-                <ul class="product-detail-features-list">${featuresList}</ul>
-            </div>
-            <div id="tab-content-review" class="product-detail-tab-content"></div>
         </div>
         `;
+
+        // <button class="product-detail-button btn-add-order" data-id="${productId}" data-action="addOrder">
+        //     <span>ซื้อสินค้า</span>
+        // </button>
+
+        // <button class="product-detail-tab-button" data-tab="features">คุณสมบัติ</button>
+        // <button class="product-detail-tab-button" data-tab="review">รีวิว</button>
+        // <div id="tab-content-features" class="product-detail-tab-content">
+        //     <ul class="product-detail-features-list">${featuresList}</ul>
+        // </div>
+        // <div id="tab-content-review" class="product-detail-tab-content"></div>
 
         this.container.innerHTML = html;
     },
