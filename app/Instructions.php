@@ -21,7 +21,7 @@
 
 <div class="container my-5" style="color: #555; max-width: 90%;">
     <h2 class="text-center fw-bold mb-4">Instructions</h2>
-    <h4 class="text-center mb-4">ซอฟต์แวร์ Sound Insulation Prediction</h4>
+    <h4 class="text-center mb-4">Software Sound Insulation Prediction</h4>
 
     <!-- Link Section -->
     <div class="mb-4">
@@ -34,24 +34,24 @@
     <hr>
 
     <!-- Instruction Text -->
-    <h5 class="fw-bold mt-4">คำแนะนำสำหรับการติดตั้งโปรแกรม INSUL</h5>
-    <p>ก่อนติดตั้งโปรแกรม INSUL เราแนะนำให้คุณปิดแอปพลิเคชั่นอื่นที่เปิดอยู่และเข้าสู่ระบบในฐานะผู้ใช้ด้วยสิทธิ์ระดับผู้ดูแลระบบ (Administrator rights)</p>
+    <h5 class="fw-bold mt-4">Instructions for INSUL Software Installation</h5>
+<p>Before installing the INSUL software, we recommend that you close any other open applications and log in with administrator rights.</p>
 
-    <p><strong>วิธีการติดตั้งโปรแกรม INSUL</strong></p>
-    <ol>
-        <li>
-            เสียบ USB ที่คุณได้รับมาซึ่งภายในมีซอฟต์แวร์ที่สำคัญ โดยเฉพาะไดร์เวอร์สำหรับ Sentinel® USB ที่จำเป็นต้องติดตั้งก่อนใช้งาน
-        </li>
-        <li>
-            หากไม่ได้รับการติดตั้งอัตโนมัติ ให้ดาวน์โหลดไฟล์ <a href="https://www.trandar.com/wp-content/uploads/2021/05/HASPUserSetup-1.zip" class="text-primary">HASPUserSetup.exe</a> จากเว็บไซต์ของ Trandar เพื่อทำการติดตั้งไดรเวอร์ด้วยตนเอง
-        </li>
-        <li>
-            ไปยังเว็บไซต์ INSUL เพื่อดาวน์โหลดไฟล์ติดตั้งเวอร์ชันล่าสุดโดยคลิก <a href="https://www.trandar.com/wp-content/uploads/2021/05/Update90r23.zip" class="text-primary">download Version INSUL 9.0</a>
-        </li>
-        <li>
-            อ่านคำแนะนำในหน้าเว็บไซต์ และดับเบิลคลิกที่ไฟล์ “Setup.exe” เพื่อเริ่มติดตั้ง
-        </li>
-    </ol>
+<p><strong>How to Install the INSUL Software</strong></p>
+<ol>
+    <li>
+        Insert the USB you received which contains the essential software, particularly the Sentinel® USB driver, which must be installed before use.
+    </li>
+    <li>
+        If the installation does not start automatically, download the <a href="https://www.trandar.com/wp-content/uploads/2021/05/HASPUserSetup-1.zip" class="text-primary">HASPUserSetup.exe</a> file from the Trandar website to manually install the driver.
+    </li>
+    <li>
+        Go to the INSUL website to download the latest version of the installation file by clicking <a href="https://www.trandar.com/wp-content/uploads/2021/05/Update90r23.zip" class="text-primary">download Version INSUL 9.0</a>
+    </li>
+    <li>
+        Read the instructions on the website and double-click the "Setup.exe" file to begin the installation.
+    </li>
+</ol>
 </div>
 
 <?php include 'template/footer.php'?>
