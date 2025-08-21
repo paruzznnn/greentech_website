@@ -1,6 +1,11 @@
 <?php
 
-function updateData(mysqli $conn, string $table_name, array $data, array $conditions): bool {
+function updateData(
+    mysqli $conn,
+    string $table_name,
+    array $data,
+    array $conditions
+): bool {
     if (empty($data) || empty($conditions)) {
         return false;
     }
@@ -49,7 +54,6 @@ function updateData(mysqli $conn, string $table_name, array $data, array $condit
     return $result;
 }
 
-// อัปเดตข้อมูลของผู้ใช้ที่มีอีเมลเป็น jane.doe@example.com
 // $data_to_update = [
 //     'name' => 'Jane D.',
 //     'age' => 29
@@ -64,5 +68,3 @@ function updateData(mysqli $conn, string $table_name, array $data, array $condit
 // } else {
 //     echo "Failed to update user.";
 // }
-
-?>

@@ -349,20 +349,17 @@
     const breadcrumbList = document.getElementById('breadcrumb-list');
     const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
 
-    //ตรวจสอบว่าอยู่หน้าแรก (แค่ newstore หรือ trandar_website/newstore)
     const isHomePage = (
-      pathSegments.length === 1 && pathSegments[0] === 'newstore' ||
-      pathSegments.length === 2 && pathSegments.includes('trandar_website') && pathSegments.includes('newstore')
+      pathSegments.length === 1 && pathSegments[0] === 'store' ||
+      pathSegments.length === 2 && pathSegments.includes('trandar_website') && pathSegments.includes('store')
     );
 
     if (isHomePage) {
-      //อยู่หน้าแรก ไม่ต้องแสดง breadcrumb
       return;
     }
 
-    //กรอง path segment ที่ไม่ต้องการแสดงใน breadcrumb
     const filteredSegments = pathSegments.filter(
-      segment => segment !== 'trandar_website' && segment !== 'newstore'
+      segment => segment !== 'trandar_website' && segment !== 'store'
     );
 
     function createBreadcrumbItem(text, url = null, isLast = false) {
@@ -370,7 +367,7 @@
       li.className = 'flex items-center';
 
       let link = '';
-      if (url === "/newstore") {
+      if (url === "/store") {
         link = pathConfig.BASE_WEB;
       } else {
         link =  pathConfig.BASE_WEB + url;
@@ -400,7 +397,7 @@
     }
 
     breadcrumbList.appendChild(
-      createBreadcrumbItem('home', '/newstore', false)
+      createBreadcrumbItem('home', '/store', false)
     );
 
     let currentPath = '';

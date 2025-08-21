@@ -69,13 +69,10 @@ function handleChangeSync($apiGetData) {
 
 function insertPhotoDetail($stmt, $apiGetData, $matID) {
     global $conn;
-
     if(empty($apiGetData)){
         return;
     }
     $photos = json_decode($apiGetData['product_item'], true);
-
-    // ตรวจสอบว่ามี photo_id นี้อยู่หรือยัง
     $checkSql = "SELECT id FROM `ecm_product_photos` WHERE material_id = ?";
     $stmt = $conn->prepare($checkSql);
     $stmt->bind_param('s', $matID);
@@ -83,23 +80,19 @@ function insertPhotoDetail($stmt, $apiGetData, $matID) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // ลบรายการเดิมก่อน
         $deleteSql = "DELETE FROM `ecm_product_photos` WHERE material_id = ?";
         $deleteStmt = $conn->prepare($deleteSql);
         $deleteStmt->bind_param('s', $matID);
         $deleteStmt->execute();
     }
 
-    // Insert รูปใหม่ทั้งหมด
     $insertSql = "INSERT INTO `ecm_product_photos` (photo_id, material_id, comp_id, pic_url) VALUES (?, ?, ?, ?)";
     $insertStmt = $conn->prepare($insertSql);
 
     foreach ($photos as $key => $photo) {
-
         $photo_id = $photo['photo_id'];
         $attachment_url = $photo['attachment_url'];
         $company_id = $photo['company_id'];
-
         $insertStmt->bind_param('ssss', $photo_id, $matID, $attachment_url, $company_id);
         $insertStmt->execute();
     }
@@ -323,7 +316,7 @@ function handleGetTms($apiGetData){
             'status' => 'error',
             'message' => 'Price or Shipping ID cannot be null.'
         ]);
-        return; // หรือหยุดการทำงาน
+        return;
     }
 
 
@@ -337,13 +330,6 @@ function handleGetTms($apiGetData){
     );
 
     if ($stmt->execute()) {
-
-        // $sql = "SELECT sync_status FROM `ecm_product` WHERE material_id = ?";
-        // $stmt = $conn->prepare($sql);
-        // $stmt->bind_param('s', $matID);
-        // $stmt->execute();
-        // $result = $stmt->get_result();
-        // $updatedData = $result->fetch_assoc();
         
         echo json_encode([
             'status' => 'success',
@@ -384,19 +370,16 @@ function handleGetDelOrder($apiGetData){
         throw new Exception("Prepare statement failed: " . $conn->error);
     }
 
-    // Bind parameters and execute the update
     $stmt->bind_param("ii", $status_del, $order_id);
     if (!$stmt->execute()) {
         throw new Exception("Execute statement failed: " . $stmt->error);
     }
 
-    // Prepare statement to select products from the updated order
     $stmt = $conn->prepare("SELECT pro_id, quantity FROM ecm_orders WHERE order_id = ?");
     if (!$stmt) {
         throw new Exception("Prepare statement failed: " . $conn->error);
     }
 
-    // Bind the order_id and execute the selection
     $stmt->bind_param("i", $order_id);
     if (!$stmt->execute()) {
         throw new Exception("Execute statement failed: " . $stmt->error);
@@ -405,22 +388,18 @@ function handleGetDelOrder($apiGetData){
     $result = $stmt->get_result();
     $data = $result->fetch_all(MYSQLI_ASSOC);
 
-    // Loop through each item and update the product stock
     foreach ($data as $item) {
-        // Prepare statement for stock update
         $sqlUpdate = "UPDATE ecm_product SET stock = stock + ? WHERE material_id = ?";
         $updateStmt = $conn->prepare($sqlUpdate);
         if (!$updateStmt) {
             throw new Exception("Prepare update statement failed: " . $conn->error);
         }
 
-        // Bind parameters for stock update
         $updateStmt->bind_param("is", $item['quantity'], $item['pro_id']);
         if (!$updateStmt->execute()) {
             throw new Exception("Execute update statement failed: " . $updateStmt->error);
         }
         
-        // Close the update statement
         $updateStmt->close();
     }
 
@@ -459,13 +438,6 @@ function handleGetReOrder($apiGetData){
     );
 
     if ($stmt->execute()) {
-
-        // $sql = "SELECT sync_status FROM `ecm_product` WHERE material_id = ?";
-        // $stmt = $conn->prepare($sql);
-        // $stmt->bind_param('s', $matID);
-        // $stmt->execute();
-        // $result = $stmt->get_result();
-        // $updatedData = $result->fetch_assoc();
         
         echo json_encode([
             'status' => 'success',
