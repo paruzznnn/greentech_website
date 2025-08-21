@@ -1,5 +1,9 @@
 <?php
-function insertData(mysqli $conn, string $table_name, array $data): bool {
+function insertData(
+    mysqli $conn,
+    string $table_name,
+    array $data
+): bool {
     if (empty($data)) {
         return false;
     }
@@ -37,7 +41,7 @@ function insertData(mysqli $conn, string $table_name, array $data): bool {
     $stmt->close();
     return $result;
 }
-// ข้อมูลที่ต้องการ insert (ในตาราง users)
+
 // $user_data = [
 //     'name' => 'Jane Doe',
 //     'email' => 'jane.doe@example.com',
@@ -45,7 +49,6 @@ function insertData(mysqli $conn, string $table_name, array $data): bool {
 //     'created_at' => date('Y-m-d H:i:s')
 // ];
 
-// เรียกใช้ฟังก์ชัน insertData
 // if (insertData($conn, 'users', $user_data)) {
 //     echo "Data inserted successfully!";
 // } else {

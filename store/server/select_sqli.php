@@ -169,19 +169,18 @@ function selectComplexData(
 
 // $columns = "users.name AS user_name, users.email, orders.order_date, order_items.product_name, order_items.quantity";
 
-// // เงื่อนไข: เฉพาะผู้ใช้ที่อีเมล = ...
 // $conditions = [
 //     'users.email' => 'jane.doe@example.com'
 // ];
 
 // $data = selectComplexData(
-//     $conn,
-//     'users',       // base table
-//     $joins,
-//     $columns,
-//     $conditions,
-//     'orders.order_date DESC', // ORDER BY
-//     '10'                     // LIMIT
+// $conn,
+// 'users',       // base table
+// $joins,
+// $columns,
+// $conditions,
+// 'orders.order_date DESC', // ORDER BY
+// '10'                     // LIMIT
 // );
 
 // echo "<h3>Order Summary:</h3>";
