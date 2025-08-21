@@ -170,17 +170,26 @@
             import(`${baseWeb}js/payment/paymentRender.js?v=${timeVersion}`)
         ])
         .then(async ([formModule, paymentModule]) => {
+
+            const { handleFormSubmit } = formModule;
+            const { 
+                fetchAddressData, 
+                fetchProvincesData,
+                fetchDistrictsData,
+                fetchSubdistricts,
+                CheckoutUI
+            } = paymentModule;
             
             const formOrder = document.querySelector("#formOrder");
-            formOrder?.addEventListener("submit", formModule.handleFormSubmit);
+            formOrder?.addEventListener("submit", handleFormSubmit);
 
-            const address = await paymentModule.fetchAddressData("getAddress", baseWeb + 'service/payment/address-data.php?');
-            const provinces = await paymentModule.fetchProvincesData(baseWeb + 'locales/provinces.json');
-            const districts = await paymentModule.fetchDistrictsData(baseWeb + 'locales/districts.json');
-            const subdistricts = await paymentModule.fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+            const address = await fetchAddressData("getAddress", baseWeb + 'service/payment/address-data.php?');
+            const provinces = await fetchProvincesData(baseWeb + 'locales/provinces.json');
+            const districts = await fetchDistrictsData(baseWeb + 'locales/districts.json');
+            const subdistricts = await fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
             const service = pathConfig.BASE_WEB + 'service/payment/payment-data.php';
 
-            paymentModule.CheckoutUI.init(
+            CheckoutUI.init(
                 provinces,
                 districts,
                 subdistricts,

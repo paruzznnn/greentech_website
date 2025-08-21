@@ -81,10 +81,10 @@ if ($action == 'getOrdersItems') {
         $products = [];
         foreach ($subItems as $items) {
             $products[] = [
-                'name' => $items['product_name'] ?? '',
+                'product_name' => $items['product_name'] ?? '',
                 'quantity' => $items['quantity'] ?? 0,
                 'price' => $items['price'] ?? 0,
-                'imageUrl' => $items['product_pic'] ?? ''
+                'product_pic' => $items['product_pic'] ?? ''
             ];
         }
 
@@ -95,9 +95,14 @@ if ($action == 'getOrdersItems') {
         (double)($item['discount_amount'] ?? 0);
 
         $data[] = [
-            'id' => $orderId,
-            'date' => $item['created_at'],
+            'order_id' => $orderId,
+            'order_code' => $item['order_code'],
+            'sub_total' => $item['sub_total'],
+            'vat_amount' => $item['vat_amount'],
+            'shipping_amount' => $item['shipping_amount'],
+            'discount_amount' => $item['discount_amount'],
             'total' => $total_price,
+            'created_at' => $item['created_at'],
             'status' => convertOrderStatus($item['status']),
             'items' => $products
         ];

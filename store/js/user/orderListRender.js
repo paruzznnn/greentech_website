@@ -1,8 +1,9 @@
+import { formatPrice } from '../formatHandler.js';
+
 export async function fetchOrders(req, call) {
     try {
         const params = new URLSearchParams({ action: req });
         const url = call + params.toString();
-
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -10,14 +11,11 @@ export async function fetchOrders(req, call) {
                 'Content-Type': 'application/json'
             }
         });
-
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const result = await response.json();
         return result.data || [];
-
     } catch (error) {
         console.error('Fetch error:', error);
         return [];
@@ -67,21 +65,43 @@ export const OrderListUI = {
     //===== template literals ==========
     createOrderCard(order) {
         const mainItem = order.items[0];
-
         const moreItemsText = order.items.length > 1
-            ? `<p class="more-items-text">และสินค้าอื่นๆ อีก ${order.items.length - 1} ชิ้น</p>`
+            ? `<p class="more-items-text">และสินค้าอื่นๆ</p>`
             : '';
 
-        const itemDetailsHTML = order.items.map(item => `
+        const maxItemsToShow = 3;
+        const visibleItems = order.items.slice(0, maxItemsToShow);
+        const hiddenItems = order.items.slice(maxItemsToShow);
+
+        let itemDetailsHTML = visibleItems.map(item => `
             <div class="item-detail">
-                <img src="${item.imageUrl}" alt="${item.name}">
+                <img src="${item.product_pic}" alt="${item.product_name}">
                 <div class="item-detail-info">
-                    <p>${item.name}</p>
-                    <p>จำนวน: ${item.quantity} x ฿${item.price.toFixed(2)}</p>
+                    <p>${item.product_name}</p>
+                    <p>จำนวน: ${item.quantity} x ${formatPrice("THB", parseFloat(item.price))}</p>
                 </div>
-                <p class="item-detail-price">฿${(item.quantity * item.price).toFixed(2)}</p>
+                <p class="item-detail-price">${formatPrice("THB", item.quantity * item.price)}</p>
             </div>
         `).join('');
+
+        // hidden
+        if (hiddenItems.length > 0) {
+            itemDetailsHTML += `
+                <div class="see-more">ดูเพิ่มเติม...</div>
+                <div class="hidden-items" style="display: none;">
+                    ${hiddenItems.map(item => `
+                        <div class="item-detail">
+                            <img src="${item.product_pic}" alt="${item.product_name}">
+                            <div class="item-detail-info">
+                                <p>${item.product_name}</p>
+                                <p>จำนวน: ${item.quantity} x ${formatPrice("THB", parseFloat(item.price))}</p>
+                            </div>
+                            <p class="item-detail-price">${formatPrice("THB", item.quantity * item.price)}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
 
         let primaryActionLabel = '';
         if (order.status === 'Delivered') {
@@ -93,59 +113,70 @@ export const OrderListUI = {
         }
 
         const cardHTML = `
-        <div class="order-card" data-order-id="${order.id}">
-            <div class="order-card-header">
-                <p>หมายเลขคำสั่งซื้อ: <span>${order.id}</span></p>
-                <span class="status-badge status-${order.status}">
-                    ${this.getThaiStatus(order.status)}
-                </span>
-            </div>
+            <div class="order-card" data-order-id="${order.order_id}">
+                <div class="order-card-header">
+                    <p>หมายเลขคำสั่งซื้อ: <span>${order.order_code}</span></p>
+                    <span class="status-badge status-${order.status}">
+                        ${this.getThaiStatus(order.status)}
+                    </span>
+                </div>
 
-            <div class="main-items-display">
-                <div class="item-summary">
-                    <img src="${mainItem.imageUrl}" alt="${mainItem.name}">
-                    <div class="item-info">
-                        <p>${mainItem.name}</p>
-                        <p>จำนวน: ${mainItem.quantity}</p>
-                        <p>ราคา: ฿${mainItem.price.toFixed(2)}</p>
+                <div class="main-items-display">
+                    <div class="item-summary">
+                        <img src="${mainItem.product_pic}" alt="${mainItem.product_name}">
+                        <div class="item-info">
+                            <p>${mainItem.product_name}</p>
+                            <p>จำนวน: ${mainItem.quantity}</p>
+                            <p>ราคา: ${formatPrice("THB", parseFloat(mainItem.price))}</p>
+                        </div>
+                        <p class="item-total-price">${formatPrice("THB", mainItem.quantity * mainItem.price)}</p>
                     </div>
-                    <p class="item-total-price">฿${(mainItem.quantity * mainItem.price).toFixed(2)}</p>
+                    ${moreItemsText}
                 </div>
-                ${moreItemsText}
-            </div>
 
-            <div id="details-${order.id}" class="order-items-details">
-                ${itemDetailsHTML}
-            </div>
+                <div id="details-${order.order_id}" class="order-items-details">
+                    ${itemDetailsHTML}
+                </div>
 
-            <div class="order-card-footer">
-                <div class="order-summary-info">
-                    <p>วันที่สั่งซื้อ: <span>${order.date}</span></p>
-                    <p>ยอดรวม: <span>฿${order.total.toFixed(2)}</span></p>
-                </div>
-                <div class="action-buttons">
-                    <button class="toggle-details-button" data-target="${order.id}">ดูรายละเอียดทั้งหมด</button>
-                    <button class="primary-action-button">${primaryActionLabel}</button>
+                <div class="order-card-footer">
+                    <div class="order-summary-info">
+                        <p>วันที่สั่งซื้อ: <span>${order.created_at}</span></p>
+                        <p>ยอดรวม: <span>${formatPrice("THB", parseFloat(order.total))}</span></p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="toggle-details-button" data-target="${order.order_id}">ดูรายละเอียดทั้งหมด</button>
+                        <button class="primary-action-button">${primaryActionLabel}</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
 
         const wrapper = document.createElement('div');
         wrapper.innerHTML = cardHTML;
-
         const cardElement = wrapper.firstElementChild;
-
         const toggleButton = cardElement.querySelector('.toggle-details-button');
         toggleButton.addEventListener('click', () => {
-            const detail = cardElement.querySelector(`#details-${order.id}`);
+            const detail = cardElement.querySelector(`#details-${order.order_id}`);
             detail.classList.toggle('open');
             toggleButton.textContent = detail.classList.contains('open') ? 'ซ่อนรายละเอียด' : 'ดูรายละเอียดทั้งหมด';
         });
 
+        cardElement.querySelectorAll('.see-more').forEach(button => {
+            button.addEventListener('click', () => {
+                const hiddenSection = button.nextElementSibling;
+                if (hiddenSection.style.display === "none") {
+                    hiddenSection.style.display = "block";
+                    button.textContent = "แสดงน้อยลง...";
+                } else {
+                    hiddenSection.style.display = "none";
+                    button.textContent = "ดูเพิ่มเติม...";
+                }
+            });
+        });
+
         const primaryButton = cardElement.querySelector('.primary-action-button');
         primaryButton.addEventListener('click', () => {
-            alert(`คุณต้องการ ${primaryButton.textContent} สำหรับคำสั่งซื้อ ${order.id} ใช่หรือไม่?`);
+            alert(`คุณต้องการ ${primaryButton.textContent} สำหรับคำสั่งซื้อ ${order.order_id} ใช่หรือไม่?`);
         });
 
         return cardElement;

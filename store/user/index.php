@@ -32,18 +32,18 @@
                     <div class="profile-layout">
                         <div class="sidebar">
                             <ul id="profileMenu">
-                                <!-- <li data-tab="info">
+                                <li data-tab="info">
                                     <span><i class="bi bi-person-gear"></i> บัญชีของฉัน</span>
-                                </li> -->
+                                </li>
                                 <!-- <li data-tab="payment">
                                     <span><i class="bi bi-cash-coin"></i>ชำระเงิน</span>
                                 </li> -->
                                 <li class="active" data-tab="orders">
                                     <span><i class="bi bi-tag"></i> รายการสั่งซื้อ</span>
                                 </li>
-                                <!-- <li data-tab="addresses">
+                                <li data-tab="addresses">
                                     <span><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</span>
-                                </li> -->
+                                </li>
                                 <li data-tab="wishlist">
                                     <span><i class="bi bi-heart"></i> สินค้าที่ถูกใจ</span>
                                 </li>
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                             <!-- <div class="tabContent" id="payment">
-                            </div>
+                            </div> -->
                             <div class="tabContent" id="addresses">
                                 <div class="main-container">
                                     <form id="shippingAddressForm" class="mb-4">
@@ -90,7 +90,7 @@
                                         <button id="copyAllAddressesBtn" class="btn btn-secondary mt-3 ms-0">คัดลอกที่อยู่ทั้งหมด</button>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
                             <div class="tabContent" id="wishlist">
                                 <div class="main-container">
                                     <div id="likedProductsGrid" class="products-grid"></div>
@@ -121,7 +121,7 @@
                                 </div>
                             </div> -->
 
-                            <!-- <div class="tabContent" id="info">
+                            <div class="tabContent" id="info">
                                 <div class="profile-card">
                                     <div class="profile-header-section">
                                         <div class="profile-picture-container">
@@ -179,7 +179,7 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div> -->
+                            </div>
                             <div class="tabContent" id="logout">
                                 <!-- <h2>Logout</h2>
                                 <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
@@ -199,14 +199,43 @@
         const baseWeb = `${pathConfig.BASE_WEB}`;
 
         Promise.all([
+            import(`${baseWeb}js/user/userRender.js?v=${timeVersion}`),
+            import(`${baseWeb}js/user/addressRender.js?v=${timeVersion}`),
             import(`${baseWeb}js/user/menuBuilder.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/orderListRender.js?v=${timeVersion}`)
+            import(`${baseWeb}js/user/orderListRender.js?v=${timeVersion}`),
+            import(`${baseWeb}js/user/wishlistRender.js?v=${timeVersion}`),
+            import(`${baseWeb}js/user/cartRender.js?v=${timeVersion}`)
         ])
-        .then(async ([menuBuilderModule, orderListModule]) => {
+        .then(async (
+            [
+                profileModule,
+                addressModule,
+                menuBuilderModule, 
+                orderListModule, 
+                wishlistModule, 
+                cartModule
+            ]
+        ) => {
+            const { setupProfileImageUpload } = profileModule;
+            const { createAddressCard } = addressModule;
             const { setupTabs } = menuBuilderModule;
             const { fetchOrders, OrderListUI } = orderListModule;
-            setupTabs();
+            const { LikedProducts } = wishlistModule;
+            const { ShoppingCart } = cartModule;
 
+            //===== Profile ==================================
+            // document.addEventListener('DOMContentLoaded', () => {
+            setupProfileImageUpload();
+            // });
+
+            //===== Address ==================================
+            document.getElementById('addAddressCardBtn').addEventListener('click', () => {
+                createAddressCard();
+            });
+            createAddressCard();
+
+            //===== Order List ==================================
+            setupTabs();
             const service = baseWeb + 'service/user/user-data.php?';
             const orders = await fetchOrders("getOrdersItems", service);
             OrderListUI.displayTabOrders('tab-order-list');
@@ -225,68 +254,18 @@
             tabButtonsHandler();
             OrderListUI.displayOrders('All', 'orders-list', orders);
 
+            //===== Cart ==================================
+            window.ShoppingCart = ShoppingCart;
+            ShoppingCart.init(baseWeb);
+
+            //===== Like ==================================
+            LikedProducts.init();
+            LikedProducts.renderProducts(ShoppingCart);
+
         })
         .catch((e) => console.error("Module import failed", e));
     </script>
 
-    <!-- OrderListUI.init(
-    orders
-    ); -->
-    <!-- <script type="module">
-        const base = pathConfig.BASE_WEB;
-        const timestamp = <?= time() ?>;
-        Promise.all([
-                import(`${base}js/user/menuBuilder.js?v=${timestamp}`),
-                import(`${base}js/user/orderListRender.js?v=${timestamp}`),
-                import(`${base}js/user/wishlistRender.js?v=${timestamp}`),
-                import(`${base}js/user/cartRender.js?v=${timestamp}`)
-            ])
-            .then(async ([menuBuilder, orderListRender, wishlistRender, cartRender]) => {
-                const { setupTabs } = menuBuilder;
-                const { fetchOrders, displayOrders, displayTabOrders } = orderListRender;
-                const { LikedProducts } = wishlistRender;
-                const { ShoppingCart } = cartRender;
-                window.ShoppingCart = ShoppingCart;
-                const service = base + 'service/user/user-data.php?';
-                setupTabs();
-                displayTabOrders('tab-order-list');
-                let orders = await fetchOrders("getOrdersItems", service);
-                const tabButtonsHandler = () => {
-                    const tabButtons = document.querySelectorAll('.tab-button');
-                    tabButtons.forEach(button => {
-                        button.addEventListener('click', (event) => {
-                            tabButtons.forEach(btn => btn.classList.remove('active'));
-                            event.currentTarget.classList.add('active');
-                            const selectedStatus = event.currentTarget.dataset.status;
-                            displayOrders(selectedStatus, 'orders-list', orders);
-                        });
-                    });
-                };
-                tabButtonsHandler();
-                displayOrders('All', 'orders-list', orders);
-                ShoppingCart.init(base);
-                LikedProducts.init();
-                LikedProducts.renderProducts(ShoppingCart);
-            })
-            .catch((e) => {
-                console.error("One or more module imports failed", e);
-            });
-    </script> -->
-
-    <!-- <script type="module">
-        import { setupProfileImageUpload } from '../js/user/userRender.js?v=<?php echo time() ?>';
-        document.addEventListener('DOMContentLoaded', () => {
-            setupProfileImageUpload();
-        });
-    </script> -->
-
-    <!-- <script type="module">
-        import { createAddressCard } from '../js/user/addressRender.js?v=<?php echo time() ?>';
-        document.getElementById('addAddressCardBtn').addEventListener('click', () => {
-            createAddressCard();
-        });
-        createAddressCard();
-    </script> -->
 
     <!-- <script>
         const initialMyCouponsData = [{
