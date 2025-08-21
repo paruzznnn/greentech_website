@@ -194,27 +194,45 @@
     </main>
     <?php include '../template/footer-bar.php'; ?>
 
-    <!-- <script type="module">
+    <script type="module">
         const timeVersion = "<?= time() ?>";
         const baseWeb = `${pathConfig.BASE_WEB}`;
 
         Promise.all([
-            import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
+            import(`${baseWeb}js/user/menuBuilder.js?v=${timeVersion}`),
             import(`${baseWeb}js/user/orderListRender.js?v=${timeVersion}`)
         ])
-        .then(async ([formModule, orderListModule]) => {
+        .then(async ([menuBuilderModule, orderListModule]) => {
+            const { setupTabs } = menuBuilderModule;
+            const { fetchOrders, OrderListUI } = orderListModule;
+            setupTabs();
 
             const service = baseWeb + 'service/user/user-data.php?';
-            const orders = await orderListModule.fetchOrders("getOrdersItems", service);
-            orderListModule.OrderListUI.init(
-                orders
-            );
-            
+            const orders = await fetchOrders("getOrdersItems", service);
+            OrderListUI.displayTabOrders('tab-order-list');
+
+            const tabButtonsHandler = () => {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        event.currentTarget.classList.add('active');
+                        const selectedStatus = event.currentTarget.dataset.status;
+                        OrderListUI.displayOrders(selectedStatus, 'orders-list', orders);
+                    });
+                });
+            };
+            tabButtonsHandler();
+            OrderListUI.displayOrders('All', 'orders-list', orders);
+
         })
         .catch((e) => console.error("Module import failed", e));
-    </script> -->
+    </script>
 
-    <script type="module">
+    <!-- OrderListUI.init(
+    orders
+    ); -->
+    <!-- <script type="module">
         const base = pathConfig.BASE_WEB;
         const timestamp = <?= time() ?>;
         Promise.all([
@@ -253,7 +271,7 @@
             .catch((e) => {
                 console.error("One or more module imports failed", e);
             });
-    </script>
+    </script> -->
 
     <!-- <script type="module">
         import { setupProfileImageUpload } from '../js/user/userRender.js?v=<?php echo time() ?>';

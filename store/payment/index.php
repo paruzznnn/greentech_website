@@ -22,6 +22,11 @@
                     <form id="formOrder" data-url="<?php echo $BASE_WEB ?>service/payment/payment-data.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="pay">
                         <input type="text" name="action" value="payOrder" hidden>
                         <input type="text" name="order_id" id="order_id" value="" hidden>
+
+                        <input type="text" name="province_name" id="province_name" value="" hidden>
+                        <input type="text" name="district_name" id="district_name" value="" hidden>
+                        <input type="text" name="subdistrict_name" id="subdistrict_name" value="" hidden>
+
                         <div class="row">
 
                             <div class="col-md-6 col-sm-12">

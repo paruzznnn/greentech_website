@@ -1,4 +1,5 @@
-import { redirectGet, showNotification, formatPrice } from './formHandler.js';
+import { redirectGet, showNotification } from './formHandler.js';
+import { formatPrice } from './formatHandler.js';
 
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
