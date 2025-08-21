@@ -269,6 +269,16 @@ Responsive Styles
   font-weight: 600;
 }
 
+.see-more {
+    color: blue;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.hidden-items {
+    margin-top: 10px;
+}
+
 .order-card {
   background-color: #ffffff;
   padding: 1.25rem;
@@ -308,8 +318,8 @@ Responsive Styles
 }
 
 .item-summary img {
-  width: 5rem;
-  height: 5rem;
+  width: 8rem;
+  height: 8rem;
   object-fit: cover;
   border-radius: 0.5rem;
   border: 1px solid #e5e7eb;
@@ -392,9 +402,9 @@ Responsive Styles
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  /* border-top: 1px solid #e5e7eb; */
 }
 
 @media (min-width: 768px) {

@@ -38,8 +38,16 @@ if ($dataJson == null) {
 }
 $action = $dataJson['action'];
 $userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
+$timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
+$dateNow = date('Y-m-d H:i:s');
 
-if($action == 'getQRPromptPay'){
+// echo '<pre>';
+// print_r($_SESSION);
+// print_r($dataJson);
+// echo '</pre>';
+// exit;
+
+if ($action == 'getQRPromptPay') {
     $PromptPayQR = new PromptPayQR();
     $PromptPayQR->size = 8;
     $PromptPayQR->id = $dataJson['phone'];
@@ -51,7 +59,6 @@ if($action == 'getQRPromptPay'){
     http_response_code(200);
     echo json_encode($response);
     exit;
-
 } else if ($action == 'payOrder') {
 
     $order_code = isset($dataJson['order_id']) ? (string) $dataJson['order_id'] : '';
@@ -61,10 +68,15 @@ if($action == 'getQRPromptPay'){
     $phone_number = isset($dataJson['phone_number']) ? (string) $dataJson['phone_number'] : '';
     $address_detail = isset($dataJson['address_detail']) ? (string) $dataJson['address_detail'] : '';
 
+    $province_name = isset($dataJson['province_name']) ? (string) $dataJson['province_name'] : '';
+    $district_name = isset($dataJson['district_name']) ? (string) $dataJson['district_name'] : '';
+    $subdistrict_name = isset($dataJson['subdistrict_name']) ? (string) $dataJson['subdistrict_name'] : '';
+
     $province = isset($dataJson['province']) ? (int) $dataJson['province'] : '';
     $district = isset($dataJson['district']) ? (int) $dataJson['district'] : '';
     $subdistrict = isset($dataJson['subdistrict']) ? (int) $dataJson['subdistrict'] : '';
     $postalCode = isset($dataJson['postalCode']) ? (string) $dataJson['postalCode'] : '';
+
     $payment_method = isset($dataJson['payment_method']) ? (string) $dataJson['payment_method'] : '';
 
     $product_items = isset($dataJson['product_item']) ? json_decode($dataJson['product_item'], true) : null;
@@ -78,75 +90,94 @@ if($action == 'getQRPromptPay'){
     $discount_amount = isset($dataJson['discount_amount']) ? (float) $dataJson['discount_amount'] : 0;
     $total_amount = isset($dataJson['total_amount']) ? (float) $dataJson['total_amount'] : 0;
 
-    // switch ($payment_method) {
-    //     case 'bank_transfer':
-    //         $payMethod = 1;
-    //         break;
-    //     case 'promptpay':
-    //         $payMethod = 2;
-    //         break;
-    //     default:
-    //         $payMethod = 0;
-    //         break;
-    // }
-
-    // switch ($delivery_option) {
-    //     case 'shipping':
-    //         $deliveryMethod = 1;
-    //         break;
-    //     case 'pickup':
-    //         $deliveryMethod = 2;
-    //         break;
-    //     default:
-    //         $deliveryMethod = 0;
-    //         break;
-    // }
-
-    // $orderKey = time();
-    // $dateNow = date('Y-m-d H:i:s');
-    // $insdata = [
-    //     'member_id' => $userId,
-    //     'order_id' => $orderKey,
-    //     'order_code' => $order_code,
-    //     'payment_method' => $payMethod,
-    //     'sub_total' => $sub_total,
-    //     'vat_amount' => $vat_amount,
-    //     'shipping_amount' => $shipping_amount,
-    //     'discount_amount' => $discount_amount,
-    //     'delivery_method' => $deliveryMethod,
-    //     'created_at' => $dateNow
-    // ];
-    // if (insertData($conn_cloudpanel, 'ecm_orders', $insdata)) {
-    //     $checkIns = true;
-    //     foreach ($product_items as $item) {
-    //         $product_id = (int)$item['id'];
-    //         $name = $item['name'];
-    //         $price = (float)$item['price'];
-    //         $quantity = (int)$item['quantity'];
-    //         $image = $item['imageUrl'];
-    //         $totalPrice = $price * $quantity;
-    //         $ins_data = [
-    //             'member_id' => $userId,
-    //             'order_id' => $orderKey,
-    //             'order_code' => $order_code,
-    //             'product_id' => $product_id,
-    //             'product_pic' => $image,
-    //             'price' => $price,
-    //             'quantity' => $quantity,
-    //             'total_price' => $totalPrice,
-    //             'currency' => "THB"
-    //         ];
-    //         insertData($conn_cloudpanel, 'ecm_orders_detail', $ins_data);
-    //     }
-    // } else {
-    //     $checkIns = false;
-    // }
-
-    $response = [
-        // "status" => $checkIns
-        "status" => true
+    switch ($payment_method) {
+        case 'bank_transfer':
+            $payMethod = 1;
+            break;
+        case 'promptpay':
+            $payMethod = 2;
+            break;
+        default:
+            $payMethod = 0;
+            break;
+    }
+    switch ($delivery_option) {
+        case 'shipping':
+            $deliveryMethod = 1;
+            break;
+        case 'pickup':
+            $deliveryMethod = 2;
+            break;
+        default:
+            $deliveryMethod = 0;
+            break;
+    }
+    $orderKey = time();
+    $order_data = [
+        'member_id' => $userId,
+        'order_id' => $orderKey,
+        'order_code' => $order_code,
+        'payment_method' => $payMethod,
+        'sub_total' => $sub_total,
+        'vat_amount' => $vat_amount,
+        'shipping_amount' => $shipping_amount,
+        'discount_amount' => $discount_amount,
+        'delivery_method' => $deliveryMethod,
+        'timezone' => $timeZone,
+        'created_at' => $dateNow
     ];
 
+    if (insertData($conn_cloudpanel, 'ecm_orders', $order_data)) {
+        $checkIns = true;
+        foreach ($product_items as $item) {
+            $product_id = (int)$item['id'];
+            $product_name = $item['name'];
+            $price = (float)$item['price'];
+            $quantity = (int)$item['quantity'];
+            $image = $item['imageUrl'];
+            $totalPrice = $price * $quantity;
+            $product_data = [
+                'member_id' => $userId,
+                'order_id' => $orderKey,
+                'order_code' => $order_code,
+                'product_id' => $product_id,
+                'product_name' => $product_name,
+                'product_pic' => $image,
+                'price' => $price,
+                'quantity' => $quantity,
+                'total_price' => $totalPrice,
+                'timezone' => $timeZone,
+                'created_at' => $dateNow
+            ];
+            insertData($conn_cloudpanel, 'ecm_orders_detail', $product_data);
+        }
+
+        $shipping_data = [
+            'member_id' => $userId,
+            'order_id' => $orderKey,
+            'order_code' => $order_code,
+            'full_name' => $full_name,
+            'phone_number' => $phone_number,
+            'address_detail' => $address_detail,
+            'province_code' => $province,
+            'province_name' => $province_name,
+            'district_code' => $district,
+            'district_name' => $district_name,
+            'subdistrict_code' => $subdistrict,
+            'subdistrict_name' => $subdistrict_name,
+            'post_code' => $postalCode,
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_shipping', $shipping_data);
+        
+    } else {
+        $checkIns = false;
+    }
+
+    $response = [
+        "status" => $checkIns
+    ];
     http_response_code(200);
     echo json_encode($response);
     $conn_cloudpanel->close();

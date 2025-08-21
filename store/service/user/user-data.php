@@ -28,141 +28,85 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
+
+// echo '<pre>';
+// print_r($_SESSION);
+// print_r($_GET);
+// echo '</pre>';
+// exit;
+
+function convertOrderStatus($status){
+    switch ($status) {
+        case '0': return 'Pending';
+        case '1': return 'Shipped';
+        case '2': return 'Delivered';
+        case '3': return 'Cancelled';
+        case '4': return 'Finished';
+        case '5': return 'Return';
+        default: return $status;
+    }
+}
+
 if ($action == 'getOrdersItems') {
 
-    $data = [
+    $data = [];
+    $conditionsMain = [
         [
-            'id' => 'ORD001',
-            'date' => '2023-07-20',
-            'total' => 1250.00,
-            'status' => 'Delivered',
-            'items' => [
-                [
-                    'name' => 'Trandar Mineral Fiber AMF',
-                    'quantity' => 2,
-                    'price' => 300,
-                    'imageUrl' => 'https://www.trandar.com//public/shop_img/6883336b6606d_______________________AMF-_________.jpg'
-                ],
-                [
-                    'name' => 'Trandar AMF Mercure',
-                    'quantity' => 1,
-                    'price' => 650,
-                    'imageUrl' => 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
-                ]
-            ]
-        ],
-        [
-            'id' => 'ORD002',
-            'date' => '2023-07-22',
-            'total' => 899.50,
-            'status' => 'Shipped',
-            'items' => [
-                [
-                    'name' => 'Trandar AMF Fine Fresko',
-                    'quantity' => 1,
-                    'price' => 899.50,
-                    'imageUrl' => 'https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg'
-                ]
-            ]
-        ],
-        [
-            'id' => 'ORD003',
-            'date' => '2023-07-25',
-            'total' => 500.00,
-            'status' => 'Pending',
-            'items' => [
-                [
-                    'name' => 'Trandar AMF Star',
-                    'quantity' => 2,
-                    'price' => 250,
-                    'imageUrl' => 'https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg'
-                ]
-            ]
-        ],
-        [
-            'id' => 'ORD004',
-            'date' => '2023-07-28',
-            'total' => 350.00,
-            'status' => 'Cancelled',
-            'items' => [
-                [
-                    'name' => 'Trandar T-Bar T15',
-                    'quantity' => 5,
-                    'price' => 70,
-                    'imageUrl' => 'https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg'
-                ]
-            ]
+            'column' => 'del',
+            'operator' => '=',
+            'value' => 0
         ]
     ];
+    $mainItems = selectData(
+        $conn_cloudpanel,
+        'ecm_orders',
+        $conditionsMain,
+        '*'
+    );
+    foreach ($mainItems as $item) {
+        $orderId = $item['order_id'];
+        $conditionsSub = [
+            [
+                'column' => 'order_id',
+                'operator' => '=',
+                'value' => $orderId
+            ]
+        ];
+        $subItems = selectData(
+            $conn_cloudpanel,
+            'ecm_orders_detail',
+            $conditionsSub,
+            '*'
+        );
+        $products = [];
+        foreach ($subItems as $items) {
+            $products[] = [
+                'product_name' => $items['product_name'] ?? '',
+                'quantity' => $items['quantity'] ?? 0,
+                'price' => $items['price'] ?? 0,
+                'product_pic' => $items['product_pic'] ?? ''
+            ];
+        }
 
-    // $conditions = [
-    //     [
-    //         'column' => 'is_del',
-    //         'operator' => '=',
-    //         'value' => 0
-    //     ]
-    // ];
+        $total_price = 
+        (double)($item['sub_total'] ?? 0) + 
+        (double)($item['vat_amount'] ?? 0) + 
+        (double)($item['shipping_amount'] ?? 0) - 
+        (double)($item['discount_amount'] ?? 0);
 
-    // $items = selectData(
-    //     $conn_cloudpanel,
-    //     'ecm_orders',
-    //     $conditions,
-    //     '*'
-    // );
-
-    //[
-    //         'id' => 'ORD001',
-    //         'date' => '2023-07-20',
-    //         'total' => 1250.00,
-    //         'status' => 'Delivered',
-    //         'items' => [
-    //             [
-    //                 'name' => 'Trandar Mineral Fiber AMF',
-    //                 'quantity' => 2,
-    //                 'price' => 300,
-    //                 'imageUrl' => 'https://www.trandar.com//public/shop_img/6883336b6606d_______________________AMF-_________.jpg'
-    //             ],
-    //             [
-    //                 'name' => 'Trandar AMF Mercure',
-    //                 'quantity' => 1,
-    //                 'price' => 650,
-    //                 'imageUrl' => 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
-    //             ]
-    //         ]
-    //     ],
-
-    // echo '<pre>';
-    // print_r($items);
-    // echo '</pre>';
-
-    // $data = [];
-    // $orderMap = [];
-
-    // foreach ($items as $item) {
-    //     $orderId = $item['order_id'];
-
-    //     $product = [
-    //         'name' => $item['product_name'] ?? '',
-    //         'quantity' => $item['quantity'] ?? 0,
-    //         'price' => $item['price'] ?? 0,
-    //         'imageUrl' => $item['image_url'] ?? ''
-    //     ];
-
-    //     if (isset($orderMap[$orderId])) {
-    //         $data[$orderMap[$orderId]]['items'][] = $product;
-    //     } else {
-    //         // ถ้ายังไม่มี order นี้ ให้สร้างใหม่
-    //         $data[] = [
-    //             'id' => $orderId,
-    //             'date' => $item['created_at'],
-    //             'total' => $item['total_price'],
-    //             'status' => $item['is_status'],
-    //             'items' => [$product]
-    //         ];
-    //         // เก็บ index ของ order นี้ใน map
-    //         $orderMap[$orderId] = array_key_last($data);
-    //     }
-    // }
+        $data[] = [
+            'order_id' => $orderId,
+            'order_code' => $item['order_code'],
+            'sub_total' => $item['sub_total'],
+            'vat_amount' => $item['vat_amount'],
+            'shipping_amount' => $item['shipping_amount'],
+            'discount_amount' => $item['discount_amount'],
+            'total' => $total_price,
+            'created_at' => $item['created_at'],
+            'status' => convertOrderStatus($item['status']),
+            'items' => $products
+        ];
+    }
 
     $response = [
         "data" => $data

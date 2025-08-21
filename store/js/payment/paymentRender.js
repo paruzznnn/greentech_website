@@ -1,5 +1,5 @@
 
-import { formatDateToYYYYMMDD, formatPrice } from '../formHandler.js';
+import { formatDateToYYYYMMDD, formatPrice } from '../formatHandler.js';
 
 export async function fetchAddressData(req, call) {
     try {
@@ -174,6 +174,11 @@ export const CheckoutUI = {
 
         selectedPaymentMethod: document.getElementById('selected-payment-method'),
         selectedDeliveryMethod: document.getElementById('selected-delivery-method'),
+
+        //====== Shipping Address =================================
+        selectedProvinceName: document.getElementById('province_name'),
+        selectedDistrictName: document.getElementById('district_name'),
+        selectedSubdistrictName: document.getElementById('subdistrict_name'),
 
         //====== Default Shipping Address =================================
         selectedFullname: null,
@@ -468,18 +473,24 @@ export const CheckoutUI = {
             if (province) {
                 this.selectors.selectedProvince.value = province.provinceCode;
                 this.provinceActive = province.provinceCode
+                const provinceName = this.lang === 'en' ? province.provinceNameEn : province.provinceNameTh;
+                this.selectors.selectedProvinceName.value = provinceName;
             }
             this.populateDistricts();
             const district = this.districtsData.find(d => d.districtCode == this.addressData.district_id);
             if (district) {
                 this.selectors.selectedDistrict.value = district.districtCode;
                 this.districtActive = district.districtCode;
+                const districtName = this.lang === 'en' ? district.districtNameEn : district.districtNameTh;
+                this.selectors.selectedDistrictName.value = districtName;
             }
             this.populateSubDistricts();
             const subdistrict = this.subdistrictsData.find(s => s.subdistrictCode == this.addressData.sub_district_id);
             if (subdistrict) {
                 this.selectors.selectedSubdistrict.value = subdistrict.subdistrictCode;
                 this.postalCodeActive = subdistrict.postalCode;
+                const subdistrictName = this.lang === 'en' ? subdistrict.subdistrictNameEn : subdistrict.subdistrictNameTh;
+                this.selectors.selectedSubdistrictName.value = subdistrictName;
             }
             this.populatePostalCode();
 
@@ -630,23 +641,22 @@ export const CheckoutUI = {
 
         document.addEventListener('change', (event) => {
 
-
             if (event.target.closest('#setupShipping')) {
-
                 if (this.addressData == null || this.addressData == undefined) {
                     event.target.checked = !event.target.checked;
                     alert('ไม่มีข้อมูลที่ตั้งค่าไว้');
                     return;
                 }
-
                 if (event.target.type === 'checkbox') {
                     const isChecked = event.target.checked;
                     this.updateShipping(isChecked);
                 }
             }
-
             if (event.target.closest('#province')) {
                 const selectedOption = event.target.closest('#province').options[event.target.closest('#province').selectedIndex];
+                const selectedText = event.target.options[event.target.selectedIndex].text;
+                this.selectors.selectedProvinceName.value = selectedText;
+
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
                 this.provinceActive = dataCode;
@@ -655,35 +665,36 @@ export const CheckoutUI = {
                 this.populateDistricts();
                 this.populateSubDistricts();
                 this.populatePostalCode();
-
                 const setupShippingCheckbox = document.querySelector('#setupShipping');
                 if (setupShippingCheckbox && setupShippingCheckbox.checked) {
                     setupShippingCheckbox.checked = false;
                     this.updateShipping(false);
                 }
             }
-
             if (event.target.closest('#district')) {
                 const selectedOption = event.target.closest('#district').options[event.target.closest('#district').selectedIndex];
+                const selectedText = event.target.options[event.target.selectedIndex].text;
+                this.selectors.selectedDistrictName.value = selectedText;
+
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
                 this.districtActive = dataCode;
                 this.populateSubDistricts();
-
                 const setupShippingCheckbox = document.querySelector('#setupShipping');
                 if (setupShippingCheckbox && setupShippingCheckbox.checked) {
                     setupShippingCheckbox.checked = false;
                     this.updateShipping(false);
                 }
             }
-
             if (event.target.closest('#subdistrict')) {
                 const selectedOption = event.target.closest('#subdistrict').options[event.target.closest('#subdistrict').selectedIndex];
+                const selectedText = event.target.options[event.target.selectedIndex].text;
+                this.selectors.selectedSubdistrictName.value = selectedText;
+
                 const value = selectedOption.value;
                 const dataCode = selectedOption.dataset.code;
                 this.postalCodeActive = dataCode;
                 this.populatePostalCode();
-
                 const setupShippingCheckbox = document.querySelector('#setupShipping');
                 if (setupShippingCheckbox && setupShippingCheckbox.checked) {
                     setupShippingCheckbox.checked = false;
