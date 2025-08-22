@@ -270,13 +270,13 @@ Responsive Styles
 }
 
 .see-more {
-    color: blue;
-    cursor: pointer;
-    margin-top: 10px;
+  color: blue;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .hidden-items {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .order-card {
@@ -1177,30 +1177,23 @@ textarea.form-input {
   color: #dc2626;
 }
 
-.message-box {
-  margin-top: 20px;
-  text-align: left;
-  font-weight: 500;
-  display: none;
+
+.saved-address {
+  background: #f18b20;
+  border: 1px solid #f28b20;
+  border-radius: 6px;
+  padding: 0.4rem;
 }
 
-.saved-addresses-list {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: normal;
+.add-address {
+  color: #ffffff;
+  background: #2196F3;
+  border: 1px solid #2196F3;
+  border-radius: 6px;
+  padding: 0.4rem;
 }
 
-.saved-address-item {
-  border-bottom: 1px dashed #d1d5db;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-}
 
-.saved-address-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-}
 
 /* ----------------------------------------------------
   @Coupon

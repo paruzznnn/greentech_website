@@ -77,10 +77,10 @@
                                     <form id="shippingAddressForm" class="mb-4" data-url="<?php echo $BASE_WEB ?>service/user/user-action.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="address">
                                         <input type="text" name="action" value="addAddress" hidden>
                                         <div id="addressesContainer"></div>
-                                        <button type="button" id="addAddressCardBtn" class="btn btn-success w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
-                                            เพิ่มที่อยู่ใหม่
+                                        <button type="button" id="addAddressCardBtn" class="add-address w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
+                                            <i class="fas fa-plus"></i> เพิ่มที่อยู่ใหม่
                                         </button>
-                                        <button id="confirm-add-address" type="submit" class="btn w-100 mt-4">บันทึกที่อยู่ทั้งหมด</button>
+                                        <button id="confirmAddress" type="submit" class="saved-address w-100 mt-4">บันทึกที่อยู่ทั้งหมด</button>
                                     </form>
                                 </div>
                             </div>

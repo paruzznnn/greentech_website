@@ -95,6 +95,7 @@ export const AddressUI = {
     selectors: {
         addressesContainer: document.getElementById('addressesContainer'),
         addAddressCardBtn: document.getElementById('addAddressCardBtn'),
+        confirmAddress: document.getElementById('confirmAddress'),
 
         //====== Default Shipping Address =================================
         selectedFullname: null,
@@ -139,8 +140,9 @@ export const AddressUI = {
         addressCardDiv.className = 'address-card';
         addressCardDiv.id = `addressCard_${currentCardIndex}`;
         addressCardDiv.innerHTML = `
-            <h3 class="address-card-title">ที่อยู่จัดส่งที่ ${currentCardIndex}</h3>
+            <h5 class="address-card-title">ที่อยู่จัดส่งที่ ${currentCardIndex}</h5>
             <input type="hidden" name="addressID_${currentCardIndex}" value="${item?.address_id || 0}" />
+            <input type="hidden" name="addressRemove_${currentCardIndex}" value="0" />
             <input type="hidden" name="setupShipping_${currentCardIndex}" value="0" />
             <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
                 <span style="font-size: 0.8rem;">ตั้งค่าเริ่มต้น</span>
@@ -156,15 +158,21 @@ export const AddressUI = {
                 </label>
             </div>
             <button type="button" class="remove-card-button" data-card-index="${currentCardIndex}">&times;</button>
-            <div class="form-group">
-                <label for="full_name_${currentCardIndex}">ชื่อ-นามสกุล</label>
-                <input type="text" id="full_name_${currentCardIndex}" name="full_name_${currentCardIndex}" 
-                    value="${item?.full_name || ''}" required>
-            </div>
-            <div class="form-group">
-                <label for="phone_number_${currentCardIndex}">เบอร์โทรศัพท์</label>
-                <input type="tel" id="phone_number_${currentCardIndex}" name="phone_number_${currentCardIndex}" 
-                    value="${item?.phone_number || ''}" required>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="full_name_${currentCardIndex}">ชื่อ-นามสกุล</label>
+                        <input type="text" id="full_name_${currentCardIndex}" name="full_name_${currentCardIndex}" 
+                            value="${item?.full_name || ''}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="phone_number_${currentCardIndex}">เบอร์โทรศัพท์</label>
+                        <input type="tel" id="phone_number_${currentCardIndex}" name="phone_number_${currentCardIndex}" 
+                            value="${item?.phone_number || ''}" required>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="address_detail_${currentCardIndex}">รายละเอียดที่อยู่ ${currentCardIndex}</label>
@@ -241,10 +249,14 @@ export const AddressUI = {
             this.populateSubDistricts();
         }
 
+        // เพิ่ม event สำหรับปุ่มลบ
         const removeButton = addressCardDiv.querySelector('.remove-card-button');
         removeButton.addEventListener('click', () => this.removeAddressCard(currentCardIndex));
 
-        if (this.addressCardCount >= this.MAX_ADDRESS_CARDS) {
+        // อัพเดทการแสดงปุ่มลบทั้งหมด
+        this.updateRemoveButtons();
+
+        if (this.getVisibleCardCount() >= this.MAX_ADDRESS_CARDS) {
             this.selectors.addAddressCardBtn.disabled = true;
         }
     },
@@ -294,20 +306,58 @@ export const AddressUI = {
         this.selectors.selectedPostalCode.value = this.postalCodeActive;
     },
 
+    // ฟังก์ชันสำหรับอัพเดทการแสดงปุ่มลบ
+    updateRemoveButtons() {
+        const visibleCards = this.selectors.addressesContainer.querySelectorAll('.address-card:not([style*="display: none"])');
+
+        visibleCards.forEach(card => {
+            const removeButton = card.querySelector('.remove-card-button');
+            if (visibleCards.length <= 1) {
+                removeButton.style.display = 'none';
+            } else {
+                removeButton.style.display = 'block';
+            }
+        });
+    },
+
+    // ฟังก์ชันสำหรับนับจำนวน card ที่แสดงอยู่
+    getVisibleCardCount() {
+        return this.selectors.addressesContainer.querySelectorAll('.address-card:not([style*="display: none"])').length;
+    },
+
     removeAddressCard(indexToRemove) {
+        // นับจำนวน card ที่ยังแสดงอยู่
+        const visibleCardCount = this.getVisibleCardCount();
+
+        // ถ้าเหลือ card เดียว ไม่ให้ลบ
+        if (visibleCardCount <= 1) {
+            alert('ต้องมีที่อยู่อย่างน้อย 1 ที่อยู่');
+            return;
+        }
+
         const card = document.getElementById(`addressCard_${indexToRemove}`);
         if (card) {
-            this.selectors.addressesContainer.removeChild(card);
-            this.addressCardCount--;
-            if (this.addressCardCount < this.MAX_ADDRESS_CARDS) {
+            const removeInput = card.querySelector(`input[name="addressRemove_${indexToRemove}"]`);
+            if (removeInput) {
+                removeInput.value = "1";
+            }
+            card.style.display = 'none';
+
+            if (this.getVisibleCardCount() < this.MAX_ADDRESS_CARDS) {
                 this.selectors.addAddressCardBtn.disabled = false;
             }
+
+            // อัพเดทหมายเลข card ที่แสดงอยู่
             let currentCardIndex = 1;
-            this.selectors.addressesContainer.querySelectorAll('.address-card').forEach(card => {
-                card.querySelector('.address-card-title').textContent = `ที่อยู่จัดส่งที่ ${currentCardIndex}`;
-                card.querySelector('.remove-card-button').dataset.cardIndex = currentCardIndex;
-                currentCardIndex++;
+            this.selectors.addressesContainer.querySelectorAll('.address-card').forEach((cardElement) => {
+                if (cardElement.style.display !== 'none') {
+                    cardElement.querySelector('.address-card-title').textContent = `ที่อยู่จัดส่งที่ ${currentCardIndex}`;
+                    currentCardIndex++;
+                }
             });
+
+            // อัพเดทการแสดงปุ่มลบ
+            this.updateRemoveButtons();
         }
     },
 
@@ -381,3 +431,4 @@ export const AddressUI = {
         });
     }
 };
+
