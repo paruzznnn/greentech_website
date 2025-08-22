@@ -80,7 +80,7 @@
                                         <button type="button" id="addAddressCardBtn" class="add-address w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
                                             <i class="fas fa-plus"></i> เพิ่มที่อยู่ใหม่
                                         </button>
-                                        <button id="confirmAddress" type="submit" class="saved-address w-100 mt-4">บันทึกที่อยู่ทั้งหมด</button>
+                                        <button id="confirmAddress" type="submit" class="saved-address w-100 mt-4">บันทึกการตั้งค่า</button>
                                     </form>
                                 </div>
                             </div>

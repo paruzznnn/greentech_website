@@ -637,6 +637,8 @@ textarea.form-input {
   color: #4b5563;
 }
 
+@media (min-width: 768px) {
+
 /* PASSWORD RULES */
 #pwdRules {
   font-size: 14px;
@@ -649,14 +651,49 @@ textarea.form-input {
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 #pwdRules li {
   display: flex;
   align-items: center;
+  width: 13rem;
+  font-size: 0.8rem;
 }
+  
+}
+
+@media (max-width: 768px) {
+
+/* PASSWORD RULES */
+#pwdRules {
+  font-size: 14px;
+  margin-top: 1rem;
+  color: #4b5563;
+}
+
+#pwdRules ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+
+#pwdRules li {
+display: flex;
+align-items: baseline;
+width: 9rem;
+font-size: 0.7rem;
+}
+
+}
+
 
 #pwdRules li i {
   margin-right: 0.5rem;
@@ -730,8 +767,8 @@ body.modal-open {
   }
 
   .form-input {
-    font-size: 15px;
-    padding: 0.6rem 1rem;
+      font-size: 14px;
+      padding: 0.3rem 1rem;
   }
 
   .box-login-social svg {
