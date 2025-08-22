@@ -31,7 +31,6 @@ $action = $_GET['action'];
 $userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 
 if ($action == 'getAddress') {
-
     $conditions = [
         [
             'column' => 'member_id', 
@@ -39,12 +38,11 @@ if ($action == 'getAddress') {
             'value' => $userId
         ],
         [
-            'column' => 'is_default', 
+            'column' => 'status', 
             'operator' => '=', 
             'value' => 1
         ]
     ];
-
     $items = selectData(
         $conn_cloudpanel, 
         'ecm_address', 
@@ -57,13 +55,13 @@ if ($action == 'getAddress') {
     foreach ($items as $item) {
         $data[] = [
             'id' => $item['address_id'],
-            'fullname' => $item['firstname'] . ' ' . $item['lastname'],
+            'fullname' => $item['full_name'],
             'phoneNumber' => $item['phone_number'],
-            'addressDetail' => $item['detail'],
-            'province_id' => $item['province_id'],
-            'district_id' => $item['district_id'],
-            'sub_district_id' => $item['sub_district_id'],
-            'postcode_id' => $item['postcode_id']
+            'addressDetail' => $item['address_detail'],
+            'province_id' => $item['province_code'],
+            'district_id' => $item['district_code'],
+            'sub_district_id' => $item['subdistrict_code'],
+            'postcode_id' => $item['post_code']
         ];
     }
 

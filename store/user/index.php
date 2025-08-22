@@ -74,21 +74,14 @@
                             </div> -->
                             <div class="tabContent" id="addresses">
                                 <div class="main-container">
-                                    <form id="shippingAddressForm" class="mb-4">
+                                    <form id="shippingAddressForm" class="mb-4" data-url="<?php echo $BASE_WEB ?>service/user/user-action.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="address">
+                                        <input type="text" name="action" value="addAddress" hidden>
                                         <div id="addressesContainer"></div>
                                         <button type="button" id="addAddressCardBtn" class="btn btn-success w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                                            </svg>
                                             เพิ่มที่อยู่ใหม่
                                         </button>
-                                        <button type="submit" class="btn btn-primary w-100 mt-4">บันทึกที่อยู่ทั้งหมด</button>
+                                        <button id="confirm-add-address" type="submit" class="btn w-100 mt-4">บันทึกที่อยู่ทั้งหมด</button>
                                     </form>
-                                    <div id="messageBox" class="message-box alert rounded-3" style="display: none;">
-                                        ที่อยู่ถูกบันทึกเรียบร้อยแล้ว!
-                                        <div id="savedAddressesList" class="saved-addresses-list"></div>
-                                        <button id="copyAllAddressesBtn" class="btn btn-secondary mt-3 ms-0">คัดลอกที่อยู่ทั้งหมด</button>
-                                    </div>
                                 </div>
                             </div>
                             <div class="tabContent" id="wishlist">
@@ -199,6 +192,7 @@
         const baseWeb = `${pathConfig.BASE_WEB}`;
 
         Promise.all([
+            import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
             import(`${baseWeb}js/user/userRender.js?v=${timeVersion}`),
             import(`${baseWeb}js/user/addressRender.js?v=${timeVersion}`),
             import(`${baseWeb}js/user/menuBuilder.js?v=${timeVersion}`),
@@ -208,6 +202,7 @@
         ])
         .then(async (
             [
+                formModule,
                 profileModule,
                 addressModule,
                 menuBuilderModule, 
@@ -216,24 +211,38 @@
                 cartModule
             ]
         ) => {
+            const { handleFormSubmit } = formModule;
             const { setupProfileImageUpload } = profileModule;
-            const { createAddressCard } = addressModule;
+            const { 
+                AddressUI, 
+                fetchAddressData, 
+                fetchProvincesData, 
+                fetchDistrictsData, 
+                fetchSubdistricts
+            } = addressModule;
             const { setupTabs } = menuBuilderModule;
             const { fetchOrders, OrderListUI } = orderListModule;
             const { LikedProducts } = wishlistModule;
             const { ShoppingCart } = cartModule;
 
             //===== Profile ==================================
-            // document.addEventListener('DOMContentLoaded', () => {
             setupProfileImageUpload();
-            // });
 
             //===== Address ==================================
-            document.getElementById('addAddressCardBtn').addEventListener('click', () => {
-                createAddressCard();
-            });
-            createAddressCard();
+            const address = await fetchAddressData("getAddressItems", baseWeb + 'service/user/user-data.php?');
+            const provinces = await fetchProvincesData(baseWeb + 'locales/provinces.json');
+            const districts = await fetchDistrictsData(baseWeb + 'locales/districts.json');
+            const subdistricts = await fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+            AddressUI.init(
+                provinces,
+                districts,
+                subdistricts,
+                address
+            );
 
+            const formAddress = document.querySelector("#shippingAddressForm");
+            formAddress?.addEventListener("submit", handleFormSubmit);
+            
             //===== Order List ==================================
             setupTabs();
             const service = baseWeb + 'service/user/user-data.php?';

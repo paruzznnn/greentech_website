@@ -62,7 +62,7 @@ function handleChangeSync($apiGetData) {
         insertProduct($stmt, $apiGetData, $syncSt, $matID);
     }
 
-    insertPhotoDetail($stmt, $apiGetData, $matID);
+    // insertPhotoDetail($stmt, $apiGetData, $matID);
 
     $stmt->close();
 }
@@ -111,14 +111,14 @@ function updateProduct($stmt, $apiGetData, $syncSt, $matID) {
         attb_price = ?,
         attb_value = ?,
         cost = ?, 
-        currency = ?, 
+        currency = "THB", 
         module = ?, 
-        stock = ?,
+        stock = "100",
         sync_status = ?,
         uom = ? 
     WHERE material_id = ?');
 
-    $stmt->bind_param('sssssssssssssss',
+    $stmt->bind_param('sssssssssssss',
         $apiGetData['code'],
         $apiGetData['pic_icon'],
         $apiGetData['material_category_id'],
@@ -128,9 +128,9 @@ function updateProduct($stmt, $apiGetData, $syncSt, $matID) {
         $apiGetData['attb_price'],
         $apiGetData['attb_value'],
         $apiGetData['cost'],
-        $apiGetData['currency'],
+        // $apiGetData['currency'],
         $apiGetData['module'],
-        $apiGetData['material_stock'],
+        // $apiGetData['material_stock'],
         $syncSt,
         $apiGetData['uom'],
         $matID
@@ -176,9 +176,9 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
         sync_status,
         comp_id,
         uom
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "THB", ?, "100", ?, ?, ?)');
 
-    $stmt->bind_param('ssssssssssssssss',
+    $stmt->bind_param('ssssssssssssss',
         $matID,
         $apiGetData['code'],
         $apiGetData['pic_icon'],
@@ -189,9 +189,9 @@ function insertProduct($stmt, $apiGetData, $syncSt, $matID) {
         $apiGetData['attb_price'],
         $apiGetData['attb_value'],
         $apiGetData['cost'],
-        $apiGetData['currency'],
+        // $apiGetData['currency'],
         $apiGetData['module'],
-        $apiGetData['material_stock'],
+        // $apiGetData['material_stock'],
         $syncSt,
         $apiGetData['comp_id'],
         $apiGetData['uom']

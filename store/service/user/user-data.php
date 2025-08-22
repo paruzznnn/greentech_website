@@ -28,6 +28,7 @@ if ($token !== $validToken) {
 
 /*---------ACTION DATA -------------*/
 $action = $_GET['action'];
+$userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 
 // echo '<pre>';
 // print_r($_SESSION);
@@ -51,6 +52,11 @@ if ($action == 'getOrdersItems') {
 
     $data = [];
     $conditionsMain = [
+        [
+            'column' => 'member_id',
+            'operator' => '=',
+            'value' => $userId
+        ],
         [
             'column' => 'del',
             'operator' => '=',
@@ -116,6 +122,32 @@ if ($action == 'getOrdersItems') {
     echo json_encode($response);
     $conn_cloudpanel->close();
     exit;
+} else if($action == 'getAddressItems') {
+    $conditions = [
+        [
+            'column' => 'member_id',
+            'operator' => '=',
+            'value' => $userId
+        ]
+    ];
+    $items = selectData(
+        $conn_cloudpanel,
+        'ecm_address',
+        $conditions,
+        '*'
+    );
+    $data = [];
+    foreach ($items as $item) {
+        $data[] = $item;
+    }
+    $response = [
+        "data" => $data
+    ];
+    http_response_code(200);
+    echo json_encode($response);
+    $conn_cloudpanel->close();
+    exit;
+
 } else {
 
     http_response_code(400);
