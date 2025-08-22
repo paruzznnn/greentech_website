@@ -38,6 +38,11 @@ if ($action == 'getAddress') {
             'value' => $userId
         ],
         [
+            'column' => 'del', 
+            'operator' => '=', 
+            'value' => 0
+        ],
+        [
             'column' => 'status', 
             'operator' => '=', 
             'value' => 1

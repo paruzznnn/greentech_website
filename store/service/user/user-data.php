@@ -128,6 +128,11 @@ if ($action == 'getOrdersItems') {
             'column' => 'member_id',
             'operator' => '=',
             'value' => $userId
+        ],
+        [
+            'column' => 'del',
+            'operator' => '=',
+            'value' => 0
         ]
     ];
     $items = selectData(
