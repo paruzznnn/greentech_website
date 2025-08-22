@@ -1,224 +1,383 @@
-export const addressData = {
-    "กรุงเทพมหานคร": {
-        "เขตบางรัก": {
-            "สีลม": "10500",
-            "สุริยวงศ์": "10500"
-        },
-        "เขตวัฒนา": {
-            "คลองเตยเหนือ": "10110",
-            "คลองตันเหนือ": "10110"
+
+export async function fetchAddressData(req, call) {
+    try {
+        const params = new URLSearchParams({
+            action: req
+        });
+        const url = call + params.toString();
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    },
-    "เชียงใหม่": {
-        "อำเภอเมืองเชียงใหม่": {
-            "ช้างเผือก": "50300",
-            "ศรีภูมิ": "50200"
-        },
-        "อำเภอแม่ริม": {
-            "แม่ริม": "50180",
-            "ริมใต้": "50180"
-        }
-    },
-    "ภูเก็ต": {
-        "อำเภอเมืองภูเก็ต": {
-            "ตลาดใหญ่": "83000",
-            "ตลาดเหนือ": "83000"
-        },
-        "อำเภอถลาง": {
-            "เทพกระษัตรี": "83110",
-            "เชิงทะเล": "83110"
-        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
     }
-};
+}
 
-const addressesContainer = document.getElementById('addressesContainer');
-const addAddressCardBtn = document.getElementById('addAddressCardBtn');
-const shippingAddressForm = document.getElementById('shippingAddressForm');
-const messageBox = document.getElementById('messageBox');
-const savedAddressesList = document.getElementById('savedAddressesList');
-const copyAllAddressesBtn = document.getElementById('copyAllAddressesBtn');
+export async function fetchProvincesData(call) {
+    try {
+        const url = call;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
+    }
+}
 
-let addressCardCount = 0;
-const MAX_ADDRESS_CARDS = 3;
+export async function fetchDistrictsData(call) {
+    try {
+        const url = call;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
+    }
+}
 
-export function createAddressCard() {
-    addressCardCount++;
-    const cardIndex = addressCardCount;
+export async function fetchSubdistricts(call) {
+    try {
+        const url = call;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
+    }
+}
 
-    const addressCardDiv = document.createElement('div');
-    addressCardDiv.className = 'address-card';
-    addressCardDiv.id = `addressCard_${cardIndex}`;
-    addressCardDiv.innerHTML = `
-        <h3 class="address-card-title">ที่อยู่จัดส่งที่ ${cardIndex}</h3>
-        <button type="button" class="remove-card-button" data-card-index="${cardIndex}">&times;</button>
-        <div class="form-group">
-            <label for="fullName_${cardIndex}">ชื่อ-นามสกุล</label>
-            <input type="text" id="fullName_${cardIndex}" required>
-        </div>
-        <div class="form-group">
-            <label for="phoneNumber_${cardIndex}">เบอร์โทรศัพท์</label>
-            <input type="tel" id="phoneNumber_${cardIndex}" required>
-        </div>
-        <div class="form-group">
-            <label for="addressLine1_${cardIndex}">ที่อยู่ 1</label>
-            <input type="text" id="addressLine1_${cardIndex}" required>
-        </div>
-        <div class="form-group">
-            <label for="addressLine2_${cardIndex}">ที่อยู่ 2 (ไม่บังคับ)</label>
-            <input type="text" id="addressLine2_${cardIndex}">
-        </div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="province_${cardIndex}">จังหวัด</label>
-                    <select id="province_${cardIndex}" required>
-                        <option value="">เลือกจังหวัด</option>
-                    </select>
+export const AddressUI = {
+    lang: null,
+    addressCardCount: 0,
+    MAX_ADDRESS_CARDS: 3,
+
+    addressData: [],
+    provincesData: [],
+    districtsData: [],
+    subdistrictsData: [],
+
+    selectors: {
+        addressesContainer: document.getElementById('addressesContainer'),
+        addAddressCardBtn: document.getElementById('addAddressCardBtn'),
+
+        //====== Default Shipping Address =================================
+        selectedFullname: null,
+        selectedPhoneNumber: null,
+        selectedAddressDetail: null,
+
+        selectedProvince: null,
+        selectedDistrict: null,
+        selectedSubdistrict: null,
+        selectedPostalCode: null
+    },
+
+    init(provinces, districts, subdistricts, address) {
+        this.lang = 'th';
+
+        this.addressData = address;
+        this.provincesData = provinces;
+        this.districtsData = districts;
+        this.subdistrictsData = subdistricts;
+
+        this.initEvents();
+
+        if (!address?.data || address.data.length === 0) {
+            this.createAddressCard();
+        } else {
+            this.loadAddressCard();
+        }
+    },
+
+    loadAddressCard() {
+        const addressItems = this.addressData?.data || [];
+        for (const item of addressItems) {
+            this.createAddressCard(item);
+        }
+    },
+
+    createAddressCard(item = null) {
+        this.addressCardCount++;
+        const currentCardIndex = this.addressCardCount;
+
+        const addressCardDiv = document.createElement('div');
+        addressCardDiv.className = 'address-card';
+        addressCardDiv.id = `addressCard_${currentCardIndex}`;
+        addressCardDiv.innerHTML = `
+            <h3 class="address-card-title">ที่อยู่จัดส่งที่ ${currentCardIndex}</h3>
+            <input type="hidden" name="addressID_${currentCardIndex}" value="${item?.address_id || 0}" />
+            <input type="hidden" name="setupShipping_${currentCardIndex}" value="0" />
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
+                <span style="font-size: 0.8rem;">ตั้งค่าเริ่มต้น</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" 
+                        class="setupShippingCheckbox" 
+                        id="setupShipping_${currentCardIndex}" 
+                        name="setupShipping_${currentCardIndex}"
+                        value="1"
+                        data-card-index="${currentCardIndex}"
+                        ${item?.status ? 'checked' : ''} />
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button type="button" class="remove-card-button" data-card-index="${currentCardIndex}">&times;</button>
+            <div class="form-group">
+                <label for="full_name_${currentCardIndex}">ชื่อ-นามสกุล</label>
+                <input type="text" id="full_name_${currentCardIndex}" name="full_name_${currentCardIndex}" 
+                    value="${item?.full_name || ''}" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number_${currentCardIndex}">เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone_number_${currentCardIndex}" name="phone_number_${currentCardIndex}" 
+                    value="${item?.phone_number || ''}" required>
+            </div>
+            <div class="form-group">
+                <label for="address_detail_${currentCardIndex}">รายละเอียดที่อยู่ ${currentCardIndex}</label>
+                <textarea id="address_detail_${currentCardIndex}" name="address_detail_${currentCardIndex}" required>${item?.address_detail || ''}</textarea>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="province_${currentCardIndex}">จังหวัด</label>
+                        <select id="province_${currentCardIndex}" name="province_${currentCardIndex}" required>
+                            <option value="">เลือกจังหวัด</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="district_${currentCardIndex}">อำเภอ/เขต</label>
+                        <select id="district_${currentCardIndex}" name="district_${currentCardIndex}" required disabled>
+                            <option value="">เลือกอำเภอ/เขต</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="district_${cardIndex}">อำเภอ/เขต</label>
-                    <select id="district_${cardIndex}" required disabled>
-                        <option value="">เลือกอำเภอ/เขต</option>
-                    </select>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="subdistrict_${currentCardIndex}">ตำบล/แขวง</label>
+                        <select id="subdistrict_${currentCardIndex}" name="subdistrict_${currentCardIndex}" required disabled>
+                            <option value="">เลือกตำบล/แขวง</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="postalCode_${currentCardIndex}">รหัสไปรษณีย์</label>
+                        <input type="text" id="postalCode_${currentCardIndex}" name="postalCode_${currentCardIndex}" readonly>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="subDistrict_${cardIndex}">ตำบล/แขวง</label>
-                    <select id="subDistrict_${cardIndex}" required disabled>
-                        <option value="">เลือกตำบล/แขวง</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="postalCode_${cardIndex}">รหัสไปรษณีย์</label>
-                    <input type="text" id="postalCode_${cardIndex}" readonly>
-                </div>
-            </div>
-        </div>
-    `;
-    addressesContainer.appendChild(addressCardDiv);
-
-    if (cardIndex > 1) {
-        const copyButtonContainer = document.createElement('div');
-        copyButtonContainer.className = 'd-flex justify-content-end mb-3';
-        copyButtonContainer.innerHTML = `
-            <button type="button" class="btn btn-info btn-sm" id="copyFromFirstBtn_${cardIndex}">
-                คัดลอกข้อมูลจากที่อยู่ 1
-            </button>
         `;
-        addressCardDiv.insertBefore(copyButtonContainer, addressCardDiv.children[2]);
-        const copyButton = document.getElementById(`copyFromFirstBtn_${cardIndex}`);
-        copyButton.addEventListener('click', () => copyAddressData(cardIndex));
-    }
+        this.selectors.addressesContainer.appendChild(addressCardDiv);
 
-    const provinceSelect = document.getElementById(`province_${cardIndex}`);
-    const districtSelect = document.getElementById(`district_${cardIndex}`);
-    const subDistrictSelect = document.getElementById(`subDistrict_${cardIndex}`);
-    const postalCodeInput = document.getElementById(`postalCode_${cardIndex}`);
-    const removeButton = addressCardDiv.querySelector('.remove-card-button');
+        this.selectors.selectedProvince = document.getElementById(`province_${currentCardIndex}`);
+        this.selectors.selectedDistrict = document.getElementById(`district_${currentCardIndex}`);
+        this.selectors.selectedSubdistrict = document.getElementById(`subdistrict_${currentCardIndex}`);
+        this.selectors.selectedPostalCode = document.getElementById(`postalCode_${currentCardIndex}`);
 
-    populateProvinces(provinceSelect);
-    provinceSelect.addEventListener('change', () => populateDistricts(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput));
-    districtSelect.addEventListener('change', () => populateSubDistricts(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput));
-    subDistrictSelect.addEventListener('change', () => autoFillPostalCode(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput));
-    removeButton.addEventListener('click', () => removeAddressCard(cardIndex));
+        // ===== LOAD DATA =====
+        this.populateProvinces();
 
-    if (addressCardCount >= MAX_ADDRESS_CARDS) {
-        addAddressCardBtn.disabled = true;
-    }
-}
+        if (item) {
+            if (item.province_code) {
+                this.provinceActive = item.province_code;
+                this.selectors.selectedProvince.value = item.province_code;
+                this.populateDistricts();
 
-function populateProvinces(select) {
-    select.innerHTML = '<option value="">เลือกจังหวัด</option>';
-    for (const province in addressData) {
-        const option = document.createElement('option');
-        option.value = province;
-        option.textContent = province;
-        select.appendChild(option);
-    }
-}
+                if (item.district_code) {
+                    this.districtActive = item.district_code;
+                    this.selectors.selectedDistrict.value = item.district_code;
+                    this.populateSubDistricts();
 
-function populateDistricts(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput) {
-    districtSelect.innerHTML = '<option value="">เลือกอำเภอ/เขต</option>';
-    subDistrictSelect.innerHTML = '<option value="">เลือกตำบล/แขวง</option>';
-    postalCodeInput.value = '';
-    districtSelect.disabled = true;
-    subDistrictSelect.disabled = true;
+                    if (item.subdistrict_code) {
+                        this.selectors.selectedSubdistrict.value = item.subdistrict_code;
 
-    const province = provinceSelect.value;
-    if (province && addressData[province]) {
-        for (const district in addressData[province]) {
-            const option = document.createElement('option');
-            option.value = district;
-            option.textContent = district;
-            districtSelect.appendChild(option);
+                        if (item.post_code) {
+                            this.postalCodeActive = item.post_code;
+                            this.populatePostalCode();
+                        }
+                    }
+                }
+            }
+        } else {
+            this.populateDistricts();
+            this.populateSubDistricts();
         }
-        districtSelect.disabled = false;
-    }
-}
 
-function populateSubDistricts(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput) {
-    subDistrictSelect.innerHTML = '<option value="">เลือกตำบล/แขวง</option>';
-    postalCodeInput.value = '';
-    subDistrictSelect.disabled = true;
+        const removeButton = addressCardDiv.querySelector('.remove-card-button');
+        removeButton.addEventListener('click', () => this.removeAddressCard(currentCardIndex));
 
-    const province = provinceSelect.value;
-    const district = districtSelect.value;
-    if (province && district && addressData[province] && addressData[province][district]) {
-        for (const subDistrict in addressData[province][district]) {
-            const option = document.createElement('option');
-            option.value = subDistrict;
-            option.textContent = subDistrict;
-            subDistrictSelect.appendChild(option);
+        if (this.addressCardCount >= this.MAX_ADDRESS_CARDS) {
+            this.selectors.addAddressCardBtn.disabled = true;
         }
-        subDistrictSelect.disabled = false;
-    }
-}
+    },
 
-function autoFillPostalCode(provinceSelect, districtSelect, subDistrictSelect, postalCodeInput) {
-    const province = provinceSelect.value;
-    const district = districtSelect.value;
-    const subDistrict = subDistrictSelect.value;
-    if (province && district && subDistrict && addressData[province]?.[district]?.[subDistrict]) {
-        postalCodeInput.value = addressData[province][district][subDistrict];
-    } else {
-        postalCodeInput.value = '';
-    }
-}
+    populateProvinces() {
+        const provinceOption = this.provincesData.map(item => {
+            const provinceName = this.lang === 'en' ? item.provinceNameEn : item.provinceNameTh;
+            return `<option value="${item.provinceCode}" data-code="${item.provinceCode}">${provinceName}</option>`;
+        });
+        const defaultOption = `<option value="">${this.lang === 'en' ? 'Select Province' : 'เลือกจังหวัด'}</option>`;
+        this.selectors.selectedProvince.innerHTML = defaultOption + provinceOption.join('');
+    },
 
-function removeAddressCard(indexToRemove) {
-    const card = document.getElementById(`addressCard_${indexToRemove}`);
-    if (card) {
-        addressesContainer.removeChild(card);
-        addressCardCount--;
-        if (addressCardCount < MAX_ADDRESS_CARDS) {
-            addAddressCardBtn.disabled = false;
+    populateDistricts() {
+        if (this.provinceActive) {
+            this.selectors.selectedDistrict.removeAttribute("disabled");
+        } else {
+            this.selectors.selectedDistrict.setAttribute("disabled", true);
         }
-        let currentCardIndex = 1;
-        addressesContainer.querySelectorAll('.address-card').forEach(card => {
-            card.querySelector('.address-card-title').textContent = `ที่อยู่จัดส่งที่ ${currentCardIndex}`;
-            card.querySelector('.remove-card-button').dataset.cardIndex = currentCardIndex;
-            currentCardIndex++;
+        const districtOption = this.districtsData
+            .filter(item => item.provinceCode == this.provinceActive)
+            .map(item => {
+                const districtName = this.lang === 'en' ? item.districtNameEn : item.districtNameTh;
+                return `<option value="${item.districtCode}" data-code="${item.districtCode}">${districtName}</option>`;
+            });
+        const defaultOption = `<option value="">${this.lang === 'en' ? 'Select District' : 'เลือกอำเภอ/เขต'}</option>`;
+        this.selectors.selectedDistrict.innerHTML = defaultOption + districtOption.join('');
+    },
+
+    populateSubDistricts() {
+        if (this.districtActive) {
+            this.selectors.selectedSubdistrict.removeAttribute("disabled");
+        } else {
+            this.selectors.selectedSubdistrict.setAttribute("disabled", true);
+        }
+        const subdistrictOption = this.subdistrictsData
+            .filter(item => item.districtCode == this.districtActive)
+            .map(item => {
+                const subdistrictName = this.lang === 'en' ? item.subdistrictNameEn : item.subdistrictNameTh;
+                return `<option value="${item.subdistrictCode}" data-code="${item.postalCode}">${subdistrictName}</option>`;
+            });
+        const defaultOption = `<option value="">${this.lang === 'en' ? 'Select Subdistrict' : 'เลือกตำบล/แขวง'}</option>`;
+        this.selectors.selectedSubdistrict.innerHTML = defaultOption + subdistrictOption.join('');
+    },
+
+    populatePostalCode() {
+        this.selectors.selectedPostalCode.value = this.postalCodeActive;
+    },
+
+    removeAddressCard(indexToRemove) {
+        const card = document.getElementById(`addressCard_${indexToRemove}`);
+        if (card) {
+            this.selectors.addressesContainer.removeChild(card);
+            this.addressCardCount--;
+            if (this.addressCardCount < this.MAX_ADDRESS_CARDS) {
+                this.selectors.addAddressCardBtn.disabled = false;
+            }
+            let currentCardIndex = 1;
+            this.selectors.addressesContainer.querySelectorAll('.address-card').forEach(card => {
+                card.querySelector('.address-card-title').textContent = `ที่อยู่จัดส่งที่ ${currentCardIndex}`;
+                card.querySelector('.remove-card-button').dataset.cardIndex = currentCardIndex;
+                currentCardIndex++;
+            });
+        }
+    },
+
+    initEvents() {
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('#addAddressCardBtn')) {
+                this.createAddressCard();
+            }
+        });
+
+        document.addEventListener('change', (event) => {
+            // หา cardIndex จาก element ID
+            const elementId = event.target.id;
+            const cardIndex = elementId.match(/_(\d+)$/)?.[1];
+            if (!cardIndex) return;
+
+            if (event.target.classList.contains('setupShippingCheckbox')) {
+                const checkbox = event.target;
+                if (checkbox.checked) {
+                    document.querySelectorAll('.setupShippingCheckbox').forEach(cb => {
+                        if (cb !== checkbox) {
+                            cb.checked = false;
+                        }
+                    });
+                }
+            }
+
+            if (elementId.startsWith('province_')) {
+                const selectedOption = event.target.options[event.target.selectedIndex];
+                const value = selectedOption.value;
+                const dataCode = selectedOption.dataset.code;
+
+                this.selectors.selectedProvince = document.getElementById(`province_${cardIndex}`);
+                this.selectors.selectedDistrict = document.getElementById(`district_${cardIndex}`);
+                this.selectors.selectedSubdistrict = document.getElementById(`subdistrict_${cardIndex}`);
+                this.selectors.selectedPostalCode = document.getElementById(`postalCode_${cardIndex}`);
+
+                this.provinceActive = dataCode;
+                this.districtActive = null;
+                this.postalCodeActive = null;
+                this.populateDistricts();
+                this.populateSubDistricts();
+                this.populatePostalCode();
+            }
+
+            if (elementId.startsWith('district_')) {
+                const selectedOption = event.target.options[event.target.selectedIndex];
+                const value = selectedOption.value;
+                const dataCode = selectedOption.dataset.code;
+
+                this.selectors.selectedDistrict = document.getElementById(`district_${cardIndex}`);
+                this.selectors.selectedSubdistrict = document.getElementById(`subdistrict_${cardIndex}`);
+                this.selectors.selectedPostalCode = document.getElementById(`postalCode_${cardIndex}`);
+
+                this.districtActive = dataCode;
+                this.postalCodeActive = null;
+                this.populateSubDistricts();
+                this.populatePostalCode();
+            }
+
+            if (elementId.startsWith('subdistrict_')) {
+                const selectedOption = event.target.options[event.target.selectedIndex];
+                const value = selectedOption.value;
+                const dataCode = selectedOption.dataset.code;
+
+                this.selectors.selectedPostalCode = document.getElementById(`postalCode_${cardIndex}`);
+
+                this.postalCodeActive = dataCode;
+                this.populatePostalCode();
+            }
         });
     }
-}
-
-function copyAddressData(targetIndex) {
-    const fields = ['fullName', 'phoneNumber', 'addressLine1', 'addressLine2', 'province', 'district', 'subDistrict', 'postalCode'];
-    fields.forEach(field => {
-        const sourceField = document.getElementById(`${field}_1`);
-        const targetField = document.getElementById(`${field}_${targetIndex}`);
-        if (sourceField && targetField) {
-            targetField.value = sourceField.value;
-            if (field === 'province') populateDistricts(targetField, document.getElementById(`district_${targetIndex}`), document.getElementById(`subDistrict_${targetIndex}`), document.getElementById(`postalCode_${targetIndex}`));
-            if (field === 'district') populateSubDistricts(document.getElementById(`province_${targetIndex}`), targetField, document.getElementById(`subDistrict_${targetIndex}`), document.getElementById(`postalCode_${targetIndex}`));
-            if (field === 'subDistrict') autoFillPostalCode(document.getElementById(`province_${targetIndex}`), document.getElementById(`district_${targetIndex}`), targetField, document.getElementById(`postalCode_${targetIndex}`));
-        }
-    });
-}
+};
