@@ -5,7 +5,7 @@
         <!-- <img src="/e-store/trandar_logo.png" alt="" class="store-modal-title" /> -->
 
         <form id="cookie-preferences" class="cookie-content">
-            
+
             <h3>การตั้งค่าความเป็นส่วนตัว</h3>
             <!-- คุกกี้ที่มีความจำเป็น -->
             <div class="cookie-section">
@@ -235,6 +235,75 @@
 
         })
         .catch((e) => console.error("Module import failed", e));
+</script>
+
+<script>
+    // ---------- wait DOM ---------- //
+    document.addEventListener("DOMContentLoaded", () => {
+        function generateState(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function randomString(len = 64) {
+            const bytes = new Uint8Array(len);
+            crypto.getRandomValues(bytes);
+            return btoa(String.fromCharCode(...bytes))
+                .replace(/[\+\/=]/g, '') // base64url
+                .substring(0, len);
+        }
+
+        // LINE Login
+        document.getElementById('loginLineBtn')?.addEventListener('click', function() {
+            const clientId = '2007612199';
+            const redirectUri = encodeURIComponent(pathConfig.LINE_REDIRECT);
+            const state = generateState(8);
+            const scope = 'profile openid';
+            const authUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${encodeURIComponent(scope)}`;
+            window.location.href = authUrl;
+        });
+
+        // Facebook Login (for page permissions)
+        document.getElementById('loginFacebookBtn')?.addEventListener('click', function() {
+            const clientId = '2097721124030477';
+            const redirectUri = encodeURIComponent(pathConfig.FACE_BOOK_REDIRECT);
+            const state = generateState(8);
+            const scope = 'email,public_profile';
+            const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+            window.location.href = facebookAuthUrl;
+        });
+
+        // Facebook Page
+        // const clientId = '699793683081119';
+        // const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/facebook_page.php');
+        // const state = generateState(8);
+        // const scope = 'email,public_profile,pages_show_list,pages_read_engagement,pages_manage_posts,pages_messaging,pages_manage_metadata';
+        // const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+        // window.location.href = facebookAuthUrl;
+
+
+        // Google Login
+        document.getElementById('loginGoogleBtn')?.addEventListener('click', function() {
+            const clientId = '262467068023-qhh35u6a7gkiqvdndgl4ldr2l6nqcdgh.apps.googleusercontent.com';
+            const redirectUri = encodeURIComponent(pathConfig.GOOGLE_REDIRECT);
+            const state = randomString(12);
+            const scope = encodeURIComponent('https://www.googleapis.com/auth/drive');
+            const authUrl =
+                `https://accounts.google.com/o/oauth2/v2/auth` +
+                `?response_type=code` +
+                `&client_id=${clientId}` +
+                `&redirect_uri=${redirectUri}` +
+                `&scope=${scope}` +
+                `&state=${state}` +
+                `&access_type=offline`;
+            window.location.href = authUrl;
+        });
+
+    });
 </script>
 
 

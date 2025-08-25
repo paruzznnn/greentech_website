@@ -1,17 +1,27 @@
 <!-- header 1 -->
 <header class="header-store1">
-  <div class="navbar-news">
+  <div class="navbar-service">
     <div class="container">
-      <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
-        <div style="display: inline;">
-          <span style="padding: 0 50px;">
-            <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
-              Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 </a>
-          </span>
+        <div class="navbar-service-wrapper">
+          <div class="nav-service-link-group nav-link-group-left ">
+              <a href="#" class="nav-service-link">บริการ Trandar Store</a>
+              <a href="#" class="nav-service-link">โปรโมชั่น</a>
+              <a href="#" class="nav-service-link">การรับประกันสินค้าและคืนสินค้า</a>
+              <a href="#" class="nav-service-link">วิธีการสั่งซื้อ</a>
+              <a href="#" class="nav-service-link">ติดตามการจัดส่ง</a>
+          </div>
+          <div class="nav-service-link-group nav-link-group-right">
+              <a href="#" class="nav-service-link">ศูนย์ช่วยเหลือ</a>
+              <div id="langButtons" class="lang-buttons-container">
+                  <i class="bi bi-globe"></i>
+                  <button data-lang="en" type="button" class="btn-lang">English</button>
+                  <button data-lang="th" type="button" class="btn-lang">Thai</button>
+              </div>
+          </div>
         </div>
-      </marquee>
     </div>
   </div>
+
   <nav class="pt-1">
     <div class="container">
       <div class="nav-store1">
@@ -97,6 +107,22 @@
     <div id="linkContainer" class="container"></div>
   </nav>
 </header>
+
+<div class="navbar-news">
+  <div class="container">
+    <!-- <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();"> -->
+      <div style="display: inline;">
+        <span style="padding: 0 50px;">
+          <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
+            <img src="https://img.icons8.com/?size=100&id=6ER3rS2ZLjRQ&format=png&color=000000" alt="" width="18px">
+            Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard 
+            ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 
+          </a>
+        </span>
+      </div>
+    <!-- </marquee> -->
+  </div>
+</div>
 
 <!-- header 2 -->
 <header class="header-store2">
@@ -304,10 +330,6 @@
     <a href="javascript:void(0)" id="menu-close-store1" class="closebtn-store1">&times;</a>
   </div>
   <div>
-    <div id="langButtons">
-      <button data-lang="en" type="button" class="btn-sm">English</button>
-      <button data-lang="th" type="button" class="btn-sm">Thai</button>
-    </div>
   </div>
 </aside>
 
@@ -328,17 +350,11 @@
   <div class="pt-1">
     <ul id="menuListContainer"></ul>
   </div>
-  <div style="display: none;">
-    <div id="langButtons">
-      <button data-lang="en" type="button" class="nav-store2-btn btn-sm">English</button>
-      <button data-lang="th" type="button" class="nav-store2-btn btn-sm">Thai</button>
-    </div>
-  </div>
 </aside>
 <div id="overlay-store2"></div>
 
 
-<nav aria-label="Breadcrumb">
+<nav id="breadcrumb-box">
   <div class="container">
     <ul id="breadcrumb-list">
     </ul>
@@ -354,7 +370,11 @@
       pathSegments.length === 2 && pathSegments.includes('trandar_website') && pathSegments.includes('store')
     );
 
+    const breadcrumbBox = document.getElementById('breadcrumb-box');
+    breadcrumbBox.style.display = isHomePage ? "none" : "block";
+
     if (isHomePage) {
+      
       return;
     }
 
@@ -546,75 +566,6 @@
 </script>
 
 <script>
-
-  // ---------- wait DOM ---------- //
-  document.addEventListener("DOMContentLoaded", () => {
-    function generateState(length) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    }
-    function randomString(len = 64) {
-      const bytes = new Uint8Array(len);
-      crypto.getRandomValues(bytes);
-      return btoa(String.fromCharCode(...bytes))
-        .replace(/[\+\/=]/g, '') // base64url
-        .substring(0, len);
-    }
-
-    // LINE Login
-    document.getElementById('loginLineBtn')?.addEventListener('click', function() {
-      const clientId = '2007612199';
-      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/line_auth.php');
-      const state = generateState(8);
-      const scope = 'profile openid';
-
-      const authUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${encodeURIComponent(scope)}`;
-      window.location.href = authUrl;
-    });
-
-    // Facebook Login (for page permissions)
-    document.getElementById('loginFacebookBtn')?.addEventListener('click', function() {
-
-      const clientId = '2097721124030477';
-      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/facebook_auth.php');
-      const state = generateState(8);
-      const scope = 'email,public_profile';
-      const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
-      window.location.href = facebookAuthUrl;
-
-      // const clientId = '699793683081119';
-      // const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/facebook_page.php');
-      // const state = generateState(8);
-      // const scope = 'email,public_profile,pages_show_list,pages_read_engagement,pages_manage_posts,pages_messaging,pages_manage_metadata';
-      // const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
-      // window.location.href = facebookAuthUrl;
-    });
-
-    // Google Login
-    document.getElementById('loginGoogleBtn')?.addEventListener('click', function() {
-      const clientId = '262467068023-qhh35u6a7gkiqvdndgl4ldr2l6nqcdgh.apps.googleusercontent.com';
-      const redirectUri = encodeURIComponent('http://localhost:3000/demo_web_app/api/google_auth.php');
-      const state = randomString(12);
-      const scope = encodeURIComponent('https://www.googleapis.com/auth/drive');
-
-      const authUrl =
-        `https://accounts.google.com/o/oauth2/v2/auth` +
-        `?response_type=code` +
-        `&client_id=${clientId}` +
-        `&redirect_uri=${redirectUri}` +
-        `&scope=${scope}` +
-        `&state=${state}` +
-        `&access_type=offline`;
-
-      window.location.href = authUrl;
-    });
-    
-  });
-
   //================= SET TIME ZONE ================================
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   fetch(`${pathConfig.BASE_WEB}/time_zone/set-timezone.php`, {
