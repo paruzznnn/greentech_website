@@ -110,7 +110,7 @@
 
 <div class="navbar-news">
   <div class="container">
-    <!-- <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();"> -->
+    <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
       <div style="display: inline;">
         <span style="padding: 0 50px;">
           <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
@@ -120,7 +120,7 @@
           </a>
         </span>
       </div>
-    <!-- </marquee> -->
+    </marquee>
   </div>
 </div>
 

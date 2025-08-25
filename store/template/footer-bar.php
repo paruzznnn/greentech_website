@@ -291,7 +291,8 @@
             const clientId = '262467068023-qhh35u6a7gkiqvdndgl4ldr2l6nqcdgh.apps.googleusercontent.com';
             const redirectUri = encodeURIComponent(pathConfig.GOOGLE_REDIRECT);
             const state = randomString(12);
-            const scope = encodeURIComponent('https://www.googleapis.com/auth/drive');
+            // const scope = encodeURIComponent('https://www.googleapis.com/auth/drive');
+            const scope = encodeURIComponent('openid profile email');
             const authUrl =
                 `https://accounts.google.com/o/oauth2/v2/auth` +
                 `?response_type=code` +
@@ -302,7 +303,6 @@
                 `&access_type=offline`;
             window.location.href = authUrl;
         });
-
     });
 </script>
 
