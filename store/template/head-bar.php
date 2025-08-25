@@ -171,12 +171,21 @@
       <form id="formLogin" class="form-space-y" data-url="<?php echo $BASE_WEB?>auth/check-login.php" data-redir="<?php echo $BASE_WEB?>user/" data-type="login">
         <input type="text" name="action" value="checkLogin" hidden>
         <div>
-          <label for="login-email" class="form-label">ชื่อผู้ใช้:</label>
-          <input type="text" id="login-email" name="login-email" class="form-input" placeholder="email@example.com" required>
+          <label for="login_email" class="form-label">อีเมล:</label>
+          <input type="text" id="login_email" name="login_email" class="form-input" placeholder="email@example.com" required>
         </div>
-        <div>
-          <label for="login-password" class="form-label">รหัสผ่าน:</label>
-          <input type="password" id="login-password" name="login-password" class="form-input" placeholder="••••••••" required>
+
+        <div class="form-group">
+          <label for="login_password" class="form-label">รหัสผ่าน:</label>
+          <div class="input-wrapper">
+            <input type="password" id="login_password" name="login_password"
+              class="form-input"
+              placeholder="••••••••" required>
+            <button type="button" onclick="togglePassword('login_password')"
+              class="toggle-btn">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
         </div>
 
         <div class="auth-remember">
@@ -231,39 +240,40 @@
 
     <!-- Tab Content: Register -->
     <div id="register-content" class="tab-content">
-      <form id="formRegister" class="form-space-y" data-url="<?php echo $BASE_WEB?>auth/check-login.php" data-redir="" data-type="register">
-        <div>
+      <form id="formRegister" class="form-space-y" data-url="<?php echo $BASE_WEB?>auth/check-register.php" data-redir="<?php echo $BASE_WEB?>user/" data-type="register">
+        <input type="text" name="action" value="checkRegister" hidden>
+        <!-- <div>
           <label for="register-username" class="form-label">ชื่อผู้ใช้:</label>
           <input type="text" id="register-username" name="register-username" class="form-input" placeholder="ชื่อผู้ใช้ของคุณ" required>
-        </div>
+        </div> -->
         <div>
-          <label for="register-email" class="form-label">อีเมล:</label>
-          <input type="email" id="register-email" name="register-email" class="form-input" placeholder="email@example.com" required>
+          <label for="register_email" class="form-label">อีเมล:</label>
+          <input type="email" id="register_email" name="register_email" class="form-input" placeholder="email@example.com" required>
         </div>
 
         <div class="form-group">
-          <label for="register-password" class="form-label">รหัสผ่าน:</label>
+          <label for="register_password" class="form-label">รหัสผ่าน:</label>
           <div class="input-wrapper">
-            <input type="password" id="register-password" name="register-password"
+            <input type="password" id="register_password" name="register_password"
               class="form-input"
               placeholder="••••••••" required>
-            <button type="button" onclick="togglePassword('register-password')"
+            <!-- <button type="button" onclick="togglePassword('register-password')"
               class="toggle-btn">
               <i class="far fa-eye"></i>
-            </button>
+            </button> -->
           </div>
         </div>
 
         <div class="form-group">
-          <label for="register-confirm-password" class="form-label">ยืนยันรหัสผ่าน:</label>
+          <label for="register_confirm_password" class="form-label">ยืนยันรหัสผ่าน:</label>
           <div class="input-wrapper">
-            <input type="password" id="register-confirm-password" name="register-confirm-password"
+            <input type="password" id="register_confirm_password" name="register_confirm_password"
               class="form-input"
               placeholder="••••••••" required>
-            <button type="button" onclick="togglePassword('register-confirm-password')"
+            <!-- <button type="button" onclick="togglePassword('register-confirm-password')"
               class="toggle-btn">
               <i class="far fa-eye"></i>
-            </button>
+            </button> -->
           </div>
           <div id="matchMessage" class="message"></div>
         </div>
@@ -289,7 +299,7 @@
         </div>
 
         <p class="auth-policy">
-          <input class="form-check-input" type="checkbox" value="" id="accept-policy">
+          <input class="form-check-input" type="checkbox" id="accept_policy" name="accept_policy" required>
           <span>
             การลงทะเบียนเข้าใช้งานหมายถึงฉันยอมรับ
             <a href="<?php echo $BASE_WEB?>terms.php">เงื่อนไขการใช้งาน</a>และ
@@ -298,8 +308,7 @@
         </p>
 
         <!-- <div class="g-recaptcha" data-sitekey="6LeEp5YrAAAAAE9gUav_bHzqkYrPpC5CAttb_xXv"></div> -->
-
-        <button type="submit" class="form-button register-button">
+        <button type="submit" id="submit-register" class="form-button register-button">
           ลงทะเบียน
         </button>
 
@@ -456,9 +465,10 @@
     const loginContent = document.getElementById("login-content");
     const registerContent = document.getElementById("register-content");
 
-    const passwordInput = document.getElementById("register-password");
-    const confirmInput = document.getElementById("register-confirm-password");
+    const passwordInput = document.getElementById("register_password");
+    const confirmInput = document.getElementById("register_confirm_password");
     const matchMessage = document.getElementById("matchMessage");
+    const submitRegister = document.getElementById("submit-register");
 
     const rules = {
       length: document.getElementById("rule-length"),
@@ -474,7 +484,7 @@
     }
 
     if (passwordInput && confirmInput && matchMessage) {
-      setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules);
+      setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules, submitRegister);
     }
 
     exposeTogglePassword(window);

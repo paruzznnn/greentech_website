@@ -28,13 +28,23 @@ export function setupAuthModal(loginTab, registerTab, loginContent, registerCont
   registerTab?.addEventListener("click", () => setActiveTab("register"));
 }
 
-export function setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules) {
+export function setupPasswordValidation(passwordInput, confirmInput, matchMessage, rules, submitButton) {
   function updateRules(value) {
-    rules.length.className = `rule-${value.length >= 8 ? "pass" : "fail"}`;
-    rules.lower.className = `rule-${/[a-z]/.test(value) ? "pass" : "fail"}`;
-    rules.upper.className = `rule-${/[A-Z]/.test(value) ? "pass" : "fail"}`;
-    rules.digit.className = `rule-${/[0-9]/.test(value) ? "pass" : "fail"}`;
-    rules.special.className = `rule-${/[!@#$%^&*(),.?":{}|<>]/.test(value) ? "pass" : "fail"}`;
+    const ruleStates = {
+      length: value.length >= 8,
+      lower: /[a-z]/.test(value),
+      upper: /[A-Z]/.test(value),
+      digit: /[0-9]/.test(value),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+    };
+
+    rules.length.className = `rule-${ruleStates.length ? "pass" : "fail"}`;
+    rules.lower.className = `rule-${ruleStates.lower ? "pass" : "fail"}`;
+    rules.upper.className = `rule-${ruleStates.upper ? "pass" : "fail"}`;
+    rules.digit.className = `rule-${ruleStates.digit ? "pass" : "fail"}`;
+    rules.special.className = `rule-${ruleStates.special ? "pass" : "fail"}`;
+
+    return Object.values(ruleStates).every(Boolean); // true if all rules pass
   }
 
   function checkPasswordMatch() {
@@ -42,31 +52,34 @@ export function setupPasswordValidation(passwordInput, confirmInput, matchMessag
     const confirmPwd = confirmInput.value;
 
     if (!confirmPwd) {
-      matchMessage.textContent = "";
+      matchMessage.textContent = "โปรดยืนยันรหัสผ่าน";
       matchMessage.className = "message";
-      return;
+      return false;
     }
 
     if (pwd === confirmPwd) {
       matchMessage.textContent = "รหัสผ่านตรงกัน";
       matchMessage.className = "message success";
+      return true;
     } else {
       matchMessage.textContent = "รหัสผ่านไม่ตรงกัน";
       matchMessage.className = "message error";
+      return false;
     }
   }
 
+  function updateSubmitState() {
+    const rulesValid = updateRules(passwordInput.value);
+    const passwordsMatch = checkPasswordMatch();
+    submitButton.disabled = !(rulesValid && passwordsMatch);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
-    updateRules(passwordInput.value);
-    checkPasswordMatch();
+    updateSubmitState();
   });
 
-  passwordInput?.addEventListener("input", () => {
-    updateRules(passwordInput.value);
-    checkPasswordMatch();
-  });
-
-  confirmInput?.addEventListener("input", checkPasswordMatch);
+  passwordInput?.addEventListener("input", updateSubmitState);
+  confirmInput?.addEventListener("input", updateSubmitState);
 }
 
 export function exposeTogglePassword(target = window) {
