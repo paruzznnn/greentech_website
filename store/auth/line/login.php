@@ -1,5 +1,5 @@
 <?php
-include_once '../lib/connect_sqli.php';
+require_once '../../server/connect_sqli.php';
 $client_id = $_ENV['LINE_CLIENT_ID'];
 $client_secret = $_ENV['LINE_CLIENT_SECRET'];
 $redirect_uri = $_ENV['LINE_REDIRECT_URI'];
@@ -8,134 +8,154 @@ $redirect_uri = $_ENV['LINE_REDIRECT_URI'];
 /*           FUNCTIONS           */
 /* ----------------------------- */
 
-function getLineToken($code) {
-    global $client_id, $client_secret, $redirect_uri;
-    $params = http_build_query([
-        'grant_type' => 'authorization_code',
-        'code' => $code,
-        'client_id' => $client_id,
-        'client_secret' => $client_secret,
-        'redirect_uri' => $redirect_uri
-    ]);
+class LineAuth {
+    private $client_id;
+    private $client_secret;
+    private $redirect_uri;
 
-    $curl = curl_init("https://api.line.me/oauth2/v2.1/token");
-
-    curl_setopt_array($curl, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => $params,
-        CURLOPT_HTTPHEADER => [
-            "Content-Type: application/x-www-form-urlencoded"
-        ],
-        CURLOPT_SSL_VERIFYPEER => false
-    ]);
-
-    $response = curl_exec($curl);
-    $err = curl_error($curl);
-    curl_close($curl);
-
-    if ($err) {
-        return json_encode(['error' => true, 'message' => $err]);
+    public function __construct($client_id, $client_secret, $redirect_uri) {
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
+        $this->redirect_uri = $redirect_uri;
     }
 
-    return $response;
-}
+    public function getAccessToken($code) {
+        $params = http_build_query([
+            'grant_type' => 'authorization_code',
+            'code' => $code,
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
+            'redirect_uri' => $this->redirect_uri
+        ]);
 
-function getLineProfile($access_token) {
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://api.line.me/v2/profile", 
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer " . $access_token
-        ],
-        CURLOPT_SSL_VERIFYPEER => false 
-    ));
+        $curl = curl_init("https://api.line.me/oauth2/v2.1/token");
 
-    $response = curl_exec($curl);
-    curl_close($curl);
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $params,
+            CURLOPT_HTTPHEADER => [
+                "Content-Type: application/x-www-form-urlencoded"
+            ],
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
 
-    return $response;
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        if ($err) {
+            return ['error' => true, 'message' => $err];
+        }
+
+        return json_decode($response, true);
+    }
+
+    public function getUserProfile($access_token) {
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://api.line.me/v2/profile",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer " . $access_token
+            ],
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        return json_decode($response, true);
+    }
 }
 
 if (!isset($_GET['code'])) {
-    echo '<script language="javascript">window.location = "../auth/login";</script>';
+    echo '<script language="javascript">window.location = "../../index.php";</script>';
     exit;
 }
 
-$token_response = json_decode(getLineToken($_GET['code']), true);
-$profile_json = getLineProfile($token_response['access_token']);
-$profile = json_decode($profile_json, true);
+$line = new LineAuth($client_id, $client_secret, $redirect_uri);
 
-echo '<pre>';
-print_r($profile);
-echo '</pre>';
+$token_response = $line->getAccessToken($_GET['code']);
+
+if (isset($token_response['access_token'])) {
+    $profile = $line->getUserProfile($token_response['access_token']);
+
+    echo '<pre>';
+    print_r($profile);
+    echo '</pre>';
+} else {
+    echo "❌ ไม่สามารถรับ access token ได้:";
+    echo '<pre>';
+    print_r($token_response);
+    echo '</pre>';
+}
 exit;
 
 
-if (isset($token_response['access_token'])) {
-    $profile_json = getLineProfile($token_response['access_token']);
-    $profile = json_decode($profile_json, true);
+// if (isset($token_response['access_token'])) {
+//     $profile_json = getLineProfile($token_response['access_token']);
+//     $profile = json_decode($profile_json, true);
 
-    $line_id = $profile['userId'];
-    $stmt_select = $conn->prepare("SELECT m_id, line_id, register FROM m_member WHERE line_id = ?");
-    $stmt_select->bind_param("s", $line_id);
-    $stmt_select->execute();
-    $result_select = $stmt_select->get_result();
+//     $line_id = $profile['userId'];
+//     $stmt_select = $conn->prepare("SELECT m_id, line_id, register FROM m_member WHERE line_id = ?");
+//     $stmt_select->bind_param("s", $line_id);
+//     $stmt_select->execute();
+//     $result_select = $stmt_select->get_result();
 
-    if ($result_select->num_rows > 0) {
+//     if ($result_select->num_rows > 0) {
 
-        $row = $result_select->fetch_assoc();
-        if ($line_id == $row['line_id']) {
-            $jwt = generateJWT($row['m_id']); 
-            if($jwt['token']){
-                $iat = $jwt['data']->iat;
-                $exp = $jwt['data']->exp;
-                $_SESSION['member_id'] = $row['m_id'];
-                $_SESSION['register'] = $row['register'];
-                $_SESSION['iat'] = $iat;
-                $_SESSION['exp'] = $exp;
-                echo '<script language="javascript">window.location = "../app/index";</script>';
-            }else{
-                echo '<script language="javascript">window.location = "../auth/login";</script>';
-            }
-        }
+//         $row = $result_select->fetch_assoc();
+//         if ($line_id == $row['line_id']) {
+//             $jwt = generateJWT($row['m_id']); 
+//             if($jwt['token']){
+//                 $iat = $jwt['data']->iat;
+//                 $exp = $jwt['data']->exp;
+//                 $_SESSION['member_id'] = $row['m_id'];
+//                 $_SESSION['register'] = $row['register'];
+//                 $_SESSION['iat'] = $iat;
+//                 $_SESSION['exp'] = $exp;
+//                 echo '<script language="javascript">window.location = "../app/index";</script>';
+//             }else{
+//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
+//             }
+//         }
 
-    } else {
+//     } else {
   
-        $register = 'N';
-        $stmt_insert = $conn->prepare("INSERT INTO m_member (date_signup, line_id, register) VALUES (NOW(), ?, ?)");
-        $stmt_insert->bind_param("ss", $line_id, $register);
-        $success = $stmt_insert->execute();
-        $last_id = $conn->insert_id;
+//         $register = 'N';
+//         $stmt_insert = $conn->prepare("INSERT INTO m_member (date_signup, line_id, register) VALUES (NOW(), ?, ?)");
+//         $stmt_insert->bind_param("ss", $line_id, $register);
+//         $success = $stmt_insert->execute();
+//         $last_id = $conn->insert_id;
 
-        if(!empty($last_id)){
-            $jwt = generateJWT($last_id); 
-            if($jwt['token']){
+//         if(!empty($last_id)){
+//             $jwt = generateJWT($last_id); 
+//             if($jwt['token']){
 
-                $iat = $jwt['data']->iat;
-                $exp = $jwt['data']->exp;
+//                 $iat = $jwt['data']->iat;
+//                 $exp = $jwt['data']->exp;
 
-                $_SESSION['member_id'] = $last_id;
-                $_SESSION['register'] = $register;
-                $_SESSION['iat'] = $iat;
-                $_SESSION['exp'] = $exp;
+//                 $_SESSION['member_id'] = $last_id;
+//                 $_SESSION['register'] = $register;
+//                 $_SESSION['iat'] = $iat;
+//                 $_SESSION['exp'] = $exp;
 
-                echo '<script language="javascript">window.location = "../app/index";</script>';
-            }else{
-                echo '<script language="javascript">window.location = "../auth/login";</script>';
-            }
-        }
+//                 echo '<script language="javascript">window.location = "../app/index";</script>';
+//             }else{
+//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
+//             }
+//         }
 
-        $stmt_insert->close();
-    }
+//         $stmt_insert->close();
+//     }
 
-    $stmt_select->close();
-    $conn->close();
+//     $stmt_select->close();
+//     $conn->close();
 
-} else {
-    echo "Failed to get access token";
-}
+// } else {
+//     echo "Failed to get access token";
+// }
 
 ?>
