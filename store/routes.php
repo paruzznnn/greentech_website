@@ -79,14 +79,14 @@ switch ($ROUTE['controller']) {
     case 'user':
     case 'payment':
 
-        $GLOBALS['BASE_WEB'] = getBasePath();
-        echo "
-        <script>
-            var pathConfig = {
-                BASE_WEB: " . json_encode($BASE_WEB) . "
-            };
-        </script>
-        ";
+$GLOBALS['BASE_WEB'] = getBasePath();
+echo "
+<script>
+    var pathConfig = {
+        BASE_WEB: " . json_encode($BASE_WEB) . "
+    };
+</script>
+";
 
         break;
     default:
@@ -100,15 +100,26 @@ switch ($ROUTE['controller']) {
         // } else {
             // session_destroy();
         // }
+        // echo '<pre>';
+        // print_r($_SERVER);
+        // echo '</pre>';
 
-        $GLOBALS['BASE_WEB'] = getBasePath();
-        echo "
-        <script>
-            var pathConfig = {
-                BASE_WEB: " . json_encode($BASE_WEB) . "
-            };
-        </script>
-        ";
+$GLOBALS['BASE_WEB'] = getBasePath();
+echo '
+<script>
+//=============================================================//
+//                    Developed by: THE DEVELOPER              //
+//                 Name: Kittinanthanatch Seekaewnamsai        //
+//             © 2025 | Code with precision and purpose        //
+//=============================================================//
+var pathConfig = {
+    BASE_WEB: ' . json_encode($GLOBALS['BASE_WEB']) . ',
+    LINE_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/line/login.php") . ',
+    FACE_BOOK_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/facebook/login.php") . ',
+    GOOGLE_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/google/login.php") . '
+};
+</script>
+';
 
         break;
 }

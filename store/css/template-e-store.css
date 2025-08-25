@@ -47,10 +47,9 @@ h5 {
 /*-------------------------------------------
   Breadcrumb
 -------------------------------------------*/
-nav[aria-label="Breadcrumb"] {
-  /* background-color: #ffffff; */
+
+#breadcrumb-box {
   padding-top: 20px;
-  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); */
   width: 100%;
 }
 
@@ -389,9 +388,10 @@ nav[aria-label="Breadcrumb"] {
 .navbar-news {
   position: relative;
   top: 0;
-  background-color: #ffffff;
-  border-bottom: 1px solid #eaeaea3d;
-  padding-top: 8px;
+  background-color: #ff98000d;
+  border-bottom: 1px solid #eaeaea;
+  /* padding-top: 8px; */
+  padding: 3px 0px;
 }
 
 /*---------------------------------------
@@ -1289,10 +1289,9 @@ body.modal-open {
   Lang              
 -----------------------------------------*/
 
-#langButtons {
+/* #langButtons {
   display: flex;
   justify-content: flex-end;
-  /* margin-right: 25px; */
   margin-top: 0.5rem;
   align-items: center;
   gap: 5px;
@@ -1313,6 +1312,74 @@ body.modal-open {
 #langButtons button.active {
   color: #ff7800;
   border-bottom: 2px solid #ff7800;
+} */
+
+/* Navbar Container */
+.navbar-service {
+    /* background-color: #f8f9fa; */
+    border-bottom: 1px solid #dddddd33;
+    padding: 8px 0;
+    font-size: 12px;
+}
+
+/* Wrapper */
+.navbar-service-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.nav-service-link-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-link-group-left {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nav-link-group-right {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-service-link {
+  color: #333;
+  text-decoration: none;
+}
+
+
+/* Language Buttons */
+.lang-buttons-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-lang {
+    border: none;
+    /* padding: 5px 12px; */
+    border-radius: 4px;
+    background-color: #e9ecef;
+    color: #333;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-lang.active {
+    background-color: #FF9800;
+    color: #fff;
+}
+
+
+.btn-lang:hover {
+    background-color: #d6d8db;
 }
 
 /*---------------------------------------
