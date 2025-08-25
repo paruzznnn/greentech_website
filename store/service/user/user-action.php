@@ -51,112 +51,21 @@ if ($action == 'addAddress') {
 
     unset($dataJson['action']);
     $addresses = [];
-
     foreach ($dataJson as $key => $value) {
         if (preg_match('/^(.*?)_(\d+)$/', $key, $matches)) {
             $field = $matches[1];
             $index = $matches[2];
-
             $addresses[$index][$field] = $value;
         }
     }
 
-    // $checkIns = false;
-    // foreach ($addresses as $address) {
-
-    //     if ($address['addressRemove'] == 0) {
-
-    //         if ($address['addressID'] == 0) {
-
-    //             $address_data = [
-    //                 'member_id' => $userId,
-    //                 'full_name' => $address['full_name'],
-    //                 'phone_number' => $address['phone_number'],
-    //                 'address_detail' => $address['address_detail'],
-    //                 'province_code' => $address['province'],
-    //                 'district_code' => $address['district'],
-    //                 'subdistrict_code' => $address['subdistrict'],
-    //                 'post_code' => $address['postalCode'],
-    //                 'status' => $address['setupShipping'],
-    //                 'timezone' => $timeZone,
-    //                 'create_date' => $dateNow
-    //             ];
-    //             // INSERT
-    //             if (insertData($conn_cloudpanel, 'ecm_address', $address_data)) {
-    //                 $checkIns = true;
-    //             } else {
-    //                 $checkIns = false;
-    //             }
-    //         } else {
-
-    //             $address_data = [
-    //                 'member_id' => $userId,
-    //                 'full_name' => $address['full_name'],
-    //                 'phone_number' => $address['phone_number'],
-    //                 'address_detail' => $address['address_detail'],
-    //                 'province_code' => $address['province'],
-    //                 'district_code' => $address['district'],
-    //                 'subdistrict_code' => $address['subdistrict'],
-    //                 'post_code' => $address['postalCode'],
-    //                 'status' => $address['setupShipping'],
-    //                 'timezone' => $timeZone,
-    //                 'update_date' => $dateNow
-    //             ];
-
-    //             $conditions = [
-    //                 'address_id' => $address['addressID']
-    //             ];
-
-    //             if (updateData($conn_cloudpanel, 'ecm_address', $address_data, $conditions)) {
-    //                 $checkIns = true;
-    //             } else {
-    //                 $checkIns = false;
-    //             }
-    //         }
-
-    //     } else {
-
-    //         $address_data = [
-    //             'member_id' => $userId,
-    //             'full_name' => $address['full_name'],
-    //             'phone_number' => $address['phone_number'],
-    //             'address_detail' => $address['address_detail'],
-    //             'province_code' => $address['province'],
-    //             'district_code' => $address['district'],
-    //             'subdistrict_code' => $address['subdistrict'],
-    //             'post_code' => $address['postalCode'],
-    //             'del' => $address['addressRemove'],
-    //             'status' => $address['setupShipping'],
-    //             'timezone' => $timeZone,
-    //             'update_date' => $dateNow
-    //         ];
-
-    //         $conditions = [
-    //             'member_id' => $userId,
-    //             'address_id' => $address['addressID']
-    //         ];
-
-    //         if (updateData($conn_cloudpanel, 'ecm_address', $address_data, $conditions)) {
-    //             $checkIns = true;
-    //         } else {
-    //             $checkIns = false;
-    //         }
-
-    //     }
-    // }
-
     $checkIns = false;
-
-    // ตรวจสอบว่า $addresses เป็น array และไม่ว่าง
     if (is_array($addresses) && count($addresses) > 0) {
-
         foreach ($addresses as $address) {
-
             // ข้ามถ้าไม่ใช่ array
             if (!is_array($address)) {
                 continue;
             }
-
             // เตรียมข้อมูลที่ใช้ร่วมกัน
             $address_data = [
                 'member_id' => $userId,
@@ -170,41 +79,30 @@ if ($action == 'addAddress') {
                 'status' => $address['setupShipping'],
                 'timezone' => $timeZone
             ];
-
             // หากเป็นการลบที่อยู่
             if ($address['addressRemove'] != 0) {
-
                 $address_data['del'] = $address['addressRemove'];
                 $address_data['update_date'] = $dateNow;
-
                 $conditions = [
                     'member_id'  => $userId,
                     'address_id' => $address['addressID']
                 ];
-
                 if (updateData($conn_cloudpanel, 'ecm_address', $address_data, $conditions)) {
                     $checkIns = true;
                 }
-
                 continue; // ไป address ถัดไป
             }
-
             // หากเป็นการเพิ่มที่อยู่ใหม่
             if ($address['addressID'] == 0) {
-
                 $address_data['create_date'] = $dateNow;
-
                 if (insertData($conn_cloudpanel, 'ecm_address', $address_data)) {
                     $checkIns = true;
                 }
             } else { // เป็นการอัปเดตที่อยู่
-
                 $address_data['update_date'] = $dateNow;
-
                 $conditions = [
                     'address_id' => $address['addressID']
                 ];
-
                 if (updateData($conn_cloudpanel, 'ecm_address', $address_data, $conditions)) {
                     $checkIns = true;
                 }

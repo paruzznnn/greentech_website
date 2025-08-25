@@ -1,6 +1,7 @@
 <?php
 require_once '../server/connect_sqli.php';
 require_once '../cookie/cookie_utils.php';
+require_once '../server/select_sqli.php';
 header('Content-Type: application/json');
 
 /*------- Authorization AND TIME ZONE ---------- */
@@ -37,29 +38,30 @@ $action = $dataJson['action'];
 
 if ($action == "checkLogin") {
 
+    // login_email: "admin@trandar.com"
+    // login_password: "@Tr123456"
+
+    echo '<pre>';
+    print_r($dataJson);
+    echo '</pre>';
+    exit;
+
     //SETING COOKIE
-    $userId = 1;
+    $userId = isset($dataJson['user_id']) ? (int) $dataJson['user_id'] : 0;
     $jwtData = generateJWT($userId);
     $cookiePrefs = getCookieSettings();
     setAutoCookie($cookiePrefs, $jwtData);
 
     $_SESSION['user'] = [
-        'id' => 1,
+        'id' => $userId,
         'username' => 'admin',
         'role' => 'user'
     ];
 
-
-    // $data = [
-    //     "value" => true
-    // ];
-
     http_response_code(200);
     $response = [
-        // "data" => $data
         "status" => true
     ];
-
     echo json_encode($response);
     exit;
 

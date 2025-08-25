@@ -29,10 +29,24 @@ export function handleFormSubmit(event) {
     })
     .then((res) => res.json())
     .then((response) => {
+
+        if(response.error){
+          alert(response.error);
+          return;
+        }
+
         if(response.status){
           switch (fromType) {
             case "register":
-              
+              postWithAuth('auth/check-login.php', { user_id: response.data.id, action: response.data.action }, 'my_secure_token_123')
+              .then(data => {
+                if(data.status){
+                  redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
+                }
+              })
+              .catch(err => {
+                console.error('Error:', err);
+              });
               break;
             case "login":
               redirectPostForm(fromRedirect, { username: 'admin', password: '1234' });
@@ -120,6 +134,24 @@ redirectGet('/search', { q: 'keyword', page: 2 });
 Exsample GET form
 redirectGetForm('/download', { file: 'report.pdf' }, '_blank');
 =======================================================================*/
+
+export async function postWithAuth(url, params = {}, token) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`, 
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 
 //============ Notify Alert ========================================
 let notificationTimeout;
