@@ -94,5 +94,6 @@
     </div>
 </div>
 <script src='js/edit_users.js?v=<?php echo time(); ?>'></script>
+<script src='../js/index_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>

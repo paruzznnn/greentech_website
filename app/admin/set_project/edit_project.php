@@ -1019,6 +1019,7 @@ $decodedId = $_POST['project_id'];
         // ... (Your existing isValidUrl function) ...
     }
 </script>
+<script src='../js/index_.js?v=<?php echo time(); ?>'></script>
 <script src='js/project_.js?v=<?php echo time(); ?>'></script>
 </body>
 
