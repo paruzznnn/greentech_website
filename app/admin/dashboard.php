@@ -1,4 +1,7 @@
-<?php include 'check_permission.php'; ?>
+<?php include 'check_permission.php'; 
+error_reporting(0);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
