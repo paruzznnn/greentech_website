@@ -38,27 +38,60 @@ $action = $dataJson['action'];
 
 if ($action == "checkLogin") {
 
-    //SETING COOKIE
-    $userId = isset($dataJson['user_id']) ? (int) $dataJson['user_id'] : 1;
-    $jwtData = generateJWT($userId);
-    $cookiePrefs = getCookieSettings();
-    setAutoCookie($cookiePrefs, $jwtData);
+    try {
+        $userId = isset($dataJson['user_id']) ? (int)$dataJson['user_id'] : 0;
 
-    $_SESSION['user'] = [
-        'id' => $userId,
-        'username' => 'admin',
-        'role' => 'user'
-    ];
+        if ($userId > 0) {
+            $jwtData = generateJWT($userId);
+            $cookiePrefs = getCookieSettings();
+            setAutoCookie($cookiePrefs, $jwtData);
+            $conditions = [['column' => 'member_id', 'operator' => '=', 'value' => $userId]];
+            $memberItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+            if (empty($memberItems)) {
+                throw new Exception("ไม่พบข้อมูลสมาชิกที่มี ID = $userId");
+            }
+            $_SESSION['user'] = [
+                'id' => $memberItems[0]['member_id'],
+                'username' => $memberItems[0]['username'] ?? 'unknown',
+                'role' => $memberItems[0]['role'] ?? 'user'
+            ];
+            http_response_code(200);
+            echo json_encode(["status" => true]);
+        } else {
+            if (empty($dataJson['login_email'])) {
+                throw new Exception("ไม่มีข้อมูล login_email");
+            }
+            $conditions = [['column' => 'email', 'operator' => '=', 'value' => $dataJson['login_email']]];
+            $memberItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+            if (empty($memberItems)) {
+                throw new Exception("ไม่พบข้อมูลสมาชิกที่ใช้ email: " . $dataJson['login_email']);
+            }
+            echo '<pre>';
+            print_r($memberItems );
+            echo '</pre>';
+            exit;
 
-    http_response_code(200);
-    $response = [
-        "status" => true
-    ];
-    echo json_encode($response);
-    exit;
+            http_response_code(200);
+            echo json_encode([
+                "status" => true,
+                "data" => $memberItems
+            ]);
+            
+        }
+    } catch (Exception $e) {
+        
+        http_response_code(400);
+        echo json_encode([
+            "status" => false,
+            "error" => $e->getMessage()
+        ]);
 
-}
-else{
+    } finally {
+        $conn_cloudpanel->close();
+        exit;
+    }
+
+} else {
 
     http_response_code(400);
     echo json_encode([
@@ -66,5 +99,3 @@ else{
     ]);
     exit;
 }
-
-?>

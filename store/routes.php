@@ -8,6 +8,7 @@ function getBasePath() {
     routes.php
     inc-cdn.php
     server/connect_sqli.php
+    logout.php
     ==================================*/
 
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')

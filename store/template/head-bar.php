@@ -388,15 +388,23 @@
     const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
 
     const isHomePage = (
-      pathSegments.length === 1 && pathSegments[0] === 'store' ||
-      pathSegments.length === 2 && pathSegments.includes('trandar_website') && pathSegments.includes('store')
-    );
+    // กรณี /store
+    (pathSegments.length === 1 && pathSegments[0] === 'store') ||
+    // กรณี /trandar_website/store
+    (pathSegments.length === 2 &&
+      pathSegments[0] === 'trandar_website' &&
+      pathSegments[1] === 'store') ||
+    // กรณี /trandar_website/store/index.php
+    (pathSegments.length === 3 &&
+      pathSegments[0] === 'trandar_website' &&
+      pathSegments[1] === 'store' &&
+      pathSegments[2] === 'index.php')
+  );
 
     const breadcrumbBox = document.getElementById('breadcrumb-box');
     breadcrumbBox.style.display = isHomePage ? "none" : "block";
 
     if (isHomePage) {
-      
       return;
     }
 

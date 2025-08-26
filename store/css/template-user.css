@@ -1477,6 +1477,16 @@ textarea.form-input {
   }
 }
 
+/* ----------------------------------------------------
+  Logout
+---------------------------------------------------- */
+.btn-user-logout {
+  text-decoration: none;
+  background-color: #FF5722;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
 
 /* ----------------------------------------------------
   @Media

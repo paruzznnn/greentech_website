@@ -19,7 +19,7 @@
         <div id="section_root_payment">
             <section id="section_payment" class="section-space">
                 <div class="container">
-                    <form id="formOrder" data-url="<?php echo $BASE_WEB ?>service/payment/payment-data.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="pay">
+                    <form id="formOrder" data-url="<?php echo $BASE_WEB ?>service/payment/payment-action.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="pay">
                         <input type="text" name="action" value="payOrder" hidden>
                         <input type="text" name="order_id" id="order_id" value="" hidden>
 
@@ -187,7 +187,7 @@
             const provinces = await fetchProvincesData(baseWeb + 'locales/provinces.json');
             const districts = await fetchDistrictsData(baseWeb + 'locales/districts.json');
             const subdistricts = await fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
-            const service = pathConfig.BASE_WEB + 'service/payment/payment-data.php';
+            const service = pathConfig.BASE_WEB + 'service/payment/payment-action.php';
 
             CheckoutUI.init(
                 provinces,

@@ -178,9 +178,12 @@
     <div class="container">
         <p>&copy; 2025 Trandar Store. สงวนลิขสิทธิ์.</p>
         <nav class="footer-nav">
-            <a href="#privacy-policy">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อตกลงการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+            <!-- <a href="#privacy-policy">นโยบายความเป็นส่วนตัว</a>
             <a href="#terms">ข้อตกลงการใช้งาน</a>
-            <a href="#contact">ติดต่อเรา</a>
+            <a href="#contact">ติดต่อเรา</a> -->
         </nav>
         <div class="footer-social">
             <span>ติดตามเรา: </span>
