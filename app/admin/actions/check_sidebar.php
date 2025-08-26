@@ -10,13 +10,11 @@ global $base_path;
 global $base_path_admin;
 global $isFile; // ดึงตัวแปร isFile ที่ประกาศจาก base_directory.php
 if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id'])) {
-    function getUserFromEmail($email) {
-        global $conn;
+    function getUserFromEmail($conn, $email) {
         $sql_user = "SELECT `user_id` FROM `mb_user` WHERE email = '{$email}' LIMIT 1;";
         $stmt_user = $conn->prepare($sql_user);
         if ($stmt_user === false) {
-            echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
-            exit();
+            return '';
         }
         $stmt_user->bind_param("s", $email);
         $stmt_user->execute();
@@ -24,7 +22,7 @@ if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id']
         $userData = $result->fetch_all(MYSQLI_ASSOC);
         return ($userData['user_id']) ? $userData['user_id'] : '';
     }
-    $userId = getUserFromEmail($_SESSION['email']);
+    $userId = getUserFromEmail($conn, $_SESSION['email']);
     if ($userId) {
         $_SESSION['user_id'] = $userId;
     }
