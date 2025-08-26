@@ -1,6 +1,4 @@
-<?php include 'check_permission.php'; 
-error_reporting(0);
-?>
+<?php include 'check_permission.php'; ?>
 
 <!DOCTYPE html>
 <html lang="en">
