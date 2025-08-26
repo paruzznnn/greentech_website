@@ -9,7 +9,7 @@ require_once(__DIR__ . '/../../../lib/permissions.php');
 global $base_path;
 global $base_path_admin;
 global $isFile; // ดึงตัวแปร isFile ที่ประกาศจาก base_directory.php
-var_dump($_SESSION);
+
 if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id'])) {
     function getUserFromEmail($conn, $email) {
         $sql_user = "SELECT `user_id` FROM `mb_user` WHERE `email` = ? LIMIT 1;";
@@ -36,9 +36,7 @@ if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id']
         $_SESSION['user_id'] = $userId;
     }
 }
-var_dump($_SESSION);
 $arrPermiss = checkPermissions($_SESSION);
-var_dump($_SESSION['user_id']); exit;
 $allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['menus_id'])) 
     ? explode(',', $arrPermiss['menus_id']) 
     : [];
