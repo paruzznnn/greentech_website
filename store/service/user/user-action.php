@@ -62,11 +62,11 @@ if ($action == 'addAddress') {
     $checkIns = false;
     if (is_array($addresses) && count($addresses) > 0) {
         foreach ($addresses as $address) {
-            // ข้ามถ้าไม่ใช่ array
+            
             if (!is_array($address)) {
                 continue;
             }
-            // เตรียมข้อมูลที่ใช้ร่วมกัน
+            
             $address_data = [
                 'member_id' => $userId,
                 'full_name' => $address['full_name'],
@@ -79,7 +79,7 @@ if ($action == 'addAddress') {
                 'status' => $address['setupShipping'],
                 'timezone' => $timeZone
             ];
-            // หากเป็นการลบที่อยู่
+        
             if ($address['addressRemove'] != 0) {
                 $address_data['del'] = $address['addressRemove'];
                 $address_data['update_date'] = $dateNow;
@@ -90,15 +90,15 @@ if ($action == 'addAddress') {
                 if (updateData($conn_cloudpanel, 'ecm_address', $address_data, $conditions)) {
                     $checkIns = true;
                 }
-                continue; // ไป address ถัดไป
+                continue;
             }
-            // หากเป็นการเพิ่มที่อยู่ใหม่
+            
             if ($address['addressID'] == 0) {
                 $address_data['create_date'] = $dateNow;
                 if (insertData($conn_cloudpanel, 'ecm_address', $address_data)) {
                     $checkIns = true;
                 }
-            } else { // เป็นการอัปเดตที่อยู่
+            } else {
                 $address_data['update_date'] = $dateNow;
                 $conditions = [
                     'address_id' => $address['addressID']

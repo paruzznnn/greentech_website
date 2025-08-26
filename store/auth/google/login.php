@@ -20,18 +20,21 @@ $dateNow = date('Y-m-d H:i:s');
 /*           FUNCTIONS           */
 /* ----------------------------- */
 
-class GoogleAuth {
+class GoogleAuth
+{
     private $client_id;
     private $client_secret;
     private $redirect_uri;
 
-    public function __construct($client_id, $client_secret, $redirect_uri) {
+    public function __construct($client_id, $client_secret, $redirect_uri)
+    {
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
         $this->redirect_uri = $redirect_uri;
     }
 
-    public function getAccessToken($code) {
+    public function getAccessToken($code)
+    {
         $params = http_build_query([
             'code' => $code,
             'client_id' => $this->client_id,
@@ -66,7 +69,8 @@ class GoogleAuth {
         return json_decode($response, true);
     }
 
-    public function getUserProfile($access_token) {
+    public function getUserProfile($access_token)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -75,7 +79,7 @@ class GoogleAuth {
             CURLOPT_HTTPHEADER => [
                 "Authorization: Bearer " . $access_token
             ],
-            CURLOPT_SSL_VERIFYPEER => false 
+            CURLOPT_SSL_VERIFYPEER => false
         ]);
 
         $response = curl_exec($curl);
@@ -93,54 +97,87 @@ if (!isset($_GET['code'])) {
 }
 
 $tokenData = $googleAuth->getAccessToken($_GET['code']);
-
 if (isset($tokenData['access_token'])) {
-
-    $profile = $googleAuth->getUserProfile($tokenData['access_token']);
-    $conditions = [
-        [
-            'column' => 'google_id', 
-            'operator' => '=', 
-            'value' => $profile['id']
-        ]
-    ];
-    $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, 'google_id');
-    if(empty($googleItems)){
-        $ins_google = [
-            'google_id' => $profile['id'],
-            'google_email' => $profile['email'],
-            'google_name' => $profile['name'],
-            'google_pic' => $profile['picture'],
-            'timezone' => $timeZone,
-            'created_at' => $dateNow
-        ];
-        insertData($conn_cloudpanel, 'ecm_member_google', $ins_google);
-        $ins_member = [
-            'google_id' => $profile['id'],
-            'accept_policy' => 1,
-            'timezone' => $timeZone,
-            'created_at' => $dateNow
-        ];
-        insertData($conn_cloudpanel, 'ecm_member', $ins_member);
-    }else{
+    try {
+        $profile = $googleAuth->getUserProfile($tokenData['access_token']);
+        if (!$profile) {
+            throw new Exception("Failed to retrieve Google user profile.");
+        }
         $conditions = [
             [
-                'column' => 'google_id', 
-                'operator' => '=', 
-                'value' => $googleItems[0]['google_id']
+                'column' => 'google_id',
+                'operator' => '=',
+                'value' => $profile['id']
             ]
         ];
-        $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
-        $userId = isset($googleItems[0]['member_id']) ? (int) $googleItems[0]['member_id'] : 0;
-        $jwtData = generateJWT($userId);
-        $cookiePrefs = getCookieSettings();
-        setAutoCookie($cookiePrefs, $jwtData);
-        $_SESSION['user'] = [
-            'id' => $userId,
-            'username' => 'admin',
-            'role' => 'user'
-        ];
-        echo '<script language="javascript">window.location = "../../user/";</script>';
+        $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, 'google_id');
+        if ($googleItems === false) {
+            throw new Exception("Database error: Failed to select data from ecm_member.");
+        }
+        if (empty($googleItems)) {
+            $ins_google = [
+                'google_id' => $profile['id'],
+                'google_email' => $profile['email'],
+                'google_name' => $profile['name'],
+                'google_pic' => $profile['picture'],
+                'timezone' => $timeZone,
+                'created_at' => $dateNow
+            ];
+            $insertGoogleResult = insertData($conn_cloudpanel, 'ecm_member_google', $ins_google);
+            if ($insertGoogleResult === false) {
+                throw new Exception("Database error: Failed to insert data into ecm_member_google.");
+            }
+            $ins_member = [
+                'google_id' => $profile['id'],
+                'accept_policy' => 1,
+                'timezone' => $timeZone,
+                'created_at' => $dateNow
+            ];
+            $ins_id = insertDataAndGetId($conn_cloudpanel, 'ecm_member', $ins_member);
+            if (!$ins_id) {
+                throw new Exception("Database error: Failed to insert data into ecm_member.");
+            }
+            $userId = (int) $ins_id;
+            $jwtData = generateJWT($userId);
+            $cookiePrefs = getCookieSettings();
+            setAutoCookie($cookiePrefs, $jwtData);
+            $_SESSION['user'] = [
+                'id' => $userId,
+                'username' => 'admin',
+                'role' => 'user'
+            ];
+            echo '<script language="javascript">window.location = "../../user/";</script>';
+        } else {
+            $conditions = [
+                [
+                    'column' => 'google_id',
+                    'operator' => '=',
+                    'value' => $googleItems[0]['google_id']
+                ]
+            ];
+            $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+            if ($googleItems === false || empty($googleItems)) {
+                throw new Exception("Database error: Failed to retrieve member data.");
+            }
+            $userId = isset($googleItems[0]['member_id']) ? (int) $googleItems[0]['member_id'] : 0;
+            if ($userId === 0) {
+                throw new Exception("Invalid user ID retrieved.");
+            }
+            $jwtData = generateJWT($userId);
+            $cookiePrefs = getCookieSettings();
+            setAutoCookie($cookiePrefs, $jwtData);
+            $_SESSION['user'] = [
+                'id' => $userId,
+                'username' => 'admin',
+                'role' => 'user'
+            ];
+            echo '<script language="javascript">window.location = "../../user/";</script>';
+        }
+    } catch (Exception $e) {
+        // Log the error message
+        error_log("Error during Google login: " . $e->getMessage());
+        echo '<script>alert("An error occurred during login. Please try again later."); window.location = "../../login/";</script>';
+    } finally {
         $conn_cloudpanel->close();
         exit;
     }
@@ -152,7 +189,3 @@ if (isset($tokenData['access_token'])) {
     echo '</pre>';
     exit;
 }
-
-
-
-?>

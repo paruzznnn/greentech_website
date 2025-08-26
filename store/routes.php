@@ -8,11 +8,11 @@ function getBasePath() {
     routes.php
     inc-cdn.php
     server/connect_sqli.php
+    logout.php
     ==================================*/
 
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
-
     $scheme = $isHttps ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $path = $isHttps ? '/store/' : '/trandar_website/store/';
@@ -33,7 +33,6 @@ function parseRoute($RELATIVEPath) {
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
     $last = end($segments);//folder
-
     return [
         'controller' => $last ?? '',
         // 'action'     => $segments[1] ?? 'index', //file
@@ -52,9 +51,25 @@ function buildUrl($path = '', $query = []) {
 
 function requireLogin() {
     if (!isset($_SESSION['user'])) {
-        header("Location: " . buildUrl('login.php'));
+        $base = getBasePath();
+        header("Location: " . $base);
         exit;
     }
+}
+
+function requireRole($roles = []) {
+    requireLogin();
+    $userRole = $_SESSION['user']['role'] ?? null;
+    if (!in_array($userRole, $roles)) {
+        show403();
+    }
+}
+
+function show403() {
+    http_response_code(403);
+    echo "<h1>403 Forbidden</h1>";
+    echo "<p>You do not have permission to access this page.</p>";
+    exit;
 }
 
 function redirectTo($path) {
@@ -62,26 +77,30 @@ function redirectTo($path) {
     exit;
 }
 
+// ===== Role-based Access =====
+$accessControl = [
+    'admin'     => ['admin', 'user'],
+    'user'      => ['user', 'admin'],
+    'app'       => ['user', 'admin'],
+    'payment'   => ['user', 'admin'],
+];
+
+// ===== Main Routing =====
 $RELATIVE = getRelativePath();
 $ROUTE = parseRoute($RELATIVE);
 
-if (in_array($ROUTE['controller'], ['dashboard', 'admin', 'user', 'app', 'payment'])) {
-    requireLogin();
-}
+// ===== Verify access rights accordingly. Role =====
+if (array_key_exists($ROUTE['controller'], $accessControl)) {
+    $allowedRoles = $accessControl[$ROUTE['controller']];
+    requireRole($allowedRoles);
 
 switch ($ROUTE['controller']) {
     case 'app':
-        break;
-    case 'dashboard':
         break;
     case 'admin':
         break;
     case 'user':
     case 'payment':
-
-echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
 
 $GLOBALS['BASE_WEB'] = getBasePath();
 echo "
@@ -94,19 +113,13 @@ echo "
 
         break;
     default:
+echo '
+<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง.");</script>
+';
+        break;
+}
 
-// echo '<pre>';
-// print_r($_SESSION);
-// echo '</pre>';
-
-// if (!empty($_SESSION['user'])) {
-//     echo "Welcome back, user ID: " . checkAutoLoginCookie();
-// } else {
-// session_destroy();
-// }
-// echo '<pre>';
-// print_r($_SERVER);
-// echo '</pre>';
+}else{
 
 $GLOBALS['BASE_WEB'] = getBasePath();
 echo '
@@ -125,5 +138,5 @@ var pathConfig = {
 </script>
 ';
 
-        break;
 }
+

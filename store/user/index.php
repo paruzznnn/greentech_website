@@ -58,9 +58,9 @@
                                     <span><i class="bi bi-chat-right-text"></i> รีวิวของฉัน</span>
                                 </li> -->
                                 
-                                <!-- <li data-tab="logout">
+                                <li data-tab="logout">
                                     <span><i class="bi bi-door-open"></i> ออกจากระบบ</span>
-                                </li> -->
+                                </li>
                             </ul>
                         </div>
                         <div class="content">
@@ -174,9 +174,11 @@
                                 </div>
                             </div>
                             <div class="tabContent" id="logout">
-                                <!-- <h2>Logout</h2>
+                                <h2>Logout</h2>
                                 <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
-                                <button>ออกจากระบบ</button> -->
+                                <a class="btn-user-logout" href="../logout.php">
+                                    ยืนยันการออกจากระบบ
+                                </a>
                             </div>
                         </div>
                     </div>
