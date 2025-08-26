@@ -11,7 +11,7 @@ global $base_path_admin;
 global $isFile; // ดึงตัวแปร isFile ที่ประกาศจาก base_directory.php
 if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id'])) {
     function getUserFromEmail($conn, $email) {
-        $sql_user = "SELECT `user_id` FROM `mb_user` WHERE email = '{$email}' LIMIT 1;";
+        $sql_user = "SELECT `user_id` FROM `mb_user` WHERE email = ? LIMIT 1;";
         $stmt_user = $conn->prepare($sql_user);
         if ($stmt_user === false) {
             return '';
