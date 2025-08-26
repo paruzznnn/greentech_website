@@ -11,6 +11,7 @@ global $base_path_admin;
 global $isFile; // ดึงตัวแปร isFile ที่ประกาศจาก base_directory.php
 
 $arrPermiss = checkPermissions($_SESSION);
+print_r($arrPermiss); exit;
 $allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['menus_id'])) 
     ? explode(',', $arrPermiss['menus_id']) 
     : [];

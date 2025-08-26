@@ -1,7 +1,7 @@
 <?php
 function checkPermissions($data)
 {
-
+    return $data;
     if(!empty($data)){
         global $conn;
         $sql = "SELECT
