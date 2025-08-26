@@ -1,8 +1,20 @@
 <?php
 require_once '../../server/connect_sqli.php';
+require_once '../../cookie/cookie_utils.php';
+require_once '../../server/select_sqli.php';
+require_once '../../server/insert_sqli.php';
+require_once '../../server/update_sqli.php';
 $client_id = $_ENV['GOOGLE_CLIENT_ID'];
 $client_secret = $_ENV['GOOGLE_CLIENT_SECRET'];
 $redirect_uri = $_ENV['GOOGLE_REDIRECT_URI'];
+
+if (isset($_SESSION['user_timezone'])) {
+    date_default_timezone_set($_SESSION['user_timezone']);
+} else {
+    date_default_timezone_set("UTC");
+}
+$timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
+$dateNow = date('Y-m-d H:i:s');
 
 /* ----------------------------- */
 /*           FUNCTIONS           */
@@ -85,81 +97,62 @@ $tokenData = $googleAuth->getAccessToken($_GET['code']);
 if (isset($tokenData['access_token'])) {
 
     $profile = $googleAuth->getUserProfile($tokenData['access_token']);
+    $conditions = [
+        [
+            'column' => 'google_id', 
+            'operator' => '=', 
+            'value' => $profile['id']
+        ]
+    ];
+    $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, 'google_id');
+    if(empty($googleItems)){
+        $ins_google = [
+            'google_id' => $profile['id'],
+            'google_email' => $profile['email'],
+            'google_name' => $profile['name'],
+            'google_pic' => $profile['picture'],
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member_google', $ins_google);
+        $ins_member = [
+            'google_id' => $profile['id'],
+            'accept_policy' => 1,
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member', $ins_member);
+    }else{
+        $conditions = [
+            [
+                'column' => 'google_id', 
+                'operator' => '=', 
+                'value' => $googleItems[0]['google_id']
+            ]
+        ];
+        $googleItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+        $userId = isset($googleItems[0]['member_id']) ? (int) $googleItems[0]['member_id'] : 0;
+        $jwtData = generateJWT($userId);
+        $cookiePrefs = getCookieSettings();
+        setAutoCookie($cookiePrefs, $jwtData);
+        $_SESSION['user'] = [
+            'id' => $userId,
+            'username' => 'admin',
+            'role' => 'user'
+        ];
+        echo '<script language="javascript">window.location = "../../user/";</script>';
+        $conn_cloudpanel->close();
+        exit;
+    }
 
-    echo '<pre>';
-    print_r($profile);
-    echo '</pre>';
 } else {
     echo "Failed to get access token.";
     echo '<pre>';
     print_r($tokenData);
     echo '</pre>';
+    exit;
 }
 
-
-// if (isset($token_response['access_token'])) {
-//     $profile_json = getGoogleProfile($token_response['access_token']);
-//     $profile = json_decode($profile_json, true);
-
-//     $google_id = $profile['id'];
-//     $google_email = $profile['email'];
-//     $stmt_select = $conn->prepare("SELECT m_id, google_id, email, register FROM m_member WHERE google_id = ? OR email = ?");
-//     $stmt_select->bind_param("ss", $google_id, $google_email);
-//     $stmt_select->execute();
-//     $result_select = $stmt_select->get_result();
-
-//     if ($result_select->num_rows > 0) {
-
-//         $row = $result_select->fetch_assoc();
-//         if ($google_id == $row['google_id'] || $google_email == $row['email']) {
-//             $jwt = generateJWT($row['m_id']); 
-//             if($jwt['token']){
-//                 $iat = $jwt['data']->iat;
-//                 $exp = $jwt['data']->exp;
-//                 $_SESSION['member_id'] = $row['m_id'];
-//                 $_SESSION['register'] = $row['register'];
-//                 $_SESSION['iat'] = $iat;
-//                 $_SESSION['exp'] = $exp;
-//                 echo '<script language="javascript">window.location = "../app/index";</script>';
-//             }else{
-//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
-//             }
-//         }
-
-//     } else {
-//         // $register = 'N';
-//         // $stmt_insert = $conn->prepare("INSERT INTO m_member (date_signup, google_id, email, register) VALUES (NOW(), ?, ?, ?)");
-//         // $stmt_insert->bind_param("sss", $google_id, $register);
-//         // $success = $stmt_insert->execute();
-//         // $last_id = $conn->insert_id;
-
-//         // if(!empty($last_id)){
-//         //     $jwt = generateJWT($last_id); 
-//         //     if($jwt['token']){
-
-//         //         $iat = $jwt['data']->iat;
-//         //         $exp = $jwt['data']->exp;
-
-//         //         $_SESSION['member_id'] = $last_id;
-//         //         $_SESSION['register'] = $register;
-//         //         $_SESSION['iat'] = $iat;
-//         //         $_SESSION['exp'] = $exp;
-
-//         //         echo '<script language="javascript">window.location = "../app/index";</script>';
-//         //     }else{
-//         //         echo '<script language="javascript">window.location = "../auth/login";</script>';
-//         //     }
-//         // }
-
-//         // $stmt_insert->close();
-//     }
-
-//     $stmt_select->close();
-//     $conn->close();
-
-// } else {
-//     echo "Failed to get access token";
-// }
 
 
 ?>

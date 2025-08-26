@@ -1,8 +1,20 @@
 <?php
 require_once '../../server/connect_sqli.php';
+require_once '../../cookie/cookie_utils.php';
+require_once '../../server/select_sqli.php';
+require_once '../../server/insert_sqli.php';
+require_once '../../server/update_sqli.php';
 $client_id = $_ENV['FACEBOOK_CLIENT_ID'];
 $client_secret = $_ENV['FACEBOOK_CLIENT_SECRET'];
 $redirect_uri = $_ENV['FACEBOOK_REDIRECT_URI'];
+
+if (isset($_SESSION['user_timezone'])) {
+    date_default_timezone_set($_SESSION['user_timezone']);
+} else {
+    date_default_timezone_set("UTC");
+}
+$timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
+$dateNow = date('Y-m-d H:i:s');
 
 /* ----------------------------- */
 /*           FUNCTIONS           */
@@ -51,78 +63,61 @@ $access_token = $fbAuth->getAccessToken($_GET['code']);
 
 if ($access_token) {
     $profile = $fbAuth->getUserProfile($access_token);
-    echo '<pre>';
-    print_r($profile);
-    echo '</pre>';
+    $conditions = [
+        [
+            'column' => 'facebook_id', 
+            'operator' => '=', 
+            'value' => $profile['id']
+        ]
+    ];
+    $facebookItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, 'facebook_id');
+    if(empty($facebookItems)){
+        $ins_google = [
+            'facebook_id' => $profile['id'],
+            'facebook_email ' => $profile['email'],
+            'facebook_name' => $profile['name'],
+            'facebook_pic' => $profile['picture']['data']['url'],
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member_facebook', $ins_google);
+        $ins_member = [
+            'facebook_id' => $profile['id'],
+            'accept_policy' => 1,
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member', $ins_member);
+    }else{
+        $conditions = [
+            [
+                'column' => 'facebook_id', 
+                'operator' => '=', 
+                'value' => $facebookItems[0]['facebook_id']
+            ]
+        ];
+        $facebookItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+        $userId = isset($facebookItems[0]['member_id']) ? (int) $facebookItems[0]['member_id'] : 0;
+        $jwtData = generateJWT($userId);
+        $cookiePrefs = getCookieSettings();
+        setAutoCookie($cookiePrefs, $jwtData);
+        $_SESSION['user'] = [
+            'id' => $userId,
+            'username' => 'admin',
+            'role' => 'user'
+        ];
+        echo '<script language="javascript">window.location = "../../user/";</script>';
+        $conn_cloudpanel->close();
+        exit;
+    }
+
 } else {
     echo 'Failed to get access token.';
+    echo '<pre>';
+    print_r($access_token);
+    echo '</pre>';
+    exit;
 }
-
-
-// if (!empty($access_token)) {
-//     $profile = getFacebookProfile($access_token);
-
-//     $facebook_id = $profile['id'];
-//     $stmt_select = $conn->prepare("SELECT m_id, facebook_id, register FROM m_member WHERE facebook_id = ?");
-//     $stmt_select->bind_param("s", $facebook_id);
-//     $stmt_select->execute();
-//     $result_select = $stmt_select->get_result();
-
-//     if ($result_select->num_rows > 0) {
-
-//         $row = $result_select->fetch_assoc();
-//         if ($facebook_id == $row['facebook_id']) {
-
-//             $jwt = generateJWT($row['m_id']); 
-//             if($jwt['token']){
-
-//                 $iat = $jwt['data']->iat;
-//                 $exp = $jwt['data']->exp;
-
-//                 $_SESSION['member_id'] = $row['m_id'];
-//                 $_SESSION['register'] = $row['register'];
-//                 $_SESSION['iat'] = $iat;
-//                 $_SESSION['exp'] = $exp;
-
-//                 echo '<script language="javascript">window.location = "../app/index";</script>';
-//             }else{
-//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
-//             }
-            
-//         }
-
-//     } else {
-  
-//         $register = 'N';
-//         $stmt_insert = $conn->prepare("INSERT INTO m_member (date_signup, facebook_id, register) VALUES (NOW(), ?, ?)");
-//         $stmt_insert->bind_param("ss", $facebook_id, $register);
-//         $success = $stmt_insert->execute();
-//         $last_id = $conn->insert_id;
-
-//         if(!empty($last_id)){
-//             $jwt = generateJWT($last_id); 
-//             if($jwt['token']){
-//                 $iat = $jwt['data']->iat;
-//                 $exp = $jwt['data']->exp;
-//                 $_SESSION['member_id'] = $last_id;
-//                 $_SESSION['register'] = $register;
-//                 $_SESSION['iat'] = $iat;
-//                 $_SESSION['exp'] = $exp;
-//                 echo '<script language="javascript">window.location = "../app/index";</script>';
-//             }else{
-//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
-//             }
-//         }
-
-//         $stmt_insert->close();  
-//     }
-
-//     $stmt_select->close();
-//     $conn->close();
-
-// } else {
-//     echo "Failed to get access token";
-// }
 
 
 

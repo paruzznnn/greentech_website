@@ -79,6 +79,10 @@ switch ($ROUTE['controller']) {
     case 'user':
     case 'payment':
 
+echo '<pre>';
+print_r($_SESSION);
+echo '</pre>';
+
 $GLOBALS['BASE_WEB'] = getBasePath();
 echo "
 <script>
@@ -91,18 +95,18 @@ echo "
         break;
     default:
 
-        // echo '<pre>';
-        // print_r($_SESSION);
-        // echo '</pre>';
+// echo '<pre>';
+// print_r($_SESSION);
+// echo '</pre>';
 
-        // if (!empty($_SESSION['user'])) {
-        //     echo "Welcome back, user ID: " . checkAutoLoginCookie();
-        // } else {
-            // session_destroy();
-        // }
-        // echo '<pre>';
-        // print_r($_SERVER);
-        // echo '</pre>';
+// if (!empty($_SESSION['user'])) {
+//     echo "Welcome back, user ID: " . checkAutoLoginCookie();
+// } else {
+// session_destroy();
+// }
+// echo '<pre>';
+// print_r($_SERVER);
+// echo '</pre>';
 
 $GLOBALS['BASE_WEB'] = getBasePath();
 echo '
@@ -110,7 +114,7 @@ echo '
 //=============================================================//
 //                    Developed by: THE DEVELOPER              //
 //                 Name: Kittinanthanatch Seekaewnamsai        //
-//             © 2025 | Code with precision and purpose        //
+//                     Phone: 083-894-5256 (FEI)               //
 //=============================================================//
 var pathConfig = {
     BASE_WEB: ' . json_encode($GLOBALS['BASE_WEB']) . ',

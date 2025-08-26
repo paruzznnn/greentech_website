@@ -38,16 +38,8 @@ $action = $dataJson['action'];
 
 if ($action == "checkLogin") {
 
-    // login_email: "admin@trandar.com"
-    // login_password: "@Tr123456"
-
-    echo '<pre>';
-    print_r($dataJson);
-    echo '</pre>';
-    exit;
-
     //SETING COOKIE
-    $userId = isset($dataJson['user_id']) ? (int) $dataJson['user_id'] : 0;
+    $userId = isset($dataJson['user_id']) ? (int) $dataJson['user_id'] : 1;
     $jwtData = generateJWT($userId);
     $cookiePrefs = getCookieSettings();
     setAutoCookie($cookiePrefs, $jwtData);

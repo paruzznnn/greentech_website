@@ -1365,7 +1365,8 @@ body.modal-open {
     border: none;
     /* padding: 5px 12px; */
     border-radius: 4px;
-    background-color: #e9ecef;
+    /* background-color: #e9ecef; */
+    background: none;
     color: #333;
     cursor: pointer;
     font-size: 12px;
