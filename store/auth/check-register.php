@@ -67,6 +67,7 @@ if ($action == "checkRegister") {
             "status" => $checkIns
         ];
         echo json_encode($response);
+        $conn_cloudpanel->close();
         exit;
 
     } catch (mysqli_sql_exception $e) {

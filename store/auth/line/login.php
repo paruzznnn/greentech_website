@@ -1,8 +1,20 @@
 <?php
 require_once '../../server/connect_sqli.php';
+require_once '../../cookie/cookie_utils.php';
+require_once '../../server/select_sqli.php';
+require_once '../../server/insert_sqli.php';
+require_once '../../server/update_sqli.php';
 $client_id = $_ENV['LINE_CLIENT_ID'];
 $client_secret = $_ENV['LINE_CLIENT_SECRET'];
 $redirect_uri = $_ENV['LINE_REDIRECT_URI'];
+
+if (isset($_SESSION['user_timezone'])) {
+    date_default_timezone_set($_SESSION['user_timezone']);
+} else {
+    date_default_timezone_set("UTC");
+}
+$timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
+$dateNow = date('Y-m-d H:i:s');
 
 /* ----------------------------- */
 /*           FUNCTIONS           */
@@ -76,86 +88,66 @@ if (!isset($_GET['code'])) {
 }
 
 $line = new LineAuth($client_id, $client_secret, $redirect_uri);
-
 $token_response = $line->getAccessToken($_GET['code']);
 
 if (isset($token_response['access_token'])) {
-    $profile = $line->getUserProfile($token_response['access_token']);
 
-    echo '<pre>';
-    print_r($profile);
-    echo '</pre>';
+    $profile = $line->getUserProfile($token_response['access_token']);
+    $conditions = [
+        [
+            'column' => 'line_id', 
+            'operator' => '=', 
+            'value' => $profile['userId']
+        ]
+    ];
+    $lineItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, 'line_id');
+    if(empty($lineItems)){
+        $ins_line = [
+            'line_id' => $profile['userId'],
+            'line_name' => $profile['displayName'],
+            'line_pic' => $profile['pictureUrl'],
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member_line', $ins_line);
+        $ins_member = [
+            'line_id' => $profile['userId'],
+            'accept_policy' => 1,
+            'timezone' => $timeZone,
+            'created_at' => $dateNow
+        ];
+        insertData($conn_cloudpanel, 'ecm_member', $ins_member);
+    }else{
+        $conditions = [
+            [
+                'column' => 'line_id', 
+                'operator' => '=', 
+                'value' => $lineItems[0]['line_id']
+            ]
+        ];
+        $lineItems = selectData($conn_cloudpanel, 'ecm_member', $conditions, '*');
+        $userId = isset($lineItems[0]['member_id']) ? (int) $lineItems[0]['member_id'] : 0;
+        $jwtData = generateJWT($userId);
+        $cookiePrefs = getCookieSettings();
+        setAutoCookie($cookiePrefs, $jwtData);
+        $_SESSION['user'] = [
+            'id' => $userId,
+            'username' => 'admin',
+            'role' => 'user'
+        ];
+        echo '<script language="javascript">window.location = "../../user/";</script>';
+        $conn_cloudpanel->close();
+        exit;
+    }
+
 } else {
-    echo "❌ ไม่สามารถรับ access token ได้:";
+
     echo '<pre>';
     print_r($token_response);
     echo '</pre>';
+    exit;
+
 }
-exit;
 
-
-// if (isset($token_response['access_token'])) {
-//     $profile_json = getLineProfile($token_response['access_token']);
-//     $profile = json_decode($profile_json, true);
-
-//     $line_id = $profile['userId'];
-//     $stmt_select = $conn->prepare("SELECT m_id, line_id, register FROM m_member WHERE line_id = ?");
-//     $stmt_select->bind_param("s", $line_id);
-//     $stmt_select->execute();
-//     $result_select = $stmt_select->get_result();
-
-//     if ($result_select->num_rows > 0) {
-
-//         $row = $result_select->fetch_assoc();
-//         if ($line_id == $row['line_id']) {
-//             $jwt = generateJWT($row['m_id']); 
-//             if($jwt['token']){
-//                 $iat = $jwt['data']->iat;
-//                 $exp = $jwt['data']->exp;
-//                 $_SESSION['member_id'] = $row['m_id'];
-//                 $_SESSION['register'] = $row['register'];
-//                 $_SESSION['iat'] = $iat;
-//                 $_SESSION['exp'] = $exp;
-//                 echo '<script language="javascript">window.location = "../app/index";</script>';
-//             }else{
-//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
-//             }
-//         }
-
-//     } else {
-  
-//         $register = 'N';
-//         $stmt_insert = $conn->prepare("INSERT INTO m_member (date_signup, line_id, register) VALUES (NOW(), ?, ?)");
-//         $stmt_insert->bind_param("ss", $line_id, $register);
-//         $success = $stmt_insert->execute();
-//         $last_id = $conn->insert_id;
-
-//         if(!empty($last_id)){
-//             $jwt = generateJWT($last_id); 
-//             if($jwt['token']){
-
-//                 $iat = $jwt['data']->iat;
-//                 $exp = $jwt['data']->exp;
-
-//                 $_SESSION['member_id'] = $last_id;
-//                 $_SESSION['register'] = $register;
-//                 $_SESSION['iat'] = $iat;
-//                 $_SESSION['exp'] = $exp;
-
-//                 echo '<script language="javascript">window.location = "../app/index";</script>';
-//             }else{
-//                 echo '<script language="javascript">window.location = "../auth/login";</script>';
-//             }
-//         }
-
-//         $stmt_insert->close();
-//     }
-
-//     $stmt_select->close();
-//     $conn->close();
-
-// } else {
-//     echo "Failed to get access token";
-// }
 
 ?>
