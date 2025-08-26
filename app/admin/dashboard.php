@@ -413,7 +413,7 @@ $username = $_SESSION['fullname'] ?? 'Admin'; // หรือใส่ชื่�
         <div class="row justify-content-center">
     <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
         <div class="dashboard-card" style="background-color:#ffa726;">
-            <a href="#">
+            <a href="set_users/edit_users.php">
                 <div class="card-inner">
                     <div class="emoji">👤</div>
                     <div class="text-area">
