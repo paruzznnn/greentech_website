@@ -31,7 +31,6 @@ function checkPermissions($data)
             AND acmp.del = ?
         GROUP BY
             mbu.user_id";
-    return $sql;
         $stmt = $conn->prepare($sql);
         if ($stmt === false) {
             echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
