@@ -1001,5 +1001,6 @@ $decodedId = $_POST['blog_id'];
         }
     </script>
     <script src='js/Blog_.js?v=<?php echo time(); ?>'></script>
+    <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>
