@@ -28,7 +28,7 @@ if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id']
     }
 }
 $arrPermiss = checkPermissions($_SESSION);
-print_r($arrPermiss); exit;
+print_r($_SESSION['user_id']); exit;
 $allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['menus_id'])) 
     ? explode(',', $arrPermiss['menus_id']) 
     : [];
