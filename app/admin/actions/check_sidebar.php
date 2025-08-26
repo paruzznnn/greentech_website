@@ -14,16 +14,24 @@ if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id']
     function getUserFromEmail($conn, $email) {
         $sql_user = "SELECT `user_id` FROM `mb_user` WHERE `email` = ? LIMIT 1;";
         $stmt_user = $conn->prepare($sql_user);
+        
         if ($stmt_user === false) {
             return '';
         }
+        
         $stmt_user->bind_param("s", $email);
         $stmt_user->execute();
         $result = $stmt_user->get_result();
-        $userData = $result->fetch_all(MYSQLI_ASSOC);
-        return ($userData['user_id']) ? $userData['user_id'] : '';
+        
+        // Use fetch_assoc() to get a single row as an associative array
+        $userData = $result->fetch_assoc();
+        
+        // Check if a row was returned and if the 'user_id' key exists
+        return (isset($userData['user_id'])) ? $userData['user_id'] : '';
     }
+    
     $userId = getUserFromEmail($conn, $_SESSION['email']);
+    
     if ($userId) {
         $_SESSION['user_id'] = $userId;
     }
