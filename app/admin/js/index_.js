@@ -131,7 +131,7 @@ const buildTabSidebar = () => {
             }
 
             sidebarContent += `
-                <a href="../logout.php" class="sidebar-link" data-href="">
+                <a href="../index.php" class="sidebar-link" data-href="">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>log out</span>
                 </a>

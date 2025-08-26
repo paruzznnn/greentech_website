@@ -69,7 +69,7 @@ if (!isset($base_path_admin)) {
         <img src="<?php echo $new_path; ?>public/img/<?php echo htmlspecialchars($img_file); ?>" alt="Profile Picture" class="profile-pic">
         <div id="globalProfileDropdown" class="dropdown-box hidden">
           <a href="<?php echo $path_admin; ?>profile.php">Profile</a>
-          <a href="<?php echo $path_admin; ?>logout.php">Logout</a>
+          <a href="<?php echo $new_path; ?>index.php">Logout</a>
         </div>
       </div>
     </div>

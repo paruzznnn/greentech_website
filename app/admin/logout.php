@@ -13,5 +13,5 @@
     @session_start();
     session_destroy();
 
-    header("Location: https://www.origami.life");
+    header("Location: https://www.trandar.com/app/index.php?lang=th");
 ?>
