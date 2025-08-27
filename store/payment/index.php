@@ -8,7 +8,7 @@
     <title>E-STORE</title>
     <?php include '../inc-meta.php'; ?>
     <link href="../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../css/template-payment.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../css/payment/template-payment.css?v=<?php echo time(); ?>" rel="stylesheet">
     <?php include '../inc-cdn.php'; ?>
 </head>
 
