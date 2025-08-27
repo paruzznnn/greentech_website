@@ -33,7 +33,7 @@ if (!isset($base_path_admin)) {
       <span class="toggle-button" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </span>
-      <a href="#"><img class="logo" src="<?php echo $new_path; ?>public/img/LOGOTRAND.png" alt=""></a>
+      <a href="https://www.trandar.com/app/admin/dashboard.php"><img class="logo" src="<?php echo $new_path; ?>public/img/LOGOTRAND.png" alt=""></a>
 
     </div>
 
