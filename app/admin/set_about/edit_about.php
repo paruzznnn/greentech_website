@@ -103,71 +103,71 @@ include '../check_permission.php';
                 <div class="lang-section th-lang active">
                     <label>ประเภท</label>
                     <select name="type_th" class="form-control" required>
-                        <option value="text">Text</option>
-                        <option value="image">Image + Text</option>
-                        <option value="quote">Quote</option>
+                        <option value="text">ข้อความ</option>
+                        <option value="image">รูปภาพ + ข้อความ</option>
+                        <option value="quote">คำคม</option>
                     </select>
                     <label>เนื้อหา (HTML)</label>
                     <textarea name="content_th" class="form-control summernote"></textarea>
-                    <label>ผู้พูด (สำหรับ quote)</label>
+                    <label>ผู้พูด (สำหรับคำคม)</label>
                     <input type="text" name="author_th" class="form-control">
                     <label>ตำแหน่ง</label>
                     <input type="text" name="position_th" class="form-control">
                 </div>
                 <div class="lang-section en-lang" style="display:none;">
-                    <label>ประเภท (English)</label>
+                    <label>Type</label>
                     <select name="type_en" class="form-control">
                         <option value="text">Text</option>
                         <option value="image">Image + Text</option>
                         <option value="quote">Quote</option>
                     </select>
-                    <label>เนื้อหา (HTML) (English)</label>
+                    <label>Content (HTML)</label>
                     <textarea name="content_en" class="form-control summernote"></textarea>
-                    <label>ผู้พูด (English)</label>
+                    <label>Author (for quotes)</label>
                     <input type="text" name="author_en" class="form-control">
-                    <label>ตำแหน่ง (English)</label>
+                    <label>Position</label>
                     <input type="text" name="position_en" class="form-control">
                 </div>
                 <div class="lang-section cn-lang" style="display:none;">
-                    <label>ประเภท (Chinese)</label>
+                    <label>类型</label>
                     <select name="type_cn" class="form-control">
-                        <option value="text">Text</option>
-                        <option value="image">Image + Text</option>
-                        <option value="quote">Quote</option>
+                        <option value="text">文本</option>
+                        <option value="image">图片 + 文本</option>
+                        <option value="quote">引文</option>
                     </select>
-                    <label>เนื้อหา (HTML) (Chinese)</label>
+                    <label>内容 (HTML)</label>
                     <textarea name="content_cn" class="form-control summernote"></textarea>
-                    <label>ผู้พูด (Chinese)</label>
+                    <label>作者 (引文)</label>
                     <input type="text" name="author_cn" class="form-control">
-                    <label>ตำแหน่ง (Chinese)</label>
+                    <label>职位</label>
                     <input type="text" name="position_cn" class="form-control">
                 </div>
                 <div class="lang-section jp-lang" style="display:none;">
-                    <label>ประเภท (Japanese)</label>
+                    <label>タイプ</label>
                     <select name="type_jp" class="form-control">
-                        <option value="text">Text</option>
-                        <option value="image">Image + Text</option>
-                        <option value="quote">Quote</option>
+                        <option value="text">テキスト</option>
+                        <option value="image">画像 + テキスト</option>
+                        <option value="quote">引用</option>
                     </select>
-                    <label>เนื้อหา (HTML) (Japanese)</label>
+                    <label>コンテンツ (HTML)</label>
                     <textarea name="content_jp" class="form-control summernote"></textarea>
-                    <label>ผู้พูด (Japanese)</label>
+                    <label>話者 (引用文)</label>
                     <input type="text" name="author_jp" class="form-control">
-                    <label>ตำแหน่ง (Japanese)</label>
+                    <label>役職</label>
                     <input type="text" name="position_jp" class="form-control">
                 </div>
                 <div class="lang-section kr-lang" style="display:none;">
-                    <label>ประเภท (Korean)</label>
+                    <label>유형</label>
                     <select name="type_kr" class="form-control">
-                        <option value="text">Text</option>
-                        <option value="image">Image + Text</option>
-                        <option value="quote">Quote</option>
+                        <option value="text">텍스트</option>
+                        <option value="image">이미지 + 텍스트</option>
+                        <option value="quote">인용문</option>
                     </select>
-                    <label>เนื้อหา (HTML) (Korean)</label>
+                    <label>내용 (HTML)</label>
                     <textarea name="content_kr" class="form-control summernote"></textarea>
-                    <label>ผู้พูด (Korean)</label>
+                    <label>화자 (인용문)</label>
                     <input type="text" name="author_kr" class="form-control">
-                    <label>ตำแหน่ง (Korean)</label>
+                    <label>직책</label>
                     <input type="text" name="position_kr" class="form-control">
                 </div>
                 <label>อัปโหลดรูปภาพ (ถ้ามี)</label>
@@ -207,9 +207,9 @@ include '../check_permission.php';
                     <div class="lang-section th-lang active">
                         <label>ประเภท</label>
                         <select name="types_th[]" class="form-control">
-                            <option value="text" <?= $type_th == 'text' ? 'selected' : '' ?>>Text</option>
-                            <option value="image" <?= $type_th == 'image' ? 'selected' : '' ?>>Image + Text</option>
-                            <option value="quote" <?= $type_th == 'quote' ? 'selected' : '' ?>>Quote</option>
+                            <option value="text" <?= $type_th == 'text' ? 'selected' : '' ?>>ข้อความ</option>
+                            <option value="image" <?= $type_th == 'image' ? 'selected' : '' ?>>รูปภาพ + ข้อความ</option>
+                            <option value="quote" <?= $type_th == 'quote' ? 'selected' : '' ?>>คำคม</option>
                         </select>
                         <label>เนื้อหา (HTML)</label>
                         <textarea name="contents_th[]" class="form-control summernote"><?= $content_th ?></textarea>
@@ -221,65 +221,65 @@ include '../check_permission.php';
 
                     <div class="lang-section en-lang" style="display:none;">
                         <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
-                        <label>ประเภท (English)</label>
+                        <label>Type</label>
                         <select name="types_en[]" class="form-control">
                             <option value="text" <?= $type_en == 'text' ? 'selected' : '' ?>>Text</option>
                             <option value="image" <?= $type_en == 'image' ? 'selected' : '' ?>>Image + Text</option>
                             <option value="quote" <?= $type_en == 'quote' ? 'selected' : '' ?>>Quote</option>
                         </select>
-                        <label>เนื้อหา (HTML) (English)</label>
+                        <label>Content (HTML)</label>
                         <textarea name="contents_en[]" class="form-control summernote"><?= $content_en ?></textarea>
-                        <label>ผู้พูด (English)</label>
+                        <label>Author</label>
                         <input type="text" name="authors_en[]" class="form-control" value="<?= $author ?>">
-                        <label>ตำแหน่ง (English)</label>
+                        <label>Position</label>
                         <input type="text" name="positions_en[]" class="form-control" value="<?= $position ?>">
                     </div>
 
                     <div class="lang-section cn-lang" style="display:none;">
                         <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
-                        <label>ประเภท (Chinese)</label>
+                        <label>类型</label>
                         <select name="types_cn[]" class="form-control">
-                            <option value="text" <?= $type_cn == 'text' ? 'selected' : '' ?>>Text</option>
-                            <option value="image" <?= $type_cn == 'image' ? 'selected' : '' ?>>Image + Text</option>
-                            <option value="quote" <?= $type_cn == 'quote' ? 'selected' : '' ?>>Quote</option>
+                            <option value="text" <?= $type_cn == 'text' ? 'selected' : '' ?>>文本</option>
+                            <option value="image" <?= $type_cn == 'image' ? 'selected' : '' ?>>图片 + 文本</option>
+                            <option value="quote" <?= $type_cn == 'quote' ? 'selected' : '' ?>>引文</option>
                         </select>
-                        <label>เนื้อหา (HTML) (Chinese)</label>
+                        <label>内容 (HTML)</label>
                         <textarea name="contents_cn[]" class="form-control summernote"><?= $content_cn ?></textarea>
-                        <label>ผู้พูด (Chinese)</label>
+                        <label>作者</label>
                         <input type="text" name="authors_cn[]" class="form-control" value="<?= $author ?>">
-                        <label>ตำแหน่ง (Chinese)</label>
+                        <label>职位</label>
                         <input type="text" name="positions_cn[]" class="form-control" value="<?= $position ?>">
                     </div>
                     
                     <div class="lang-section jp-lang" style="display:none;">
                         <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
-                        <label>ประเภท (Japanese)</label>
+                        <label>タイプ</label>
                         <select name="types_jp[]" class="form-control">
-                            <option value="text" <?= $type_jp == 'text' ? 'selected' : '' ?>>Text</option>
-                            <option value="image" <?= $type_jp == 'image' ? 'selected' : '' ?>>Image + Text</option>
-                            <option value="quote" <?= $type_jp == 'quote' ? 'selected' : '' ?>>Quote</option>
+                            <option value="text" <?= $type_jp == 'text' ? 'selected' : '' ?>>テキスト</option>
+                            <option value="image" <?= $type_jp == 'image' ? 'selected' : '' ?>>画像 + テキスト</option>
+                            <option value="quote" <?= $type_jp == 'quote' ? 'selected' : '' ?>>引用</option>
                         </select>
-                        <label>เนื้อหา (HTML) (Japanese)</label>
+                        <label>コンテンツ (HTML)</label>
                         <textarea name="contents_jp[]" class="form-control summernote"><?= $content_jp ?></textarea>
-                        <label>ผู้พูด (Japanese)</label>
+                        <label>話者</label>
                         <input type="text" name="authors_jp[]" class="form-control" value="<?= $author ?>">
-                        <label>ตำแหน่ง (Japanese)</label>
+                        <label>役職</label>
                         <input type="text" name="positions_jp[]" class="form-control" value="<?= $position ?>">
                     </div>
 
                     <div class="lang-section kr-lang" style="display:none;">
                         <button type="button" class="btn btn-info btn-sm mb-2 copy-from-th" data-id="<?= $id ?>">Copy from Thai</button>
-                        <label>ประเภท (Korean)</label>
+                        <label>유형</label>
                         <select name="types_kr[]" class="form-control">
-                            <option value="text" <?= $type_kr == 'text' ? 'selected' : '' ?>>Text</option>
-                            <option value="image" <?= $type_kr == 'image' ? 'selected' : '' ?>>Image + Text</option>
-                            <option value="quote" <?= $type_kr == 'quote' ? 'selected' : '' ?>>Quote</option>
+                            <option value="text" <?= $type_kr == 'text' ? 'selected' : '' ?>>텍스트</option>
+                            <option value="image" <?= $type_kr == 'image' ? 'selected' : '' ?>>이미지 + 텍스트</option>
+                            <option value="quote" <?= $type_kr == 'quote' ? 'selected' : '' ?>>인용문</option>
                         </select>
-                        <label>เนื้อหา (HTML) (Korean)</label>
+                        <label>내용 (HTML)</label>
                         <textarea name="contents_kr[]" class="form-control summernote"><?= $content_kr ?></textarea>
-                        <label>ผู้พูด (Korean)</label>
+                        <label>화자</label>
                         <input type="text" name="authors_kr[]" class="form-control" value="<?= $author ?>">
-                        <label>ตำแหน่ง (Korean)</label>
+                        <label>직책</label>
                         <input type="text" name="positions_kr[]" class="form-control" value="<?= $position ?>">
                     </div>
 
@@ -294,7 +294,7 @@ include '../check_permission.php';
                         <input type="file" name="image_files[]" class="form-control">
                         <input type="hidden" name="images_old[]" value="<?= $image_url ?>">
                     </div>
-                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $id ?>">ลบบล็อคนี้</button>
+                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-block" data-id="<?= $id ?>">ลบบล็อกนี้</button>
                 </div>
             </div>
         <?php endwhile; ?>

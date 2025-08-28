@@ -2,6 +2,47 @@
 require_once('../../../lib/connect.php');
 global $conn;
 
+// Start session to manage language state
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Define the content in 5 languages
+$translations = [
+    'th' => [
+        'success' => 'บันทึกข้อมูลสำเร็จ',
+        'error' => '❌ บันทึกข้อมูลไม่สำเร็จ: ',
+        'redirect' => 'กำลังเปลี่ยนเส้นทาง...',
+    ],
+    'en' => [
+        'success' => 'Data saved successfully.',
+        'error' => '❌ Failed to save data: ',
+        'redirect' => 'Redirecting...',
+    ],
+    'cn' => [
+        'success' => '数据保存成功。',
+        'error' => '❌ 数据保存失败: ',
+        'redirect' => '正在重定向...',
+    ],
+    'jp' => [
+        'success' => 'データは正常に保存されました。',
+        'error' => '❌ データの保存に失敗しました: ',
+        'redirect' => 'リダイレクト中...',
+    ],
+    'kr' => [
+        'success' => '데이터가 성공적으로 저장되었습니다.',
+        'error' => '❌ 데이터 저장 실패: ',
+        'redirect' => '리디렉션 중...',
+    ],
+];
+
+// Set default language to 'th' if not specified in session
+$lang = $_SESSION['lang'] ?? 'th';
+if (!isset($translations[$lang])) {
+    $lang = 'th'; // Fallback to default if language is not supported
+}
+$text = $translations[$lang];
+
 $page_name = $_POST['page_name'] ?? '';
 $meta_title = $_POST['meta_title'] ?? '';
 $meta_description = $_POST['meta_description'] ?? '';
@@ -40,8 +81,10 @@ if ($id) {
 }
 
 if ($stmt->execute()) {
-    header("Location: list_metatags.php");
+    echo $text['success'];
+    echo '<script>setTimeout(function(){ window.location.href = "list_metatags.php"; }, 1000);</script>';
     exit;
 } else {
-    echo "❌ บันทึกข้อมูลไม่สำเร็จ: " . $conn->error;
+    echo $text['error'] . $conn->error;
 }
+?>

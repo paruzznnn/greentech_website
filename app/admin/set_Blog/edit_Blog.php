@@ -9,6 +9,68 @@ if (!isset($_POST['blog_id'])) {
 }
 
 $decodedId = $_POST['blog_id'];
+
+// Define all strings to be translated
+$strings = [
+    'th' => [
+        'edit_blog' => 'แก้ไขบล็อก',
+        'back' => 'ย้อนกลับ',
+        'save_blog' => 'บันทึกบล็อก',
+        'cover_photo' => 'รูปภาพหน้าปก',
+        'image_size' => 'ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px',
+        'related_projects' => 'โครงการที่เกี่ยวข้อง',
+        'subject' => 'หัวข้อ',
+        'description' => 'รายละเอียด',
+        'content' => 'เนื้อหา'
+    ],
+    'en' => [
+        'edit_blog' => 'Edit blog',
+        'back' => 'Back',
+        'save_blog' => 'Save blog',
+        'cover_photo' => 'Cover photo',
+        'image_size' => 'Recommended image size: width: 350px and height: 250px',
+        'related_projects' => 'Related projects',
+        'subject' => 'Subject',
+        'description' => 'Description',
+        'content' => 'Content'
+    ],
+    'cn' => [
+        'edit_blog' => '编辑博客',
+        'back' => '返回',
+        'save_blog' => '保存博客',
+        'cover_photo' => '封面图片',
+        'image_size' => '推荐图片尺寸：宽度 350px，高度 250px',
+        'related_projects' => '相关项目',
+        'subject' => '主题',
+        'description' => '描述',
+        'content' => '内容'
+    ],
+    'jp' => [
+        'edit_blog' => 'ブログを編集',
+        'back' => '戻る',
+        'save_blog' => 'ブログを保存',
+        'cover_photo' => 'カバー写真',
+        'image_size' => '推奨画像サイズ：幅350px、高さ250px',
+        'related_projects' => '関連プロジェクト',
+        'subject' => '件名',
+        'description' => '説明',
+        'content' => 'コンテンツ'
+    ],
+    'kr' => [
+        'edit_blog' => '블로그 수정',
+        'back' => '뒤로',
+        'save_blog' => '블로그 저장',
+        'cover_photo' => '커버 사진',
+        'image_size' => '권장 이미지 크기: 너비 350px, 높이 250px',
+        'related_projects' => '관련 프로젝트',
+        'subject' => '제목',
+        'description' => '설명',
+        'content' => '내용'
+    ]
+];
+
+// Determine current language (default to Thai if not set)
+$lang = 'th'; // You can change this to a variable that detects the user's language preference
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -95,7 +157,7 @@ $decodedId = $_POST['blog_id'];
             width: 36px;
             margin-right: 8px;
         }
-         /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
+          /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -133,7 +195,7 @@ $decodedId = $_POST['blog_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit blog
+                        <i class="far fa-newspaper"></i> <?php echo $strings[$lang]['edit_blog']; ?>
                     </h4>
 
                     <?php
@@ -295,11 +357,11 @@ $decodedId = $_POST['blog_id'];
                                     <div style='margin: 10px;'>
                                         <div style='margin: 10px; text-align: end;'>
                                              <button type='button' id='backToblogList' class='btn btn-secondary'> 
-                                                 <i class='fas fa-arrow-left'></i> Back 
+                                                 <i class='fas fa-arrow-left'></i> " . $strings[$lang]['back'] . " 
                                              </button>
-                                          </div>
-                                         <label><span>Cover photo</span>:</label>
-                                         <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                         </div>
+                                         <label><span>" . $strings[$lang]['cover_photo'] . "</span>:</label>
+                                         <div><span>" . $strings[$lang]['image_size'] . "</span></div>
                                          <div id='previewContainer' class='previewContainer'>
                                              <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                                          </div>
@@ -308,7 +370,7 @@ $decodedId = $_POST['blog_id'];
                                          <input type='file' class='form-control' id='fileInput' name='fileInput'>
                                      </div>
                                      <div style='margin: 10px;'>
-                                         <label><span>Related projects</span>:</label>
+                                         <label><span>" . $strings[$lang]['related_projects'] . "</span>:</label>
                                          <select class='form-control select2-multiple' id='related_projects_edit' name='related_projects[]' multiple='multiple'>
                                              " . $allprojectsOptions . "
                                          </select>
@@ -355,15 +417,15 @@ $decodedId = $_POST['blog_id'];
                                              <div class='tab-content' id='languageTabsContent'>
                                                  <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Subject (TH)</span>:</label>
+                                                         <label><span>" . $strings['th']['subject'] . " (TH)</span>:</label>
                                                          <input type='text' class='form-control' id='blog_subject' name='blog_subject' value='" . htmlspecialchars($row['subject_blog']) . "'>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Description (TH)</span>:</label>
+                                                         <label><span>" . $strings['th']['description'] . " (TH)</span>:</label>
                                                          <textarea class='form-control' id='blog_description' name='blog_description'>" . htmlspecialchars($row['description_blog']) . "</textarea>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Content (TH)</span>:</label>
+                                                         <label><span>" . $strings['th']['content'] . " (TH)</span>:</label>
                                                          <textarea class='form-control summernote' id='summernote_update' name='blog_content'>" . $content_th_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
@@ -373,15 +435,15 @@ $decodedId = $_POST['blog_id'];
                                                          <div id='loadingIndicator_en' class='loading-overlay' style='display: none;'>
                                                              <div class='loading-spinner'></div>
                                                          </div>
-                                                         <label><span>Subject (EN)</span>:</label>
+                                                         <label><span>" . $strings['en']['subject'] . " (EN)</span>:</label>
                                                          <input type='text' class='form-control' id='blog_subject_en' name='blog_subject_en' value='" . htmlspecialchars($row['subject_blog_en']) . "'>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Description (EN)</span>:</label>
+                                                         <label><span>" . $strings['en']['description'] . " (EN)</span>:</label>
                                                          <textarea class='form-control' id='blog_description_en' name='blog_description_en'>" . htmlspecialchars($row['description_blog_en']) . "</textarea>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Content (EN)</span>:</label>
+                                                         <label><span>" . $strings['en']['content'] . " (EN)</span>:</label>
                                                          <textarea class='form-control summernote' id='summernote_update_en' name='blog_content_en'>" . $content_en_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
@@ -391,15 +453,15 @@ $decodedId = $_POST['blog_id'];
                                                          <div id='loadingIndicator_cn' class='loading-overlay' style='display: none;'>
                                                              <div class='loading-spinner'></div>
                                                          </div>
-                                                         <label><span>Subject (CN)</span>:</label>
+                                                         <label><span>" . $strings['cn']['subject'] . " (CN)</span>:</label>
                                                          <input type='text' class='form-control' id='blog_subject_cn' name='blog_subject_cn' value='" . htmlspecialchars($row['subject_blog_cn']) . "'>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Description (CN)</span>:</label>
+                                                         <label><span>" . $strings['cn']['description'] . " (CN)</span>:</label>
                                                          <textarea class='form-control' id='blog_description_cn' name='blog_description_cn'>" . htmlspecialchars($row['description_blog_cn']) . "</textarea>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Content (CN)</span>:</label>
+                                                         <label><span>" . $strings['cn']['content'] . " (CN)</span>:</label>
                                                          <textarea class='form-control summernote' id='summernote_update_cn' name='blog_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
@@ -409,15 +471,15 @@ $decodedId = $_POST['blog_id'];
                                                          <div id='loadingIndicator_jp' class='loading-overlay' style='display: none;'>
                                                              <div class='loading-spinner'></div>
                                                          </div>
-                                                         <label><span>Subject (JP)</span>:</label>
+                                                         <label><span>" . $strings['jp']['subject'] . " (JP)</span>:</label>
                                                          <input type='text' class='form-control' id='blog_subject_jp' name='blog_subject_jp' value='" . htmlspecialchars($row['subject_blog_jp']) . "'>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Description (JP)</span>:</label>
+                                                         <label><span>" . $strings['jp']['description'] . " (JP)</span>:</label>
                                                          <textarea class='form-control' id='blog_description_jp' name='blog_description_jp'>" . htmlspecialchars($row['description_blog_jp']) . "</textarea>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Content (JP)</span>:</label>
+                                                         <label><span>" . $strings['jp']['content'] . " (JP)</span>:</label>
                                                          <textarea class='form-control summernote' id='summernote_update_jp' name='blog_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
@@ -427,15 +489,15 @@ $decodedId = $_POST['blog_id'];
                                                          <div id='loadingIndicator_kr' class='loading-overlay' style='display: none;'>
                                                              <div class='loading-spinner'></div>
                                                          </div>
-                                                         <label><span>Subject (KR)</span>:</label>
+                                                         <label><span>" . $strings['kr']['subject'] . " (KR)</span>:</label>
                                                          <input type='text' class='form-control' id='blog_subject_kr' name='blog_subject_kr' value='" . htmlspecialchars($row['subject_blog_kr']) . "'>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Description (KR)</span>:</label>
+                                                         <label><span>" . $strings['kr']['description'] . " (KR)</span>:</label>
                                                          <textarea class='form-control' id='blog_description_kr' name='blog_description_kr'>" . htmlspecialchars($row['description_blog_kr']) . "</textarea>
                                                      </div>
                                                      <div style='margin: 10px;'>
-                                                         <label><span>Content (KR)</span>:</label>
+                                                         <label><span>" . $strings['kr']['content'] . " (KR)</span>:</label>
                                                          <textarea class='form-control summernote' id='summernote_update_kr' name='blog_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
                                                      </div>
                                                  </div>
@@ -444,23 +506,23 @@ $decodedId = $_POST['blog_id'];
                                      </div>
                                       <div style='margin: 10px; text-align: end;'>
                                           <button type='button' id='submitEditblog' class='btn btn-success'>
-                                              <i class='fas fa-save'></i> Save blog
+                                              <i class='fas fa-save'></i> " . $strings[$lang]['save_blog'] . "
                                           </button>
                                       </div>
                                   </div>
-                            </div>
-                        </form>
-                        ";
-                    } else {
-                        echo "<div class='alert alert-warning'>ไม่พบข้อมูลโครงการ</div>";
-                    }
-                    $stmt->close();
-                    $conn->close();
-                    ?>
-                </div>
-            </div>
-        </div>
-    </div>
+                              </div>
+                          </form>
+                          ";
+                      } else {
+                          echo "<div class='alert alert-warning'>ไม่พบข้อมูลโครงการ</div>";
+                      }
+                      $stmt->close();
+                      $conn->close();
+                      ?>
+                  </div>
+              </div>
+          </div>
+      </div>
     
 <script>
         $(document).ready(function() {

@@ -1,15 +1,101 @@
-<?php include '../check_permission.php'?>
+<?php
+include '../check_permission.php';
+
+// ส่วนที่เพิ่ม: ตรวจสอบและกำหนดภาษาจาก URL
+// session_start();
+$lang = 'th'; // กำหนดภาษาเริ่มต้นเป็น 'th'
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        unset($_SESSION['lang']);
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// ส่วนที่เพิ่ม: กำหนดข้อความตามแต่ละภาษา
+$texts = [
+    'page_title' => [
+        'th' => 'รายการสินค้า',
+        'en' => 'List Shop',
+        'cn' => '商品列表',
+        'jp' => '商品一覧',
+        'kr' => '상품 목록'
+    ],
+    'manage_category' => [
+        'th' => 'จัดการหมวดหมู่',
+        'en' => 'Manage Category',
+        'cn' => '管理分类',
+        'jp' => 'カテゴリ管理',
+        'kr' => '카테고리 관리'
+    ],
+    'write_shop' => [
+        'th' => 'เขียนสินค้า',
+        'en' => 'Write Shop',
+        'cn' => '撰写商品',
+        'jp' => '商品を書く',
+        'kr' => '상품 작성'
+    ],
+    'parent_group' => [
+        'th' => 'กลุ่มแม่',
+        'en' => 'Parent Group',
+        'cn' => '主分类',
+        'jp' => '親グループ',
+        'kr' => '상위 그룹'
+    ],
+    'sub_group' => [
+        'th' => 'กลุ่มย่อย',
+        'en' => 'Sub Group',
+        'cn' => '子分类',
+        'jp' => 'サブグループ',
+        'kr' => '하위 그룹'
+    ],
+    'product_name' => [
+        'th' => 'ชื่อสินค้า',
+        'en' => 'Product Name',
+        'cn' => '商品名称',
+        'jp' => '商品名',
+        'kr' => '상품명'
+    ],
+    'date_created' => [
+        'th' => 'วันที่สร้าง',
+        'en' => 'Date Created',
+        'cn' => '创建日期',
+        'jp' => '作成日',
+        'kr' => '작성일'
+    ],
+    'management' => [
+        'th' => 'การจัดการ',
+        'en' => 'Management',
+        'cn' => '管理',
+        'jp' => '管理',
+        'kr' => '관리'
+    ],
+];
+
+// ฟังก์ชันสำหรับเรียกใช้ข้อความตามภาษาที่เลือก
+function getTextByLang($key) {
+    global $texts, $lang;
+    return $texts[$key][$lang] ?? $texts[$key]['th'];
+}
+?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= htmlspecialchars($lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List shop</title>
+    <title><?= getTextByLang('page_title') ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
-
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
     <script src="../../../inc/jquery/js/jquery-ui.min.js"></script>
 
@@ -18,11 +104,6 @@
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,23 +130,16 @@
             padding: 10px 15px;
             cursor: pointer;
         }
-
-
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 10px;
         }
-
-        /* Media query for smaller screens */
         @media (max-width: 768px) {
-
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
-
         }
-
         .btn-circle {
             border: none;
             width: 30px;
@@ -73,12 +147,10 @@
             border-radius: 50%;
             font-size: 14px;
         }
-
         .btn-edit {
             background-color: #FFC107;
             color: #ffffff;
         }
-
         .btn-del {
             background-color: #ff4537;
             color: #ffffff;
@@ -89,72 +161,50 @@
 <?php include '../template/header.php' ?>
 
 <body>
-
     <div class="content-sticky" id="">
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
-
                     <div>
                         <div class="responsive-grid">
                             <div style="margin: 10px;">
-
                                 <div style="display: flex; justify-content: space-between;">
                                     <h4 class="line-ref mb-3"> 
                                         <i class="far fa-newspaper"></i>   
-                                        List shop
+                                        <?= getTextByLang('page_title') ?>
                                     </h4>
                                     <div>
                                         <a type="button" class="btn btn-info me-2" href="<?php echo $base_path_admin.'set_product/group_management.php'?>">
-                                            <i class="fas fa-layer-group"></i> จัดการหมวดหมู่
+                                            <i class="fas fa-layer-group"></i> <?= getTextByLang('manage_category') ?>
                                         </a>
                                         <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_product/setup_shop.php'?>">
                                             <i class="fa-solid fa-plus"></i>
-                                            write shop
+                                            <?= getTextByLang('write_shop') ?>
                                         </a>
                                     </div>
                                 </div>
-
                                 <table id="td_list_shop" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>กลุ่มแม่</th>
-                                            <th>กลุ่มย่อย</th>
-                                            <th>ชื่อสินค้า</th>
-                                            <th>วันที่สร้าง</th>
-                                            <th>การจัดการ</th>
+                                            <th><?= getTextByLang('parent_group') ?></th>
+                                            <th><?= getTextByLang('sub_group') ?></th>
+                                            <th><?= getTextByLang('product_name') ?></th>
+                                            <th><?= getTextByLang('date_created') ?></th>
+                                            <th><?= getTextByLang('management') ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
-
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/shop_.js?v=<?php echo time(); ?>'></script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
