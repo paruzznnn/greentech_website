@@ -1,21 +1,176 @@
 <?php
+// ส่วนที่เพิ่ม: ตรวจสอบและกำหนดภาษาจาก URL
+// session_start();
+$lang = 'th'; // กำหนดภาษาเริ่มต้นเป็น 'th'
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        unset($_SESSION['lang']);
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// ส่วนที่เพิ่ม: กำหนดข้อความตามแต่ละภาษา
+$texts = [
+    'error_not_found' => [
+        'th' => 'ไม่พบข้อมูลไอเดียที่ต้องการแก้ไข',
+        'en' => 'Idea data to be edited not found',
+        'cn' => '找不到要编辑的想法数据',
+        'jp' => '編集するアイデアデータが見つかりません',
+        'kr' => '수정할 아이디어 데이터를 찾을 수 없습니다'
+    ],
+    'page_title' => [
+        'th' => 'แก้ไขไอเดีย',
+        'en' => 'Edit Idea',
+        'cn' => '编辑想法',
+        'jp' => 'アイデアを編集',
+        'kr' => '아이디어 수정'
+    ],
+    'edit_idia_header' => [
+        'th' => 'แก้ไขไอเดีย',
+        'en' => 'Edit Idea',
+        'cn' => '编辑想法',
+        'jp' => 'アイデアを編集',
+        'kr' => '아이디어 수정'
+    ],
+    'btn_back' => [
+        'th' => 'กลับ',
+        'en' => 'Back',
+        'cn' => '返回',
+        'jp' => '戻る',
+        'kr' => '뒤로가기'
+    ],
+    'label_cover_image' => [
+        'th' => 'ภาพหน้าปก',
+        'en' => 'Cover Image',
+        'cn' => '封面图片',
+        'jp' => 'カバー画像',
+        'kr' => '표지 이미지'
+    ],
+    'note_image_size' => [
+        'th' => 'ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px',
+        'en' => 'Appropriate image size: 350px width and 250px height',
+        'cn' => '图片尺寸建议：宽度350px，高度250px',
+        'jp' => '推奨画像サイズ：幅350px、高さ250px',
+        'kr' => '권장 이미지 크기: 너비 350px, 높이 250px'
+    ],
+    'lang_th' => [
+        'th' => 'ภาษาไทย',
+        'en' => 'Thai',
+        'cn' => '泰语',
+        'jp' => 'タイ語',
+        'kr' => '태국어'
+    ],
+    'lang_en' => [
+        'th' => 'ภาษาอังกฤษ',
+        'en' => 'English',
+        'cn' => '英语',
+        'jp' => '英語',
+        'kr' => '영어'
+    ],
+    'lang_cn' => [
+        'th' => 'ภาษาจีน',
+        'en' => 'Chinese',
+        'cn' => '中文',
+        'jp' => '中国語',
+        'kr' => '중국어'
+    ],
+    'lang_jp' => [
+        'th' => 'ภาษาญี่ปุ่น',
+        'en' => 'Japanese',
+        'cn' => '日语',
+        'jp' => '日本語',
+        'kr' => '일본어'
+    ],
+    'lang_kr' => [
+        'th' => 'ภาษาเกาหลี',
+        'en' => 'Korean',
+        'cn' => '韩语',
+        'jp' => '韓国語',
+        'kr' => '한국어'
+    ],
+    'label_subject' => [
+        'th' => 'หัวข้อ',
+        'en' => 'Subject',
+        'cn' => '标题',
+        'jp' => '件名',
+        'kr' => '제목'
+    ],
+    'label_description' => [
+        'th' => 'คำอธิบาย',
+        'en' => 'Description',
+        'cn' => '描述',
+        'jp' => '説明',
+        'kr' => '설명'
+    ],
+    'label_content' => [
+        'th' => 'เนื้อหา',
+        'en' => 'Content',
+        'cn' => '内容',
+        'jp' => 'コンテンツ',
+        'kr' => '내용'
+    ],
+    'btn_save' => [
+        'th' => 'บันทึกไอเดีย',
+        'en' => 'Save Idea',
+        'cn' => '保存想法',
+        'jp' => 'アイデアを保存',
+        'kr' => '아이디어 저장'
+    ],
+    'alert_no_data' => [
+        'th' => 'ไม่มีข้อมูลข่าว',
+        'en' => 'No news data',
+        'cn' => '没有新闻数据',
+        'jp' => 'ニュースデータがありません',
+        'kr' => '뉴스 데이터가 없습니다'
+    ],
+    'alert_no_idea_data' => [
+        'th' => 'ไม่พบข้อมูลไอเดียที่ต้องการแก้ไข',
+        'en' => 'Idea data to be edited not found',
+        'cn' => '找不到要编辑的想法数据',
+        'jp' => '編集するアイデアデータが見つかりません',
+        'kr' => '수정할 아이디어 데이터를 찾을 수 없습니다'
+    ],
+    'alert_sql_error' => [
+        'th' => 'ERROR: ข้อผิดพลาดในการเรียกข้อมูลจากฐานข้อมูล',
+        'en' => 'ERROR: Error fetching data from the database',
+        'cn' => '错误: 从数据库获取数据出错',
+        'jp' => 'エラー: データベースからのデータ取得エラー',
+        'kr' => '오류: 데이터베이스에서 데이터를 가져오는 중 오류가 발생했습니다'
+    ]
+];
+
+// ฟังก์ชันสำหรับเรียกใช้ข้อความตามภาษาที่เลือก
+function getTextByLang($key) {
+    global $texts, $lang;
+    return $texts[$key][$lang] ?? $texts[$key]['th'];
+}
+
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
 
 if (!isset($_POST['idia_id'])) {
-    echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
+    echo "<div class='alert alert-danger'>" . getTextByLang('alert_no_idea_data') . "</div>";
     exit;
 }
 
 $decodedId = $_POST['idia_id'];
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= htmlspecialchars($lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แก้ไขไอเดีย</title>
+    <title><?= getTextByLang('page_title') ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -95,29 +250,26 @@ $decodedId = $_POST['idia_id'];
             width: 36px;
             margin-right: 8px;
         }
-        /* วางโค้ด CSS นี้ไว้ในไฟล์ .css ของคุณหรือในแท็ก <style> */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.7); /* พื้นหลังโปร่งแสง */
+            background-color: rgba(255, 255, 255, 0.7);
             z-index: 1000;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
         .loading-spinner {
             width: 50px;
             height: 50px;
-            border: 5px solid #f3f3f3; /* สีเทาอ่อน */
-            border-top: 5px solid #3498db; /* สีน้ำเงิน */
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
             border-radius: 50%;
-            animation: spin 1s linear infinite; /* ทำให้หมุนตลอด */
+            animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -133,7 +285,7 @@ $decodedId = $_POST['idia_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-idiapaper"></i> แก้ไขไอเดีย
+                        <i class="far fa-idiapaper"></i> <?= getTextByLang('edit_idia_header') ?>
                     </h4>
 
                     <?php
@@ -164,7 +316,7 @@ $decodedId = $_POST['idia_id'];
                     ");
 
                     if ($stmt === false) {
-                        die('❌ SQL Prepare failed: ' . $conn->error);
+                        die(getTextByLang('alert_sql_error') . ": " . $conn->error);
                     }
 
                     $stmt->bind_param('i', $decodedId);
@@ -267,19 +419,16 @@ $decodedId = $_POST['idia_id'];
                         echo "
                         <form id='formidia_edit' enctype='multipart/form-data'>
                             <input type='hidden' class='form-control' id='idia_id' name='idia_id' value='" . htmlspecialchars($row['idia_id']) . "'>
-                            <div class='row >
-                            
+                            <div class='row'>
                                 <div>
-                                
-                                
                                     <div style='margin: 10px;'>
                                         <div style='margin: 10px; text-align: end;'>
                                             <button type='button' id='backToidiaList' class='btn btn-secondary'> 
-                                                <i class='fas fa-arrow-left'></i> กลับ 
+                                                <i class='fas fa-arrow-left'></i> " . getTextByLang('btn_back') . "
                                             </button>
                                         </div>
-                                        <label><span>ภาพหน้าปก</span>:</label>
-                                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                        <label><span>" . getTextByLang('label_cover_image') . "</span>:</label>
+                                        <div><span>" . getTextByLang('note_image_size') . "</span></div>
                                         <div id='previewContainer' class='previewContainer'>
                                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                                         </div>
@@ -289,39 +438,32 @@ $decodedId = $_POST['idia_id'];
                                     </div>
                                 </div>
                                 <div>
-                                    
-
                                     <div class='card mb-4'>
                                         <div class='card-header p-0'>
                                             <ul class='nav nav-tabs' id='languageTabs' role='tablist'>
                                                 <li class='nav-item' role='presentation'>
                                                     <button class='nav-link active' id='th-tab' data-bs-toggle='tab' data-bs-target='#th' type='button' role='tab' aria-controls='th' aria-selected='true'>
-                                                        <img src='https://flagcdn.com/w320/th.png' alt='Thai Flag' class='flag-icon' style=' width: 36px; 
-                                                margin-right: 8px;'>ภาษาไทย
+                                                        <img src='https://flagcdn.com/w320/th.png' alt='Thai Flag' class='flag-icon' style=' width: 36px; margin-right: 8px;'>" . getTextByLang('lang_th') . "
                                                     </button>
                                                 </li>
                                                 <li class='nav-item' role='presentation'>
                                                     <button class='nav-link' id='en-tab' data-bs-toggle='tab' data-bs-target='#en' type='button' role='tab' aria-controls='en' aria-selected='false'>
-                                                        <img src='https://flagcdn.com/w320/gb.png' alt='English Flag' class='flag-icon' style=' width: 36px; 
-                                                margin-right: 8px;'>ภาษาอังกฤษ
+                                                        <img src='https://flagcdn.com/w320/gb.png' alt='English Flag' class='flag-icon' style=' width: 36px; margin-right: 8px;'>" . getTextByLang('lang_en') . "
                                                     </button>
                                                 </li>
                                                 <li class='nav-item' role='presentation'>
                                                     <button class='nav-link' id='cn-tab' data-bs-toggle='tab' data-bs-target='#cn' type='button' role='tab' aria-controls='cn' aria-selected='false'>
-                                                        <img src='https://flagcdn.com/w320/cn.png' alt='Chinese Flag' class='flag-icon' style=' width: 36px; 
-                                                margin-right: 8px;'>ภาษาจีน
+                                                        <img src='https://flagcdn.com/w320/cn.png' alt='Chinese Flag' class='flag-icon' style=' width: 36px; margin-right: 8px;'>" . getTextByLang('lang_cn') . "
                                                     </button>
                                                 </li>
                                                 <li class='nav-item' role='presentation'>
                                                     <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
-                                                        <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
-                                                margin-right: 8px;'>ภาษาญี่ปุ่น
+                                                        <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; margin-right: 8px;'>" . getTextByLang('lang_jp') . "
                                                     </button>
                                                 </li>
                                                 <li class='nav-item' role='presentation'>
                                                     <button class='nav-link' id='kr-tab' data-bs-toggle='tab' data-bs-target='#kr' type='button' role='tab' aria-controls='kr' aria-selected='false'>
-                                                        <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; 
-                                                margin-right: 8px;'>ภาษาเกาหลี
+                                                        <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; margin-right: 8px;'>" . getTextByLang('lang_kr') . "
                                                     </button>
                                                 </li>
                                             </ul>
@@ -330,15 +472,15 @@ $decodedId = $_POST['idia_id'];
                                             <div class='tab-content' id='languageTabsContent'>
                                                 <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>หัวข้อ (TH)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_subject') . " (TH)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject' name='idia_subject' value='" . htmlspecialchars($row['subject_idia']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>คำอธิบาย (TH)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_description') . " (TH)</span>:</label>
                                                         <textarea class='form-control' id='idia_description' name='idia_description'>" . htmlspecialchars($row['description_idia']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>เนื้อหา (TH)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_content') . " (TH)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update' name='idia_content'>" . $content_th_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -348,15 +490,15 @@ $decodedId = $_POST['idia_id'];
                                                         <div id='loadingIndicator' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <label><span>หัวข้อ (EN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_subject') . " (EN)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject_en' name='idia_subject_en' value='" . htmlspecialchars($row['subject_idia_en']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>คำอธิบาย (EN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_description') . " (EN)</span>:</label>
                                                         <textarea class='form-control' id='idia_description_en' name='idia_description_en'>" . htmlspecialchars($row['description_idia_en']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>เนื้อหา (EN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_content') . " (EN)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update_en' name='idia_content_en'>" . $content_en_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -366,15 +508,15 @@ $decodedId = $_POST['idia_id'];
                                                         <div id='loadingIndicatorCn' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <label><span>หัวข้อ (CN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_subject') . " (CN)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject_cn' name='idia_subject_cn' value='" . htmlspecialchars($row['subject_idia_cn']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>คำอธิบาย (CN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_description') . " (CN)</span>:</label>
                                                         <textarea class='form-control' id='idia_description_cn' name='idia_description_cn'>" . htmlspecialchars($row['description_idia_cn']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>เนื้อหา (CN)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_content') . " (CN)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update_cn' name='idia_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -384,15 +526,15 @@ $decodedId = $_POST['idia_id'];
                                                         <div id='loadingIndicatorJp' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <label><span>หัวข้อ (JP)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_subject') . " (JP)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject_jp' name='idia_subject_jp' value='" . htmlspecialchars($row['subject_idia_jp']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>คำอธิบาย (JP)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_description') . " (JP)</span>:</label>
                                                         <textarea class='form-control' id='idia_description_jp' name='idia_description_jp'>" . htmlspecialchars($row['description_idia_jp']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>เนื้อหา (JP)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_content') . " (JP)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update_jp' name='idia_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -402,15 +544,15 @@ $decodedId = $_POST['idia_id'];
                                                         <div id='loadingIndicatorKr' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <label><span>หัวข้อ (KR)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_subject') . " (KR)</span>:</label>
                                                         <input type='text' class='form-control' id='idia_subject_kr' name='idia_subject_kr' value='" . htmlspecialchars($row['subject_idia_kr']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>คำอธิบาย (KR)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_description') . " (KR)</span>:</label>
                                                         <textarea class='form-control' id='idia_description_kr' name='idia_description_kr'>" . htmlspecialchars($row['description_idia_kr']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <label><span>เนื้อหา (KR)</span>:</label>
+                                                        <label><span>" . getTextByLang('label_content') . " (KR)</span>:</label>
                                                         <textarea class='form-control summernote' id='summernote_update_kr' name='idia_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -419,7 +561,7 @@ $decodedId = $_POST['idia_id'];
                                     </div>
                                     <div style='margin: 10px; text-align: end;'>
                                         <button type='button' id='submitEditidia' class='btn btn-success'>
-                                            <i class='fas fa-save'></i> บันทึกไอเดีย
+                                            <i class='fas fa-save'></i> " . getTextByLang('btn_save') . "
                                         </button>
                                     </div>
                                 </div>
@@ -427,7 +569,7 @@ $decodedId = $_POST['idia_id'];
                         </form>
                         ";
                     } else {
-                        echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
+                        echo "<div class='alert alert-warning'>" . getTextByLang('alert_no_data') . "</div>";
                     }
                     $stmt->close();
                     $conn->close();
@@ -436,6 +578,7 @@ $decodedId = $_POST['idia_id'];
             </div>
         </div>
     </div>
+
     
 <script>
     $(document).ready(function() {

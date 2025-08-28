@@ -1,12 +1,116 @@
-<?php include '../check_permission.php'; ?>
-
-<?php
+<?php 
+include '../check_permission.php'; 
 require_once('../../../lib/connect.php');
 
+// Define the content in 5 languages
+$translations = [
+    'th' => [
+        'page_title' => 'จัดการ Meta Tags',
+        'manage_title' => 'จัดการ Meta Tags',
+        'page_name' => 'ชื่อหน้า',
+        'meta_title' => 'Meta Title',
+        'meta_description' => 'Meta Description',
+        'meta_keywords' => 'Meta Keywords',
+        'og_title' => 'OG Title',
+        'og_description' => 'OG Description',
+        'og_image' => 'OG Image',
+        'save_btn' => 'บันทึก',
+        'list_title' => 'รายการ Meta Tags',
+        'table_page' => 'หน้า',
+        'table_title' => 'หัวข้อ',
+        'table_description' => 'รายละเอียด',
+        'table_action' => 'การดำเนินการ',
+        'edit_btn' => 'แก้ไข',
+        'alert_meta_title' => 'กรุณากรอก Meta Title',
+    ],
+    'en' => [
+        'page_title' => 'Manage Meta Tags',
+        'manage_title' => 'Manage Meta Tags',
+        'page_name' => 'Page Name',
+        'meta_title' => 'Meta Title',
+        'meta_description' => 'Meta Description',
+        'meta_keywords' => 'Meta Keywords',
+        'og_title' => 'OG Title',
+        'og_description' => 'OG Description',
+        'og_image' => 'OG Image',
+        'save_btn' => 'Save',
+        'list_title' => 'List of Meta Tags',
+        'table_page' => 'Page',
+        'table_title' => 'Title',
+        'table_description' => 'Description',
+        'table_action' => 'Action',
+        'edit_btn' => 'Edit',
+        'alert_meta_title' => 'Please enter a Meta Title',
+    ],
+    'cn' => [
+        'page_title' => '管理元标签',
+        'manage_title' => '管理元标签',
+        'page_name' => '页面名称',
+        'meta_title' => '元标题',
+        'meta_description' => '元描述',
+        'meta_keywords' => '元关键词',
+        'og_title' => 'OG 标题',
+        'og_description' => 'OG 描述',
+        'og_image' => 'OG 图片',
+        'save_btn' => '保存',
+        'list_title' => '元标签列表',
+        'table_page' => '页面',
+        'table_title' => '标题',
+        'table_description' => '描述',
+        'table_action' => '操作',
+        'edit_btn' => '编辑',
+        'alert_meta_title' => '请输入元标题',
+    ],
+    'jp' => [
+        'page_title' => 'メタタグの管理',
+        'manage_title' => 'メタタグの管理',
+        'page_name' => 'ページ名',
+        'meta_title' => 'メタタイトル',
+        'meta_description' => 'メタディスクリプション',
+        'meta_keywords' => 'メタキーワード',
+        'og_title' => 'OGタイトル',
+        'og_description' => 'OGディスクリプション',
+        'og_image' => 'OG画像',
+        'save_btn' => '保存',
+        'list_title' => 'メタタグリスト',
+        'table_page' => 'ページ',
+        'table_title' => 'タイトル',
+        'table_description' => '説明',
+        'table_action' => '操作',
+        'edit_btn' => '編集',
+        'alert_meta_title' => 'メタタイトルを入力してください',
+    ],
+    'kr' => [
+        'page_title' => '메타 태그 관리',
+        'manage_title' => '메타 태그 관리',
+        'page_name' => '페이지 이름',
+        'meta_title' => '메타 제목',
+        'meta_description' => '메타 설명',
+        'meta_keywords' => '메타 키워드',
+        'og_title' => 'OG 제목',
+        'og_description' => 'OG 설명',
+        'og_image' => 'OG 이미지',
+        'save_btn' => '저장',
+        'list_title' => '메타 태그 목록',
+        'table_page' => '페이지',
+        'table_title' => '제목',
+        'table_description' => '설명',
+        'table_action' => '작업',
+        'edit_btn' => '수정',
+        'alert_meta_title' => '메타 제목을 입력하십시오',
+    ],
+];
 
+// Get the current language from URL parameter or default to Thai
+$lang = $_GET['lang'] ?? 'th';
+$lang = strtolower($lang);
+if (!isset($translations[$lang])) {
+    $lang = 'th'; // Fallback to default language
+}
+
+$text = $translations[$lang];
 
 $meta = [];
-
 if (isset($_GET['id'])) {
     $stmt = $conn->prepare("SELECT * FROM metatags WHERE id = ?");
     $stmt->bind_param("i", $_GET['id']);
@@ -17,11 +121,11 @@ if (isset($_GET['id'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= $lang ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List Meta tags</title>
+    <title><?= $text['page_title'] ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -46,7 +150,7 @@ if (isset($_GET['id'])) {
 
     <link href='../css/index_.css?v=<?php echo time(); ?>' rel='stylesheet'>
 </head>
- <?php include '../template/header.php'; ?>
+<?php include '../template/header.php'; ?>
 <body>
 <div class="content-sticky">
     <div class="container-fluid">
@@ -54,7 +158,7 @@ if (isset($_GET['id'])) {
             <div style="margin: 10px;">
                 <h4 class="line-ref mb-3">
                     <i class="fa-solid fa-code"></i>
-                    จัดการ Meta Tags
+                    <?= $text['manage_title'] ?>
                 </h4>
 
                 <form method="post" action="setup_metatags.php" enctype="multipart/form-data">
@@ -63,62 +167,61 @@ if (isset($_GET['id'])) {
                     <?php endif; ?>
 
                     <div class="mb-3">
-                        <label>Page Name</label>
+                        <label><?= $text['page_name'] ?></label>
                         <input type="text" name="page_name" class="form-control" value="<?= htmlspecialchars($meta['page_name'] ?? '') ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label>Meta Title</label>
+                        <label><?= $text['meta_title'] ?></label>
                         <input type="text" name="meta_title" class="form-control" value="<?= htmlspecialchars($meta['meta_title'] ?? '') ?>" required>
                     </div>
 
                     <div class="mb-3">
-                        <label>Meta Description</label>
+                        <label><?= $text['meta_description'] ?></label>
                         <textarea name="meta_description" class="form-control"><?= htmlspecialchars($meta['meta_description'] ?? '') ?></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label>Meta Keywords</label>
+                        <label><?= $text['meta_keywords'] ?></label>
                         <input type="text" name="meta_keywords" class="form-control" value="<?= htmlspecialchars($meta['meta_keywords'] ?? '') ?>">
                     </div>
 
                     <hr>
 
                     <div class="mb-3">
-                        <label>OG Title</label>
+                        <label><?= $text['og_title'] ?></label>
                         <input type="text" name="og_title" class="form-control" value="<?= htmlspecialchars($meta['og_title'] ?? '') ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label>OG Description</label>
+                        <label><?= $text['og_description'] ?></label>
                         <textarea name="og_description" class="form-control"><?= htmlspecialchars($meta['og_description'] ?? '') ?></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label>OG Image</label>
+                        <label><?= $text['og_image'] ?></label>
                         <input type="file" name="og_image" class="form-control">
                         <?php
                         $defaultImage = '../../public/img/q-removebg-preview1.png';
                         $ogImagePath = !empty($meta['og_image']) ? htmlspecialchars($meta['og_image']) : $defaultImage;
                         ?>
                         <img src="<?= $ogImagePath ?>" style="max-height: 100px; max-width: 150px; object-fit: contain; border:1px solid #ccc; padding: 4px;" class="mt-2">
-
                     </div>
 
                     <button type="submit" class="btn btn-success">
-                        <i class="fa fa-save"></i> บันทึก
+                        <i class="fa fa-save"></i> <?= $text['save_btn'] ?>
                     </button>
                 </form>
 
                 <hr>
-                <h5 class="mt-4"><i class="fa fa-list"></i> รายการ Meta Tags</h5>
+                <h5 class="mt-4"><i class="fa fa-list"></i> <?= $text['list_title'] ?></h5>
                 <table class="table table-bordered mt-2">
                     <thead>
                         <tr>
-                            <th>Page</th>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Action</th>
+                            <th><?= $text['table_page'] ?></th>
+                            <th><?= $text['table_title'] ?></th>
+                            <th><?= $text['table_description'] ?></th>
+                            <th><?= $text['table_action'] ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -132,14 +235,13 @@ if (isset($_GET['id'])) {
                                 <td><?= htmlspecialchars($row['meta_description']) ?></td>
                                 <td>
                                     <a href="?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">
-                                        <i class="fa fa-edit"></i> แก้ไข
+                                        <i class="fa fa-edit"></i> <?= $text['edit_btn'] ?>
                                     </a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
-
             </div>
         </div>
     </div>
@@ -148,12 +250,12 @@ if (isset($_GET['id'])) {
 <script>
 document.querySelector('form').addEventListener('submit', function(e) {
     if (document.querySelector('[name=meta_title]').value.trim() === '') {
-        alert('กรุณากรอก Meta Title');
+        alert('<?= $text['alert_meta_title'] ?>');
         e.preventDefault();
     }
 });
 </script>
 <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
-    <script src='js/banner_.js?v=<?php echo time(); ?>'></script>
+<script src='js/banner_.js?v=<?php echo time(); ?>'></script>
 </body>
 </html>

@@ -56,14 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($row && password_verify($password, $row['password']) || $password == $row['password']) {
             
             // --- ส่วนที่ปรับปรุงเพื่อบล็อก Role 1 และ 2 ---
-            $blocked_roles = [1, 2];
-            if (in_array($row['role_id'], $blocked_roles)) {
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Permission denied for this role."
-                ]);
-                exit();
-            }
+            // $blocked_roles = [1, 2];
+            // if (in_array($row['role_id'], $blocked_roles)) {
+            //     echo json_encode([
+            //         "status" => "error",
+            //         "message" => "Permission denied for this role."
+            //     ]);
+            //     exit();
+            // }
             // --- สิ้นสุดส่วนที่ปรับปรุง ---
 
             $secret_key = $_ENV['JWT_SECRET_KEY'];

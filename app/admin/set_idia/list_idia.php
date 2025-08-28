@@ -1,12 +1,89 @@
+<?php
+// session_start();
+$lang = 'th'; // กำหนดภาษาเริ่มต้นเป็น 'th'
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        unset($_SESSION['lang']);
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
 
+// กำหนดข้อความตามแต่ละภาษา
+$texts = [
+    'page_title' => [
+        'th' => 'รายการไอเดีย',
+        'en' => 'Idea List',
+        'cn' => '想法列表',
+        'jp' => 'アイデアリスト',
+        'kr' => '아이디어 목록'
+    ],
+    'list_idia' => [
+        'th' => 'รายการไอเดีย',
+        'en' => 'Idea List',
+        'cn' => '想法列表',
+        'jp' => 'アイデアリスト',
+        'kr' => '아이디어 목록'
+    ],
+    'write_idia' => [
+        'th' => 'สร้างไอเดีย',
+        'en' => 'Add New Idea',
+        'cn' => '创建想法',
+        'jp' => 'アイデアを作成',
+        'kr' => '아이디어 작성'
+    ],
+    'th_no' => [
+        'th' => 'ลำดับ',
+        'en' => 'No.',
+        'cn' => '编号',
+        'jp' => '番号',
+        'kr' => '번호'
+    ],
+    'th_subject' => [
+        'th' => 'หัวข้อ',
+        'en' => 'Subject',
+        'cn' => '主题',
+        'jp' => '件名',
+        'kr' => '주제'
+    ],
+    'th_date_created' => [
+        'th' => 'วันที่สร้าง',
+        'en' => 'Date created',
+        'cn' => '创建日期',
+        'jp' => '作成日',
+        'kr' => '작성일'
+    ],
+    'th_action' => [
+        'th' => 'การจัดการ',
+        'en' => 'Action',
+        'cn' => '操作',
+        'jp' => 'アクション',
+        'kr' => '동작'
+    ]
+];
 
-<?php include '../check_permission.php'?>
+// ฟังก์ชันสำหรับเรียกใช้ข้อความตามภาษาที่เลือก
+function getTextByLang($key) {
+    global $texts, $lang;
+    return $texts[$key][$lang] ?? $texts[$key]['th'];
+}
+
+include '../check_permission.php'
+?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= htmlspecialchars($lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List idia</title>
+    <title><?= getTextByLang('page_title') ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -20,11 +97,6 @@
 
     <link href="https://cdn.jsdelivr.net/npm/fontawesome5-fullcss@1.1.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +124,6 @@
             cursor: pointer;
         }
 
-
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
@@ -61,11 +132,9 @@
 
         /* Media query for smaller screens */
         @media (max-width: 768px) {
-
             .responsive-grid {
                 grid-template-columns: 1fr;
             }
-
         }
 
         .btn-circle {
@@ -96,48 +165,41 @@
         <div class="container-fluid">
             <div class="box-content">
                 <div class="row">
-
                     <div>
                         <div class="responsive-grid">
                             <div style="margin: 10px;">
-
                                 <div style="display: flex; justify-content: space-between;">
                                     <h4 class="line-ref mb-3"> 
                                         <i class="far fa-newspaper"></i>   
-                                        List idia
+                                        <?= getTextByLang('list_idia') ?>
                                     </h4>
                                     <a type="button" class="btn btn-primary" href="<?php echo $base_path_admin.'set_idia/setup_idia.php'?>">
                                         <i class="fa-solid fa-plus"></i>
-                                        write idia
+                                        <?= getTextByLang('write_idia') ?>
                                     </a>
                                 </div>
 
                                 <table id="td_list_idia" class="table table-hover" style="width:100%;">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Subject</th>
-                                            <th>Date created</th>
-                                            <th>Action</th>
+                                            <th><?= getTextByLang('th_no') ?></th>
+                                            <th><?= getTextByLang('th_subject') ?></th>
+                                            <th><?= getTextByLang('th_date_created') ?></th>
+                                            <th><?= getTextByLang('th_action') ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 
-
-
     <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script src='js/idia_.js?v=<?php echo time(); ?>'></script>
 </body>
-
 </html>

@@ -1,22 +1,172 @@
 <?php
+// เริ่ม session
+session_start();
+
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
 
+// กำหนดภาษาเริ่มต้นและตรวจสอบค่าใน URL
+$lang = 'th';
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// สร้าง array สำหรับเก็บข้อความในแต่ละภาษา
+$texts = [
+    'th' => [
+        'title' => 'แก้ไขร้านค้า',
+        'header' => 'แก้ไขร้านค้า',
+        'not_found' => 'ไม่พบข้อมูลข่าวที่ต้องการแก้ไข',
+        'no_data' => 'ไม่มีข้อมูลข่าว',
+        'back_button' => 'ย้อนกลับ',
+        'save_button' => 'บันทึกร้านค้า',
+        'cover_photo' => 'รูปหน้าปก',
+        'photo_size' => 'ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px',
+        'main_group' => 'กลุ่มแม่',
+        'select_main_group' => '-- เลือกกลุ่มแม่ --',
+        'sub_group' => 'กลุ่มย่อย',
+        'select_sub_group' => '-- เลือกกลุ่มย่อย --',
+        'subject' => 'หัวข้อ (TH)',
+        'description' => 'คำอธิบาย (TH)',
+        'content' => 'เนื้อหา (TH)',
+        'language' => [
+            'th' => 'ภาษาไทย',
+            'en' => 'ภาษาอังกฤษ',
+            'cn' => 'ภาษาจีน',
+            'jp' => 'ภาษาญี่ปุ่น',
+            'kr' => 'ภาษาเกาหลี'
+        ],
+        'translate_button' => 'Origami Ai Translate',
+    ],
+    'en' => [
+        'title' => 'Edit Shop',
+        'header' => 'Edit Shop',
+        'not_found' => 'The news data to be edited was not found.',
+        'no_data' => 'No news data available.',
+        'back_button' => 'Back',
+        'save_button' => 'Save shop',
+        'cover_photo' => 'Cover photo',
+        'photo_size' => 'Recommended image size: width: 350px and height: 250px',
+        'main_group' => 'Main Group',
+        'select_main_group' => '-- Select Main Group --',
+        'sub_group' => 'Sub Group',
+        'select_sub_group' => '-- Select Sub Group --',
+        'subject' => 'Subject (EN)',
+        'description' => 'Description (EN)',
+        'content' => 'Content (EN)',
+        'language' => [
+            'th' => 'Thai',
+            'en' => 'English',
+            'cn' => 'Chinese',
+            'jp' => 'Japanese',
+            'kr' => 'Korean'
+        ],
+        'translate_button' => 'Origami Ai Translate',
+    ],
+    'cn' => [
+        'title' => '编辑商店',
+        'header' => '编辑商店',
+        'not_found' => '未找到要编辑的新闻数据',
+        'no_data' => '没有新闻数据',
+        'back_button' => '返回',
+        'save_button' => '保存商店',
+        'cover_photo' => '封面照片',
+        'photo_size' => '推荐图片尺寸：宽度：350px，高度：250px',
+        'main_group' => '主组',
+        'select_main_group' => '-- 选择主组 --',
+        'sub_group' => '子组',
+        'select_sub_group' => '-- 选择子组 --',
+        'subject' => '标题 (CN)',
+        'description' => '描述 (CN)',
+        'content' => '内容 (CN)',
+        'language' => [
+            'th' => '泰语',
+            'en' => '英语',
+            'cn' => '中文',
+            'jp' => '日语',
+            'kr' => '韩语'
+        ],
+        'translate_button' => 'Origami Ai Translate',
+    ],
+    'jp' => [
+        'title' => 'ショップを編集',
+        'header' => 'ショップを編集',
+        'not_found' => '編集するニュースデータが見つかりませんでした',
+        'no_data' => 'ニュースデータがありません',
+        'back_button' => '戻る',
+        'save_button' => 'ショップを保存',
+        'cover_photo' => 'カバー写真',
+        'photo_size' => '推奨画像サイズ：幅：350px、高さ：250px',
+        'main_group' => 'メイングループ',
+        'select_main_group' => '-- メイングループを選択 --',
+        'sub_group' => 'サブグループ',
+        'select_sub_group' => '-- サブグループを選択 --',
+        'subject' => '件名 (JP)',
+        'description' => '説明 (JP)',
+        'content' => '内容 (JP)',
+        'language' => [
+            'th' => 'タイ語',
+            'en' => '英語',
+            'cn' => '中国語',
+            'jp' => '日本語',
+            'kr' => '韓国語'
+        ],
+        'translate_button' => 'Origami Ai Translate',
+    ],
+    'kr' => [
+        'title' => '상점 편집',
+        'header' => '상점 편집',
+        'not_found' => '편집할 뉴스 데이터를 찾을 수 없습니다.',
+        'no_data' => '뉴스 데이터가 없습니다.',
+        'back_button' => '뒤로',
+        'save_button' => '상점 저장',
+        'cover_photo' => '표지 사진',
+        'photo_size' => '권장 이미지 크기: 너비 350px, 높이 250px',
+        'main_group' => '메인 그룹',
+        'select_main_group' => '-- 메인 그룹 선택 --',
+        'sub_group' => '서브 그룹',
+        'select_sub_group' => '-- 서브 그룹 선택 --',
+        'subject' => '제목 (KR)',
+        'description' => '설명 (KR)',
+        'content' => '내용 (KR)',
+        'language' => [
+            'th' => '태국어',
+            'en' => '영어',
+            'cn' => '중국어',
+            'jp' => '일본어',
+            'kr' => '한국어'
+        ],
+        'translate_button' => 'Origami Ai Translate',
+    ],
+];
+
+$current_texts = $texts[$lang];
+
 // ตรวจสอบว่าได้รับค่า shop_id หรือไม่
 if (!isset($_POST['shop_id'])) {
-    echo "<div class='alert alert-danger'>ไม่พบข้อมูลข่าวที่ต้องการแก้ไข</div>";
+    echo "<div class='alert alert-danger'>{$current_texts['not_found']}</div>";
     exit;
 }
 
 $decodedId = $_POST['shop_id'];
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit shop</title>
+    <title><?php echo $current_texts['title']; ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -141,7 +291,7 @@ $decodedId = $_POST['shop_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit shop
+                        <i class="far fa-newspaper"></i> <?php echo $current_texts['header']; ?>
                     </h4>
 
                     <?php
@@ -317,12 +467,12 @@ if ($result->num_rows > 0) {
             <div class=''>
                 <div style='margin: 10px; text-align: end;'>
                     <button type='button' id='backToShopList' class='btn btn-secondary'> 
-                        <i class='fas fa-arrow-left'></i> Back 
+                        <i class='fas fa-arrow-left'></i> {$current_texts['back_button']}
                     </button>
                 </div>
                 <div style='margin: 10px;'>
-                    <label><span>Cover photo</span>:</label>
-                    <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                    <label><span>{$current_texts['cover_photo']}</span>:</label>
+                    <div><span>{$current_texts['photo_size']}</span></div>
                     <div id='previewContainer' class='previewContainer'>
                         <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                     </div>
@@ -330,18 +480,18 @@ if ($result->num_rows > 0) {
                 <div style='margin: 10px;'>
                     <input type='file' class='form-control' id='fileInput' name='fileInput'> </div>
                 <div style='margin: 10px;'>
-                    <label><span>กลุ่มแม่</span>:</label>
+                    <label><span>{$current_texts['main_group']}</span>:</label>
                     <select id='main_group_select' class='form-control'>
-                        <option value=''>-- เลือกกลุ่มแม่ --</option>
+                        <option value=''>{$current_texts['select_main_group']}</option>
                         "; // ปิด PHP เพื่อใส่ mainGroupOptions
                             echo $mainGroupOptions;
                         echo "
                     </select>
                 </div>
                 <div style='margin: 10px;'>
-                    <label><span>กลุ่มย่อย</span>:</label>
+                    <label><span>{$current_texts['sub_group']}</span>:</label>
                     <select id='sub_group_select' name='group_id' class='form-control'>
-                        <option value=''>-- เลือกกลุ่มย่อย --</option>
+                        <option value=''>{$current_texts['select_sub_group']}</option>
                     </select>
                 </div>
                 
@@ -356,31 +506,31 @@ if ($result->num_rows > 0) {
                             <li class='nav-item' role='presentation'>
                                 <button class='nav-link active' id='th-tab' data-bs-toggle='tab' data-bs-target='#th' type='button' role='tab' aria-controls='th' aria-selected='true'>
                                     <img src='https://flagcdn.com/w320/th.png' alt='Thai Flag' class='flag-icon' style=' width: 36px; 
-            margin-right: 8px;'>Thai
+            margin-right: 8px;'>{$current_texts['language']['th']}
                                 </button>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <button class='nav-link' id='en-tab' data-bs-toggle='tab' data-bs-target='#en' type='button' role='tab' aria-controls='en' aria-selected='false'>
                                     <img src='https://flagcdn.com/w320/gb.png' alt='English Flag' class='flag-icon' style=' width: 36px; 
-            margin-right: 8px;'>English
+            margin-right: 8px;'>{$current_texts['language']['en']}
                                 </button>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <button class='nav-link' id='cn-tab' data-bs-toggle='tab' data-bs-target='#cn' type='button' role='tab' aria-controls='cn' aria-selected='false'>
                                     <img src='https://flagcdn.com/w320/cn.png' alt='Chinese Flag' class='flag-icon' style=' width: 36px; 
-            margin-right: 8px;'>Chinese
+            margin-right: 8px;'>{$current_texts['language']['cn']}
                                 </button>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <button class='nav-link' id='jp-tab' data-bs-toggle='tab' data-bs-target='#jp' type='button' role='tab' aria-controls='jp' aria-selected='false'>
                                     <img src='https://flagcdn.com/w320/jp.png' alt='Japanese Flag' class='flag-icon' style=' width: 36px; 
-            margin-right: 8px;'>Japanese
+            margin-right: 8px;'>{$current_texts['language']['jp']}
                                 </button>
                             </li>
                             <li class='nav-item' role='presentation'>
                                 <button class='nav-link' id='kr-tab' data-bs-toggle='tab' data-bs-target='#kr' type='button' role='tab' aria-controls='kr' aria-selected='false'>
                                     <img src='https://flagcdn.com/w320/kr.png' alt='Korean Flag' class='flag-icon' style=' width: 36px; 
-            margin-right: 8px;'>Korean
+            margin-right: 8px;'>{$current_texts['language']['kr']}
                                 </button>
                             </li>
                         </ul>
@@ -389,21 +539,21 @@ if ($result->num_rows > 0) {
                         <div class='tab-content' id='languageTabsContent'>
                             <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
                                 <div style='margin: 10px;'>
-                                    <label><span>Subject (TH)</span>:</label>
+                                    <label><span>{$current_texts['subject']}</span>:</label>
                                     <input type='text' class='form-control' id='shop_subject' name='shop_subject' value='" . htmlspecialchars($row['subject_shop']) . "'>
                                 </div>
                                 <div style='margin: 10px;'>
-                                    <label><span>Description (TH)</span>:</label>
+                                    <label><span>{$current_texts['description']}</span>:</label>
                                     <textarea class='form-control' id='shop_description' name='shop_description'>" . htmlspecialchars($row['description_shop']) . "</textarea>
                                 </div>
                                 <div style='margin: 10px;'>
-                                    <label><span>Content (TH)</span>:</label>
+                                    <label><span>{$current_texts['content']}</span>:</label>
                                     <textarea class='form-control summernote' id='summernote_update' name='shop_content'>" . $content_th_with_correct_paths . "</textarea>
                                 </div>
                             </div>
                             <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                    <button type='button' id='copyFromThaiEn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <button type='button' id='copyFromThaiEn' class='btn btn-info btn-sm float-end mb-2'>{$current_texts['translate_button']}</button>
                                     <div id='loadingIndicatorEn' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
                                     </div>
@@ -424,7 +574,7 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='cn' role='tabpanel' aria-labelledby='cn-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                    <button type='button' id='copyFromThaiCn' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <button type='button' id='copyFromThaiCn' class='btn btn-info btn-sm float-end mb-2'>{$current_texts['translate_button']}</button>
                                     <div id='loadingIndicatorCn' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
                                     </div>
@@ -445,7 +595,7 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='jp' role='tabpanel' aria-labelledby='jp-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                    <button type='button' id='copyFromThaiJp' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <button type='button' id='copyFromThaiJp' class='btn btn-info btn-sm float-end mb-2'>{$current_texts['translate_button']}</button>
                                     <div id='loadingIndicatorJp' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
                                     </div>
@@ -466,7 +616,7 @@ if ($result->num_rows > 0) {
                             </div>
                             <div class='tab-pane fade' id='kr' role='tabpanel' aria-labelledby='kr-tab'>
                                 <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                                    <button type='button' id='copyFromThaiKr' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                    <button type='button' id='copyFromThaiKr' class='btn btn-info btn-sm float-end mb-2'>{$current_texts['translate_button']}</button>
                                     <div id='loadingIndicatorKr' class='loading-overlay' style='display: none;'>
                                         <div class='loading-spinner'></div>
                                     </div>
@@ -492,7 +642,7 @@ if ($result->num_rows > 0) {
                 </div>
                 <div style='margin: 10px; text-align: end;'>
                     <button type='button' id='submitEditshop' class='btn btn-success'>
-                        <i class='fas fa-save'></i> Save shop
+                        <i class='fas fa-save'></i> {$current_texts['save_button']}
                     </button>
                 </div>
             </div>
@@ -512,7 +662,7 @@ if ($result->num_rows > 0) {
     </script>
     ";
 } else {
-    echo "<div class='alert alert-warning'>ไม่มีข้อมูลข่าว</div>";
+    echo "<div class='alert alert-warning'>{$current_texts['no_data']}</div>";
 }
 $stmt->close();
 ?>

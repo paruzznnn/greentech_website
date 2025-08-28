@@ -3,15 +3,15 @@ $(document).ready(function () {
     var usersTable = $('#usersTable').DataTable({
         "autoWidth": false,
         "language": {
-            "search": "ค้นหา:",
-            "lengthMenu": "แสดง _MENU_ รายการ",
-            "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+            "search": translations[currentLang].dt_search,
+            "lengthMenu": translations[currentLang].dt_lengthMenu,
+            "info": translations[currentLang].dt_info,
             "paginate": {
-                "next": "ถัดไป",
-                "previous": "ก่อนหน้า"
+                "next": translations[currentLang].dt_next,
+                "previous": translations[currentLang].dt_previous
             },
-            "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
-            "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน"
+            "infoEmpty": translations[currentLang].dt_infoEmpty,
+            "zeroRecords": translations[currentLang].dt_zeroRecords
         }
     });
 
@@ -19,20 +19,18 @@ $(document).ready(function () {
     $('#usersTable').on('click', '.btn-delete', function() {
         var userId = $(this).data('id');
         Swal.fire({
-            title: "คุณแน่ใจหรือไม่?",
-            text: "ข้อมูลผู้ใช้จะถูกลบอย่างถาวร!",
+            title: translations[currentLang].swal_confirm_title,
+            text: translations[currentLang].swal_confirm_text,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
             cancelButtonColor: "#3085d6",
-            confirmButtonText: "ใช่, ลบเลย!",
-            cancelButtonText: "ยกเลิก"
+            confirmButtonText: translations[currentLang].swal_confirm_button,
+            cancelButtonText: translations[currentLang].swal_cancel_button
         }).then((result) => {
             if (result.isConfirmed) {
-                // ส่ง AJAX request ไปยังไฟล์ process_users.php เพื่อลบข้อมูล
-                // แก้ไข URL ให้ถูกต้อง
                 $.ajax({
-                    url: "actions/process_users.php", // แก้ไข URL
+                    url: "actions/process_users.php", 
                     type: "POST",
                     data: {
                         action: 'delete_user',
@@ -42,25 +40,25 @@ $(document).ready(function () {
                     success: function(response) {
                         if (response.status === 'success') {
                             Swal.fire(
-                                'ลบสำเร็จ!',
-                                'ข้อมูลผู้ใช้ถูกลบเรียบร้อยแล้ว.',
+                                translations[currentLang].swal_success_title,
+                                translations[currentLang].swal_success_text,
                                 'success'
                             ).then(() => {
                                 window.location.reload();
                             });
                         } else {
                             Swal.fire(
-                                'เกิดข้อผิดพลาด!',
-                                'ไม่สามารถลบข้อมูลผู้ใช้ได้: ' + response.message,
+                                translations[currentLang].swal_error_title,
+                                translations[currentLang].swal_delete_error + response.message,
                                 'error'
                             );
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('AJAX Error:', xhr.responseText); // แสดงข้อความ error ที่ชัดเจนขึ้น
+                        console.error('AJAX Error:', xhr.responseText);
                         Swal.fire(
-                            'เกิดข้อผิดพลาด!',
-                            'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้.',
+                            translations[currentLang].swal_error_title,
+                            translations[currentLang].swal_server_error,
                             'error'
                         );
                     }

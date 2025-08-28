@@ -1,22 +1,127 @@
 <?php
+session_start(); // เพิ่มบรรทัดนี้เพื่อเริ่มใช้งาน session
 include '../../../lib/connect.php';
 include '../../../lib/base_directory.php';
 include '../check_permission.php';
 
+// ส่วนที่แก้ไข: จัดการการเลือกภาษาและเก็บใน Session
+$lang = 'th'; // กำหนดภาษาเริ่มต้น
+$supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+
+if (isset($_GET['lang'])) {
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        // ถ้าภาษาที่ส่งมาไม่รองรับ ให้ใช้ภาษาจาก session หรือ 'th'
+        if (isset($_SESSION['lang'])) {
+            $lang = $_SESSION['lang'];
+        }
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// กำหนดข้อความตามภาษาที่เลือก
+$texts = [
+    'th' => [
+        'page_title' => 'แก้ไขโครงการ',
+        'header_title' => 'แก้ไขโครงการ',
+        'back_button' => 'กลับ',
+        'cover_photo' => 'รูปภาพหน้าปก',
+        'image_size_note' => 'ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px',
+        'related_shops' => 'ร้านค้าที่เกี่ยวข้อง',
+        'subject' => 'หัวข้อ',
+        'description' => 'คำอธิบาย',
+        'content' => 'เนื้อหา',
+        'ai_translate' => 'แปลอัตโนมัติด้วย Origami AI',
+        'save_button' => 'บันทึกโครงการ',
+        'error_no_project_found' => 'ไม่พบข้อมูลโครงการที่ต้องการแก้ไข',
+        'error_no_data' => 'ไม่มีข้อมูลโครงการ'
+    ],
+    'en' => [
+        'page_title' => 'Edit Project',
+        'header_title' => 'Edit Project',
+        'back_button' => 'Back',
+        'cover_photo' => 'Cover photo',
+        'image_size_note' => 'Recommended image size: width: 350px and height: 250px',
+        'related_shops' => 'Related Shops',
+        'subject' => 'Subject',
+        'description' => 'Description',
+        'content' => 'Content',
+        'ai_translate' => 'Origami Ai Translate',
+        'save_button' => 'Save Project',
+        'error_no_project_found' => 'Project data to be edited not found',
+        'error_no_data' => 'No project data available'
+    ],
+    'cn' => [
+        'page_title' => '编辑项目',
+        'header_title' => '编辑项目',
+        'back_button' => '返回',
+        'cover_photo' => '封面照片',
+        'image_size_note' => '推荐图片尺寸：宽: 350px，高: 250px',
+        'related_shops' => '相关商店',
+        'subject' => '主题',
+        'description' => '描述',
+        'content' => '内容',
+        'ai_translate' => '折纸AI翻译',
+        'save_button' => '保存项目',
+        'error_no_project_found' => '未找到要编辑的项目数据',
+        'error_no_data' => '没有可用的项目数据'
+    ],
+    'jp' => [
+        'page_title' => 'プロジェクトの編集',
+        'header_title' => 'プロジェクトの編集',
+        'back_button' => '戻る',
+        'cover_photo' => 'カバー写真',
+        'image_size_note' => '推奨画像サイズ：幅: 350px、高さ: 250px',
+        'related_shops' => '関連店舗',
+        'subject' => '件名',
+        'description' => '説明',
+        'content' => '内容',
+        'ai_translate' => 'オリガミAI翻訳',
+        'save_button' => 'プロジェクトを保存',
+        'error_no_project_found' => '編集するプロジェクトデータが見つかりません',
+        'error_no_data' => 'プロジェクトデータがありません'
+    ],
+    'kr' => [
+        'page_title' => '프로젝트 편집',
+        'header_title' => '프로젝트 편집',
+        'back_button' => '뒤로',
+        'cover_photo' => '커버 사진',
+        'image_size_note' => '권장 이미지 크기: 너비: 350px, 높이: 250px',
+        'related_shops' => '관련 상점',
+        'subject' => '제목',
+        'description' => '설명',
+        'content' => '내용',
+        'ai_translate' => '오리가미 AI 번역',
+        'save_button' => '프로젝트 저장',
+        'error_no_project_found' => '편집할 프로젝트 데이터를 찾을 수 없습니다',
+        'error_no_data' => '프로젝트 데이터가 없습니다'
+    ]
+];
+
+// ดึงข้อความที่ต้องการจาก array ตามภาษาที่เลือก
+$current_texts = $texts[$lang];
+
 if (!isset($_POST['project_id'])) {
-    echo "<div class='alert alert-danger'>ไม่พบข้อมูลโครงการที่ต้องการแก้ไข</div>";
+    echo "<div class='alert alert-danger'>" . $current_texts['error_no_project_found'] . "</div>";
     exit;
 }
 
 $decodedId = $_POST['project_id'];
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?php echo htmlspecialchars($lang); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Project</title>
+    <title><?php echo htmlspecialchars($current_texts['page_title']); ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
@@ -147,7 +252,7 @@ $decodedId = $_POST['project_id'];
             <div class="box-content">
                 <div class="row">
                     <h4 class="line-ref mb-3">
-                        <i class="far fa-newspaper"></i> Edit Project
+                        <i class="far fa-newspaper"></i> <?php echo htmlspecialchars($current_texts['header_title']); ?>
                     </h4>
 
                     <?php
@@ -309,11 +414,11 @@ $decodedId = $_POST['project_id'];
                                     <div style='margin: 10px;'>
                                         <div style='margin: 10px; text-align: end;'>
                                             <button type='button' id='backToProjectList' class='btn btn-secondary'> 
-                                                <i class='fas fa-arrow-left'></i> Back 
+                                                <i class='fas fa-arrow-left'></i> " . htmlspecialchars($current_texts['back_button']) . "
                                             </button>
                                         </div>
-                                        <div><span>Cover photo</span>:</div>
-                                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                        <div><span>" . htmlspecialchars($current_texts['cover_photo']) . "</span>:</div>
+                                        <div><span>" . htmlspecialchars($current_texts['image_size_note']) . "</span></div>
                                         <div id='previewContainer' class='previewContainer'>
                                             <img id='previewImage' src='{$previewImageSrc}' alt='Image Preview' style='max-width: 100%;'>
                                         </div>
@@ -322,7 +427,7 @@ $decodedId = $_POST['project_id'];
                                         <input type='file' class='form-control' id='fileInput' name='fileInput'>
                                     </div>
                                     <div style='margin: 10px;'>
-                                        <div><span>Related Shops</span>:</div>
+                                        <div><span>" . htmlspecialchars($current_texts['related_shops']) . "</span>:</div>
                                         <select class='form-control select2-multiple' id='related_shops_edit' name='related_shops[]' multiple='multiple'>
                                             " . $allShopsOptions . "
                                         </select>
@@ -368,87 +473,87 @@ $decodedId = $_POST['project_id'];
                                             <div class='tab-content' id='languageTabsContent'>
                                                 <div class='tab-pane fade show active' id='th' role='tabpanel' aria-labelledby='th-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Subject (TH)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['subject']) . " (TH)</span>:</div>
                                                         <input type='text' class='form-control' id='project_subject' name='project_subject' value='" . htmlspecialchars($row['subject_project']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Description (TH)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['description']) . " (TH)</span>:</div>
                                                         <textarea class='form-control' id='project_description' name='project_description'>" . htmlspecialchars($row['description_project']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Content (TH)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['content']) . " (TH)</span>:</div>
                                                         <textarea class='form-control summernote' id='summernote_update' name='project_content'>" . $content_th_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
                                                 <div class='tab-pane fade' id='en' role='tabpanel' aria-labelledby='en-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <button type='button' id='copyFromThai' class='btn btn-info btn-sm float-end mb-2'>" . htmlspecialchars($current_texts['ai_translate']) . "</button>
                                                         <div id='loadingIndicator_en' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <div><span>Subject (EN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['subject']) . " (EN)</span>:</div>
                                                         <input type='text' class='form-control' id='project_subject_en' name='project_subject_en' value='" . htmlspecialchars($row['subject_project_en']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Description (EN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['description']) . " (EN)</span>:</div>
                                                         <textarea class='form-control' id='project_description_en' name='project_description_en'>" . htmlspecialchars($row['description_project_en']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Content (EN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['content']) . " (EN)</span>:</div>
                                                         <textarea class='form-control summernote' id='summernote_update_en' name='project_content_en'>" . $content_en_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
                                                 <div class='tab-pane fade' id='cn' role='tabpanel' aria-labelledby='cn-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <button type='button' id='copyFromEnglish' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <button type='button' id='copyFromEnglish' class='btn btn-info btn-sm float-end mb-2'>" . htmlspecialchars($current_texts['ai_translate']) . "</button>
                                                         <div id='loadingIndicator_cn' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <div><span>Subject (CN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['subject']) . " (CN)</span>:</div>
                                                         <input type='text' class='form-control' id='project_subject_cn' name='project_subject_cn' value='" . htmlspecialchars($row['subject_project_cn']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Description (CN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['description']) . " (CN)</span>:</div>
                                                         <textarea class='form-control' id='project_description_cn' name='project_description_cn'>" . htmlspecialchars($row['description_project_cn']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Content (CN)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['content']) . " (CN)</span>:</div>
                                                         <textarea class='form-control summernote' id='summernote_update_cn' name='project_content_cn'>" . $content_cn_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
                                                 <div class='tab-pane fade' id='jp' role='tabpanel' aria-labelledby='jp-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <button type='button' id='copyFromChinese' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <button type='button' id='copyFromChinese' class='btn btn-info btn-sm float-end mb-2'>" . htmlspecialchars($current_texts['ai_translate']) . "</button>
                                                         <div id='loadingIndicator_jp' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <div><span>Subject (JP)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['subject']) . " (JP)</span>:</div>
                                                         <input type='text' class='form-control' id='project_subject_jp' name='project_subject_jp' value='" . htmlspecialchars($row['subject_project_jp']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Description (JP)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['description']) . " (JP)</span>:</div>
                                                         <textarea class='form-control' id='project_description_jp' name='project_description_jp'>" . htmlspecialchars($row['description_project_jp']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Content (JP)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['content']) . " (JP)</span>:</div>
                                                         <textarea class='form-control summernote' id='summernote_update_jp' name='project_content_jp'>" . $content_jp_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
                                                 <div class='tab-pane fade' id='kr' role='tabpanel' aria-labelledby='kr-tab'>
                                                     <div style='margin: 10px;'>
-                                                        <button type='button' id='copyFromJapanese' class='btn btn-info btn-sm float-end mb-2'>Origami Ai Translate</button>
+                                                        <button type='button' id='copyFromJapanese' class='btn btn-info btn-sm float-end mb-2'>" . htmlspecialchars($current_texts['ai_translate']) . "</button>
                                                         <div id='loadingIndicator_kr' class='loading-overlay' style='display: none;'>
                                                             <div class='loading-spinner'></div>
                                                         </div>
-                                                        <div><span>Subject (KR)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['subject']) . " (KR)</span>:</div>
                                                         <input type='text' class='form-control' id='project_subject_kr' name='project_subject_kr' value='" . htmlspecialchars($row['subject_project_kr']) . "'>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Description (KR)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['description']) . " (KR)</span>:</div>
                                                         <textarea class='form-control' id='project_description_kr' name='project_description_kr'>" . htmlspecialchars($row['description_project_kr']) . "</textarea>
                                                     </div>
                                                     <div style='margin: 10px;'>
-                                                        <div><span>Content (KR)</span>:</div>
+                                                        <div><span>" . htmlspecialchars($current_texts['content']) . " (KR)</span>:</div>
                                                         <textarea class='form-control summernote' id='summernote_update_kr' name='project_content_kr'>" . $content_kr_with_correct_paths . "</textarea>
                                                     </div>
                                                 </div>
@@ -457,7 +562,7 @@ $decodedId = $_POST['project_id'];
                                     </div>
                                     <div style='margin: 10px; text-align: end;'>
                                         <button type='button' id='submitEditproject' class='btn btn-success'>
-                                            <i class='fas fa-save'></i> Save Project
+                                            <i class='fas fa-save'></i> " . htmlspecialchars($current_texts['save_button']) . "
                                         </button>
                                     </div>
                                 </div>
@@ -465,7 +570,7 @@ $decodedId = $_POST['project_id'];
                         </form>
                         ";
                     } else {
-                        echo "<div class='alert alert-warning'>ไม่มีข้อมูลโครงการ</div>";
+                        echo "<div class='alert alert-warning'>" . $current_texts['error_no_data'] . "</div>";
                     }
                     $stmt->close();
                     $conn->close();
