@@ -7,8 +7,11 @@ function nationLanguages() {
         let $select = $('#language-select');
         $select.empty();
 
-        // ดึงจาก localStorage ก่อน ถ้าไม่มี fallback เป็น 'th'
-        let initialLang = (localStorage.getItem('language') || 'th').toLowerCase();
+        // ✅ แก้ไข: ดึงภาษาปัจจุบันจาก URL parameter ก่อน, ถ้าไม่มีค่อยใช้ localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        let initialLang = urlParams.get('lang') || (localStorage.getItem('language') || 'th');
+        initialLang = initialLang.toLowerCase();
+
         console.log('initialLang:', initialLang);
 
         $.each(nationalities, function (index, entry) {
@@ -25,10 +28,12 @@ function nationLanguages() {
             $select.append(option);
         });
 
-        // ถ้า localStorage ไม่มีค่า match เลย → fallback เป็น option แรก
+        // ถ้า initialLang จาก URL หรือ localStorage ไม่มีค่า match เลย ให้ fallback เป็น option แรก
         if ($select.find('option:selected').length === 0 && nationalities.length > 0) {
             let fallbackLang = nationalities[0].abbreviation;
             $select.val(fallbackLang);
+            // ✅ บันทึก fallback ลง localStorage ด้วย
+            localStorage.setItem('language', fallbackLang); 
         }
 
         updateSelectedLanguageFlag();
@@ -55,35 +60,35 @@ function updateSelectedLanguageFlag() {
 // **ฟังก์ชัน changeLanguage ไม่จำเป็นอีกต่อไปสำหรับการแปลแบบ AJAX**
 // **เพราะตอนนี้เราจะรีเฟรชหน้าเว็บแทน**
 // function changeLanguage(lang, updateUrl = true) {
-//     let new_path = $('#new_path').val();
-//     fetch(new_path + 'api/languages/' + lang + '.json')
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error('Network response was not ok');
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             document.querySelectorAll("[data-translate][lang]").forEach(el => {
-//                 const key = el.getAttribute("data-translate");
-//                 el.textContent = data[key] || el.textContent;
-//                 el.setAttribute('lang', lang);
-//             });
-//             // บันทึกภาษาลง local storage
-//             localStorage.setItem('language', lang);
-//             // ถ้า updateUrl เป็น true ก็ให้แก้ไข URL
-//             if (updateUrl) {
-//                 updateUrlWithLanguage(lang);
-//             }
-//         })
-//         .catch(error => console.error('Error loading language file:', error));
+//     let new_path = $('#new_path').val();
+//     fetch(new_path + 'api/languages/' + lang + '.json')
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             document.querySelectorAll("[data-translate][lang]").forEach(el => {
+//                 const key = el.getAttribute("data-translate");
+//                 el.textContent = data[key] || el.textContent;
+//                 el.setAttribute('lang', lang);
+//             });
+//             // บันทึกภาษาลง local storage
+//             localStorage.setItem('language', lang);
+//             // ถ้า updateUrl เป็น true ก็ให้แก้ไข URL
+//             if (updateUrl) {
+//                 updateUrlWithLanguage(lang);
+//             }
+//         })
+//         .catch(error => console.error('Error loading language file:', error));
 // }
 
 // **ฟังก์ชัน updateUrlWithLanguage ก็ไม่จำเป็นแล้วเช่นกัน**
 // function updateUrlWithLanguage(lang) {
-//     const url = new URL(window.location.href);
-//     url.searchParams.set('lang', lang);
-//     history.pushState({}, '', url);
+//     const url = new URL(window.location.href);
+//     url.searchParams.set('lang', lang);
+//     history.pushState({}, '', url);
 // }
 
 
