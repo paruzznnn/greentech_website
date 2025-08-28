@@ -190,24 +190,22 @@
     <?php include '../template/footer-bar.php'; ?>
 
     <script type="module">
-        const timeVersion = "<?= time() ?>";
-        const baseWeb = `${pathConfig.BASE_WEB}`;
 
         Promise.all([
-            import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/userRender.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/addressRender.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/menuBuilder.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/orderListRender.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/wishlistRender.js?v=${timeVersion}`),
-            import(`${baseWeb}js/user/cartRender.js?v=${timeVersion}`)
+            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/userRender.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/addressRender.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/tabBuilder.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/orderListRender.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/wishlistRender.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/user/cartRender.js?v=<?php echo time();?>`)
         ])
         .then(async (
             [
                 formModule,
                 profileModule,
                 addressModule,
-                menuBuilderModule, 
+                tabBuilderModule, 
                 orderListModule, 
                 wishlistModule, 
                 cartModule
@@ -222,7 +220,7 @@
                 fetchDistrictsData, 
                 fetchSubdistricts
             } = addressModule;
-            const { setupTabs } = menuBuilderModule;
+            const { setupTabs } = tabBuilderModule;
             const { fetchOrders, OrderListUI } = orderListModule;
             const { LikedProducts } = wishlistModule;
             const { ShoppingCart } = cartModule;
@@ -231,10 +229,10 @@
             setupProfileImageUpload();
 
             //===== Address ==================================
-            const address = await fetchAddressData("getAddressItems", baseWeb + 'service/user/user-data.php?');
-            const provinces = await fetchProvincesData(baseWeb + 'locales/provinces.json');
-            const districts = await fetchDistrictsData(baseWeb + 'locales/districts.json');
-            const subdistricts = await fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+            const address = await fetchAddressData("getAddressItems", pathConfig.BASE_WEB + 'service/user/user-data.php?');
+            const provinces = await fetchProvincesData(pathConfig.BASE_WEB + 'locales/provinces.json');
+            const districts = await fetchDistrictsData(pathConfig.BASE_WEB + 'locales/districts.json');
+            const subdistricts = await fetchSubdistricts(pathConfig.BASE_WEB + 'locales/subdistricts.json');
             AddressUI.init(
                 provinces,
                 districts,
@@ -247,7 +245,7 @@
             
             //===== Order List ==================================
             setupTabs();
-            const service = baseWeb + 'service/user/user-data.php?';
+            const service = pathConfig.BASE_WEB + 'service/user/user-data.php?';
             const orders = await fetchOrders("getOrdersItems", service);
             OrderListUI.displayTabOrders('tab-order-list');
 
@@ -267,11 +265,13 @@
 
             //===== Cart ==================================
             window.ShoppingCart = ShoppingCart;
-            ShoppingCart.init(baseWeb);
+            ShoppingCart.init(pathConfig.BASE_WEB);
 
             //===== Like ==================================
             LikedProducts.init();
             LikedProducts.renderProducts(ShoppingCart);
+
+            console.log('window', window);
 
         })
         .catch((e) => console.error("Module import failed", e));

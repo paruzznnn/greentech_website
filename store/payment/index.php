@@ -162,12 +162,9 @@
 
 
     <script type="module">
-        const timeVersion = "<?= time() ?>";
-        const baseWeb = `${pathConfig.BASE_WEB}`;
-
         Promise.all([
-            import(`${baseWeb}js/formHandler.js?v=${timeVersion}`),
-            import(`${baseWeb}js/payment/paymentRender.js?v=${timeVersion}`)
+            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/payment/paymentRender.js?v=<?php echo time();?>`)
         ])
         .then(async ([formModule, paymentModule]) => {
 
@@ -183,10 +180,10 @@
             const formOrder = document.querySelector("#formOrder");
             formOrder?.addEventListener("submit", handleFormSubmit);
 
-            const address = await fetchAddressData("getAddress", baseWeb + 'service/payment/address-data.php?');
-            const provinces = await fetchProvincesData(baseWeb + 'locales/provinces.json');
-            const districts = await fetchDistrictsData(baseWeb + 'locales/districts.json');
-            const subdistricts = await fetchSubdistricts(baseWeb + 'locales/subdistricts.json');
+            const address = await fetchAddressData("getAddress", pathConfig.BASE_WEB + 'service/payment/address-data.php?');
+            const provinces = await fetchProvincesData(pathConfig.BASE_WEB + 'locales/provinces.json');
+            const districts = await fetchDistrictsData(pathConfig.BASE_WEB + 'locales/districts.json');
+            const subdistricts = await fetchSubdistricts(pathConfig.BASE_WEB + 'locales/subdistricts.json');
             const service = pathConfig.BASE_WEB + 'service/payment/payment-action.php';
 
             CheckoutUI.init(

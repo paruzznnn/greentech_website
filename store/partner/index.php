@@ -49,7 +49,7 @@
     </main>
     <?php include '../template/footer-bar.php'; ?>
 
-     <script type="module">
+    <script type="module">
         import(`${pathConfig.BASE_WEB}js/partner/partnerRender.js?v=<?= time() ?>`)
         .then(async ({ 
             initTabs, 

@@ -467,13 +467,11 @@
 </script>
 
 <script type="module">
-  const base = pathConfig.BASE_WEB;
-  const timestamp = <?= time() ?>;
 
   Promise.all([
-    import(`${base}js/formHandler.js?v=${timestamp}`),
-    import(`${base}js/modalBuilder.js?v=${timestamp}`),
-    import(`${base}js/menuBuilder.js?v=${timestamp}`)
+    import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
+    import(`${pathConfig.BASE_WEB}js/modalBuilder.js?v=<?php echo time();?>`),
+    import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time();?>`)
   ])
   .then( async ([formHandler, modalBuilder, menuBuilder]) => {
     const { handleFormSubmit } = formHandler;
