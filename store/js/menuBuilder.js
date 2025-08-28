@@ -124,6 +124,70 @@ export function buildLinkmenuSlide(menuData) {
   });
 }
 
+export function buildLinkmenuSlideAdmin(menuData) {
+  const containers = [
+    document.getElementById("menuListContainerAdmin1"),
+    document.getElementById("menuListContainerAdmin2")
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
+
+  function createMenu(items, isSub = false) {
+    const ul = document.createElement("ul");
+    ul.classList.add(isSub ? "submenu-list" : "menu-list");
+
+    items.forEach(item => {
+      const li = document.createElement("li");
+
+      const a = document.createElement("a");
+      a.href = item.link || "#";
+      a.innerHTML = `
+        ${item.icon || ''} 
+        <span>${item.title}</span>
+        ${item.subMenu && item.subMenu.length > 0
+          ? '<span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>'
+          : ''}
+      `;
+      li.appendChild(a);
+
+      // ถ้ามี submenu
+      if (item.subMenu && item.subMenu.length > 0) {
+        li.classList.add("has-submenu");
+
+        // สร้าง submenu
+        const subMenuEl = createMenu(item.subMenu, true);
+        subMenuEl.style.display = "none"; // ซ่อนเริ่มต้น
+        li.appendChild(subMenuEl);
+
+        // เพิ่ม event ที่ <a> เพื่อ toggle submenu
+        a.addEventListener("click", (e) => {
+          e.preventDefault(); // ป้องกันลิงก์กระโดด
+          e.stopPropagation();
+
+          const isOpen = subMenuEl.style.display === "block";
+          subMenuEl.style.display = isOpen ? "none" : "block";
+
+          const toggleIcon = a.querySelector(".submenu-toggle i");
+          if (toggleIcon) {
+            toggleIcon.className = isOpen ? "bi bi-chevron-down" : "bi bi-chevron-up";
+          }
+        });
+      }
+
+      ul.appendChild(li);
+    });
+
+    return ul;
+  }
+
+  containers.forEach(container => {
+    const menu = createMenu(menuData);
+    container.innerHTML = '';
+    container.appendChild(menu);
+  });
+}
+
+
 export function adjustPosition(box) {
   const rect = box.getBoundingClientRect();
   const vw = window.innerWidth;

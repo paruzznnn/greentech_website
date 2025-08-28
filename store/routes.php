@@ -88,6 +88,7 @@ $accessControl = [
 // ===== Main Routing =====
 $RELATIVE = getRelativePath();
 $ROUTE = parseRoute($RELATIVE);
+$GLOBALS['BASE_WEB'] = getBasePath();
 
 // ===== Verify access rights accordingly. Role =====
 if (array_key_exists($ROUTE['controller'], $accessControl)) {
@@ -98,11 +99,19 @@ switch ($ROUTE['controller']) {
     case 'app':
         break;
     case 'admin':
+
+echo "
+<script>
+    var pathConfig = {
+        BASE_WEB: " . json_encode($BASE_WEB) . "
+    };
+</script>
+";
+
         break;
     case 'user':
     case 'payment':
 
-$GLOBALS['BASE_WEB'] = getBasePath();
 echo "
 <script>
     var pathConfig = {
@@ -121,7 +130,6 @@ echo '
 
 }else{
 
-$GLOBALS['BASE_WEB'] = getBasePath();
 echo '
 <script>
 //=============================================================//
