@@ -156,6 +156,12 @@ $currentLang = $translations[$lang];
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
+
+    // กำหนด URL ของรูปโปรไฟล์เริ่มต้น
+    $default_profile_img = 'https://as1.ftcdn.net/jpg/01/12/09/12/1000_F_112091233_xghsriqmHzk4sq71lWBL4q0e7n9QJKX6.jpg';
+
+    // ตรวจสอบว่ามีรูปโปรไฟล์หรือไม่ ถ้าไม่มีหรือเป็นค่าว่าง ให้ใช้รูปเริ่มต้น
+    $profile_img_src = !empty($user['profile_img']) ? '/public/img/' . htmlspecialchars($user['profile_img']) : $default_profile_img;
     ?>
     <?php if (isset($_GET['updated'])): ?>
     <div style="text-align: center; color: green; font-weight: bold; margin-bottom: 20px;">
@@ -169,7 +175,7 @@ $currentLang = $translations[$lang];
                 <div class="card-body text-center">
                     <h3 class="mb-4"><?= $currentLang['profile_title'] ?></h3>
                     <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-                        <img src="/public/img/<?php echo htmlspecialchars($user['profile_img']); ?>" alt="รูปโปรไฟล์" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                        <img src="<?= $profile_img_src ?>" alt="รูปโปรไฟล์" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                         <div class="form-group text-start">
                             <label for="profile_img"><?= $currentLang['change_photo_label'] ?>:</label>
                             <input type="file" name="profile_img" class="form-control">
