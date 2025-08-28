@@ -1080,12 +1080,12 @@ Sidenav
 
 #sidenav-store2 {
     width: 268px;
-    padding-top: 90px;
+    padding-top: 80px;
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    background: #f8f8f7;
+    background: #ffffff;
     z-index: 1001;
     overflow-x: hidden;
     border-right: 1px solid #eaeaea;
@@ -1149,6 +1149,7 @@ Sidenav
     list-style: none;
     padding: 0;
     margin: 0;
+    font-size: 0.9rem;
 }
 
 .menu-list>li,

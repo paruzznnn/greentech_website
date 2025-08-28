@@ -85,105 +85,30 @@
                 buildLinkmenuSlideAdmin
             } = menuBuilder;
 
-            const MENU_DATA = [{
-                icon: '<i class="bi bi-speedometer2"></i>',
-                title: "แดชบอร์ด",
-                link: "#dashboard"
-                },
-                {
-                    icon: '<i class="bi bi-people"></i>',
-                    title: "ผู้ใช้งาน",
-                    link: "#users",
-                    subMenu: [{
-                        icon: '<i class="bi bi-person-lines-fill"></i>',
-                        title: "สมาชิกทั้งหมด",
-                        link: "#users/all"
-                    },
-                    {
-                        icon: '<i class="bi bi-person-plus"></i>',
-                        title: "เพิ่มสมาชิกใหม่",
-                        link: "#users/add"
-                    },
-                    {
-                        icon: '<i class="bi bi-people-fill"></i>',
-                        title: "กลุ่มผู้ใช้",
-                        link: "#users/groups",
-                        subMenu: [{
-                            icon: '<i class="bi bi-shield-check"></i>',
-                            title: "Admin",
-                            link: "#users/groups/admin"
-                        },
-                        {
-                            icon: '<i class="bi bi-shield"></i>',
-                            title: "Moderator",
-                            link: "#users/groups/moderator"
-                        },
-                        {
-                            icon: '<i class="bi bi-person-circle"></i>',
-                            title: "Customer",
-                            link: "#users/groups/customer"
-                        }
-                        ]
-                    }
-                    ]
-                },
-                {
-                    icon: '<i class="bi bi-box-seam"></i>',
-                    title: "สินค้า",
-                    link: "#products",
-                    subMenu: [{
-                        icon: '<i class="bi bi-grid"></i>',
-                        title: "สินค้าทั้งหมด",
-                        link: "#products/all"
-                    },
-                    {
-                        icon: '<i class="bi bi-plus-circle"></i>',
-                        title: "เพิ่มสินค้าใหม่",
-                        link: "#products/add"
-                    },
-                    {
-                        icon: '<i class="bi bi-tags"></i>',
-                        title: "หมวดหมู่สินค้า",
-                        link: "#products/categories"
-                    }
-                    ]
-                },
-                {
-                    icon: '<i class="bi bi-graph-up"></i>',
-                    title: "รายงาน",
-                    link: "#reports"
-                },
-                {
-                    icon: '<i class="bi bi-gear"></i>',
-                    title: "การตั้งค่า",
-                    link: "#settings"
-                },
-                {
-                    icon: '<i class="bi bi-clock-history"></i>',
-                    title: "ประวัติ",
-                    link: "#history"
-                },
-                {
-                    icon: '',
-                    title: "ออกจากระบบ",
-                    link: "#"
-                }
-            ];
-            
-            buildLinkmenuSlideAdmin(MENU_DATA);
+            const service = pathConfig.BASE_WEB + 'service/admin/header-data.php?';
+            const menuData = await fetchHeader("getMenuHeaderSideItems", service);
+
+            console.log('menuData', menuData);
+
+            if(menuData){
+                buildLinkmenuSlideAdmin(menuData);
+            }
 
             // ============= Responsive ==================
             const checkDeviceSize = () => {
                 const width = window.innerWidth;
-                if (width > 480) leftSlideClose();
+                if (width > 480) {
+                    leftSlideClose();
+                } else {
+                    leftSlideCloseAdmin();
+                }
+
                 document.body.classList.remove("is-mobile", "is-tablet", "is-desktop");
                 if (width <= 480) {
                     document.body.classList.add("is-mobile");
                 } else if (width <= 768) {
-                    leftSlideCloseAdmin();
                     document.body.classList.add("is-tablet");
                 } else {
-                    leftSlideCloseAdmin();
                     document.body.classList.add("is-desktop");
                 }
             };
