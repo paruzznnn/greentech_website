@@ -523,7 +523,7 @@ $stmt->close();
 
     <?php include 'template/header.php'; ?>
 
-    <div class="dashboard-wrapper container">
+    <div class="dashboard-wrapper container" style="padding-top: 1em;">
     <?php
 date_default_timezone_set('Asia/Bangkok');
 $hour = date('H');
@@ -538,6 +538,29 @@ $username = $_SESSION['fullname'] ?? 'Admin';
 ?>
 <h2 class="mb-1"><?= $greeting ?> <?= htmlspecialchars($username) ?>!</h2>
 <h3 class="mb-5"><?= $currentLang['dashboard_title'] ?></h3>
+
+    <div class="row">
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="dashboard-card" style="background-color:#fff;">
+                <canvas id="userChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="dashboard-card" style="background-color:#fff;">
+                <canvas id="topPagesChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="dashboard-card" style="background-color:#fff;">
+                <canvas id="sourceChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="dashboard-card" style="background-color:#fff;">
+                <canvas id="countryChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+    </div>
 
     <div class="dashboard-layout">
         <div class="row justify-content-center">
@@ -768,5 +791,141 @@ $username = $_SESSION['fullname'] ?? 'Admin';
     </div>
 </div>
     </div> <script src="js/index_.js?v=<?= time(); ?>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('fetch_analytics_data.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok, status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                console.error('API Error:', data.error);
+                return;
+            }
+
+            // ฟังก์ชันสำหรับสร้างกราฟ
+            function createChart(chartId, chartType, chartData, chartOptions) {
+                const ctx = document.getElementById(chartId);
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: chartType,
+                        data: chartData,
+                        options: chartOptions
+                    });
+                } else {
+                    console.error(`Error: Canvas element with ID "${chartId}" not found.`);
+                }
+            }
+
+            // Array ของชุดสีที่คุณต้องการใช้สำหรับแต่ละกราฟ
+            // สามารถเพิ่มหรือเปลี่ยนสีได้ตามต้องการ
+            const barColors = [
+                '#336699', // น้ำเงินเข้ม
+                '#99CC33', // เขียว
+                '#FF6633', // ส้ม
+                '#666666', // เทาเข้ม
+                '#339999', // เขียวอมน้ำเงิน
+                '#FFCC00', // เหลือง
+                '#660066', // ม่วง
+                '#A0522D', // น้ำตาล
+                '#8B0000', // แดงเข้ม
+                '#2F4F4F'  // เทาอมเขียว
+            ];
+
+            // กราฟที่ 1: Daily Active Users
+            createChart('userChart', 'line', {
+                labels: data.daily_users.labels,
+                datasets: [{
+                    label: 'Active Users (30 days)',
+                    data: data.daily_users.data,
+                    fill: false,
+                    borderColor: 'rgb(2, 117, 216)',
+                    tension: 0.1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            });
+
+            // กราฟที่ 2: Top Pages
+            createChart('topPagesChart', 'bar', {
+                labels: data.top_pages.labels,
+                datasets: [{
+                    label: 'Top Pages',
+                    data: data.top_pages.data,
+                    // กำหนดสีตาม array ที่เตรียมไว้
+                    backgroundColor: barColors.slice(0, data.top_pages.data.length),
+                    borderColor: 'rgb(33, 37, 41)', // ใช้สีเดียวเพื่อให้เส้นขอบดูสม่ำเสมอ
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'x',
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            });
+
+            // กราฟที่ 3: Source
+            createChart('sourceChart', 'bar', {
+                labels: data.source.labels,
+                datasets: [{
+                    label: 'User Source',
+                    data: data.source.data,
+                    // กำหนดสีตาม array ที่เตรียมไว้
+                    backgroundColor: barColors.slice(0, data.source.data.length),
+                    borderColor: 'rgb(108, 117, 125)',
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'x',
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            });
+
+            // กราฟที่ 4: Country
+            createChart('countryChart', 'bar', {
+                labels: data.country.labels,
+                datasets: [{
+                    label: 'User Country',
+                    data: data.country.data,
+                    // กำหนดสีตาม array ที่เตรียมไว้
+                    backgroundColor: barColors.slice(0, data.country.data.length),
+                    borderColor: 'rgb(52, 58, 64)',
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'x',
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+});
+</script>
 </body>
 </html>
