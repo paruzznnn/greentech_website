@@ -101,14 +101,31 @@ $translations = [
     ],
 ];
 
-// Get the current language from URL parameter or default to Thai
-$lang = $_GET['lang'] ?? 'th';
-$lang = strtolower($lang);
-if (!isset($translations[$lang])) {
-    $lang = 'th'; // Fallback to default language
+// โค้ดสำหรับจัดการภาษาจาก URL parameter หรือ Session
+$lang = 'th'; // กำหนดภาษาเริ่มต้นเป็น 'th'
+$supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+
+// เช็คจาก URL ก่อน
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
+    $lang = $_GET['lang'];
+} else {
+    // ถ้าไม่มีใน URL ให้เช็คจาก Session
+    if (isset($_SESSION['lang']) && in_array($_SESSION['lang'], $supportedLangs)) {
+        $lang = $_SESSION['lang'];
+    }
 }
 
-$text = $translations[$lang];
+$text = $translations[$lang] ?? $translations['th']; // Fallback หากภาษาไม่ถูกต้อง
+
+// ฟังก์ชันสำหรับเพิ่มพารามิเตอร์ภาษาลงใน URL
+function addLangToUrl($url, $lang) {
+    if (strpos($url, '?') === false) {
+        return $url . '?lang=' . $lang;
+    } else {
+        return $url . '&lang=' . $lang;
+    }
+}
 
 $meta = [];
 if (isset($_GET['id'])) {
@@ -234,7 +251,7 @@ if (isset($_GET['id'])) {
                                 <td><?= htmlspecialchars($row['meta_title']) ?></td>
                                 <td><?= htmlspecialchars($row['meta_description']) ?></td>
                                 <td>
-                                    <a href="?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">
+                                    <a href="<?= addLangToUrl('?id=' . $row['id'], $lang) ?>" class="btn btn-sm btn-warning">
                                         <i class="fa fa-edit"></i> <?= $text['edit_btn'] ?>
                                     </a>
                                 </td>
