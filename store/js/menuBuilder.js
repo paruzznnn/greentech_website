@@ -143,25 +143,28 @@ export function buildLinkmenuSlideAdmin(menuData) {
       a.href = item.link || "#";
       a.innerHTML = `
         ${item.icon || ''} 
-        <span>${item.title}</span>
+        <span class="menu-title">${item.title}</span>
         ${item.subMenu && item.subMenu.length > 0
           ? '<span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>'
           : ''}
       `;
       li.appendChild(a);
 
-      // ถ้ามี submenu
       if (item.subMenu && item.subMenu.length > 0) {
         li.classList.add("has-submenu");
 
-        // สร้าง submenu
         const subMenuEl = createMenu(item.subMenu, true);
-        subMenuEl.style.display = "none"; // ซ่อนเริ่มต้น
+        subMenuEl.style.display = "none";
         li.appendChild(subMenuEl);
 
-        // เพิ่ม event ที่ <a> เพื่อ toggle submenu
         a.addEventListener("click", (e) => {
-          e.preventDefault(); // ป้องกันลิงก์กระโดด
+          const clickedInsideTitle = e.target.closest(".menu-title");
+
+          // ถ้าคลิกที่ชื่อเมนูให้ไปตามลิงก์
+          if (clickedInsideTitle) return;
+
+          // ถ้าไม่ใช่ชื่อเมนู ให้ toggle submenu
+          e.preventDefault(); // กันไม่ให้ลิงก์ทำงาน
           e.stopPropagation();
 
           const isOpen = subMenuEl.style.display === "block";

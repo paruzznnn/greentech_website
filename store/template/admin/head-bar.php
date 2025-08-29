@@ -72,14 +72,102 @@
 </aside>
 <div id="overlay-store2"></div>
 
+<nav id="breadcrumb-box">
+    <div class="container">
+        <ul id="breadcrumb-list">
+        </ul>
+    </div>
+</nav>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const breadcrumbList = document.getElementById('breadcrumb-list');
+    const breadcrumbBox = document.getElementById('breadcrumb-box');
+
+    const pathSegments = window.location.pathname
+        .split('/')
+        .filter(segment => segment !== '');
+
+    // ตรวจสอบว่าอยู่หน้า admin root หรือไม่
+    const isAdminRoot = (
+        pathSegments.length === 3 &&
+        pathSegments[0] === 'trandar_website' &&
+        pathSegments[1] === 'store' &&
+        pathSegments[2] === 'admin'
+    );
+
+    // ซ่อน breadcrumb ถ้าอยู่หน้า admin root
+    if (isAdminRoot) {
+        breadcrumbBox.style.display = 'none';
+        return;
+    } else {
+        breadcrumbBox.style.display = 'block';
+    }
+
+    // กรอง segment ที่ไม่จำเป็น
+    const filteredSegments = pathSegments.filter(
+        segment => segment !== 'trandar_website' && segment !== 'store'
+    );
+
+    // เริ่มต้น breadcrumb ด้วย 'Admin'
+    function createBreadcrumbItem(text, url = null, isLast = false) {
+        const li = document.createElement('li');
+        li.className = 'flex items-center';
+
+        const displayText = text.replace(/-/g, ' ');
+        const dataLang = text;
+
+        if (url && !isLast) {
+            const a = document.createElement('a');
+            a.href = pathConfig.BASE_WEB + url;
+            a.textContent = displayText;
+            a.setAttribute('data-lang', dataLang);
+            li.appendChild(a);
+        } else {
+            const span = document.createElement('span');
+            span.className = 'text-gray-500';
+            span.textContent = displayText;
+            span.setAttribute('data-lang', dataLang);
+            li.appendChild(span);
+        }
+
+        if (!isLast) {
+            const separator = document.createElement('span');
+            separator.className = 'mx-2';
+            separator.innerHTML = '<i class="bi bi-chevron-right"></i>';
+            li.appendChild(separator);
+        }
+
+        return li;
+    }
+
+    // เริ่มต้นที่ Admin
+    breadcrumbList.appendChild(
+        createBreadcrumbItem('admin', '/admin', false)
+    );
+
+    // ประมวลผล breadcrumb ต่อจาก admin
+    let currentPath = '/admin';
+    filteredSegments.slice(1).forEach((segment, index, arr) => {
+        currentPath += '/' + segment;
+        const isLast = index === arr.length - 1;
+        breadcrumbList.appendChild(
+            createBreadcrumbItem(segment, currentPath, isLast)
+        );
+    });
+});
+</script>
+
+
+
 <script type="module">
-    
     Promise.all([
-            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time();?>`)
+            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+            import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
         ])
         .then(async ([formHandler, menuBuilder]) => {
-            const { handleFormSubmit } = formHandler;
+            const {
+                handleFormSubmit
+            } = formHandler;
             const {
                 fetchHeader,
                 buildLinkmenuSlideAdmin
@@ -88,9 +176,7 @@
             const service = pathConfig.BASE_WEB + 'service/admin/header-data.php?';
             const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
-            console.log('menuData', menuData);
-
-            if(menuData){
+            if (menuData) {
                 buildLinkmenuSlideAdmin(menuData);
             }
 
@@ -155,11 +241,24 @@
                 checkDeviceSize();
             };
 
+            document.addEventListener("click", (e) => {
+                const menu = document.getElementById("sidenav-store1");
+                const menuOpen = document.getElementById("menu-open-store1");
+
+                // เช็คว่าคลิกอยู่นอกเมนู และไม่ใช่ปุ่มเปิดเมนู
+                if (
+                    menu && 
+                    !menu.contains(e.target) && 
+                    !menuOpen.contains(e.target)
+                ) {
+                    leftSlideCloseAdmin();
+                }
+            });
+
             window.addEventListener("resize", handleResize);
 
         })
         .catch((e) => {
             console.error("One or more module imports failed", e);
         });
-
 </script>

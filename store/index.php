@@ -21,55 +21,70 @@
 
   <script type="module">
     import(`${pathConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
-      .then(async ({ 
-        fetchIndexData, 
-        renderSections, 
-        renderIntroduce, 
-        renderBanners, 
-        renderCarouselSM, 
-        renderCarouselMD, 
-        renderCarouselLG 
+      .then(async ({
+        fetchIndexData,
+        renderSections,
+        renderIntroduce,
+        renderBanners,
+        renderCarouselSM,
+        renderCarouselMD,
+        renderCarouselLG,
+        renderGridCardMD
       }) => {
-
         const service = pathConfig.BASE_WEB + 'service/index-data.php?';
+
+        // ดึง sections และ sort ก่อน render
         const sections = await fetchIndexData("getSectionItems", service);
         sections.data.sort((a, b) => a.sort - b.sort);
         renderSections("#sections_root_store", sections.data);
 
+        // loop sections แล้ว render ตาม type
         for (const section of sections.data) {
-            switch (section.type) {
-              case "crssm":
-                const popularItems = await fetchIndexData("getPopularItems", service);
-                renderCarouselSM("#" + section.carouselId, popularItems.data);
-                break;
-              case "crsmd":
-                const productItems = await fetchIndexData("getProductItems", service);
-
-                const configData = {
-                  BASE_WEB: pathConfig.BASE_WEB,
-                  user: productItems.member
-                }
-
-                renderCarouselMD("#" + section.carouselId, productItems.data, configData);
-                break;
-              case "crslg":
-                const newsItems = await fetchIndexData("getNewsItems", service);
-                renderCarouselLG("#" + section.carouselId, newsItems.data);
-                break;
-              case "bbn":
-                const banners = await fetchIndexData("getBannersItems", service);
-                renderBanners("#" + section.carouselId, banners.data);
-                break;
-              case "intd":
-                const introItems = await fetchIndexData("getIntroItems", service);
-                renderIntroduce("#" + section.carouselId, introItems.data);
-                break;
+          switch (section.type) {
+            case "crssm": {
+              const popularItems = await fetchIndexData("getPopularItems", service);
+              renderCarouselSM(`#${section.carouselId}`, popularItems.data);
+              break;
             }
+            case "crsmd": {
+              const productItems = await fetchIndexData("getProductItems", service);
+              const configData = {
+                BASE_WEB: pathConfig.BASE_WEB,
+                user: productItems.member
+              };
+              renderCarouselMD(`#${section.carouselId}`, productItems.data, configData);
+              break;
+            }
+            case "crslg": {
+              const newsItems = await fetchIndexData("getNewsItems", service);
+              renderCarouselLG(`#${section.carouselId}`, newsItems.data);
+              break;
+            }
+            case "bbn": {
+              const banners = await fetchIndexData("getBannersItems", service);
+              renderBanners(`#${section.carouselId}`, banners.data);
+              break;
+            }
+            case "intd": {
+              const introItems = await fetchIndexData("getIntroItems", service);
+              renderIntroduce(`#${section.carouselId}`, introItems.data);
+              break;
+            }
+            case "cmd": {
+              const productsItems = await fetchIndexData("getProductItems", service);
+              const configData = {
+                BASE_WEB: pathConfig.BASE_WEB,
+                user: productsItems.member
+              };
+              renderGridCardMD(`#${section.carouselId}`, productsItems.data, configData);
+              break;
+            }
+          }
         }
-        
       })
       .catch((e) => console.error("Module import failed", e));
   </script>
+
 
 </body>
 
