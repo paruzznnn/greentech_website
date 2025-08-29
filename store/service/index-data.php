@@ -41,16 +41,16 @@ $action = $_GET['action'];
 if ($action == 'getSectionItems') {
 
     $data = [
-        // [
-        //     "id" => "section_popular",
-        //     "class" => "section-space",
-        //     "title" => "การค้นหายอดนิยม",
-        //     "carouselId" => "carousel_popular",
-        //     "isSlide" => true,
-        //     "type" => "crssm",
-        //     "sort" => 2,
-        //     "req" => "getPopularItems"
-        // ],
+        [
+            "id" => "section_popular",
+            "class" => "section-space",
+            "title" => "การค้นหายอดนิยม",
+            "carouselId" => "carousel_popular",
+            "isSlide" => true,
+            "type" => "crssm",
+            "sort" => 2,
+            "req" => "getPopularItems"
+        ],
         [
             "id" => "section_baner",
             "class" => "section-space",
@@ -62,25 +62,25 @@ if ($action == 'getSectionItems') {
             "req" => "getBannersItems"
         ],
         [
-            "id" => "section_products",
+            "id" => "section_product",
             "class" => "section-space",
             "title" => "แทรนดาร์ อะคูสติก",
-            "carouselId" => "carousel_products",
+            "carouselId" => "carousel_product",
             "isSlide" => true,
             "type" => "crsmd",
+            "sort" => 5,
+            "req" => "getProductItems"
+        ],
+        [
+            "id" => "section_products",
+            "class" => "section-space",
+            "title" => "แทรนดาร์ อะคูสติก แนะนำ",
+            "carouselId" => "carousel_products",
+            "isSlide" => false,
+            "type" => "cmd",
             "sort" => 4,
             "req" => "getProductItems"
         ],
-        // [
-        //     "id" => "section_products1",
-        //     "class" => "section-space",
-        //     "title" => "แทรนดาร์ อะคูสติก",
-        //     "carouselId" => "carousel_products1",
-        //     "isSlide" => true,
-        //     "type" => "crsmd",
-        //     "sort" => 6,
-        //     "req" => "getProductItems"
-        // ],
         // [
         //     "id" => "section_news",
         //     "class" => "section-space",
@@ -91,16 +91,16 @@ if ($action == 'getSectionItems') {
         //     "sort" => 5,
         //     "req" => "getNewsItems"
         // ],
-        // [
-        //     "id" => "section_introduce",
-        //     "class" => "section-space",
-        //     "title" => "",
-        //     "carouselId" => "introduce_store",
-        //     "isSlide" => false,
-        //     "type" => "intd",
-        //     "sort" => 3,
-        //     "req" => ""
-        // ]
+        [
+            "id" => "section_introduce",
+            "class" => "section-space",
+            "title" => "",
+            "carouselId" => "introduce_store",
+            "isSlide" => false,
+            "type" => "intd",
+            "sort" => 3,
+            "req" => ""
+        ]
     ];
 
     http_response_code(200);

@@ -14,9 +14,31 @@
 <body>
 
     <?php include '../../template/admin/head-bar.php'; ?>
-    <main></main>
-    <?php //include '../template/admin/footer-bar.php'; ?>
+    <main>
+        <div>
+            <section id="" class="section-space">
+                <div class="container">
+                    <!-- <table id="tb_menuLinkRel" class="display" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Office</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table> -->
+                </div>
+            </section>
+        </div>
+    </main>
+    <!-- <script src="<?php echo $BASE_WEB .'js/admin/control_menu/buildMenuData.js?v='. time();?>"></script> -->
+    <?php include '../../template/admin/footer-bar.php'; ?>
 
 </body>
 
 </html>
+
+

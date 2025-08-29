@@ -1,10 +1,12 @@
 {
   "th": "Thai",
   "en": "English",
-  "้home": "Home",
+  "store": "Home",
   "product": "Product",
   "detail": "Detail",
   "list": "List",
   "user": "User",
-  "payment": "Payment"
+  "payment": "Payment",
+  "admin": "Admin",
+  "control_menu": "Menu management"
 }

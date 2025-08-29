@@ -36,13 +36,33 @@ export function renderSections(targetId, data) {
       ? `${titleHtml}<div id="${section.carouselId}" class="owl-carousel owl-theme"></div>`
       : `${titleHtml}<div id="${section.carouselId}"></div>`;
 
-    html += `
+    if(section.id == "section_products"){
+
+      html += `
+      <section id="${section.id}" class="${sectionClass}">
+        <div class="container">
+          <div 
+          style="
+          background: #ffffff; 
+          padding: 0.5rem;
+          border-radius: 3px;
+          ">${contentHtml}</div>
+        </div>
+      </section>
+    `;
+
+    }else{
+
+      html += `
       <section id="${section.id}" class="${sectionClass}">
         <div class="container">
           ${contentHtml}
         </div>
       </section>
     `;
+
+    }
+
   });
 
   document.querySelector(targetId).innerHTML = html;
@@ -162,11 +182,9 @@ function renderProductsPage({
       <p class="intd-card-subtitle">โดย: ${product.subtitle || ""}</p>
       <img src="${product.image || ""}" alt="${product.title || ""}">
       <div class="intd-price-info">
-        <span class="intd-current-price">${
-          product.price?.toLocaleString() || "0"
+        <span class="intd-current-price">${product.price?.toLocaleString() || "0"
         }</span>
-        <span class="intd-old-price">${
-          product.oldPrice?.toLocaleString() || ""
+        <span class="intd-old-price">${product.oldPrice?.toLocaleString() || ""
         }</span>
         <span class="intd-discount-text">${product.discount || ""}</span>
       </div>
@@ -178,12 +196,10 @@ function renderProductsPage({
   productListContainer.innerHTML = productItemsHtml;
 
   paginationControls.innerHTML = `
-    <button class="intd-page-btn prev-btn" ${
-      currentPage === 1 ? "disabled" : ""
+    <button class="intd-page-btn prev-btn" ${currentPage === 1 ? "disabled" : ""
     }>ก่อนหน้า</button>
     <span class="intd-page-info">หน้า ${currentPage} / ${totalPages}</span>
-    <button class="intd-page-btn next-btn" ${
-      currentPage === totalPages ? "disabled" : ""
+    <button class="intd-page-btn next-btn" ${currentPage === totalPages ? "disabled" : ""
     }>ถัดไป</button>
   `;
 
@@ -282,6 +298,7 @@ function setupCarousel(container) {
   showSlide(currentIndex);
   startAutoPlay();
 }
+// ---------- RENDER INTRODUCE ----------------
 
 function addCart(product) {
   const existingCart =
@@ -554,3 +571,111 @@ export function renderCarouselLG(selector, items) {
   });
 }
 
+export function renderGridCardMD(selector, items, config) {
+  const container = document.querySelector(selector);
+  container.classList.add("cpd-md-grid");
+
+  let currentIndex = 0;
+  const batchSize = 5;
+
+  // render เฉพาะ batch (ไม่ render ทั้งหมดทีเดียว)
+  function renderBatch() {
+    const nextItems = items.slice(currentIndex, currentIndex + batchSize);
+    nextItems.forEach((item) => {
+      const badgesWithIcon = item.productBadges
+        .map((badge) => `<span class="badges-tag">${badge}</span>`)
+        .join("");
+
+      const div = document.createElement("div");
+      div.classList.add("cpd-md-card");
+      div.setAttribute("data-product-id", item.productId);
+
+      div.innerHTML = `
+        <div class="cpd-md-card-row img-view-detail">
+          <img src="${item.image}" alt="${item.productName}" class="cpd-md-card-image" />
+          ${true ? `<div class="cpd-md-card-discount">-${10}%</div>` : ""}
+        </div>
+
+        <div class="cpd-md-card-body">
+          <div class="cpd-md-card-category">
+            <i class="bi bi-layers"></i> ${item.category}
+          </div>
+          <strong class="cpd-md-card-name">${item.productName}</strong>
+          <p class="cpd-md-card-detail">${item.productDetail}</p>
+          <div class="cpd-md-card-badges">${badgesWithIcon}</div>
+        </div>
+
+        <div class="cpd-md-card-footer">
+          <span class="cpd-md-card-price">
+            ${formatPrice(item.productCurrency, item.productPrice)}
+          </span>
+          <div class="cpd-md-card-footer-action">
+            <div class="e-store-tooltip left btn-view-detail">
+              <i class="bi bi-file-text"></i>
+              <span class="e-store-tooltiptext">รายละเอียดเพิ่มเติม</span>
+            </div>
+            <button class="btn-add-wishlist"><i class="bi bi-heart"></i></button>
+            <button class="btn-add-cart"><i class="bi bi-cart3"></i></button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(div);
+    });
+
+    currentIndex += batchSize;
+
+    // ถ้าแสดงครบแล้ว → ซ่อนปุ่ม
+    if (currentIndex >= items.length) {
+      loadMoreBtn.style.display = "none";
+    }
+  }
+
+  // ปุ่ม "ดูเพิ่มเติม"
+  const loadMoreBtn = document.createElement("button");
+  loadMoreBtn.textContent = "ดูเพิ่มเติม";
+  loadMoreBtn.classList.add("cpd-md-loadmore");
+  loadMoreBtn.style.margin = "1rem auto";
+  loadMoreBtn.style.display = "block";
+
+  loadMoreBtn.addEventListener("click", () => {
+    renderBatch();
+  });
+
+  // แทรกปุ่มหลัง container
+  container.insertAdjacentElement("afterend", loadMoreBtn);
+
+  // render รอบแรก
+  renderBatch();
+
+  // event delegation (wishlist, cart, detail)
+  container.addEventListener("click", (e) => {
+    if (e.target.closest(".btn-add-wishlist")) {
+      if (config.user) {
+        const itemDiv = e.target.closest(".cpd-md-card");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addWishlist(product);
+      } else {
+        document.getElementById("auth-modal").style.display = "flex";
+      }
+    }
+
+    else if (e.target.closest(".btn-add-cart")) {
+      if (config.user) {
+        const itemDiv = e.target.closest(".cpd-md-card");
+        const productId = itemDiv.dataset.productId;
+        const product = items.find((i) => i.productId === productId);
+        if (product) addCart(product);
+      } else {
+        document.getElementById("auth-modal").style.display = "flex";
+      }
+    }
+
+    else if (e.target.closest(".btn-view-detail") || e.target.closest(".img-view-detail")) {
+      const itemDiv = e.target.closest(".cpd-md-card");
+      const productId = itemDiv.dataset.productId;
+      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
+    }
+  });
+}

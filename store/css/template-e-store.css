@@ -119,7 +119,7 @@ h5 {
 
 .e-store-tooltip .e-store-tooltiptext {
   visibility: hidden;
-  width: 120px;
+  width: 108px;
   background-color: #555;
   color: #fff;
   text-align: center;
@@ -129,7 +129,7 @@ h5 {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s, visibility 0.3s;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 
@@ -639,58 +639,58 @@ textarea.form-input {
 
 @media (min-width: 768px) {
 
-/* PASSWORD RULES */
-#pwdRules {
-  font-size: 14px;
-  margin-top: 1rem;
-  color: #4b5563;
-}
+  /* PASSWORD RULES */
+  #pwdRules {
+    font-size: 14px;
+    margin-top: 1rem;
+    color: #4b5563;
+  }
 
-#pwdRules ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
+  #pwdRules ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 
-#pwdRules li {
-  display: flex;
-  align-items: center;
-  width: 13rem;
-  font-size: 0.8rem;
-}
-  
+  #pwdRules li {
+    display: flex;
+    align-items: center;
+    width: 13rem;
+    font-size: 0.8rem;
+  }
+
 }
 
 @media (max-width: 768px) {
 
-/* PASSWORD RULES */
-#pwdRules {
-  font-size: 14px;
-  margin-top: 1rem;
-  color: #4b5563;
-}
+  /* PASSWORD RULES */
+  #pwdRules {
+    font-size: 14px;
+    margin-top: 1rem;
+    color: #4b5563;
+  }
 
-#pwdRules ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
+  #pwdRules ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 
 
-#pwdRules li {
-display: flex;
-align-items: baseline;
-width: 9rem;
-font-size: 0.7rem;
-}
+  #pwdRules li {
+    display: flex;
+    align-items: baseline;
+    width: 9rem;
+    font-size: 0.7rem;
+  }
 
 }
 
@@ -767,8 +767,8 @@ body.modal-open {
   }
 
   .form-input {
-      font-size: 14px;
-      padding: 0.3rem 1rem;
+    font-size: 14px;
+    padding: 0.3rem 1rem;
   }
 
   .box-login-social svg {
@@ -1316,25 +1316,25 @@ body.modal-open {
 
 /* Navbar Container */
 .navbar-service {
-    /* background-color: #f8f9fa; */
-    border-bottom: 1px solid #dddddd33;
-    padding: 8px 0;
-    font-size: 12px;
+  /* background-color: #f8f9fa; */
+  border-bottom: 1px solid #dddddd33;
+  padding: 8px 0;
+  font-size: 12px;
 }
 
 /* Wrapper */
 .navbar-service-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 auto;
-    padding: 0 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 15px;
 }
 
 .nav-service-link-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav-link-group-left {
@@ -1356,31 +1356,31 @@ body.modal-open {
 
 /* Language Buttons */
 .lang-buttons-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-lang {
-    border: none;
-    /* padding: 5px 12px; */
-    border-radius: 4px;
-    /* background-color: #e9ecef; */
-    background: none;
-    color: #333;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  border: none;
+  /* padding: 5px 12px; */
+  border-radius: 4px;
+  /* background-color: #e9ecef; */
+  background: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn-lang.active {
-    background-color: #FF9800;
-    color: #fff;
+  background-color: #FF9800;
+  color: #fff;
 }
 
 
 .btn-lang:hover {
-    background-color: #d6d8db;
+  background-color: #d6d8db;
 }
 
 /*---------------------------------------
@@ -1456,6 +1456,158 @@ body.modal-open {
   display: block;
   margin: 0 auto;
 }
+
+/*---------------------------------------
+  Card              
+-----------------------------------------*/
+
+.cpd-md-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.7rem;
+}
+
+.cpd-md-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  /* transition: transform 0.3s ease, box-shadow 0.2s ease; */
+}
+
+.cpd-md-card:hover {
+  /* transform: translateY(0); */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ff9902;
+}
+
+.cpd-md-card-row {
+  position: relative;
+}
+
+.cpd-md-card-discount {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+.cpd-md-card-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.cpd-md-card-body {
+  padding: .75rem;
+  flex: 1;
+}
+
+.cpd-md-card-category {
+  font-size: 12px;
+  color: #666;
+}
+
+.cpd-md-card-name {
+  display: block;
+  margin-top: .25rem;
+  font-size: 15px;
+}
+
+.cpd-md-card-detail {
+  font-size: 13px;
+  color: #444;
+  margin: .5rem 0;
+}
+
+.cpd-md-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+
+.badges-tag {
+  background: #eee;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.cpd-md-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem .75rem;
+  border-top: 1px solid #eee;
+}
+
+.cpd-md-card-price {
+  color: #ff9902;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.cpd-md-card-footer-action button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 1rem;
+}
+
+.cpd-md-card-footer-action button:hover {
+  color: #ff9902;
+}
+
+.cpd-md-loadmore {
+  display: block;
+  margin: 1.5rem auto;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #ff9800;
+  font-size: 15px;
+  font-weight: bold;
+  border: 1px solid #ff9e00;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cpd-md-loadmore:hover {
+  background: #ff9800;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.cpd-md-loadmore:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.cpd-md-loadmore:disabled {
+  background: #f8f8f8;
+  color: #aaa;
+  border-color: #ddd;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+
+/*---------------------------------------
+  Card              
+-----------------------------------------*/
 
 .store-card {
   /* cursor: pointer; */

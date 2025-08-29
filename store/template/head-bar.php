@@ -447,7 +447,7 @@
     }
 
     breadcrumbList.appendChild(
-      createBreadcrumbItem('home', '/store', false)
+      createBreadcrumbItem('store', '/store', false)
     );
 
     let currentPath = '';

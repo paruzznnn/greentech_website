@@ -5,6 +5,7 @@ require_once __DIR__ . '/cookie/cookie_utils.php';
 function getBasePath() {
 
     /*==== FILE SETUP BASE PATH =======
+    parseRoute
     routes.php
     inc-cdn.php
     server/connect_sqli.php
@@ -32,11 +33,26 @@ function getRelativePath() {
 function parseRoute($RELATIVEPath) {
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
-    $last = end($segments);//folder
+
+    $last = "";
+    foreach ($segments as $segmen) {
+        switch ($segmen) {
+            case 'user':
+                $last = $segmen;
+                break;
+            case 'payment':
+                $last = $segmen;
+                break;
+            case 'admin':
+                $last = $segmen;
+                break;
+            default:
+                $last = "";
+                break;
+        }
+    }
     return [
-        'controller' => $last ?? '',
-        // 'action'     => $segments[1] ?? 'index', //file
-        // 'params'     => array_slice($segments, 2),
+        'controller' => $last ?? ''
     ];
 }
 
@@ -79,10 +95,11 @@ function redirectTo($path) {
 
 // ===== Role-based Access =====
 $accessControl = [
-    'admin'     => ['admin', 'user'],
+    'admin'     => ['user', 'admin'],
     'user'      => ['user', 'admin'],
     'app'       => ['user', 'admin'],
     'payment'   => ['user', 'admin'],
+    // 'protect'   => ['user']
 ];
 
 // ===== Main Routing =====
@@ -90,7 +107,11 @@ $RELATIVE = getRelativePath();
 $ROUTE = parseRoute($RELATIVE);
 $GLOBALS['BASE_WEB'] = getBasePath();
 
-// ===== Verify access rights accordingly. Role =====
+// echo '<pre>';
+// print_r($ROUTE);
+// echo '</pre>';
+
+// ===== Verify access rights accordingly role =====
 if (array_key_exists($ROUTE['controller'], $accessControl)) {
     $allowedRoles = $accessControl[$ROUTE['controller']];
     requireRole($allowedRoles);
