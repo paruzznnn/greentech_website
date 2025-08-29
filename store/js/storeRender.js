@@ -576,7 +576,7 @@ export function renderGridCardMD(selector, items, config) {
   container.classList.add("cpd-md-grid");
 
   let currentIndex = 0;
-  const batchSize = 5;
+  const batchSize = 6;
 
   // render เฉพาะ batch (ไม่ render ทั้งหมดทีเดียว)
   function renderBatch() {
