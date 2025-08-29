@@ -563,7 +563,8 @@ $username = $_SESSION['fullname'] ?? 'Admin';
     </div>
 
     <div class="dashboard-layout">
-        <div class="row justify-content-center">
+        <!-- <div class="row justify-content-center"> -->
+        <div class="row">
     <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
         <div class="dashboard-card" style="background-color:#ffa726;">
             <a href="set_users/edit_users.php">
@@ -580,7 +581,7 @@ $username = $_SESSION['fullname'] ?? 'Admin';
         </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
+    <!-- <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
         <div class="dashboard-card" style="background-color:#42a5f5;">
             <a href="set_product/list_shop.php">
                 <div class="card-inner">
@@ -772,7 +773,7 @@ $username = $_SESSION['fullname'] ?? 'Admin';
                 <div class="info-icon"><i class="fas fa-info-circle"></i></div>
             </a>
         </div>
-    </div>
+    </div> -->
 
     <div class="col-12 col-sm-6 col-md-4 col-lg-2-4 mb-4">
         <div class="dashboard-card" style="background-color:#26a69a;">
