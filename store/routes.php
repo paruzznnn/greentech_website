@@ -33,26 +33,8 @@ function getRelativePath() {
 function parseRoute($RELATIVEPath) {
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
-
-    $last = "";
-    foreach ($segments as $segmen) {
-        switch ($segmen) {
-            case 'user':
-                $last = $segmen;
-                break;
-            case 'payment':
-                $last = $segmen;
-                break;
-            case 'admin':
-                $last = $segmen;
-                break;
-            default:
-                $last = "";
-                break;
-        }
-    }
     return [
-        'controller' => $last ?? ''
+        'controller' => $segments ?? []
     ];
 }
 
@@ -93,63 +75,31 @@ function redirectTo($path) {
     exit;
 }
 
-// ===== Role-based Access =====
-$accessControl = [
-    'admin'     => ['user', 'admin'],
-    'user'      => ['user', 'admin'],
-    'app'       => ['user', 'admin'],
-    'payment'   => ['user', 'admin'],
-    // 'protect'   => ['user']
-];
-
-// ===== Main Routing =====
+// ===== Main Routing ================
 $RELATIVE = getRelativePath();
 $ROUTE = parseRoute($RELATIVE);
 $GLOBALS['BASE_WEB'] = getBasePath();
 
-// echo '<pre>';
-// print_r($ROUTE);
-// echo '</pre>';
 
-// ===== Verify access rights accordingly role =====
-if (array_key_exists($ROUTE['controller'], $accessControl)) {
-    $allowedRoles = $accessControl[$ROUTE['controller']];
-    requireRole($allowedRoles);
+// ===== Role-based Access =======  //
+//  $Key ใน $access เท่ากับ Folder    //
+//  และ [user, admin] คือ Array Role //
+//================================  //
 
-switch ($ROUTE['controller']) {
-    case 'app':
-        break;
-    case 'admin':
+$accessControl = [
+    'admin' => ['user', 'admin'],
+    'user' => ['user', 'admin'],
+    'app' => ['user', 'admin'],
+    'payment' => ['user', 'admin'],
+    'control_menu' => ['user', 'admin'],
+];
 
-echo "
-<script>
-    var pathConfig = {
-        BASE_WEB: " . json_encode($BASE_WEB) . "
-    };
-</script>
-";
-
-        break;
-    case 'user':
-    case 'payment':
-
-echo "
-<script>
-    var pathConfig = {
-        BASE_WEB: " . json_encode($BASE_WEB) . "
-    };
-</script>
-";
-
-        break;
-    default:
-echo '
-<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง.");</script>
-';
-        break;
+foreach ($ROUTE['controller'] as $value) {
+    if (array_key_exists($value, $accessControl)) {
+        $allowedRoles = $accessControl[$value];
+        requireRole($allowedRoles);
+    }
 }
-
-}else{
 
 echo '
 <script>
@@ -167,5 +117,4 @@ var pathConfig = {
 </script>
 ';
 
-}
 

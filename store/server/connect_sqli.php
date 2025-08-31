@@ -134,23 +134,3 @@ function generateOtp($length = 4)
     }
     return $randomString;
 }
-
-function getTotalRecords($conn, $table, $indexColumn)
-{
-    $result = $conn->query("SELECT COUNT($indexColumn) as count FROM $table WHERE del = 0");
-    if ($result) {
-        $row = $result->fetch_assoc();
-        return $row['count'];
-    }
-    return 0;
-}
-
-function getFilteredRecordsCount($conn, $table, $whereClause, $indexColumn)
-{
-    $result = $conn->query("SELECT COUNT($indexColumn) as count FROM $table WHERE $whereClause");
-    if ($result) {
-        $row = $result->fetch_assoc();
-        return $row['count'];
-    }
-    return 0;
-}

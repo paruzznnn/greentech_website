@@ -124,7 +124,117 @@ export function buildLinkmenuSlide(menuData) {
   });
 }
 
-export function buildLinkmenuSlideAdmin(menuData) {
+// export function buildLinkmenuSlideAdmin(menuData) {
+//   const containers = [
+//     document.getElementById("menuListContainerAdmin1"),
+//     document.getElementById("menuListContainerAdmin2")
+//   ].filter(Boolean);
+
+//   if (containers.length === 0) return;
+
+//   // ฟังก์ชันสร้างเมนู
+//   function createMenu(items, isSub = false) {
+//     const ul = document.createElement("ul");
+//     ul.classList.add(isSub ? "submenu-list" : "menu-list");
+
+//     items.forEach(item => {
+//       const li = document.createElement("li");
+
+//       const a = document.createElement("a");
+//       a.href = item.link || "#";
+//       a.innerHTML = `
+//         ${item.icon || ''} 
+//         <span class="menu-title">${item.title}</span>
+//         ${item.subMenu && item.subMenu.length > 0
+//           ? '<span class="submenu-toggle"><i class="bi bi-chevron-down"></i></span>'
+//           : ''}
+//       `;
+//       li.appendChild(a);
+
+//       if (item.subMenu && item.subMenu.length > 0) {
+//         li.classList.add("has-submenu");
+
+//         const subMenuEl = createMenu(item.subMenu, true);
+//         subMenuEl.style.display = "none";
+//         li.appendChild(subMenuEl);
+
+//         a.addEventListener("click", (e) => {
+//           const clickedInsideTitle = e.target.closest(".menu-title");
+
+//           // ถ้าคลิกที่ชื่อเมนูให้ไปตามลิงก์
+//           if (clickedInsideTitle) return;
+
+//           // ถ้าไม่ใช่ชื่อเมนู ให้ toggle submenu
+//           e.preventDefault();
+//           e.stopPropagation();
+
+//           const isOpen = subMenuEl.style.display === "block";
+//           subMenuEl.style.display = isOpen ? "none" : "block";
+
+//           const toggleIcon = a.querySelector(".submenu-toggle i");
+//           if (toggleIcon) {
+//             toggleIcon.className = isOpen ? "bi bi-chevron-down" : "bi bi-chevron-up";
+//           }
+//         });
+//       }
+
+//       ul.appendChild(li);
+//     });
+
+//     return ul;
+//   }
+
+//   // ฟังก์ชัน filter เมนู
+//   function filterMenu(container, query) {
+//     const items = container.querySelectorAll("li");
+//     items.forEach(li => {
+//       const titleEl = li.querySelector(".menu-title");
+//       const text = titleEl ? titleEl.textContent.toLowerCase() : "";
+//       const match = text.includes(query);
+
+//       // ถ้ามี submenu ต้องเช็คด้วย
+//       const subMenu = li.querySelector("ul");
+//       if (subMenu) {
+//         const subItems = subMenu.querySelectorAll("li");
+//         const hasMatchInSub = Array.from(subItems).some(subLi => {
+//           const subTitleEl = subLi.querySelector(".menu-title");
+//           return subTitleEl && subTitleEl.textContent.toLowerCase().includes(query);
+//         });
+
+//         li.style.display = match || hasMatchInSub ? "block" : "none";
+//         if (hasMatchInSub) {
+//           subMenu.style.display = "block"; // เปิด submenu อัตโนมัติถ้ามี match
+//         }
+//       } else {
+//         li.style.display = match ? "block" : "none";
+//       }
+//     });
+//   }
+
+// containers.forEach((container, index) => {
+//   container.innerHTML = '';
+
+//   // เพิ่มช่องค้นหา พร้อม id
+//   const searchInput = document.createElement("input");
+//   searchInput.type = "text";
+//   searchInput.placeholder = "ค้นหาเมนู...";
+//   searchInput.classList.add("menu-search");
+//   searchInput.id = `menuSearchAdmin${index + 1}`; // id จะเป็น menuSearchAdmin1, menuSearchAdmin2
+
+//   container.appendChild(searchInput);
+
+//   const menu = createMenu(menuData);
+//   container.appendChild(menu);
+
+//   // Event สำหรับ filter
+//   searchInput.addEventListener("input", () => {
+//     filterMenu(container, searchInput.value.toLowerCase());
+//   });
+// });
+
+// }
+
+export function buildLinkmenuSlideAdmin(menuData, config) {
   const containers = [
     document.getElementById("menuListContainerAdmin1"),
     document.getElementById("menuListContainerAdmin2")
@@ -132,6 +242,7 @@ export function buildLinkmenuSlideAdmin(menuData) {
 
   if (containers.length === 0) return;
 
+  // ฟังก์ชันสร้างเมนู
   function createMenu(items, isSub = false) {
     const ul = document.createElement("ul");
     ul.classList.add(isSub ? "submenu-list" : "menu-list");
@@ -159,12 +270,9 @@ export function buildLinkmenuSlideAdmin(menuData) {
 
         a.addEventListener("click", (e) => {
           const clickedInsideTitle = e.target.closest(".menu-title");
+          if (clickedInsideTitle) return; // ถ้าคลิกชื่อเมนูให้ไปตามลิงก์
 
-          // ถ้าคลิกที่ชื่อเมนูให้ไปตามลิงก์
-          if (clickedInsideTitle) return;
-
-          // ถ้าไม่ใช่ชื่อเมนู ให้ toggle submenu
-          e.preventDefault(); // กันไม่ให้ลิงก์ทำงาน
+          e.preventDefault();
           e.stopPropagation();
 
           const isOpen = subMenuEl.style.display === "block";
@@ -183,10 +291,63 @@ export function buildLinkmenuSlideAdmin(menuData) {
     return ul;
   }
 
-  containers.forEach(container => {
-    const menu = createMenu(menuData);
+  // ฟังก์ชัน filter เมนู
+  function filterMenu(container, query) {
+    const items = container.querySelectorAll("li");
+    items.forEach(li => {
+      const titleEl = li.querySelector(".menu-title");
+      const text = titleEl ? titleEl.textContent.toLowerCase() : "";
+      const match = text.includes(query);
+
+      const subMenu = li.querySelector("ul");
+      if (subMenu) {
+        const subItems = subMenu.querySelectorAll("li");
+        const hasMatchInSub = Array.from(subItems).some(subLi => {
+          const subTitleEl = subLi.querySelector(".menu-title");
+          return subTitleEl && subTitleEl.textContent.toLowerCase().includes(query);
+        });
+
+        li.style.display = match || hasMatchInSub ? "block" : "none";
+        if (hasMatchInSub) {
+          subMenu.style.display = "block";
+        }
+      } else {
+        li.style.display = match ? "block" : "none";
+      }
+    });
+  }
+
+  // เมนูค่าเริ่มต้นที่ fix ไว้ด้านล่างเสมอ
+  const defaultMenu = [
+    { title: "ตั้งค่าเริ่มต้น", link: config.BASE_WEB + "admin/control_menu/", icon: '<i class="bi bi-gear"></i>' },
+    { title: "ออกจากระบบ", link: config.BASE_WEB + "logout.php", icon: '<i class="bi bi-box-arrow-right"></i>' }
+  ];
+
+  containers.forEach((container, index) => {
     container.innerHTML = '';
+
+    // เพิ่มช่องค้นหา พร้อม id
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = "ค้นหาเมนู...";
+    searchInput.classList.add("menu-search");
+    searchInput.id = `menuSearchAdmin${index + 1}`;
+
+    container.appendChild(searchInput);
+
+    // เมนูจาก menuData
+    const menu = createMenu(menuData);
     container.appendChild(menu);
+
+    // เมนูค่าเริ่มต้นอยู่ด้านล่างสุด
+    const fixedMenu = createMenu(defaultMenu);
+    fixedMenu.classList.add("default-menu");
+    container.appendChild(fixedMenu);
+
+    // Event filter
+    searchInput.addEventListener("input", () => {
+      filterMenu(container, searchInput.value.toLowerCase());
+    });
   });
 }
 

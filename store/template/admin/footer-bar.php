@@ -1,4 +1,4 @@
-<!-- <footer class="site-footer">
+<footer class="site-footer">
     <div class="container">
         <p>&copy; 2025 Trandar Store. สงวนลิขสิทธิ์.</p>
         <nav class="footer-nav">
@@ -14,7 +14,7 @@
             <a href="#">Email</a>
         </div>
     </div>
-</footer> -->
+</footer>
 
 <script type="module">
     import(`${pathConfig.BASE_WEB}js/language.js?v=<?= time() ?>`)
@@ -62,4 +62,4 @@
 </script>
 
 <!-- <script src="/e-store/js/chatService.js?v=<?php echo time(); ?>"></script> -->
-<!-- <script src="/e-store/js/mathematics.js?v=<?php echo time(); ?>"></script> -->
+<!-- <script src="<?php echo $BASE_WEB; ?>js/mathematics.js?v=<?php echo time(); ?>"></script> -->
