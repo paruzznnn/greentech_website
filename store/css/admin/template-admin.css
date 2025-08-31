@@ -724,7 +724,7 @@ NavStore1
     background-color: #ffffff;
     border-bottom: 1px solid #eaeaea;
     position: relative;
-    z-index: 10010;
+    z-index: 1010;
 }
 
 .nav-store1 {
@@ -909,7 +909,7 @@ transition: transform 0.4s ease-in-out;
 }
 
 #sidenav-store1::-webkit-scrollbar {
-    width: 4px; 
+    width: 4px;
 }
 
 #sidenav-store1::-webkit-scrollbar-track {
@@ -1218,6 +1218,30 @@ Sidenav
     padding-left: 20px;
 }
 
+.menu-search {
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 2px solid #eaeaea12;
+    /* border-radius: 8px; */
+    outline: none;
+    transition: all 0.2s ease
+}
+
+.menu-search:focus {
+    border-color: #FF9800;
+    /* สีน้ำเงิน (Bootstrap primary) */
+    /* box-shadow: 0 0 6px rgba(13, 110, 253, 0.3); */
+}
+
+.menu-search::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
 
 /*---------------------------------------
 Lang              
@@ -1295,8 +1319,9 @@ Lang
 /*---------------------------------------
 Section              
 -----------------------------------------*/
-.section-space {
+.section-space-admin {
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /* ----------------------------------------------------

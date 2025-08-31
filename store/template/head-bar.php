@@ -106,23 +106,25 @@
   <nav class="mt-2">
     <div id="linkContainer" class="container"></div>
   </nav>
+
+  <div class="navbar-news">
+    <div class="container">
+      <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+        <div style="display: inline;">
+          <span style="padding: 0 50px;">
+            <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
+              <img src="https://img.icons8.com/?size=100&id=6ER3rS2ZLjRQ&format=png&color=000000" alt="" width="18px">
+              Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard 
+              ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 
+            </a>
+          </span>
+        </div>
+      </marquee>
+    </div>
+  </div>
+
 </header>
 
-<div class="navbar-news">
-  <div class="container">
-    <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
-      <div style="display: inline;">
-        <span style="padding: 0 50px;">
-          <a id="newsMarquee-link" href="" style="text-decoration: none; color: inherit; font-size: 12px;">
-            <img src="https://img.icons8.com/?size=100&id=6ER3rS2ZLjRQ&format=png&color=000000" alt="" width="18px">
-            Trandar Acoustics หนึ่งในวัสดุจากกลุ่ม Harmony เปิดตัวที่ Acoustics Solution For WELL Standard 
-            ที่ Harmony Club ในงาน INNOVATORX FORUM 2023 
-          </a>
-        </span>
-      </div>
-    </marquee>
-  </div>
-</div>
 
 <!-- header 2 -->
 <header class="header-store2">

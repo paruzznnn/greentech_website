@@ -60,14 +60,14 @@
 <!-- sidenav 1 -->
 <aside id="sidenav-store1" class="sidenav">
     <div>
-        <ul id="menuListContainerAdmin1"></ul>
+        <ul id="menuListContainerAdmin1" style="padding: 0px !important;"></ul>
     </div>
 </aside>
 
 <!-- sidenav 2 -->
 <aside id="sidenav-store2" class="sidenav">
     <div class="pt-1">
-        <ul id="menuListContainerAdmin2"></ul>
+        <ul id="menuListContainerAdmin2" style="padding: 0px !important;"></ul>
     </div>
 </aside>
 <div id="overlay-store2"></div>
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
             if (menuData) {
-                buildLinkmenuSlideAdmin(menuData);
+                buildLinkmenuSlideAdmin(menuData, pathConfig);
             }
 
             // ============= Responsive ==================

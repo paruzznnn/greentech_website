@@ -8,5 +8,6 @@
   "user": "User",
   "payment": "Payment",
   "admin": "Admin",
-  "control_menu": "Menu management"
+  "control_menu": "Menu management",
+  "add_menu": "Add Menu"
 }
