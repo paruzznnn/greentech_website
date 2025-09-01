@@ -194,256 +194,264 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* General container for the product grid */
-        .product-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-            align-items: start;
-        }
+        .product-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+            align-items: stretch; /* ทำให้ items ยืดเท่ากันตามความสูง */
+        }
 
-        /* Styles for Main Category Blocks */
-        .main-category-block {
-            position: relative;
-            border: 1px solid #ddd;
-            overflow: visible;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background-color: #fcfcfc;
-            cursor: pointer;
-            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
+        /* Styles for Main Category Blocks */
+        .main-category-block {
+            position: relative;
+            border: 1px solid #ddd;
+            overflow: visible;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #fcfcfc;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            display: flex; /* ทำให้เนื้อหาภายในสามารถจัดเรียงแบบ Flex ได้ */
+            flex-direction: column; /* จัดเรียงเนื้อหาจากบนลงล่าง */
+        }
 
-        /* เพิ่ม z-index และ transform เฉพาะเมื่อบล็อกนั้นถูก active */
-        .main-category-block.active {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            transform: translateY(-5px);
-            z-index: 10; 
-        }
+        /* เพิ่ม z-index และ transform เฉพาะเมื่อบล็อกนั้นถูก active */
+        .main-category-block.active {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            z-index: 10;
+        }
 
-        /* ปิด hover effect เมื่อ dropdown เปิดอยู่ */
-        .product-grid-container.is-dropdown-open .main-category-block:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(0);
-        }
+        /* ปิด hover effect เมื่อ dropdown เปิดอยู่ */
+        .product-grid-container.is-dropdown-open .main-category-block:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
 
-        /* คง hover effect ไว้สำหรับบล็อกที่ไม่มี class active */
-        .product-grid-container:not(.is-dropdown-open) .main-category-block:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            transform: translateY(-5px);
-        }
+        /* คง hover effect ไว้สำหรับบล็อกที่ไม่มี class active */
+        .product-grid-container:not(.is-dropdown-open) .main-category-block:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
 
-        .main-category-block .block-image-top {
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e6e6e6;
-        }
+        .main-category-block .block-image-top {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e6e6e6;
+        }
 
-        .main-category-block .block-image-top img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .main-category-block .block-image-top img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        .main-category-block .block-header-bottom {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: #f0f0f0;
-            border-top: 1px solid #e0e0e0;
-            position: relative;
-        }
+        .main-category-block .block-header-bottom {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #e0e0e0;
+            position: relative;
+        }
 
-        .main-category-block .block-title-info {
-            flex-grow: 1;
-        }
+        .main-category-block .block-title-info {
+            flex-grow: 1;
+        }
 
-        .main-category-block .block-title-info h3 {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #555;
-            margin: 0 0 5px 0;
-        }
+        .main-category-block .block-title-info h3 {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #555;
+            margin: 0 0 5px 0;
+        }
 
-        .main-category-block .product-count {
-            font-size: 0.9em;
-            color: #777;
-            margin: 0;
-        }
+        .main-category-block .product-count {
+            font-size: 0.9em;
+            color: #777;
+            margin: 0;
+        }
 
-        .main-category-block .toggle-arrow,
-        .sub-category-item .toggle-arrow-sub {
-            font-size: 1.2em;
-            color: #555;
-            margin-left: 10px;
-            transition: transform 0.3s ease;
-        }
+        .main-category-block .toggle-arrow,
+        .sub-category-item .toggle-arrow-sub {
+            font-size: 1.2em;
+            color: #555;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
 
-        /* Dropdown Container สำหรับส่วนที่ Dropdown ลงมา */
-        .dropdown-container {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            z-index: 20; /* ค่า z-index ที่สูงกว่า .main-category-block.active */
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            display: none;
-            max-height: 400px;
-            overflow-y: auto;
-        }
+        /* Dropdown Container สำหรับส่วนที่ Dropdown ลงมา */
+        .dropdown-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            z-index: 20; /* ค่า z-index ที่สูงกว่า .main-category-block.active */
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
 
-        .block-content-accordion {
-            padding: 15px;
-        }
-        
-        .sub-category-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        .block-content-accordion {
+            padding: 15px;
+        }
+        
+        .sub-category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-        .sub-category-item {
-            margin-bottom: 8px;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
+        .sub-category-item {
+            margin-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
 
-        .sub-category-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+        .sub-category-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
 
-        .sub-category-item .sub-category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            cursor: pointer;
-            font-weight: bold;
-            color: #444;
-            transition: color 0.2s;
-        }
+        .sub-category-item .sub-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #444;
+            transition: color 0.2s;
+        }
 
-        .sub-category-item .sub-category-header:hover {
-            color: #ff9900;
-        }
+        .sub-category-item .sub-category-header:hover {
+            color: #ff9900;
+        }
 
-        .sub-category-item .sub-category-header h4 {
-            font-size: 1em;
-            margin: 0;
-        }
+        .sub-category-item .sub-category-header h4 {
+            font-size: 1em;
+            margin: 0;
+        }
 
-        /* Accordion Content for Sub Category (Product List) */
-        .product-list-accordion {
-            list-style: none;
-            padding-left: 25px;
-            margin: 5px 0 0 0;
-            background-color: #fdfdfd;
-            border-radius: 4px;
-            padding-top: 5px;
-            padding-bottom: 5px;
-        }
+        /* Accordion Content for Sub Category (Product List) */
+        .product-list-accordion {
+            list-style: none;
+            padding-left: 25px;
+            margin: 5px 0 0 0;
+            background-color: #fdfdfd;
+            border-radius: 4px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
 
-        .product-list-accordion li {
-            padding: 6px 0;
-            font-size: 0.95em;
-            border-bottom: 1px dotted #e0e0e0;
-        }
+        .product-list-accordion li {
+            padding: 6px 0;
+            font-size: 0.95em;
+            border-bottom: 1px dotted #e0e0e0;
+        }
 
-        .product-list-accordion li:last-child {
-            border-bottom: none;
-        }
+        .product-list-accordion li:last-child {
+            border-bottom: none;
+        }
 
-        .product-list-accordion li a {
-            text-decoration: none;
-            color: #555;
-            display: block;
-        }
+        .product-list-accordion li a {
+            text-decoration: none;
+            color: #555;
+            display: block;
+        }
 
-        .product-list-accordion li a:hover {
-            color: #ff9900;
-            text-decoration: underline;
-        }
+        .product-list-accordion li a:hover {
+            color: #ff9900;
+            text-decoration: underline;
+        }
 
-        /* For Search Results (flat product list) */
-        .box-news {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
-            background-color: #fcfcfc;
-        }
+        /* สำหรับผลการค้นหา (รายการสินค้าแบบเรียบ) */
+        .box-container {
+            display: flex; /* ใช้ Flexbox สำหรับการจัดเรียงเนื้อหาภายใน */
+            flex-direction: column; /* จัดเรียงเนื้อหาจากบนลงล่าง */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            background-color: #fcfcfc;
+        }
+        .box-news:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
 
-        .box-news:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            transform: translateY(-5px);
-        }
+        .box-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e6e6e6;
+        }
 
-        .box-image {
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e6e6e6;
-        }
+        .box-image img, .box-image iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        .box-image img, .box-image iframe {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .box-content {
+            padding: 15px;
+            background-color: #ffffff;
+            flex-grow: 1; /* ทำให้ส่วนเนื้อหายืดเติมพื้นที่ว่างที่เหลือทั้งหมด */
+        }
 
-        .box-content {
-            padding: 15px;
-            background-color: #ffffff;
-        }
+        .box-content h5 {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            height: 40px;
+            overflow: hidden;
+            color: #333;
+        }
 
-        .box-content h5 {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            height: 40px;
-            overflow: hidden;
-            color: #333;
-        }
+        .box-content p {
+            font-size: 0.9em;
+            color: #666;
+            height: 20px;
+            overflow: hidden;
+        }
 
-        .box-content p {
-            font-size: 0.9em;
-            color: #666;
-            height: 20px;
-            overflow: hidden;
-        }
+        .text-news {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%; /* ทำให้ลิงก์ยืดเต็มพื้นที่ของ box-content */
+            display: flex; /* ใช้ Flexbox เพื่อจัดเรียงเนื้อหาภายในลิงก์ */
+            flex-direction: column;
+        }
 
-        .text-news {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
+        .line-clamp {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        .line-clamp {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Remove default list styles */
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        /* Remove default list styles */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
     </style>
+
 </head>
 <body>
 
