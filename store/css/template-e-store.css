@@ -406,6 +406,7 @@ h5 {
   border-radius: 10px;
   width: 100%;
   max-width: 480px;
+  min-width: 300px !important;
   animation: fadeIn 0.3s ease;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
@@ -927,7 +928,7 @@ body.modal-open {
 
 .gallery-layout-store1 {
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 55% 45%;
   gap: 1rem;
 }
 
@@ -940,7 +941,7 @@ body.modal-open {
 
 .section-store1 p {
   word-wrap: break-word; 
-  overflow-wrap: anywhere;
+  /* overflow-wrap: anywhere; */
   white-space: normal;
 }
 
@@ -971,7 +972,7 @@ body.modal-open {
   display: inline-block;
   margin-bottom: 4px;
   border-radius: 4px;
-  color: #333;
+  color: #555;
   transition: color 0.3s ease;
 }
 
@@ -999,12 +1000,12 @@ body.modal-open {
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .gallery-layout-store1 {
     grid-template-columns: 1fr;
-    /* grid-template-rows: auto auto auto auto; */
+    grid-template-rows: auto auto auto auto;
   }
-}
+} */
 
 /*---------------------------------------
   Sidenav              

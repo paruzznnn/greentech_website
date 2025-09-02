@@ -19,34 +19,14 @@
         <div>
             <section id="" class="section-space-admin">
                 <div class="container">
-                    <table id="tb_menuLinkRel" class="display" style="width: 100%">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
                 </div>
             </section>
         </div>
     </main>
 
-    <script>
-        $(document).ready( function () {
-            $('#tb_menuLinkRel').DataTable();
-        } );
-    </script>
-
-    <!-- <script src="<?php echo $BASE_WEB .'js/admin/control_link/buildMenuData.js?v='. time();?>"></script> -->
     <?php include '../../template/admin/footer-bar.php'; ?>
 
 </body>
-
 </html>
 
 
