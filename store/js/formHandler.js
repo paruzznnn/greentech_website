@@ -61,6 +61,9 @@ export function handleFormSubmit(event) {
             }
             redirectGet(fromRedirect, { notify: 'pay' });
             break;
+          case "setupLink":
+            redirectGet(fromRedirect, { notify: 'setuplink' });
+            break;
           default:
             break;
         }

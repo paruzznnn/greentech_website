@@ -43,42 +43,98 @@ $dateNow = date('Y-m-d H:i:s');
 
 if ($action == 'setupAddLink') {
 
-    $link_icon = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : '';
-    $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : '';
-    $link_path = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : '';
+    try {
+        $link_icon  = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : '';
+        $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : '';
+        $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : '';
 
+        $link_data = [
+            'link_name' => $link_label,
+            'link_url'  => $link_path,
+            'link_icon' => $link_icon
+        ];
 
-    $nested = expandFormArray($dataJson);
-    if(!empty($nested['sections'])){
-        foreach ($nested['sections'] as $sectionId => $section) {
-            if (isset($section['images'])) {
-                foreach ($section['images'] as $i => $img) {
-                    // echo "Section $sectionId Image $i: $img \n";
-                    echo "Section $sectionId Image $i: {$img['category']}\n";
-                    echo "Section $sectionId Image $i: ({$img['url']})\n";
+        $link_id = insertDataAndGetId($conn_cloudpanel, 'ecm_link', $link_data);
+
+        if (empty($link_id)) {
+            throw new Exception("ไม่สามารถบันทึก link หลักได้");
+        }
+
+        $nested = expandFormArray($dataJson);
+
+        if (!empty($nested['sections'])) {
+            foreach ($nested['sections'] as $sectionId => $section) {
+
+                if (isset($section['images'])) {
+                    foreach ($section['images'] as $i => $img) {
+                        $sort_number = preg_replace('/\D/', '', $sectionId);
+                        $img_data = [
+                            'link_id'          => $link_id,
+                            'link_sub_type'    => 'image',
+                            'link_sub_sort'    => $sort_number,
+                            'link_sub_img'     => $img['url'],
+                            'link_sub_category' => $img['category'],
+                            'timezone'         => $timeZone,
+                            'created_at'       => $dateNow
+                        ];
+
+                        if (!insertData($conn_cloudpanel, 'ecm_link_sub_img', $img_data)) {
+                            throw new Exception("ไม่สามารถบันทึก image section {$sectionId} ได้");
+                        }
+                    }
                 }
-            }
 
-            if (isset($section['menus'])) {
-                foreach ($section['menus'] as $i => $menu) {
-                    echo "Section $sectionId Menu $i: {$menu['label']}\n";
-                    echo "Section $sectionId Menu $i: ({$menu['href']})\n";
+                if (isset($section['menus'])) {
+                    foreach ($section['menus'] as $i => $menu) {
+                        $sort_number = preg_replace('/\D/', '', $sectionId);
+                        $menu_data = [
+                            'link_id'       => $link_id,
+                            'link_sub_type' => 'menu',
+                            'link_sub_sort' => $sort_number,
+                            'link_sub_name' => $menu['label'],
+                            'link_sub_url'  => $menu['href'],
+                            'timezone'      => $timeZone,
+                            'created_at'    => $dateNow
+                        ];
+
+                        if (!insertData($conn_cloudpanel, 'ecm_link_sub_menu', $menu_data)) {
+                            throw new Exception("ไม่สามารถบันทึก menu section {$sectionId} ได้");
+                        }
+                    }
                 }
-            }
 
-            if (isset($section['text'])) {
-                echo "Section $sectionId Text: {$section['text']}\n";
+                if (isset($section['text'])) {
+                    $sort_number = preg_replace('/\D/', '', $sectionId);
+                    $menu_data = [
+                        'link_id'       => $link_id,
+                        'link_sub_type' => 'text',
+                        'link_sub_sort' => $sort_number,
+                        'link_sub_text' => $section['text'],
+                        'timezone'      => $timeZone,
+                        'created_at'    => $dateNow
+                    ];
+
+                    if (!insertData($conn_cloudpanel, 'ecm_link_sub_text', $menu_data)) {
+                        throw new Exception("ไม่สามารถบันทึก text section {$sectionId} ได้");
+                    }
+                }
             }
         }
+
+        http_response_code(200);
+        echo json_encode(["status" => true]);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            "status" => false,
+            "error"  => $e->getMessage()
+        ]);
+    } finally {
+        if (isset($conn_cloudpanel) && $conn_cloudpanel) {
+            $conn_cloudpanel->close();
+        }
+        exit;
     }
-
-
-
-
-
-    // http_response_code(200);
-    // echo json_encode($response);
-    exit;
 } else {
 
     http_response_code(400);

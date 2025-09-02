@@ -88,7 +88,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="link_type" class="form-label">ส่วนเสริม (ประเภท)</label>
-                                    <select id="link_type" name="link_type" class="form-input">
+                                    <select id="link_type" class="form-input">
                                         <option value="">-- เลือกประเภท --</option>
                                         <option value="image">รูปภาพ</option>
                                         <option value="menu">เมนู</option>

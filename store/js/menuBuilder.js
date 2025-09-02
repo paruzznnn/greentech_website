@@ -21,17 +21,21 @@ export async function fetchHeader(req, call) {
   }
 }
 
-function generateSectionHTML(section) {
+function buildMenuSection(section) {
   if (!section || !section.type || !section.content) return "";
+
+  console.log('section', section);
 
   switch (section.type) {
     case "image":
       return `
         <div class="section-store1">
           <h4>รูปภาพ</h4>
-          <div class="section-gallery-store1">
-            ${section.content.map(img => `<img src="${img.src}" alt="${img.alt || ''}">`).join("")}
-          </div>
+            <div class="scroll-x">
+            <div class="section-gallery-store1">
+              ${section.content.map(img => `<img src="${img.src}" alt="${img.alt || ''}">`).join("")}
+            </div>
+            </div>
         </div>`;
     case "menu":
       return `
@@ -42,44 +46,56 @@ function generateSectionHTML(section) {
           </ul>
         </div>`;
     case "text":
-      return `<div class="section-store1"><h4>รายละเอียด</h4><p>${section.content}</p></div>`;
+      return `
+        <div class="section-store1"><h4>รายละเอียด</h4><p>${section.content}</p></div>`;
     default:
       return "";
   }
 }
 
-function generateItemHTML(item, contentArray) {
-  if (item.hasToggle && item.id) {
-    const contentObj = contentArray.find(c => c.id === item.id);
-    if (!contentObj) return "";
+function buildLinkmenuBox(item, contentArray) {
+  const contentObj = item.hasToggle && item.id 
+    ? contentArray.find(c => c.id === item.id) 
+    : null;
 
-    const sectionsHTML = ["section1", "section2", "section3", "section4"]
-      .map(key => generateSectionHTML(contentObj[key]))
-      .join("");
-
+  if (!contentObj) {
     return `
       <div class="toggle-wrapper-store1">
-        <a href="${item.path}" class="a-link-store1 toggle-btn-store1" data-id="${item.id}">${item.icon} ${item.label}</a>
-        <div id="${item.id}" class="toggle-box-store1">
-          <div class="gallery-layout-store1">${sectionsHTML}</div>
-        </div>
+        <a href="${item.path}" class="a-link-store1 no-toggle-store1">
+          <i class="${item.icon}"></i> ${item.label}
+        </a>
       </div>`;
-  } else {
-    return `
-      <div class="toggle-wrapper-store1">
-        <a href="${item.path}" class="a-link-store1 no-toggle-store1">${item.icon} ${item.label}</a>
-      </div>`;
+
+  }else{
+
+  const sectionsHTML = ["section0", "section1", "section2", "section3"]
+  .map(key => buildMenuSection(contentObj[key]))
+  .join("");
+
+  return `
+    <div class="toggle-wrapper-store1">
+      <a href="${item.path}" class="a-link-store1 toggle-btn-store1" data-id="${item.id}">
+        <i class="${item.icon}"></i> ${item.label}
+      </a>
+      <div id="${item.id}" class="toggle-box-store1">
+        <div class="gallery-layout-store1">${sectionsHTML}</div>
+      </div>
+    </div>`;
+
   }
+
 }
 
+
 export function buildLinkmenu(data, contentArray) {
+
   const container = document.getElementById("linkContainer");
   if (!container) return;
 
   const firstFive = data.slice(0, 5);
   const remaining = data.slice(5);
 
-  container.innerHTML = firstFive.map(item => generateItemHTML(item, contentArray)).join("");
+  container.innerHTML = firstFive.map(item => buildLinkmenuBox(item, contentArray)).join("");
 
   if (remaining.length) {
     container.insertAdjacentHTML("beforeend", `
