@@ -9,6 +9,7 @@
     <?php include '../../inc-meta.php'; ?>
     <link href="../../css/admin/template-admin.css?v=<?php echo time(); ?>" rel="stylesheet">
     <?php include '../../inc-cdn.php'; ?>
+    <link href="../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
 </head>
 
 <body>
@@ -16,9 +17,9 @@
     <?php include '../../template/admin/head-bar.php'; ?>
     <main>
         <div>
-            <section id="" class="section-space">
+            <section id="" class="section-space-admin">
                 <div class="container">
-                    <!-- <table id="tb_menuLinkRel" class="display" style="width: 100%">
+                    <table id="tb_menuLinkRel" class="display" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -29,12 +30,19 @@
                         </thead>
                         <tbody>
                         </tbody>
-                    </table> -->
+                    </table>
                 </div>
             </section>
         </div>
     </main>
-    <!-- <script src="<?php echo $BASE_WEB .'js/admin/control_menu/buildMenuData.js?v='. time();?>"></script> -->
+
+    <script>
+        $(document).ready( function () {
+            $('#tb_menuLinkRel').DataTable();
+        } );
+    </script>
+
+    <!-- <script src="<?php echo $BASE_WEB .'js/admin/control_link/buildMenuData.js?v='. time();?>"></script> -->
     <?php include '../../template/admin/footer-bar.php'; ?>
 
 </body>

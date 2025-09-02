@@ -12,7 +12,6 @@
 </head>
 
 <body>
-
     <?php include '../template/admin/head-bar.php'; ?>
     <main>
         <div>
@@ -24,7 +23,6 @@
         </div>
     </main>
     <?php include '../template/admin/footer-bar.php'; ?>
-
 </body>
 
 </html>

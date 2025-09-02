@@ -1,0 +1,38 @@
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    padding: 4px 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_filter input:hover {
+    border-color: #bbb;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+    outline: none;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    padding: 4px 6px;
+    margin-left: 0.5em;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+/* hover */
+.dataTables_wrapper .dataTables_length select:hover {
+    border-color: #bbb;
+}
+
+/* focus */
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+    outline: none;
+}

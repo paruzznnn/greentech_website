@@ -46,7 +46,6 @@ $action = $_GET['action'];
 if ($action == 'getMenuHeaderSideItems') {
 
     try {
-        // Step 1: ดึงข้อมูลจาก ecm_link_rel
         $conditions = [['column' => 'del', 'operator' => '=', 'value' => 0]];
         $link_rels = selectData($conn_cloudpanel, 'ecm_link_rel', $conditions, '*');
 
@@ -54,7 +53,6 @@ if ($action == 'getMenuHeaderSideItems') {
             throw new Exception("ไม่สามารถดึงข้อมูลจากตาราง ecm_link_rel");
         }
 
-        // Step 2: รวม link_id ทั้งหมด
         $link_ids = [];
         foreach ($link_rels as $rel) {
             $link_ids[$rel['parent_link_id']] = true;
@@ -66,7 +64,6 @@ if ($action == 'getMenuHeaderSideItems') {
             throw new Exception("ไม่พบ link_id ที่เกี่ยวข้อง");
         }
 
-        // Step 3: ดึงข้อมูลลิงก์
         $link_conditions = [['column' => 'link_id', 'operator' => 'IN', 'value' => $link_ids]];
         $all_links = selectData($conn_cloudpanel, 'ecm_link', $link_conditions, '*');
 
@@ -74,14 +71,12 @@ if ($action == 'getMenuHeaderSideItems') {
             throw new Exception("ไม่สามารถดึงข้อมูลจากตาราง ecm_link");
         }
 
-        // Step 4: สร้าง map link_id => link data
         $link_map = [];
         foreach ($all_links as $link) {
             $link['children'] = [];
             $link_map[$link['link_id']] = $link;
         }
 
-        // Step 5: สร้าง tree โครงสร้างความสัมพันธ์
         foreach ($link_rels as $rel) {
             $parent_id = $rel['parent_link_id'];
             $child_id = $rel['child_link_id'];
@@ -90,11 +85,9 @@ if ($action == 'getMenuHeaderSideItems') {
             }
         }
 
-        // Step 6: หา root nodes
         $child_ids = array_column($link_rels, 'child_link_id');
         $root_ids = array_diff(array_keys($link_map), $child_ids);
 
-        // Step 7: แปลง tree เป็นโครงสร้างเมนูที่ต้องการ
         function buildMenu($nodes)
         {
             global $BASE_WEB;
@@ -113,11 +106,9 @@ if ($action == 'getMenuHeaderSideItems') {
             return $menu;
         }
 
-        // Step 8: สร้าง $data เมนู
         $root_nodes = array_intersect_key($link_map, array_flip($root_ids));
         $data = buildMenu($root_nodes);
 
-        // ส่ง response กลับ
         http_response_code(200);
         echo json_encode([
             "data" => $data

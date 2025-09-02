@@ -270,7 +270,7 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
 
         a.addEventListener("click", (e) => {
           const clickedInsideTitle = e.target.closest(".menu-title");
-          if (clickedInsideTitle) return; // ถ้าคลิกชื่อเมนูให้ไปตามลิงก์
+          if (clickedInsideTitle) return;
 
           e.preventDefault();
           e.stopPropagation();
@@ -291,7 +291,6 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
     return ul;
   }
 
-  // ฟังก์ชัน filter เมนู
   function filterMenu(container, query) {
     const items = container.querySelectorAll("li");
     items.forEach(li => {
@@ -317,10 +316,22 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
     });
   }
 
-  // เมนูค่าเริ่มต้นที่ fix ไว้ด้านล่างเสมอ
   const defaultMenu = [
-    { title: "ตั้งค่าเริ่มต้น", link: config.BASE_WEB + "admin/control_menu/", icon: '<i class="bi bi-gear"></i>' },
-    { title: "ออกจากระบบ", link: config.BASE_WEB + "logout.php", icon: '<i class="bi bi-box-arrow-right"></i>' }
+    { 
+      title: "การจัดการเมนู", 
+      link: config.BASE_WEB + "admin/control/", 
+      icon: '<i class="bi bi-gear"></i>',
+      subMenu: [
+        // { title: "การตั้งค่าทั่วไป", link: config.BASE_WEB + "admin/control_link/" },
+        { title: "ติดตั้งเมนู", link: config.BASE_WEB + "admin/control/setup_link/" },
+        // { title: "ระบบสำรองข้อมูล", link: config.BASE_WEB + "admin/control_link/backup" }
+      ]
+    },
+    { 
+      title: "ออกจากระบบ", 
+      link: config.BASE_WEB + "logout.php", 
+      icon: '<i class="bi bi-box-arrow-right"></i>' 
+    }
   ];
 
   containers.forEach((container, index) => {

@@ -1,0 +1,298 @@
+<?php include '../../../routes.php'; ?>
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-STORE</title>
+    <?php include '../../../inc-meta.php'; ?>
+    <link href="../../../css/admin/template-admin.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../../../inc-cdn.php'; ?>
+    <link href="../../../css/admin/alertMessage-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+
+    <style>
+
+        .card-hyperlink {
+            border: 1px solid #dee2e6;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-hyperlink-section {
+            border: 2px dashed #dee2e6;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .box-icon-picker {
+            position: relative;
+        }
+
+        .iconPicker {
+            position: absolute;
+            right: 0;
+            background-color: #fafafa;
+            top: 0px;
+            z-index: 99;
+            border: 1px solid #6b7280;
+            border-radius: 3px;
+            padding: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <?php include '../../../template/admin/head-bar.php'; ?>
+    <main>
+        <div>
+            <section id="" class="section-space-admin">
+                <div class="container">
+                    <form id="setupFormLink" data-url="<?php echo $BASE_WEB ?>service/admin/control/setup-link-action.php" data-redir="<?php echo $BASE_WEB ?>admin/control/setup_link" data-type="setupLink">
+                        <input type="text" name="action" value="setupAddLink" hidden>
+                        <div class="card-hyperlink">
+                            <h5>ส่วนตั้งค่า</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="d-flex">
+                                            <label for="link_icon" class="form-label">ไอคอน:</label>
+                                            <i id="showIcon" class=""></i>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <input type="text" id="link_icon" name="link_icon"
+                                                class="form-input" required>
+                                            <button type="button" id="targetIconPicker" class="toggle-btn">
+                                                <i class="fas fa-table"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="box-icon-picker">
+                                        <div class="iconPicker"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="link_label" class="form-label">ชื่อเมนู</label>
+                                    <input type="text" id="link_label" name="link_label" class="form-input">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="link_path" class="form-label">เส้นทาง (Path)</label>
+                                    <input type="text" id="link_path" name="link_path" class="form-input">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="link_type" class="form-label">ส่วนเสริม (ประเภท)</label>
+                                    <select id="link_type" name="link_type" class="form-input">
+                                        <option value="">-- เลือกประเภท --</option>
+                                        <option value="image">รูปภาพ</option>
+                                        <option value="menu">เมนู</option>
+                                        <option value="text">ข้อความ</option>
+                                    </select>
+                                    <div class="mt-2 d-flex justify-content-between">
+                                        <span id="limit-message"> สามารถเพิ่มได้สูงสุด 4 ส่วนเท่านั้น</span>
+                                        <button type="button" class="btn btn-primary btn-sm" id="add-section-btn">เพิ่ม</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dynamic-content-container">
+                        </div>
+                        <div style="text-align: end;">
+                            <button type="submit" class="btn" style="background-color: #FF9800;">
+                                บันทึกข้อมูล
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module">
+        Promise.all([
+            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
+            import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time();?>`)
+        ])
+        .then(async ([formModule, linkModule]) => {
+
+            const { handleFormSubmit, showMessageBox } = formModule;
+            const { DynamicSectionManager } = linkModule;
+
+            const iconInput = document.getElementById("link_icon");
+            const showIcon = document.getElementById("showIcon");
+
+            $(".iconPicker")
+                .addClass("d-none")
+                .iconpicker({
+                    iconset: "fontawesome5",
+                    selectedClass: "btn-link",
+                    unselectedClass: "btn-light"
+                })
+                .on("change", e => {
+                    iconInput.value = e.icon;
+                    showIcon.className = e.icon;
+                });
+
+            $(document).on("click", e => {
+                if (!$(e.target).closest(".iconPicker").length && !$(e.target).is("#targetIconPicker")) {
+                    $(".iconPicker").addClass("d-none");
+                }
+            });
+
+            $("#targetIconPicker").on("click", e => {
+                e.stopPropagation();
+                $(".iconPicker").toggleClass("d-none");
+                // showMessageBox("คุณต้องการบันทึกข้อมูลหรือไม่?", 
+                //     () => console.log("ข้อมูลที่บันทึก"), 
+                //     () => console.log("กดยกเลิก")
+                // );
+            });
+
+            // // ================= MAIN FORM =================
+            DynamicSectionManager.init({
+                sectionLimit: 4,
+                typeSelectorId: "link_type",
+                addButtonId: "add-section-btn",
+                containerId: "dynamic-content-container",
+                limitMessageId: "limit-message"
+            });
+
+            // DynamicSectionManager.addSection('image', [{ src: 'https://example.com/image.jpg' }]);
+            // DynamicSectionManager.addSection('menu', [{ label: 'Home', href: '/home' }]);
+            // DynamicSectionManager.addSection('text', 'Sample text content');
+
+            const formSetup = document.querySelector("#setupFormLink");
+            formSetup?.addEventListener("submit", handleFormSubmit);
+
+            
+        })
+        .catch((e) => console.error("Module import failed", e));
+    </script>
+
+
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // ================= MAIN FORM =================
+            const SECTION_LIMIT = 4;
+            let sectionCounter = 0;
+
+            const mainLabelInput = document.getElementById("link_label");
+            // const mainIdInput = document.getElementById("link_id");
+            const mainPathInput = document.getElementById("link_path");
+            const typeSelector = document.getElementById("link_type");
+            const addSectionBtn = document.getElementById("add-section-btn");
+            const dynamicContainer = document.getElementById("dynamic-content-container");
+            const form = document.getElementById("setup-form");
+            const limitMessage = document.getElementById("limit-message");
+
+
+            // ----------- ปุ่มเพิ่ม Section ----------
+            addSectionBtn.addEventListener("click", () => {
+                if (dynamicContainer.children.length >= SECTION_LIMIT) {
+                    limitMessage.style.display = "block";
+                    setTimeout(() => limitMessage.style.display = "none", 3000);
+                    return;
+                }
+                createSectionUI(typeSelector.value);
+            });
+
+            // ----------- Submit Form ----------
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+
+                const mainMenu = {
+                    icon: iconInput.value,
+                    label: mainLabelInput.value,
+                    // id: mainIdInput.value,
+                    path: mainPathInput.value,
+                    hasToggle: true
+                };
+
+                const sections = Array.from(dynamicContainer.children).map(div => {
+                    const type = div.dataset.type;
+                    let content = [];
+
+                    if (type === "image") {
+                        content = Array.from(div.querySelectorAll(".image-url-input")).map(inp => ({
+                            src: inp.value,
+                            alt: "img"
+                        }));
+                    } else if (type === "menu") {
+                        const labels = div.querySelectorAll(".menu-label-input");
+                        const hrefs = div.querySelectorAll(".menu-href-input");
+                        content = Array.from(labels).map((inp, i) => ({
+                            icon: "",
+                            label: inp.value,
+                            href: hrefs[i].value
+                        }));
+                    } else if (type === "text") {
+                        content = div.querySelector(".text-content").value;
+                    }
+                    return {
+                        type,
+                        content
+                    };
+                });
+
+
+            });
+
+            // ----------- Message Box ----------
+
+
+            // ----------- Initial Data ----------
+            // const initialData = {
+            //     mainMenu: {
+            //         icon: "fas fa-home",
+            //         label: "หน้าหลัก",
+            //         id: "homeMenu",
+            //         path: "/home",
+            //         hasToggle: true
+            //     },
+            //     contentSections: [{
+            //             type: "image",
+            //             content: [{
+            //                 src: "https://via.placeholder.com/150",
+            //                 alt: "img1"
+            //             }]
+            //         },
+            //         {
+            //             type: "menu",
+            //             content: [{
+            //                 icon: "",
+            //                 label: "เมนูย่อย",
+            //                 href: "#"
+            //             }]
+            //         },
+            //         {
+            //             type: "text",
+            //             content: "ข้อความรายละเอียดเริ่มต้น"
+            //         }
+            //     ]
+            // };
+
+            // // Render ค่าเริ่มต้น
+            // Object.assign(iconInput, {
+            //     value: initialData.mainMenu.icon
+            // });
+            // showIcon.className = initialData.mainMenu.icon;
+            // mainLabelInput.value = initialData.mainMenu.label;
+            // mainIdInput.value = initialData.mainMenu.id;
+            // mainPathInput.value = initialData.mainMenu.path;
+            // initialData.contentSections.forEach(sec => createSectionUI(sec.type, sec.content));
+        });
+    </script> -->
+
+
+    <?php include '../../../template/admin/footer-bar.php'; ?>
+
+</body>
+
+</html>
