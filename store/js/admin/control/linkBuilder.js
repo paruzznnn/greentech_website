@@ -238,7 +238,7 @@ export const DynamicSectionManager = {
                 <option value="thumbnail" ${category === "thumbnail" ? "selected" : ""}>Thumbnail</option>
             </select>
 
-            <button type="button" class="delete-item-btn btn btn-sm btn-danger">ลบ</button>
+            <button type="button" class="delete-item-btn btn btn-sm btn-danger"><i class="bi bi-x"></i></button>
         `;
 
         div.querySelector(".delete-item-btn").addEventListener("click", () => div.remove());

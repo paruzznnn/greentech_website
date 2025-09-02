@@ -1,5 +1,7 @@
 <?php
 require_once '../server/connect_sqli.php';
+require_once '../server/select_sqli.php';
+require_once '../server/insert_sqli.php';
 header('Content-Type: application/json');
 
 /* ---------------POST NEED USE ------------------
@@ -37,72 +39,165 @@ if ($token !== $validToken) {
 /*---------ACTION DATA -------------*/
 
 $action = $_GET['action'];
-if($action == 'getMenuHeaderItems'){
+if ($action == 'getMenuHeaderItems') {
 
-    $data = [
-        [
-            'icon' => '',
-            'label' => 'สินค้าแทรนดาร์ อะคูสติก',
-            'id' => 'box1',
-            'path' => $BASE_WEB . 'product/',
-            'hasToggle' => true
-        ],
-        // [
-        //     'icon' => '',
-        //     'label' => 'สินค้าแทรนดาร์ อะคูสติก',
-        //     'id' => '',
-        //     'path' => $BASE_WEB . 'product/',
-        //     'hasToggle' => false
-        // ]
-    ];
-
-    http_response_code(200);
-    $response = [
-        "data" => $data
-    ];
-
-    echo json_encode($response);
-    exit;
-
-}
-else if($action == 'getMenuHeaderBox') {
-
-    $data = [
-        [
-            'id' => 'box1',
-            'section1' => [
-                'type' => 'image',
-                'content' => [
-                    ['src' => 'https://www.trandar.com//public/shop_img/687e056ead593_Afibus-03.png', 'alt' => 'img1'],
-                    ['src' => 'https://www.trandar.com//public/shop_img/687a3420a32fa_Zound_Borad_223.png', 'alt' => 'img2'],
-                    ['src' => 'https://www.trandar.com//public/shop_img/687e056ead593_Afibus-03.png', 'alt' => 'img3']
-                ]
-            ],
-            'section2' => [
-                'type' => 'menu',
-                'content' => [
-                    ['label' => 'เมนูย่อย 1', 'href' => '#'],
-                    ['label' => 'เมนูย่อย 2', 'href' => '#'],
-                    ['label' => '', 'href' => '#']
-                ]
-            ],
-            'section3' => [
-                'type' => 'text',
-                'content' => 'ข้อมูลรายละเอียดเพิ่มเติมของอะคูสติกออนไลน์'
+    try {
+        $conditions = [
+            [
+                'column'   => 'del',
+                'operator' => '=',
+                'value'    => 0
             ]
-        ]
-    ];
+        ];
 
-    http_response_code(200);
-    $response = [
-        "data" => $data
-    ];
+        $items = selectData(
+            $conn_cloudpanel,
+            'ecm_link',
+            $conditions,
+            '*',
+            'link_id ASC'
+        );
 
-    echo json_encode($response);
-    exit;
+        if ($items === false || $items === null) {
+            throw new Exception("ไม่สามารถดึงข้อมูลจาก ecm_link ได้");
+        }
 
-}
-else if($action == 'getMenuHeaderSideItems'){
+        $data = [];
+        foreach ($items as $item) {
+            $data[] = [
+                'id'        => $item['link_id'],
+                'icon'      => $item['link_icon'],
+                'label'     => $item['link_name'],
+                'path'      => $BASE_WEB . $item['link_url'],
+                'hasToggle' => true
+            ];
+        }
+
+        http_response_code(200);
+        $response = [
+            "data" => $data
+        ];
+        echo json_encode($response);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            "status" => false,
+            "error"  => $e->getMessage()
+        ]);
+    } finally {
+        if (isset($conn_cloudpanel) && $conn_cloudpanel) {
+            $conn_cloudpanel->close();
+        }
+        exit;
+    }
+} else if ($action == 'getMenuHeaderBox') {
+
+    try {
+        $conditions = [
+            [
+                'column'   => 'del',
+                'operator' => '=',
+                'value'    => 0
+            ]
+        ];
+
+        $images = selectData($conn_cloudpanel, 'ecm_link_sub_img', $conditions, '*', 'link_id ASC');
+        if ($images === false) {
+            throw new Exception("ไม่สามารถดึงข้อมูลจาก ecm_link_sub_img ได้");
+        }
+
+        $menus  = selectData($conn_cloudpanel, 'ecm_link_sub_menu', $conditions, '*', 'link_id ASC');
+        if ($menus === false) {
+            throw new Exception("ไม่สามารถดึงข้อมูลจาก ecm_link_sub_menu ได้");
+        }
+
+        $texts  = selectData($conn_cloudpanel, 'ecm_link_sub_text', $conditions, '*', 'link_id ASC');
+        if ($texts === false) {
+            throw new Exception("ไม่สามารถดึงข้อมูลจาก ecm_link_sub_text ได้");
+        }
+
+        // รวมข้อมูลทั้งหมด โดยใช้ link_id เป็น key หลัก
+        $data = [];
+
+        // -------------------- IMAGES --------------------
+        foreach ($images as $img) {
+            $id = $img['link_id'];
+            $sectionKey = "section" . $img['link_sub_sort'];
+
+            if (!isset($data[$id])) {
+                $data[$id] = ['id' => $id];
+            }
+
+            if (!isset($data[$id][$sectionKey])) {
+                $data[$id][$sectionKey] = [
+                    'type' => 'image',
+                    'content' => []
+                ];
+            }
+
+            $data[$id][$sectionKey]['content'][] = [
+                'src' => $img['link_sub_img'],
+                'alt' => $img['link_sub_category']
+            ];
+        }
+
+        // -------------------- MENUS --------------------
+        foreach ($menus as $menu) {
+            $id = $menu['link_id'];
+            $sectionKey = "section" . $menu['link_sub_sort'];
+
+            if (!isset($data[$id])) {
+                $data[$id] = ['id' => $id];
+            }
+
+            if (!isset($data[$id][$sectionKey])) {
+                $data[$id][$sectionKey] = [
+                    'type' => 'menu',
+                    'content' => []
+                ];
+            }
+
+            $data[$id][$sectionKey]['content'][] = [
+                'label' => $menu['link_sub_name'],
+                'href'  => $menu['link_sub_url']
+            ];
+        }
+
+        // -------------------- TEXT --------------------
+        foreach ($texts as $txt) {
+            $id = $txt['link_id'];
+            $sectionKey = "section" . $txt['link_sub_sort'];
+
+            if (!isset($data[$id])) {
+                $data[$id] = ['id' => $id];
+            }
+
+            $data[$id][$sectionKey] = [
+                'type'    => 'text',
+                'content' => $txt['link_sub_text']
+            ];
+        }
+
+        $data = array_values($data);
+
+        http_response_code(200);
+        echo json_encode([
+            "status" => true,
+            "data"   => $data
+        ]);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            "status" => false,
+            "error"  => $e->getMessage()
+        ]);
+    } finally {
+        if (isset($conn_cloudpanel) && $conn_cloudpanel) {
+            $conn_cloudpanel->close();
+        }
+        exit;
+    }
+} else if ($action == 'getMenuHeaderSideItems') {
 
     $data = [
         [
@@ -144,9 +239,7 @@ else if($action == 'getMenuHeaderSideItems'){
 
     echo json_encode($response);
     exit;
-
-}
-else{
+} else {
 
     http_response_code(400);
     echo json_encode([
@@ -157,5 +250,3 @@ else{
 
 
 /*----------------------------------*/
-
-
