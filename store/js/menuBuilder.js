@@ -335,10 +335,11 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
   const defaultMenu = [
     { 
       title: "การจัดการเมนู", 
-      link: config.BASE_WEB + "admin/control/", 
+      // link: config.BASE_WEB + "admin/control/", 
+      link: '#', 
       icon: '<i class="bi bi-gear"></i>',
       subMenu: [
-        // { title: "การตั้งค่าทั่วไป", link: config.BASE_WEB + "admin/control_link/" },
+        { title: "รายการเมนู", link: config.BASE_WEB + "admin/control/list_link/" },
         { title: "ติดตั้งเมนู", link: config.BASE_WEB + "admin/control/setup_link/" },
         // { title: "ระบบสำรองข้อมูล", link: config.BASE_WEB + "admin/control_link/backup" }
       ]

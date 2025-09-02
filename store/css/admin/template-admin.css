@@ -235,6 +235,8 @@ Badges Status
 }
 
 .store-card-dropdown-content a:hover {
+    text-decoration: none;
+    color: #7b838a;
     background-color: #dddddd3d;
 }
 
@@ -1323,6 +1325,34 @@ Footer
 .footer-social a:hover {
     color: #ff7b34;
 }
+
+
+/* ----------------------------------------------------
+@Tables
+---------------------------------------------------- */
+.tables-over {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+/* scrollbar */
+.tables-over::-webkit-scrollbar {
+    height: 6px;
+}
+
+.tables-over::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 10px;
+}
+
+.tables-over::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
 
 /* ----------------------------------------------------
 @Media
