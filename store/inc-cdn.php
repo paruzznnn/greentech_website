@@ -9,11 +9,22 @@ $path = $isHttps ? '/store/' : '/trandar_website/store/';
 define('BASE_PATH', $scheme . '://' . $host . $path);
 ?>
 
-<script src="<?php echo BASE_PATH ?>node_modules/jquery/dist/jquery.min.js"></script>
+<!-- <script src="<?php echo BASE_PATH ?>node_modules/jquery/dist/jquery.min.js"></script> -->
 
 <link rel="stylesheet" href="<?php echo BASE_PATH ?>node_modules/bootstrap-icons/font/bootstrap-icons.min.css" />
-<link href="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <link href="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script> -->
+
+
+<!-- Bootstrap 4 + Popper -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap Iconpicker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/js/bootstrap-iconpicker.bundle.min.js"></script>
 
 <link href="<?php echo BASE_PATH ?>node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -34,9 +45,4 @@ define('BASE_PATH', $scheme . '://' . $host . $path);
 
 <link href="<?php echo BASE_PATH ?>node_modules/datatables/media/css/dataTables.min.css" rel="stylesheet">
 <script src="<?php echo BASE_PATH ?>node_modules/datatables/media/js/dataTables.min.js"></script>
-
-
-
-
-
 

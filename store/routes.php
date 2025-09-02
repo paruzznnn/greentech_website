@@ -91,7 +91,7 @@ $accessControl = [
     'user' => ['user', 'admin'],
     'app' => ['user', 'admin'],
     'payment' => ['user', 'admin'],
-    'control_menu' => ['user', 'admin'],
+    // 'control_link' => ['user', 'admin'],
 ];
 
 foreach ($ROUTE['controller'] as $value) {

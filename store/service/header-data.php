@@ -40,20 +40,20 @@ $action = $_GET['action'];
 if($action == 'getMenuHeaderItems'){
 
     $data = [
-        // [
-        //     'icon' => '',
-        //     'label' => 'สินค้าแทรนดาร์ อะคูสติก',
-        //     'id' => 'box1',
-        //     'path' => $BASE_WEB . 'product/',
-        //     'hasToggle' => true
-        // ],
         [
             'icon' => '',
             'label' => 'สินค้าแทรนดาร์ อะคูสติก',
-            'id' => '',
+            'id' => 'box1',
             'path' => $BASE_WEB . 'product/',
-            'hasToggle' => false
-        ]
+            'hasToggle' => true
+        ],
+        // [
+        //     'icon' => '',
+        //     'label' => 'สินค้าแทรนดาร์ อะคูสติก',
+        //     'id' => '',
+        //     'path' => $BASE_WEB . 'product/',
+        //     'hasToggle' => false
+        // ]
     ];
 
     http_response_code(200);
@@ -81,16 +81,15 @@ else if($action == 'getMenuHeaderBox') {
             'section2' => [
                 'type' => 'menu',
                 'content' => [
-                    ['icon' => '', 'label' => 'เมนูย่อย 1', 'href' => '#'],
-                    ['icon' => '', 'label' => 'เมนูย่อย 2', 'href' => '#'],
-                    ['icon' => '', 'label' => '', 'href' => '#']
+                    ['label' => 'เมนูย่อย 1', 'href' => '#'],
+                    ['label' => 'เมนูย่อย 2', 'href' => '#'],
+                    ['label' => '', 'href' => '#']
                 ]
             ],
             'section3' => [
                 'type' => 'text',
                 'content' => 'ข้อมูลรายละเอียดเพิ่มเติมของอะคูสติกออนไลน์'
-            ],
-            'section4' => null
+            ]
         ]
     ];
 
