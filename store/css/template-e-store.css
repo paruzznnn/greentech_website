@@ -951,7 +951,8 @@ body.modal-open {
 }
 
 .gallery-layout-store1.layout-3 {
-  grid-template-columns: repeat(2, 1fr);
+  /* grid-template-columns: repeat(2, 1fr); */
+  grid-template-columns: 1fr;
 }
 
 .gallery-layout-store1.layout-4 {

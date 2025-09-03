@@ -1,5 +1,6 @@
 <?php
 require_once '../../../server/connect_sqli.php';
+require_once '../../../server/select_sqli.php';
 require_once '../../../server/package_data_table.php';
 header('Content-Type: application/json');
 
@@ -50,7 +51,7 @@ if ($action == 'get_tb_listLink') {
     $columns = ['link_id', 'link_url', 'link_icon'];
     $whereClause = "del = 0";
     if (!empty($searchValue)) {
-    $whereClause .= " AND (link_name LIKE '%$searchValue%')";
+        $whereClause .= " AND (link_name LIKE '%$searchValue%')";
     }
     $orderBy = $columns[$orderIndex] . " " . $orderDir;
 
@@ -63,7 +64,7 @@ if ($action == 'get_tb_listLink') {
     $dataResult = $conn_cloudpanel->query($dataQuery);
     $data = [];
     while ($row = $dataResult->fetch_assoc()) {
-    $data[] = $row;
+        $data[] = $row;
     }
 
     $Index = 'link_id';
@@ -71,14 +72,78 @@ if ($action == 'get_tb_listLink') {
     $totalFiltered = getFilteredRecordsCount($conn_cloudpanel, 'ecm_link', $whereClause, $Index);
 
     $response = [
-    "draw" => intval($draw),
-    "recordsTotal" => intval($totalRecords),
-    "recordsFiltered" => intval($totalFiltered),
-    "data" => $data,
+        "draw" => intval($draw),
+        "recordsTotal" => intval($totalRecords),
+        "recordsFiltered" => intval($totalFiltered),
+        "data" => $data,
     ];
 
     echo json_encode($response);
+} else if ($action == 'getLinkItems') {
 
+    try {
+        $link_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
+        if ($link_id <= 0) {
+            throw new Exception("ค่า link_id ไม่ถูกต้อง");
+        }
+
+        $conditions = [
+            ['column' => 'link_id', 'operator' => '=', 'value' => $link_id],
+            ['column' => 'del', 'operator' => '=', 'value' => 0]
+        ];
+
+        // main
+        $linkMain = selectData($conn_cloudpanel, 'ecm_link', $conditions, '*');
+        if (empty($linkMain)) {
+            throw new Exception("ไม่พบข้อมูลในตาราง ecm_link (id={$link_id})");
+        }
+
+        // sub image
+        $linkSubImg = selectData($conn_cloudpanel, 'ecm_link_sub_img', $conditions, '*');
+        if ($linkSubImg === false) {
+            throw new Exception("เกิดข้อผิดพลาดในการ query ecm_link_sub_img");
+        }
+
+        // sub menu
+        $linkSubMenu = selectData($conn_cloudpanel, 'ecm_link_sub_menu', $conditions, '*');
+        if ($linkSubMenu === false) {
+            throw new Exception("เกิดข้อผิดพลาดในการ query ecm_link_sub_menu");
+        }
+
+        // sub text
+        $linkSubText = selectData($conn_cloudpanel, 'ecm_link_sub_text', $conditions, '*');
+        if ($linkSubText === false) {
+            throw new Exception("เกิดข้อผิดพลาดในการ query ecm_link_sub_text");
+        }
+
+        $data = [
+            'main'  => $linkMain,
+            'image' => $linkSubImg,
+            'menu'  => $linkSubMenu,
+            'text'  => $linkSubText,
+        ];
+
+        http_response_code(200);
+        echo json_encode([
+            "status" => true,
+            "data"   => $data
+        ]);
+        exit;
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            "error" => true,
+            "message" => $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+        exit;
+    } finally {
+        if ($conn_cloudpanel instanceof mysqli) {
+            $conn_cloudpanel->close();
+        }
+        exit;
+    }
 } else {
 
     http_response_code(400);
@@ -90,8 +155,3 @@ if ($action == 'get_tb_listLink') {
 
 
 /*----------------------------------*/
-
-
-?>
-
-
