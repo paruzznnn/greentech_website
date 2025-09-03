@@ -11,7 +11,6 @@
     <?php include '../../../inc-cdn.php'; ?>
     <link href="../../../css/admin/alertMessage-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
     <link href="../../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-
     <style>
         .card-list-link {
             border: 1px solid #dee2e6;
@@ -21,7 +20,6 @@
             margin-bottom: 20px;
         }
     </style>
-
 </head>
 
 <body>
@@ -56,9 +54,7 @@
                 import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
             ])
             .then(async ([formModule, linkModule]) => {
-
                 const { redirectGet } = formModule;
-
                 $(document).ready(function() {
                     let tb_listLink = $('#tb_listLink').DataTable({
                         language: {

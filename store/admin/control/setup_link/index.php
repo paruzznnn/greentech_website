@@ -108,7 +108,7 @@
                         <div id="dynamic-content-container">
                         </div>
                         <div style="text-align: end;">
-                            <button type="submit" class="btn" style="background-color: #FF9800;">
+                            <button type="submit" class="btn w-100" style="background-color: #FF9800;">
                                 บันทึกข้อมูล
                             </button>
                         </div>

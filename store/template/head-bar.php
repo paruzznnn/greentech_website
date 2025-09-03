@@ -38,8 +38,8 @@
               <i class="fa fa-search icon-left"></i>
               <input type="text" id="input-search" class="input-search" placeholder="ค้นหา..." />
               <button class="btn-inside">
-                <i class="bi bi-camera-fill"></i>
-                <span>ค้นหาสินค้า</span>
+                <!-- <i class="bi bi-camera-fill"></i> -->
+                <span>ค้นหา</span>
               </button>
             </div>
           </form>
