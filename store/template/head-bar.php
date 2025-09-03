@@ -478,7 +478,7 @@
   .then( async ([formHandler, modalBuilder, menuBuilder]) => {
     const { handleFormSubmit } = formHandler;
     const { setupAuthModal, setupPasswordValidation, exposeTogglePassword } = modalBuilder;
-    const { fetchHeader, buildLinkmenu, buildLinkmenuSlide, resetPosition } = menuBuilder;
+    const { fetchHeader, buildLinkmenu, buildLinkmenuSlide } = menuBuilder;
 
     // ============== DOM Elements ========================
     const loginTab = document.getElementById("login-tab");
@@ -579,16 +579,10 @@
     document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
     document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
 
-    checkDeviceSize();
-    const handleResize = () => {
-      checkDeviceSize();
-      document.querySelectorAll(".toggle-box-store1").forEach(box => {
-        box.classList.remove("show");
-        resetPosition(box);
-      });
-    };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", () => {
+      checkDeviceSize();
+    });
 
   })
   .catch((e) => {

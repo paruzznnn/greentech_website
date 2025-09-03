@@ -900,25 +900,36 @@ body.modal-open {
   white-space: nowrap;
 }
 
+.toggle-btn-store1 {
+  cursor: pointer;
+}
+
 .toggle-box-store1 {
-  display: none;
-  padding: 10px;
-  border: 1px solid #eaeaea;
-  background: #fff;
   position: absolute;
   top: 100%;
   left: 0;
   z-index: 90;
+
+  padding: 10px;
+  border: 1px solid #eaeaea;
+  background: #fff;
+  border-radius: 4px;
+  box-sizing: border-box;
   width: fit-content;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-  transition: opacity 0.3s ease;
-  border-radius: 2px;
+
+  /* ซ่อนเริ่มต้น */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 0.3s ease, left 0.2s ease, right 0.2s ease, visibility 0.3s ease;
 }
 
 .toggle-box-store1.show {
-  display: block;
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .no-toggle-store1 {
@@ -928,20 +939,52 @@ body.modal-open {
 
 .gallery-layout-store1 {
   display: grid;
-  grid-template-columns: 55% 45%;
   gap: 1rem;
 }
 
+.gallery-layout-store1.layout-1 {
+  grid-template-columns: 1fr;
+}
+
+.gallery-layout-store1.layout-2 {
+  grid-template-columns: 1fr;
+}
+
+.gallery-layout-store1.layout-3 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.gallery-layout-store1.layout-4 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Layout สำหรับ "image mode" */
+.gallery-layout-store1.image-mode {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+
+  .gallery-layout-store1.layout-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-layout-store1.layout-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-layout-store1.image-mode {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .section-store1 {
-  /* border-radius: 6px; */
-  /* padding: 10px; */
-  /* background: #fff; */
   min-height: 180px;
 }
 
 .section-store1 p {
-  word-wrap: break-word; 
-  /* overflow-wrap: anywhere; */
+  word-wrap: break-word;
   white-space: normal;
 }
 
@@ -953,7 +996,7 @@ body.modal-open {
 
 .section-gallery-store1 {
   display: grid;
-  grid-template-columns: repeat(3, 180px);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px;
 }
 
@@ -963,7 +1006,6 @@ body.modal-open {
   object-fit: cover;
   border-radius: 3px;
   border: 1px solid #eaeaeacf;
-  /* min-width: 180px; */
 }
 
 .a-link-store1 {
@@ -979,7 +1021,6 @@ body.modal-open {
 .a-link-store1:hover {
   color: #ff7800;
 }
-
 
 .submenu-store1 {
   display: flex;
@@ -1000,12 +1041,7 @@ body.modal-open {
   font-size: 14px;
 }
 
-/* @media (max-width: 768px) {
-  .gallery-layout-store1 {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
-  }
-} */
+
 
 /*---------------------------------------
   Sidenav              
