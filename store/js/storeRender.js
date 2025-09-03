@@ -28,45 +28,42 @@ export async function fetchIndexData(req, call) {
 
 // ---------- RENDER SECTIONS -----------------
 export function renderSections(targetId, data) {
-  let html = "";
-  data.forEach((section) => {
-    const sectionClass = section.class || "";
+  const createContentHtml = (section) => {
     const titleHtml = section.title ? `<h5>${section.title}</h5>` : "";
-    const contentHtml = section.isSlide
-      ? `${titleHtml}<div id="${section.carouselId}" class="owl-carousel owl-theme"></div>`
-      : `${titleHtml}<div id="${section.carouselId}"></div>`;
+    const detailHtml = section.detail ? `<p>${section.detail}</p>` : "";
+    const baseContent = section.isSlide
+      ? `<div id="${section.carouselId}" class="owl-carousel owl-theme"></div>`
+      : `<div id="${section.carouselId}"></div>`;
+    return `${titleHtml}${detailHtml}${baseContent}`;
+  };
 
-    if(section.id == "section_products"){
+  const getWrapperStyle = (sectionId) => {
+    // section ที่ต้องการกล่องสีขาว border-radius
+    const styledSections = ["section_products", "section_brand"];
+    return styledSections.includes(sectionId)
+      ? `style="background:#fff;padding:0.5rem;border-radius:3px;"`
+      : "";
+  };
 
-      html += `
-      <section id="${section.id}" class="${sectionClass}">
-        <div class="container">
-          <div 
-          style="
-          background: #ffffff; 
-          padding: 0.5rem;
-          border-radius: 3px;
-          ">${contentHtml}</div>
-        </div>
-      </section>
-    `;
+  const html = data
+    .map((section) => {
+      const sectionClass = section.class || "";
+      const contentHtml = createContentHtml(section);
+      const wrapperStyle = getWrapperStyle(section.id);
 
-    }else{
-
-      html += `
-      <section id="${section.id}" class="${sectionClass}">
-        <div class="container">
-          ${contentHtml}
-        </div>
-      </section>
-    `;
-
-    }
-
-  });
+      return `
+        <section id="${section.id}" class="${sectionClass}">
+          <div class="container">
+            <div ${wrapperStyle}>${contentHtml}</div>
+          </div>
+        </section>
+      `;
+    })
+    .join("");
 
   document.querySelector(targetId).innerHTML = html;
 }
+
 
 // ---------- RENDER INTRODUCE ----------------
 export function renderIntroduce(containerId, items) {
@@ -298,7 +295,6 @@ function setupCarousel(container) {
   showSlide(currentIndex);
   startAutoPlay();
 }
-// ---------- RENDER INTRODUCE ----------------
 
 function addCart(product) {
   const existingCart =
@@ -345,7 +341,6 @@ function addWishlist(product) {
 
 // ---------- RENDER INTRODUCE ----------------
 
-// ---------- RENDER BANNERS ------------------
 export function renderBanners(containerId, banners) {
   const container = document.querySelector(containerId);
   if (!container) {
@@ -378,7 +373,6 @@ export function renderBanners(containerId, banners) {
   });
 }
 
-// ---------- RENDER CAROUSEL SMALL -----------
 export function renderCarouselSM(selector, items) {
   const container = document.querySelector(selector);
   items.forEach((item) => {
@@ -394,15 +388,19 @@ export function renderCarouselSM(selector, items) {
   });
 
   $(selector).owlCarousel({
-    loop: true,
+    loop: false,
     margin: 10,
     nav: true,
     dots: false,
     autoWidth: true,
+    touchDrag: true,
+    mouseDrag: true,
+    onInitialized: function(event) {
+      $(event.target).removeClass("owl-drag");
+    }
   });
 }
 
-// ---------- RENDER CAROUSEL MEDIUM ----------
 export function renderCarouselMD(selector, items, config) {
   const container = document.querySelector(selector);
   items.forEach((item) => {
@@ -531,13 +529,18 @@ export function renderCarouselMD(selector, items, config) {
   $(selector).owlCarousel({
     loop: false,
     margin: 10,
-    nav: false,
+    nav: true,
     dots: false,
     autoWidth: true,
+    touchDrag: true,    
+    mouseDrag: true,
+    onInitialized: function(event) {
+      $(event.target).removeClass("owl-drag");
+    }
   });
+
 }
 
-// ---------- RENDER CAROUSEL LARGE ------------
 export function renderCarouselLG(selector, items) {
   const container = document.querySelector(selector);
   items.forEach((item) => {
@@ -563,13 +566,51 @@ export function renderCarouselLG(selector, items) {
   });
 
   $(selector).owlCarousel({
-    loop: true,
+    loop: false,
     margin: 10,
-    nav: false,
+    nav: true,
     dots: false,
     autoWidth: true,
+    touchDrag: true,
+    mouseDrag: true,
+    onInitialized: function(event) {
+      $(event.target).removeClass("owl-drag");
+    }
   });
 }
+
+export function renderGridCardSM(selector, items) {
+
+  // <div>${item.title}</div>
+  const container = document.querySelector(selector);
+  items.forEach((item) => {
+    const div = document.createElement("div");
+    div.classList.add("item");
+    div.innerHTML = `
+    <a href="${item.compLink}" target="_blank">
+      <div class="cb-sm-grid">
+        <div><img src="${item.image}" alt="" class="cb-sm-grid-image"/></div>
+      </div>
+    </a>
+    `;
+    container.appendChild(div);
+  });
+
+  $(selector).owlCarousel({
+    loop: false,
+    margin: 10,
+    nav: true,
+    dots: false,
+    autoWidth: true,
+    touchDrag: true,
+    mouseDrag: true,
+    onInitialized: function(event) {
+      $(event.target).removeClass("owl-drag");
+    }
+  });
+
+}
+
 
 export function renderGridCardMD(selector, items, config) {
   const container = document.querySelector(selector);
@@ -679,3 +720,5 @@ export function renderGridCardMD(selector, items, config) {
     }
   });
 }
+
+

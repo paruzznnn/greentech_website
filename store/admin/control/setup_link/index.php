@@ -13,7 +13,6 @@
     <link href="../../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
 
     <style>
-
         .card-hyperlink {
             border: 1px solid #dee2e6;
             background: #ffffff;
@@ -44,7 +43,6 @@
             border-radius: 3px;
             padding: 5px;
         }
-
     </style>
 </head>
 
@@ -56,7 +54,13 @@
             <section id="" class="section-space-admin">
                 <div class="container">
                     <form id="setupFormLink" data-url="<?php echo $BASE_WEB ?>service/admin/control/setup-link-action.php" data-redir="<?php echo $BASE_WEB ?>admin/control/setup_link" data-type="setupLink">
-                        <input type="text" name="action" value="setupAddLink" hidden>
+                        <?php
+                        if (isset($_GET['id'])) { ?>
+                            <input type="text" name="action" value="editSetupLink" hidden>
+                            <input type="text" name="link_id" value="<?php echo $_GET['id'] ?>" hidden>
+                        <?php } else { ?>
+                            <input type="text" name="action" value="setupAddLink" hidden>
+                        <?php } ?>
                         <div class="card-hyperlink">
                             <h5>ส่วนตั้งค่า</h5>
                             <div class="row">
@@ -104,7 +108,7 @@
                         <div id="dynamic-content-container">
                         </div>
                         <div style="text-align: end;">
-                            <button type="submit" class="btn" style="background-color: #FF9800;">
+                            <button type="submit" class="btn w-100" style="background-color: #FF9800;">
                                 บันทึกข้อมูล
                             </button>
                         </div>
@@ -116,180 +120,144 @@
 
     <script type="module">
         Promise.all([
-            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time();?>`)
-        ])
-        .then(async ([formModule, linkModule]) => {
+                import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+                import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
+            ])
+            .then(async ([formModule, linkModule]) => {
+                const {
+                    handleFormSubmit,
+                    showMessageBox
+                } = formModule;
+                const {
+                    DynamicSectionManager,
+                    fetchLinkData
+                } = linkModule;
 
-            const { handleFormSubmit, showMessageBox } = formModule;
-            const { DynamicSectionManager } = linkModule;
+                // ============ ICON PICKER ============
+                const iconInput = document.getElementById("link_icon");
+                const showIcon = document.getElementById("showIcon");
 
-            const iconInput = document.getElementById("link_icon");
-            const showIcon = document.getElementById("showIcon");
+                $(".iconPicker")
+                    .addClass("d-none")
+                    .iconpicker({
+                        iconset: "fontawesome5",
+                        selectedClass: "btn-link",
+                        unselectedClass: "btn-light"
+                    })
+                    .on("change", e => {
+                        iconInput.value = e.icon;
+                        showIcon.className = e.icon;
+                    });
 
-            $(".iconPicker")
-                .addClass("d-none")
-                .iconpicker({
-                    iconset: "fontawesome5",
-                    selectedClass: "btn-link",
-                    unselectedClass: "btn-light"
-                })
-                .on("change", e => {
-                    iconInput.value = e.icon;
-                    showIcon.className = e.icon;
+                $(document).on("click", e => {
+                    if (!$(e.target).closest(".iconPicker").length && !$(e.target).is("#targetIconPicker")) {
+                        $(".iconPicker").addClass("d-none");
+                    }
                 });
 
-            $(document).on("click", e => {
-                if (!$(e.target).closest(".iconPicker").length && !$(e.target).is("#targetIconPicker")) {
-                    $(".iconPicker").addClass("d-none");
-                }
-            });
+                $("#targetIconPicker").on("click", e => {
+                    e.stopPropagation();
+                    $(".iconPicker").toggleClass("d-none");
+                });
 
-            $("#targetIconPicker").on("click", e => {
-                e.stopPropagation();
-                $(".iconPicker").toggleClass("d-none");
-                // showMessageBox("คุณต้องการบันทึกข้อมูลหรือไม่?", 
-                //     () => console.log("ข้อมูลที่บันทึก"), 
-                //     () => console.log("กดยกเลิก")
-                // );
-            });
-
-            // // ================= MAIN FORM =================
-            DynamicSectionManager.init({
-                sectionLimit: 4,
-                typeSelectorId: "link_type",
-                addButtonId: "add-section-btn",
-                containerId: "dynamic-content-container",
-                limitMessageId: "limit-message"
-            });
-
-            // DynamicSectionManager.addSection('image', [{ src: 'https://example.com/image.jpg' }]);
-            // DynamicSectionManager.addSection('menu', [{ label: 'Home', href: '/home' }]);
-            // DynamicSectionManager.addSection('text', 'Sample text content');
-
-            const formSetup = document.querySelector("#setupFormLink");
-            formSetup?.addEventListener("submit", handleFormSubmit);
-
-            
-        })
-        .catch((e) => console.error("Module import failed", e));
-    </script>
-
-
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-
-            // ================= MAIN FORM =================
-            const SECTION_LIMIT = 4;
-            let sectionCounter = 0;
-
-            const mainLabelInput = document.getElementById("link_label");
-            // const mainIdInput = document.getElementById("link_id");
-            const mainPathInput = document.getElementById("link_path");
-            const typeSelector = document.getElementById("link_type");
-            const addSectionBtn = document.getElementById("add-section-btn");
-            const dynamicContainer = document.getElementById("dynamic-content-container");
-            const form = document.getElementById("setup-form");
-            const limitMessage = document.getElementById("limit-message");
-
-
-            // ----------- ปุ่มเพิ่ม Section ----------
-            addSectionBtn.addEventListener("click", () => {
-                if (dynamicContainer.children.length >= SECTION_LIMIT) {
-                    limitMessage.style.display = "block";
-                    setTimeout(() => limitMessage.style.display = "none", 3000);
-                    return;
-                }
-                createSectionUI(typeSelector.value);
-            });
-
-            // ----------- Submit Form ----------
-            form.addEventListener("submit", e => {
-                e.preventDefault();
-
-                const mainMenu = {
-                    icon: iconInput.value,
-                    label: mainLabelInput.value,
-                    // id: mainIdInput.value,
-                    path: mainPathInput.value,
-                    hasToggle: true
+                // ============ MAIN FORM ============
+                const linkId = <?php echo isset($_GET['id']) ? (int)$_GET['id'] : 0; ?>;
+                let links = {
+                    data: {}
                 };
 
-                const sections = Array.from(dynamicContainer.children).map(div => {
-                    const type = div.dataset.type;
-                    let content = [];
-
-                    if (type === "image") {
-                        content = Array.from(div.querySelectorAll(".image-url-input")).map(inp => ({
-                            src: inp.value,
-                            alt: "img"
-                        }));
-                    } else if (type === "menu") {
-                        const labels = div.querySelectorAll(".menu-label-input");
-                        const hrefs = div.querySelectorAll(".menu-href-input");
-                        content = Array.from(labels).map((inp, i) => ({
-                            icon: "",
-                            label: inp.value,
-                            href: hrefs[i].value
-                        }));
-                    } else if (type === "text") {
-                        content = div.querySelector(".text-content").value;
-                    }
-                    return {
-                        type,
-                        content
+                if (linkId) {
+                    const service = pathConfig.BASE_WEB + 'service/admin/control/list-link-data.php?';
+                    const param = {
+                        action: "getLinkItems",
+                        id: linkId
                     };
+                    links = await fetchLinkData(param, service);
+
+                    const existing_data = links.data?.main[0];
+                    if(existing_data){
+                        document.getElementById("link_icon").value = existing_data.link_icon;
+                        document.getElementById("showIcon").className = existing_data.link_icon;
+                        document.getElementById("link_label").value = existing_data.link_name;
+                        document.getElementById("link_path").value = existing_data.link_url;
+                    }
+
+                }
+
+                DynamicSectionManager.init({
+                    sectionLimit: 4,
+                    typeSelectorId: "link_type",
+                    addButtonId: "add-section-btn",
+                    containerId: "dynamic-content-container",
+                    limitMessageId: "limit-message"
+                });
+
+                // ============ AUTO LOOP FOR SECTIONS ============
+                const sectionHandlers = {
+                    image: (items) => items.map(item => ({
+                        id: item.id || 0,
+                        url: item.link_sub_img,
+                        category: item.link_sub_category || "",
+                        status: "existing"
+                    })),
+
+                    menu: (items) => items.map(item => ({
+                        id: item.id || 0,
+                        label: item.link_sub_name,
+                        href: item.link_sub_url,
+                        status: "existing"
+                    })),
+
+                    text: (items) => {
+                        // text section เก็บเป็น 1 record ต่อ sort
+                        const first = items[0] || {};
+                        return {
+                            id: first.id || 0,
+                            text: first.link_sub_text || "",
+                            status: "existing"
+                        };
+                    }
+                };
+
+                // ฟังก์ชันช่วย group ตาม link_sub_sort
+                function groupBySort(items) {
+                    return items.reduce((acc, item) => {
+                        const sort = item.link_sub_sort ?? 0;
+                        if (!acc[sort]) acc[sort] = [];
+                        acc[sort].push(item);
+                        return acc;
+                    }, {});
+                }
+
+                // Loop ทุก type
+                Object.keys(sectionHandlers).forEach(type => {
+                    const items = links.data?.[type];
+                    if (Array.isArray(items) && items.length > 0) {
+                        // group ก่อน
+                        const grouped = groupBySort(items);
+
+                        Object.values(grouped).forEach(group => {
+                            const formatted = sectionHandlers[type](group);
+                            DynamicSectionManager.addSection(type, formatted, true); // isFromDB = true
+                        });
+                    } else {
+                        console.warn(`No data found for section: ${type}`);
+                    }
                 });
 
 
-            });
+                // ============ FORM SUBMIT ============
+                const formSetup = document.querySelector("#setupFormLink");
+                formSetup?.addEventListener("submit", handleFormSubmit);
+                
+            })
+            .catch((e) => console.error("Module import failed", e));
 
-            // ----------- Message Box ----------
-
-
-            // ----------- Initial Data ----------
-            // const initialData = {
-            //     mainMenu: {
-            //         icon: "fas fa-home",
-            //         label: "หน้าหลัก",
-            //         id: "homeMenu",
-            //         path: "/home",
-            //         hasToggle: true
-            //     },
-            //     contentSections: [{
-            //             type: "image",
-            //             content: [{
-            //                 src: "https://via.placeholder.com/150",
-            //                 alt: "img1"
-            //             }]
-            //         },
-            //         {
-            //             type: "menu",
-            //             content: [{
-            //                 icon: "",
-            //                 label: "เมนูย่อย",
-            //                 href: "#"
-            //             }]
-            //         },
-            //         {
-            //             type: "text",
-            //             content: "ข้อความรายละเอียดเริ่มต้น"
-            //         }
-            //     ]
-            // };
-
-            // // Render ค่าเริ่มต้น
-            // Object.assign(iconInput, {
-            //     value: initialData.mainMenu.icon
-            // });
-            // showIcon.className = initialData.mainMenu.icon;
-            // mainLabelInput.value = initialData.mainMenu.label;
-            // mainIdInput.value = initialData.mainMenu.id;
-            // mainPathInput.value = initialData.mainMenu.path;
-            // initialData.contentSections.forEach(sec => createSectionUI(sec.type, sec.content));
-        });
-    </script> -->
-
+        // showMessageBox("คุณต้องการบันทึกข้อมูลหรือไม่?", 
+        //     () => console.log("ข้อมูลที่บันทึก"), 
+        //     () => console.log("กดยกเลิก")
+        // );
+    </script>
 
     <?php include '../../../template/admin/footer-bar.php'; ?>
 

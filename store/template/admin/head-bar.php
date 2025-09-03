@@ -236,11 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
             document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
 
-            checkDeviceSize();
-            const handleResize = () => {
-                checkDeviceSize();
-            };
-
             document.addEventListener("click", (e) => {
                 const menu = document.getElementById("sidenav-store1");
                 const menuOpen = document.getElementById("menu-open-store1");
@@ -255,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            window.addEventListener("resize", handleResize);
+            window.addEventListener("resize", checkDeviceSize);
 
         })
         .catch((e) => {

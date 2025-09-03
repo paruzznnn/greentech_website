@@ -1,10 +1,34 @@
+export async function fetchLinkData(req, call) {
+    try {
+        const params = new URLSearchParams({
+            action: req.action,
+            id: req.id
+        });
+        const url = call + params.toString();
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer my_secure_token_123',
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return { data: [] };
+    }
+}
+
 export const DynamicSectionManager = {
     // Configuration
     SECTION_LIMIT: 4,
     sectionCounter: 0,
     sections: new Map(),
 
-    // DOM elements (will be initialized)
+    // DOM elements
     typeSelector: null,
     addSectionBtn: null,
     dynamicContainer: null,
@@ -33,9 +57,12 @@ export const DynamicSectionManager = {
                 data.forEach(img => {
                     DynamicSectionManager.addImageItem(
                         container,
-                        img.url || img.src,   // รองรับทั้ง url, src
+                        img.url || img.src,
                         element.dataset.id,
-                        img.category || ""
+                        img.category || "",
+                        true,               // isFromDB
+                        img.id || 0,        // id
+                        img.status || "existing"
                     );
                 });
             },
@@ -52,7 +79,10 @@ export const DynamicSectionManager = {
                             element.querySelector(".image-container"),
                             url,
                             element.dataset.id,
-                            category
+                            category,
+                            false, // new
+                            0,
+                            "new"
                         );
                         urlInput.value = "";
                         catInput.value = "";
@@ -74,12 +104,21 @@ export const DynamicSectionManager = {
             populate(element, data) {
                 if (!data) return;
                 const container = element.querySelector(".menu-container");
-                data.forEach(menu => DynamicSectionManager.addMenuItem(container, menu.label, menu.href, element.dataset.id));
+                data.forEach(menu => DynamicSectionManager.addMenuItem(
+                    container,
+                    menu.label,
+                    menu.href,
+                    element.dataset.id,
+                    true,
+                    menu.id || 0,
+                    menu.status || "existing"
+                ));
             },
             bindEvents(element) {
                 const addBtn = element.querySelector(".add-menu-btn");
                 const labelInput = element.querySelector(".new-menu-label");
                 const hrefInput = element.querySelector(".new-menu-href");
+
                 addBtn.addEventListener("click", () => {
                     const label = labelInput.value.trim();
                     const href = hrefInput.value.trim();
@@ -88,7 +127,10 @@ export const DynamicSectionManager = {
                             element.querySelector(".menu-container"),
                             label,
                             href,
-                            element.dataset.id
+                            element.dataset.id,
+                            false,
+                            0,
+                            "new"
                         );
                         labelInput.value = "";
                         hrefInput.value = "";
@@ -104,49 +146,57 @@ export const DynamicSectionManager = {
             `,
             populate(element, data) {
                 if (data) {
-                    element.querySelector(".text-content").value = data;
+                    element.querySelector(".text-content").value = data.text || "";
+                    // เพิ่ม hidden id
+                    const hiddenId = document.createElement("input");
+                    hiddenId.type = "hidden";
+                    hiddenId.name = `sections[${element.dataset.id}][id]`;
+                    hiddenId.value = data.id || 0;
+                    element.appendChild(hiddenId);
                 }
             },
             bindEvents(element) {
                 const textarea = element.querySelector(".text-content");
                 textarea.setAttribute("name", `sections[${element.dataset.id}][text]`);
+
+                // === NEW: mark updated when editing existing text ===
+                textarea.addEventListener("input", () => {
+                    const sectionStatusInput = element.querySelector(".section-status");
+                    if (sectionStatusInput.value === "existing") {
+                        sectionStatusInput.value = "updated";
+                    }
+                });
             }
         }
     },
 
     // ================= INITIALIZATION =================
     init(options = {}) {
-        // Set configuration
         this.SECTION_LIMIT = options.sectionLimit || 4;
-        
-        // Get DOM elements
+
         this.typeSelector = document.getElementById(options.typeSelectorId || "link_type");
         this.addSectionBtn = document.getElementById(options.addButtonId || "add-section-btn");
         this.dynamicContainer = document.getElementById(options.containerId || "dynamic-content-container");
         this.limitMessage = document.getElementById(options.limitMessageId || "limit-message");
 
-        // Bind main event
         if (this.addSectionBtn) {
             this.addSectionBtn.addEventListener("click", () => this.addSection());
         }
-
-        return this; // For method chaining
+        return this;
     },
 
     // ================= SECTION MANAGEMENT =================
-    createSection(type, data = null) {
+    createSection(type, data = null, isFromDB = false) {
         const sectionConfig = this.sectionTypes[type];
-        if (!sectionConfig) {
-            throw new Error(`Unknown section type: ${type}`);
-        }
+        if (!sectionConfig) throw new Error(`Unknown section type: ${type}`);
 
         const sectionId = `section-${this.sectionCounter++}`;
-        
-        // Create section element
         const section = document.createElement("div");
         section.className = "card-hyperlink-section mb-3 p-3 border rounded";
         section.dataset.type = type;
         section.dataset.id = sectionId;
+
+        const sectionDbId = Array.isArray(data) ? 0 : (data?.id || 0);
 
         section.innerHTML = `
             <div class="d-flex justify-content-between mb-3">
@@ -156,56 +206,73 @@ export const DynamicSectionManager = {
                 </button>
             </div>
             ${sectionConfig.template}
+            <input type="hidden" class="section-status" name="sections[${sectionId}][status]" value="${isFromDB ? "existing" : "new"}">
+            <input type="hidden" class="section-id" name="sections[${sectionId}][id]" value="${sectionDbId}">
         `;
 
-        // Add to container
         this.dynamicContainer.appendChild(section);
 
-        // Bind delete button
         section.querySelector(".delete-section-btn").addEventListener("click", () => {
-            this.removeSection(sectionId);
+            this.markSectionDeleted(sectionId);
         });
 
-        // Populate data if provided
-        if (data) {
-            sectionConfig.populate(section, data);
-        }
-
-        // Bind section-specific events
+        if (data) sectionConfig.populate(section, data);
         sectionConfig.bindEvents(section);
 
-        // Store section reference
         this.sections.set(sectionId, {
             element: section,
             type: type,
-            id: sectionId
+            id: sectionId,
+            status: isFromDB ? "existing" : "new"
         });
 
         return { sectionId, element: section };
     },
 
-    addSection(type = null, data = null) {
-        // Check limit
+    addSection(type = null, data = null, isFromDB = false) {
         if (this.sections.size >= this.SECTION_LIMIT) {
             this.showLimitMessage();
             return null;
         }
-
-        const sectionType = type || (this.typeSelector ? this.typeSelector.value : 'text');
-
+        const sectionType = type || (this.typeSelector ? this.typeSelector.value : "text");
         try {
-            return this.createSection(sectionType, data);
+            return this.createSection(sectionType, data, isFromDB);
         } catch (error) {
             console.error("Error creating section:", error);
             return null;
         }
     },
 
-    removeSection(sectionId) {
+    markSectionDeleted(sectionId) {
         const sectionData = this.sections.get(sectionId);
         if (sectionData) {
-            sectionData.element.remove();
-            this.sections.delete(sectionId);
+            sectionData.status = "deleted";
+            sectionData.element.style.display = "none";
+
+            const sectionStatusInput = sectionData.element.querySelector(".section-status");
+            if (sectionStatusInput) sectionStatusInput.value = "deleted";
+
+            sectionData.element.querySelectorAll(".item-status").forEach(input => {
+                input.value = "deleted";
+                const parent = input.closest(".image-item, .menu-item");
+                if (parent) {
+                    parent.dataset.status = "deleted";
+                    parent.style.display = "none";
+                }
+            });
+
+            const textInput = sectionData.element.querySelector(".text-content");
+            if (textInput) {
+                let textStatus = sectionData.element.querySelector(".text-status");
+                if (!textStatus) {
+                    textStatus = document.createElement("input");
+                    textStatus.type = "hidden";
+                    textStatus.className = "text-status";
+                    textStatus.name = `sections[${sectionId}][text_status]`;
+                    sectionData.element.appendChild(textStatus);
+                }
+                textStatus.value = "deleted";
+            }
         }
     },
 
@@ -217,51 +284,91 @@ export const DynamicSectionManager = {
     },
 
     // ================= ITEM MANAGEMENT =================
-    addImageItem(container, url, sectionId, category = "") {
-        const index = container.querySelectorAll(".image-url-input").length;
+    addImageItem(container, url, sectionId, category = "", isFromDB = false, id = 0, status = null) {
+        const index = container.querySelectorAll(".image-item").length;
         const div = document.createElement("div");
-        // div.className = "d-flex align-items-center mb-2";
+        const finalStatus = status || (isFromDB ? "existing" : "new");
+
+        div.classList.add("image-item");
+        div.dataset.status = finalStatus;
+
         div.setAttribute("style", "display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 5px 0px;");
         div.innerHTML = `
-            <img src="${url}" style="width:64px;height:64px;" class="rounded me-2">
-
-            <input type="text" 
-                name="sections[${sectionId}][images][${index}][url]" 
-                value="${url}" 
-                class="image-url-input form-input me-2">
-
-            <select name="sections[${sectionId}][images][${index}][category]" 
-                class="form-input me-2">
+            <img src="${url}" style="width:64px;height:64px;" class="preview-img rounded me-2">
+            <input type="hidden" name="sections[${sectionId}][images][${index}][id]" value="${id}">
+            <input type="text" name="sections[${sectionId}][images][${index}][url]" value="${url}" class="image-url-input form-input me-2">
+            <select name="sections[${sectionId}][images][${index}][category]" class="form-input me-2">
                 <option value="">-- เลือกประเภท --</option>
                 <option value="banner" ${category === "banner" ? "selected" : ""}>Banner</option>
                 <option value="gallery" ${category === "gallery" ? "selected" : ""}>Gallery</option>
                 <option value="thumbnail" ${category === "thumbnail" ? "selected" : ""}>Thumbnail</option>
             </select>
-
+            <input type="hidden" class="item-status" name="sections[${sectionId}][images][${index}][status]" value="${finalStatus}">
             <button type="button" class="delete-item-btn btn btn-sm btn-danger"><i class="bi bi-x"></i></button>
         `;
 
-        div.querySelector(".delete-item-btn").addEventListener("click", () => div.remove());
+        const urlInput = div.querySelector(".image-url-input");
+        const previewImg = div.querySelector(".preview-img");
+
+        // === preview update real-time ===
+        urlInput.addEventListener("input", () => {
+            previewImg.src = urlInput.value || "";
+            markUpdated();
+        });
+
+        // === mark updated on change ===
+        const markUpdated = () => {
+            const statusInput = div.querySelector(".item-status");
+            if (statusInput.value === "existing") {
+                statusInput.value = "updated";
+                div.dataset.status = "updated";
+            }
+        };
+        div.querySelector("select").addEventListener("change", markUpdated);
+
+        div.querySelector(".delete-item-btn").addEventListener("click", () => {
+            div.dataset.status = "deleted";
+            div.querySelector(".item-status").value = "deleted";
+            div.style.display = "none";
+        });
+
         container.appendChild(div);
     },
 
-    addMenuItem(container, label, href, sectionId) {
-        const index = container.querySelectorAll(".menu-label-input").length;
+    addMenuItem(container, label, href, sectionId, isFromDB = false, id = 0, status = null) {
+        const index = container.querySelectorAll(".menu-item").length;
         const div = document.createElement("div");
-        // div.className = "d-flex align-items-center mb-2";
+        const finalStatus = status || (isFromDB ? "existing" : "new");
+
+        div.classList.add("menu-item");
+        div.dataset.status = finalStatus;
+
         div.setAttribute("style", "display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 5px 0px;");
         div.innerHTML = `
-            <input type="text" 
-                name="sections[${sectionId}][menus][${index}][label]" 
-                value="${label}" 
-                class="menu-label-input form-input me-2">
-            <input type="text" 
-                name="sections[${sectionId}][menus][${index}][href]" 
-                value="${href}" 
-                class="menu-href-input form-input me-2">
+            <input type="hidden" name="sections[${sectionId}][menus][${index}][id]" value="${id}">
+            <input type="text" name="sections[${sectionId}][menus][${index}][label]" value="${label}" class="menu-label-input form-input me-2">
+            <input type="text" name="sections[${sectionId}][menus][${index}][href]" value="${href}" class="menu-href-input form-input me-2">
+            <input type="hidden" class="item-status" name="sections[${sectionId}][menus][${index}][status]" value="${finalStatus}">
             <button type="button" class="delete-item-btn btn btn-sm btn-danger"><i class="bi bi-x"></i></button>
         `;
-        div.querySelector(".delete-item-btn").addEventListener("click", () => div.remove());
+
+        // === mark updated on input change ===
+        const markUpdated = () => {
+            const statusInput = div.querySelector(".item-status");
+            if (statusInput.value === "existing") {
+                statusInput.value = "updated";
+                div.dataset.status = "updated";
+            }
+        };
+        div.querySelector(".menu-label-input").addEventListener("input", markUpdated);
+        div.querySelector(".menu-href-input").addEventListener("input", markUpdated);
+
+        div.querySelector(".delete-item-btn").addEventListener("click", () => {
+            div.dataset.status = "deleted";
+            div.querySelector(".item-status").value = "deleted";
+            div.style.display = "none";
+        });
+
         container.appendChild(div);
     },
 
@@ -279,6 +386,48 @@ export const DynamicSectionManager = {
         return Array.from(this.sections.values());
     },
 
+    getFormattedData() {
+        const result = [];
+        this.sections.forEach(section => {
+            const sec = {
+                id: section.element.querySelector(".section-id")?.value || 0,
+                type: section.type,
+                status: section.element.querySelector(".section-status")?.value || section.status,
+                data: {}
+            };
+
+            if (section.type === "image") {
+                sec.data.images = Array.from(section.element.querySelectorAll(".image-item")).map(div => ({
+                    id: div.querySelector("input[name*='[id]']").value,
+                    url: div.querySelector(".image-url-input").value,
+                    category: div.querySelector("select").value,
+                    status: div.querySelector(".item-status").value
+                }));
+            }
+
+            if (section.type === "menu") {
+                sec.data.menus = Array.from(section.element.querySelectorAll(".menu-item")).map(div => ({
+                    id: div.querySelector("input[name*='[id]']").value,
+                    label: div.querySelector(".menu-label-input").value,
+                    href: div.querySelector(".menu-href-input").value,
+                    status: div.querySelector(".item-status").value
+                }));
+            }
+
+            if (section.type === "text") {
+                sec.data.text = section.element.querySelector(".text-content").value;
+                sec.data.id = section.element.querySelector("input[name*='[id]']")?.value || 0;
+                const textStatus = section.element.querySelector(".text-status");
+                if (textStatus) {
+                    sec.data.text_status = textStatus.value;
+                }
+            }
+
+            result.push(sec);
+        });
+        return result;
+    },
+
     getSectionById(sectionId) {
         return this.sections.get(sectionId);
     },
@@ -287,7 +436,6 @@ export const DynamicSectionManager = {
         return this.sections.size;
     },
 
-    // ================= EXTENSION METHODS =================
     addSectionType(typeName, config) {
         if (!config.title || !config.template || !config.populate || !config.bindEvents) {
             throw new Error("Section type config must include: title, template, populate, bindEvents");
@@ -299,7 +447,6 @@ export const DynamicSectionManager = {
         delete this.sectionTypes[typeName];
     },
 
-    // ================= HELPER METHODS =================
     reset() {
         this.removeAllSections();
         this.sectionCounter = 0;

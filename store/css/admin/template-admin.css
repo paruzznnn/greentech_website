@@ -35,6 +35,40 @@ body.is-desktop {
     min-width: 768px !important;
 }
 
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px !important;
+    }
+}
+
+/* md ≥ 768px */
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px !important;
+    }
+}
+
+/* lg ≥ 992px */
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px !important;
+    }
+}
+
+/* xl ≥ 1200px */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px !important;
+    }
+}
+
+/* xxl ≥ 1400px */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px !important;
+    }
+}
+
 h5 {
     color: var(--font-e-store) !important;
 }
