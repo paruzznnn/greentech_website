@@ -126,25 +126,68 @@ $dailyUsersRequest = (new RunReportRequest())
         $countryData[] = (int) $row->getMetricValues()[0]->getValue();
     }
 
+    // เพิ่มส่วนการดึงข้อมูลสินค้าที่ได้รับความนิยมสูงสุด
+$topProductsRequest = (new RunReportRequest())
+    ->setProperty('properties/' . $property_id)
+    ->setDateRanges([
+        new DateRange([
+            'start_date' => '2020-01-01', // กำหนดช่วงเวลาเริ่มต้นให้ครอบคลุมทั้งหมด
+            'end_date' => 'today',
+        ]),
+    ])
+    ->setDimensions([
+        new Dimension(['name' => 'pageTitle']),
+    ])
+    ->setMetrics([
+        new Metric(['name' => 'screenPageViews']),
+    ])
+    ->setDimensionFilter((new \Google\Analytics\Data\V1beta\FilterExpression([
+        'filter' => (new \Google\Analytics\Data\V1beta\Filter([
+            'field_name' => 'pagePath',
+            'string_filter' => (new \Google\Analytics\Data\V1beta\Filter\StringFilter([
+                'match_type' => \Google\Analytics\Data\V1beta\Filter\StringFilter\MatchType::CONTAINS,
+                'value' => 'shop_detail.php',
+            ])),
+        ])),
+    ])))
+    ->setOrderBys([
+        (new OrderBy())->setMetric((new MetricOrderBy())->setMetricName('screenPageViews'))->setDesc(true),
+    ])
+    ->setLimit(10); // จำกัดการแสดงผล 10 อันดับ
+
+$topProductsResponse = $client->runReport($topProductsRequest);
+$topProductsData = [];
+$topProductsLabels = [];
+foreach ($topProductsResponse->getRows() as $row) {
+    $topProductsLabels[] = $row->getDimensionValues()[0]->getValue();
+    $topProductsData[] = (int) $row->getMetricValues()[0]->getValue();
+}
+
     // รวมข้อมูลทั้งหมดใน Array เดียวแล้วส่งกลับเป็น JSON
-    $response = [
-        'daily_users' => [
-            'labels' => $dailyUsersLabels,
-            'data' => $dailyUsersData,
-        ],
-        'top_pages' => [
-            'labels' => $topPagesLabels,
-            'data' => $topPagesData,
-        ],
-        'source' => [
-            'labels' => $sourceLabels,
-            'data' => $sourceData,
-        ],
-        'country' => [
-            'labels' => $countryLabels,
-            'data' => $countryData,
-        ],
-    ];
+    // รวมข้อมูลทั้งหมดใน Array เดียวแล้วส่งกลับเป็น JSON
+$response = [
+    'daily_users' => [
+        'labels' => $dailyUsersLabels,
+        'data' => $dailyUsersData,
+    ],
+    'top_pages' => [
+        'labels' => $topPagesLabels,
+        'data' => $topPagesData,
+    ],
+    'source' => [
+        'labels' => $sourceLabels,
+        'data' => $sourceData,
+    ],
+    'country' => [
+        'labels' => $countryLabels,
+        'data' => $countryData,
+    ],
+    // เพิ่มข้อมูลกราฟใหม่ที่นี่
+    'top_products' => [
+        'labels' => $topProductsLabels,
+        'data' => $topProductsData,
+    ],
+];
 
     header('Content-Type: application/json');
     echo json_encode($response);

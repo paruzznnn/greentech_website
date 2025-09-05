@@ -374,7 +374,37 @@ $currentLang = $translations[$lang];
         margin-top: 0;
         margin-bottom: 20px;
     }
+    .dashboard-card-graph {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        padding: 20px;
+        min-height: 350px;
+    }
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 280px; /* กำหนดความสูงที่แน่นอนเพื่อป้องกันกราฟยืด */
+    }
+    .chart-header {
+        text-align: left;
+        margin-bottom: 10px;
+    }
+    .chart-header h4 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .chart-header p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #777;
+    }
 </style>
+
 </head>
 <?php
 // นับจำนวนแถวทั้งหมดในตาราง mb_comments
@@ -540,27 +570,62 @@ $username = $_SESSION['fullname'] ?? 'Admin';
 <h3 class="mb-5"><?= $currentLang['dashboard_title'] ?></h3>
 
     <div class="row">
-        <div class="col-12 col-lg-6 mb-4">
-            <div class="dashboard-card" style="background-color:#fff;">
-                <canvas id="userChart" style="height: 250px;"></canvas>
+    <div class="col-12 col-md-6 mb-4">
+        <div class="dashboard-card-graph">
+            <div class="chart-header">
+                <h4>Daily Active Users</h4>
+                <p>ข้อมูลผู้ใช้งานรายวันในช่วง 30 วันที่ผ่านมา</p>
             </div>
-        </div>
-        <div class="col-12 col-lg-6 mb-4">
-            <div class="dashboard-card" style="background-color:#fff;">
-                <canvas id="topPagesChart" style="height: 250px;"></canvas>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6 mb-4">
-            <div class="dashboard-card" style="background-color:#fff;">
-                <canvas id="sourceChart" style="height: 250px;"></canvas>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6 mb-4">
-            <div class="dashboard-card" style="background-color:#fff;">
-                <canvas id="countryChart" style="height: 250px;"></canvas>
+            <div class="chart-container">
+                <canvas id="userChart"></canvas>
             </div>
         </div>
     </div>
+      <div class="col-12 col-md-6 mb-4">
+        <div class="dashboard-card-graph">
+            <div class="chart-header">
+                <h4>Top View Products</h4>
+                <p>สินค้าที่มีผู้เข้าชมมากที่สุด</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="topProductsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 mb-4">
+        <div class="dashboard-card-graph">
+            <div class="chart-header">
+                <h4>User Country</h4>
+                <p>จำนวนผู้ใช้งานในแต่ละประเทศ</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="countryChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 mb-4">
+        <div class="dashboard-card-graph">
+            <div class="chart-header">
+                <h4>User Source</h4>
+                <p>ที่มาของผู้ใช้งาน (เช่น Organic, Direct, Referral)</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </div>
+    </div>
+   <div class="col-12 col-md-6 mb-4">
+        <div class="dashboard-card-graph">
+            <div class="chart-header">
+                <h4>Top Pages</h4>
+                <p>10 หน้าที่มีผู้เข้าชมสูงสุด</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="topPagesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="dashboard-layout">
         <!-- <div class="row justify-content-center"> -->
@@ -808,7 +873,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // ฟังก์ชันสำหรับสร้างกราฟ
             function createChart(chartId, chartType, chartData, chartOptions) {
                 const ctx = document.getElementById(chartId);
                 if (ctx) {
@@ -822,37 +886,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // Array ของชุดสีที่คุณต้องการใช้สำหรับแต่ละกราฟ
-            // สามารถเพิ่มหรือเปลี่ยนสีได้ตามต้องการ
+            // ชุดสีใหม่สำหรับสไตล์ Minimalist
             const barColors = [
-                '#336699', // น้ำเงินเข้ม
-                '#99CC33', // เขียว
-                '#FF6633', // ส้ม
-                '#666666', // เทาเข้ม
-                '#339999', // เขียวอมน้ำเงิน
-                '#FFCC00', // เหลือง
-                '#660066', // ม่วง
-                '#A0522D', // น้ำตาล
-                '#8B0000', // แดงเข้ม
-                '#2F4F4F'  // เทาอมเขียว
+                '#588B8B', // เขียวอมเทา
+                '#C8C8A9', // เทาอ่อนอมเหลือง
+                '#F28F3B', // ส้ม
+                '#A24E2E', // น้ำตาลแดง
+                '#686F70', // เทาเข้ม
+                '#4E8975', // เขียวอมน้ำเงิน
+                '#E19D6F', // สีอิฐ
+                '#C4A28A', // เบจอมเทา
+                '#8C6D68', // น้ำตาลอมเทา
+                '#B4B2A8'  // เทาอ่อน
             ];
-
-            // กราฟที่ 1: Daily Active Users
+            
+            // กราฟที่ 1: Daily Active Users (เส้น)
             createChart('userChart', 'line', {
                 labels: data.daily_users.labels,
                 datasets: [{
                     label: 'Active Users (30 days)',
                     data: data.daily_users.data,
-                    fill: false,
-                    borderColor: 'rgb(2, 117, 216)',
-                    tension: 0.1
+                    fill: true,
+                    backgroundColor: 'rgba(88, 139, 139, 0.2)',
+                    borderColor: '#588B8B',
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#588B8B'
                 }]
             }, {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { // เพิ่มส่วนนี้สำหรับชื่อกราฟ
+                        display: true,
+                        text: 'Daily Active Users (30 days)'
                     }
                 }
             });
@@ -863,10 +940,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Top Pages',
                     data: data.top_pages.data,
-                    // กำหนดสีตาม array ที่เตรียมไว้
                     backgroundColor: barColors.slice(0, data.top_pages.data.length),
-                    borderColor: 'rgb(33, 37, 41)', // ใช้สีเดียวเพื่อให้เส้นขอบดูสม่ำเสมอ
-                    borderWidth: 1
                 }]
             }, {
                 responsive: true,
@@ -874,7 +948,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 indexAxis: 'x',
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { // เพิ่มส่วนนี้
+                        display: true,
+                        text: 'Top Pages'
                     }
                 }
             });
@@ -885,10 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'User Source',
                     data: data.source.data,
-                    // กำหนดสีตาม array ที่เตรียมไว้
                     backgroundColor: barColors.slice(0, data.source.data.length),
-                    borderColor: 'rgb(108, 117, 125)',
-                    borderWidth: 1
                 }]
             }, {
                 responsive: true,
@@ -896,7 +978,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 indexAxis: 'x',
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { // เพิ่มส่วนนี้
+                        display: true,
+                        text: 'User Source'
                     }
                 }
             });
@@ -907,10 +1000,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'User Country',
                     data: data.country.data,
-                    // กำหนดสีตาม array ที่เตรียมไว้
                     backgroundColor: barColors.slice(0, data.country.data.length),
-                    borderColor: 'rgb(52, 58, 64)',
-                    borderWidth: 1
                 }]
             }, {
                 responsive: true,
@@ -918,7 +1008,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 indexAxis: 'x',
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { // เพิ่มส่วนนี้
+                        display: true,
+                        text: 'User Country'
+                    }
+                }
+            });
+
+            // กราฟที่ 5: Top Products
+            createChart('topProductsChart', 'bar', {
+                labels: data.top_products.labels,
+                datasets: [{
+                    label: 'Top View Products',
+                    data: data.top_products.data,
+                    backgroundColor: barColors.slice(0, data.top_products.data.length),
+                }]
+            }, {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { // เพิ่มส่วนนี้
+                        display: true,
+                        text: 'Top View Products'
                     }
                 }
             });
