@@ -1936,6 +1936,7 @@ body.modal-open {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
+  gap: 0.7rem;
 }
 
 @media (min-width: 992px) {
@@ -1960,7 +1961,7 @@ body.modal-open {
 .intd-slideshow-wrapper {
   position: relative;
   width: 100%;
-  padding: 1rem;
+  /* padding: 1rem; */
 }
 
 .intd-carousel-container {
@@ -2091,7 +2092,7 @@ body.modal-open {
 
 .intd-right-column {
   width: 100%;
-  padding: 1rem;
+  /* padding: 1rem; */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
