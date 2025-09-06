@@ -42,7 +42,7 @@ export function renderSections(targetId, data) {
     const styledSections = ["section_products", "section_brand"];
     return styledSections.includes(sectionId)
       ? `style="background:#fff;padding:0.5rem;border-radius:3px;"`
-      : "";
+      : `style="background:#fff;padding:0.5rem;border-radius:3px;"`;
   };
 
   const html = data
@@ -617,7 +617,7 @@ export function renderGridCardMD(selector, items, config) {
   container.classList.add("cpd-md-grid");
 
   let currentIndex = 0;
-  const batchSize = 6;
+  const batchSize = 8;
 
   // render เฉพาะ batch (ไม่ render ทั้งหมดทีเดียว)
   function renderBatch() {
@@ -631,10 +631,11 @@ export function renderGridCardMD(selector, items, config) {
       div.classList.add("cpd-md-card");
       div.setAttribute("data-product-id", item.productId);
 
+      // ${true ? `<div class="cpd-md-card-discount">-${10}%</div>` : ""}
+
       div.innerHTML = `
         <div class="cpd-md-card-row img-view-detail">
           <img src="${item.image}" alt="${item.productName}" class="cpd-md-card-image" />
-          ${true ? `<div class="cpd-md-card-discount">-${10}%</div>` : ""}
         </div>
 
         <div class="cpd-md-card-body">

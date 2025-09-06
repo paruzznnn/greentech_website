@@ -309,7 +309,7 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
   }
 
   const defaultMenu = [
-    { 
+    {
       title: "การจัดการเมนู", 
       // link: config.BASE_WEB + "admin/control/", 
       link: '#', 

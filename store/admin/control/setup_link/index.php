@@ -83,21 +83,58 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="link_label" class="form-label">ชื่อเมนู</label>
-                                    <input type="text" id="link_label" name="link_label" class="form-input">
+                                    <div class="form-group">
+                                        <label for="link_label" class="form-label">ชื่อเมนู</label>
+                                        <input type="text" id="link_label" name="link_label" class="form-input">
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="link_path" class="form-label">เส้นทาง (Path)</label>
-                                    <input type="text" id="link_path" name="link_path" class="form-input">
+                                    <div class="form-group">
+                                        <label for="link_path" class="form-label">เส้นทาง (Path)</label>
+                                        <input type="text" id="link_path" name="link_path" class="form-input">
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="link_type" class="form-label">ส่วนเสริม (ประเภท)</label>
-                                    <select id="link_type" class="form-input">
-                                        <option value="">-- เลือกประเภท --</option>
-                                        <option value="image">รูปภาพ</option>
-                                        <option value="menu">เมนู</option>
-                                        <option value="text">ข้อความ</option>
-                                    </select>
+                                    <div class="form-group">
+                                        <label for="link_role" class="form-label">ให้สิทธิเมนูส่วน</label>
+                                        <select id="link_role" name="link_role" class="form-input" required>
+                                            <option value="">-- เลือกสิทธิ --</option>
+                                            <option value="1">แอดมิน</option>
+                                            <option value="2">ผู้ใช้งาน</option>
+                                            <option value="3">ผู้เยี่ยมชม</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="link_comp" class="form-label">ประเภทบริษัท</label>
+                                        <select id="link_comp" name="link_comp" class="form-input" required>
+                                            <option value="">-- เลือกประเภทบริษัท --</option>
+                                            <option value="1">วัสดุก่อสร้าง</option>
+                                            <option value="2">ซอฟต์แวร์</option>
+                                            <option value="3">อาหาร</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="d-flex flex-row-reverse mb-2" style="gap: 1rem">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="open_type" name="open_type"/>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>ต้องการเปิดใช้งานส่วนเสริมหรือไม่</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="display_type" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="link_type" class="form-label">ส่วนเสริม</label>
+                                        <select id="link_type" class="form-input">
+                                            <option value="">-- เลือกส่วนเสริม --</option>
+                                            <option value="image">รูปภาพ</option>
+                                            <option value="menu">เมนู</option>
+                                            <option value="text">ข้อความ</option>
+                                        </select>
+                                    </div>
                                     <div class="mt-2 d-flex justify-content-between">
                                         <span id="limit-message"> สามารถเพิ่มได้สูงสุด 4 ส่วนเท่านั้น</span>
                                         <button type="button" class="btn btn-primary btn-sm" id="add-section-btn">เพิ่ม</button>
@@ -158,6 +195,16 @@
                 $("#targetIconPicker").on("click", e => {
                     e.stopPropagation();
                     $(".iconPicker").toggleClass("d-none");
+                });
+
+                const openType = document.getElementById("open_type");
+                const displayType = document.getElementById("display_type");
+                openType.addEventListener("change", function () {
+                    if (openType.checked) {
+                    displayType.style.display = "block";
+                    } else {
+                    displayType.style.display = "none";
+                    }
                 });
 
                 // ============ MAIN FORM ============

@@ -52,17 +52,17 @@ if ($action == 'getSectionItems') {
             "sort" => 2,
             "req" => "getPopularItems"
         ],
-        [
-            "id" => "section_baner",
-            "class" => "section-space",
-            "title" => "",
-            "detail" => "",
-            "carouselId" => "banner_store",
-            "isSlide" => false,
-            "type" => "bbn",
-            "sort" => 1,
-            "req" => "getBannersItems"
-        ],
+        // [
+        //     "id" => "section_baner",
+        //     "class" => "section-space",
+        //     "title" => "",
+        //     "detail" => "",
+        //     "carouselId" => "banner_store",
+        //     "isSlide" => false,
+        //     "type" => "bbn",
+        //     "sort" => 1,
+        //     "req" => "getBannersItems"
+        // ],
         [
             "id" => "section_product",
             "class" => "section-space",
@@ -71,7 +71,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "carousel_product",
             "isSlide" => true,
             "type" => "crsmd",
-            "sort" => 6,
+            "sort" => 5,
             "req" => "getProductItems"
         ],
         [
@@ -82,7 +82,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "carousel_products",
             "isSlide" => false,
             "type" => "gcmd",
-            "sort" => 5,
+            "sort" => 3,
             "req" => "getProductItems"
         ],
         // [
@@ -103,7 +103,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "introduce_store",
             "isSlide" => false,
             "type" => "intd",
-            "sort" => 3,
+            "sort" => 1,
             "req" => "getIntroItems"
         ],
         [
@@ -116,7 +116,18 @@ if ($action == 'getSectionItems') {
             "type" => "gcsm",
             "sort" => 4,
             "req" => "getBrandItems"
-        ]
+        ],
+        // [
+        //     "id" => "section_baner2",
+        //     "class" => "section-space",
+        //     "title" => "",
+        //     "detail" => "",
+        //     "carouselId" => "banner_store2",
+        //     "isSlide" => false,
+        //     "type" => "bbn",
+        //     "sort" => 7,
+        //     "req" => "getBannersItems2"
+        // ],
     ];
 
     http_response_code(200);
@@ -174,6 +185,28 @@ else if ($action == 'getBannersItems') {
         [
             "path" => $BASE_WEB . "product",
             "image" => "https://www.trandar.com//public/img/687f610c3a362.jpg",
+            "title" => "BEST ACOUSTIC CONSULTANT",
+            "description" => "Inspiration ของ แทรนดาร์ อะคูสติก
+                        คือเราต้องการที่จะยกระดับมาตรฐานทางด้านการออกแบบระบบอะคูสติกให้เทียบเท่ากับต่างประเทศและระดับโลก
+                        <br>Kridsada Satukijchai (CEO)",
+            "buttonText" => "ดูสินค้าเพิ่มเติม"
+        ]
+    ];
+
+    http_response_code(200);
+    $response = [
+        "data" => $data
+    ];
+
+    echo json_encode($response);
+    exit;
+} 
+else if ($action == 'getBannersItems2') {
+
+    $data = [
+        [
+            "path" => $BASE_WEB . "product",
+            "image" => "https://www.trandar.com//public/img/688b3f108a8f9.jpg",
             "title" => "BEST ACOUSTIC CONSULTANT",
             "description" => "Inspiration ของ แทรนดาร์ อะคูสติก
                         คือเราต้องการที่จะยกระดับมาตรฐานทางด้านการออกแบบระบบอะคูสติกให้เทียบเท่ากับต่างประเทศและระดับโลก
