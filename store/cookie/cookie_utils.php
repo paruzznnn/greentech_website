@@ -24,6 +24,15 @@ function getCookieSettings(): array {
     return $arrCookie;
 }
 
+function setVisitorSession() {
+    if (!isset($_COOKIE['visitor_session'])) {
+        $sessionId = bin2hex(random_bytes(16));
+        setcookie('visitor_session', $sessionId, time() + 3600, '/', '', false, true);
+        return $sessionId;
+    }
+    return $_COOKIE['visitor_session'];
+}
+
 function setAutoCookie($cookiePrefs, $jwtData) {
     if (!empty($cookiePrefs)) {
         foreach ($cookiePrefs as $key => $value) {

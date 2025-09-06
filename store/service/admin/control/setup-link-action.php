@@ -50,24 +50,29 @@ $dateNow = date('Y-m-d H:i:s');
 if ($action == 'setupAddLink') {
 
     try {
-        $link_icon  = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : '';
-        $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : '';
-        $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : '';
+        $link_icon  = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : null;
+        $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : null;
+        $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : null;
+
+        $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
+        $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
+        $open_type  = isset($dataJson['open_type']) ? (string) 'Y' : 'N';
 
         $link_data = [
             'link_name' => $link_label,
             'link_url'  => $link_path,
-            'link_icon' => $link_icon
+            'link_icon' => $link_icon,
+            'link_role' => $link_role,
+            'link_comp' => $link_comp,
+            'link_sub_active' => $open_type
         ];
 
         $link_id = insertDataAndGetId($conn_cloudpanel, 'ecm_link', $link_data);
-
         if (empty($link_id)) {
             throw new Exception("ไม่สามารถบันทึก link หลักได้");
         }
 
         $nested = expandFormArray($dataJson);
-
         if (!empty($nested['sections'])) {
             foreach ($nested['sections'] as $sectionId => $section) {
 
@@ -155,9 +160,13 @@ if ($action == 'setupAddLink') {
     try {
 
         $link_id  = isset($dataJson['link_id']) ? (int) $dataJson['link_id'] : 0;
-        $link_icon  = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : '';
-        $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : '';
-        $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : '';
+        $link_icon  = isset($dataJson['link_icon']) ? (string) $dataJson['link_icon'] : null;
+        $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : null;
+        $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : null;
+
+        $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
+        $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
+        $open_type  = isset($dataJson['open_type']) ? (string) 'Y' : 'N';
 
         if (empty($link_id)) {
             throw new Exception("ไม่สามารถบันทึก link หลักได้");
@@ -166,7 +175,10 @@ if ($action == 'setupAddLink') {
         $link_data = [
             'link_name' => $link_label,
             'link_url'  => $link_path,
-            'link_icon' => $link_icon
+            'link_icon' => $link_icon,
+            'link_role' => $link_role,
+            'link_comp' => $link_comp,
+            'link_sub_active' => $open_type
         ];
 
         $conditions = [
@@ -178,7 +190,6 @@ if ($action == 'setupAddLink') {
         }
 
         $nested = expandFormArray($dataJson);
-
         $deleteFlag = ['del' => 1];
 
         if (!empty($nested['sections'])) {
@@ -334,7 +345,6 @@ if ($action == 'setupAddLink') {
                 }
             }
         }
-
 
         http_response_code(200);
         echo json_encode(["status" => true]);

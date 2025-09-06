@@ -1,6 +1,13 @@
 <?php
 @session_start();
 require_once __DIR__ . '/cookie/cookie_utils.php';
+if (isset($_SESSION['user_timezone'])) {
+    date_default_timezone_set($_SESSION['user_timezone']);
+} else {
+    date_default_timezone_set("UTC");
+}
+$timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
+$dateNow = date('Y-m-d H:i:s');
 
 function getBasePath() {
 
@@ -100,6 +107,12 @@ foreach ($ROUTE['controller'] as $value) {
         requireRole($allowedRoles);
     }
 }
+
+// echo $sessionId = setVisitorSession() ."<br>";
+// echo $page = $_SERVER['REQUEST_URI']."<br>";
+// echo $ref = $_SERVER['HTTP_REFERER'] ?? null."<br>";
+// echo $ua = $_SERVER['HTTP_USER_AGENT']."<br>";
+// echo $time = $dateNow."<br>";
 
 echo '
 <script>
