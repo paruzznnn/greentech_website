@@ -118,8 +118,8 @@ export function buildLinkmenu(data, contentArray) {
   const container = document.getElementById("linkContainer");
   if (!container) return;
 
-  const firstFive = data.slice(0, 5);
-  const remaining = data.slice(5);
+  const firstFive = data.slice(0, 7);
+  const remaining = data.slice(7);
 
   container.innerHTML = firstFive.map(item => buildLinkmenuBox(item, contentArray)).join("");
 

@@ -31,14 +31,11 @@ export function renderSections(targetId, data) {
   const createContentHtml = (section) => {
     const titleHtml = section.title ? `<h5>${section.title}</h5>` : "";
     const detailHtml = section.detail ? `<p>${section.detail}</p>` : "";
-    const baseContent = section.isSlide
-      ? `<div id="${section.carouselId}" class="owl-carousel owl-theme"></div>`
-      : `<div id="${section.carouselId}"></div>`;
+    const baseContent = `<div id="${section.carouselId}"></div>`;
     return `${titleHtml}${detailHtml}${baseContent}`;
   };
 
   const getWrapperStyle = (sectionId) => {
-    // section ที่ต้องการกล่องสีขาว border-radius
     const styledSections = ["section_products", "section_brand"];
     return styledSections.includes(sectionId)
       ? `style="background:#fff;padding:0.5rem;border-radius:3px;"`
@@ -63,7 +60,6 @@ export function renderSections(targetId, data) {
 
   document.querySelector(targetId).innerHTML = html;
 }
-
 
 // ---------- RENDER INTRODUCE ----------------
 export function renderIntroduce(containerId, items) {
@@ -341,6 +337,7 @@ function addWishlist(product) {
 
 // ---------- RENDER INTRODUCE ----------------
 
+// ---------- RENDER INDEX --------------------
 export function renderBanners(containerId, banners) {
   const container = document.querySelector(containerId);
   if (!container) {
@@ -375,6 +372,12 @@ export function renderBanners(containerId, banners) {
 
 export function renderCarouselSM(selector, items) {
   const container = document.querySelector(selector);
+
+  // สร้าง div ใหม่สำหรับ owl-carousel
+  const carouselDiv = document.createElement("div");
+  carouselDiv.classList.add("owl-carousel", "owl-theme");
+
+  // เพิ่มแต่ละ item เข้าไปใน carousel
   items.forEach((item) => {
     const div = document.createElement("div");
     div.classList.add("item");
@@ -384,10 +387,14 @@ export function renderCarouselSM(selector, items) {
         <div>${item.title}</div>
       </div>
     `;
-    container.appendChild(div);
+    carouselDiv.appendChild(div);
   });
 
-  $(selector).owlCarousel({
+  // เพิ่ม carouselDiv เข้าไปใน container
+  container.appendChild(carouselDiv);
+
+  // เรียก owlCarousel บน carouselDiv
+  $(carouselDiv).owlCarousel({
     loop: false,
     margin: 10,
     nav: true,
@@ -403,14 +410,16 @@ export function renderCarouselSM(selector, items) {
 
 export function renderCarouselMD(selector, items, config) {
   const container = document.querySelector(selector);
+
+  // สร้าง div ใหม่สำหรับ owl-carousel
+  const carouselDiv = document.createElement("div");
+  carouselDiv.classList.add("owl-carousel", "owl-theme");
+
+  // เพิ่มแต่ละ item ลงใน carouselDiv
   items.forEach((item) => {
     const badgesWithIcon = item.productBadges
       .map((badge) => `<span class="badges-tag">${badge}</span> `)
       .join("");
-
-    // <a href="#"><i class="fa fa-share-alt"></i> Share</a>
-    // <a href="#"><i class="fas fa-copy"></i> Copy URL</a>
-    // /e-store/partner/?id=${1}
 
     const div = document.createElement("div");
     div.classList.add("item");
@@ -425,18 +434,17 @@ export function renderCarouselMD(selector, items, config) {
               </div>
               <div>
                 <strong>${item.compName}</strong>
-                <span>
-                <i class="bi bi-globe-americas"></i>
-                ${item.dateCreated}
-                </span>
+                <span><i class="bi bi-globe-americas"></i> ${item.dateCreated}</span>
               </div>
               <div>
-              <div class="store-card-dropdown">
-                <i class="bi bi-three-dots-vertical"></i>
-                <div class="store-card-dropdown-content">
-                  <a href="https://www.trandar.com/app/index.php" target="_blank"><i class="fas fa-share"></i> เจ้าของสินค้า</a>
+                <div class="store-card-dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                  <div class="store-card-dropdown-content">
+                    <a href="https://www.trandar.com/app/index.php" target="_blank">
+                      <i class="fas fa-share"></i> เจ้าของสินค้า
+                    </a>
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </div>
@@ -445,21 +453,17 @@ export function renderCarouselMD(selector, items, config) {
           </div>
           <div class="store-card-body">
             <div>
-              <span style="font-size: 12px;"><i class="bi bi-layers"></i><span>
+              <span style="font-size: 12px;"><i class="bi bi-layers"></i></span>
               <small style="font-size: 12px;">${item.category}</small>
             </div>
             <strong>${item.productName}</strong>
           </div>
           <ul class="store-list-group">
             <li class="store-list-item">
-              <div class="line-clamp">
-                ${item.productDetail}
-              </div>
+              <div class="line-clamp">${item.productDetail}</div>
             </li>
             <li class="store-list-item">
-              <div>
-                ${badgesWithIcon}
-              </div>
+              <div>${badgesWithIcon}</div>
             </li>
           </ul>
           <div class="store-card-footer">
@@ -482,51 +486,32 @@ export function renderCarouselMD(selector, items, config) {
         </div>
       </div>
     `;
-
-    container.appendChild(div);
+    carouselDiv.appendChild(div);
   });
 
-  container.addEventListener("click", (e) => {
+  // เพิ่ม carouselDiv เข้า container
+  container.appendChild(carouselDiv);
+
+  // จัดการ event click สำหรับ wishlist, cart, view detail
+  carouselDiv.addEventListener("click", (e) => {
+    const itemDiv = e.target.closest(".item");
+    if (!itemDiv) return;
+    const productId = itemDiv.dataset.productId;
+    const product = items.find((i) => i.productId === productId);
 
     if (e.target.closest(".btn-add-wishlist")) {
-      if (config.user) {
-        const itemDiv = e.target.closest(".item");
-        const productId = itemDiv.dataset.productId;
-        const product = items.find((i) => i.productId === productId);
-        if (product) addWishlist(product);
-      } else {
-        document.getElementById("auth-modal").style.display = "flex";
-      }
-    }
-
-    else if (e.target.closest(".btn-add-cart")) {
-      if (config.user) {
-        const itemDiv = e.target.closest(".item");
-        const productId = itemDiv.dataset.productId;
-        const product = items.find((i) => i.productId === productId);
-        if (product) addCart(product);
-      } else {
-        document.getElementById("auth-modal").style.display = "flex";
-      }
-    }
-
-    else if (e.target.closest(".btn-view-detail")) {
-      const itemDiv = e.target.closest(".item");
-      const productId = itemDiv.dataset.productId;
-      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
+      if (config.user && product) addWishlist(product);
+      else document.getElementById("auth-modal").style.display = "flex";
+    } else if (e.target.closest(".btn-add-cart")) {
+      if (config.user && product) addCart(product);
+      else document.getElementById("auth-modal").style.display = "flex";
+    } else if (e.target.closest(".btn-view-detail") || e.target.closest(".img-view-detail")) {
       redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
     }
-
-    else if (e.target.closest(".img-view-detail")) {
-      const itemDiv = e.target.closest(".item");
-      const productId = itemDiv.dataset.productId;
-      // redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId }, '_blank');
-      redirectGet(`${config.BASE_WEB}product/detail/`, { id: productId });
-    }
-
   });
 
-  $(selector).owlCarousel({
+  // เรียก owlCarousel บน carouselDiv
+  $(carouselDiv).owlCarousel({
     loop: false,
     margin: 10,
     nav: true,
@@ -538,34 +523,45 @@ export function renderCarouselMD(selector, items, config) {
       $(event.target).removeClass("owl-drag");
     }
   });
-
 }
 
 export function renderCarouselLG(selector, items) {
   const container = document.querySelector(selector);
+
+  const wrapperDiv = document.createElement("div");
+  wrapperDiv.classList.add("carousel-wrapper");
+
+  const coverDiv = document.createElement("div");
+  coverDiv.classList.add("carousel-left");
+  coverDiv.innerHTML = `<img src="https://www.trandar.com/public/news_img/Cinema-Club-bkk-Joshhotel-768x960.jpg" alt="">`;
+
+  const carouselDiv = document.createElement("div");
+  carouselDiv.classList.add("carousel-right", "owl-carousel", "owl-theme");
+
   items.forEach((item) => {
+
+    console.log('item', item);
+
     const div = document.createElement("div");
     div.classList.add("item");
     div.innerHTML = `
-      <div class="news-card">
-        <div class="news-card-row">
-          <div class="news-card-image">
-            <img src="${item.image}" alt="">
-          </div>
-          <div class="news-card-content">
-            <h5 class="news-card-title">Card title</h5>
-            <p class="news-card-text">
-              This is a wider card with supporting text below as a natural lead-in to additional content.
-            </p>
-            <p class="news-card-updated">Last updated 3 mins ago</p>
-          </div>
-        </div>
+    <div class="custom-card">
+      <img src="${item.image}" class="custom-card-img" alt="">
+      <div class="custom-card-body">
+        <h5 class="custom-card-title">Card title</h5>
+        <p class="custom-card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="#" class="custom-card-btn btn btn-primary">Go somewhere</a>
       </div>
+    </div>
     `;
-    container.appendChild(div);
+    carouselDiv.appendChild(div);
   });
 
-  $(selector).owlCarousel({
+  wrapperDiv.appendChild(coverDiv);
+  wrapperDiv.appendChild(carouselDiv);
+  container.appendChild(wrapperDiv);
+  
+  $(carouselDiv).owlCarousel({
     loop: false,
     margin: 10,
     nav: true,
@@ -579,10 +575,15 @@ export function renderCarouselLG(selector, items) {
   });
 }
 
+
 export function renderGridCardSM(selector, items) {
 
-  // <div>${item.title}</div>
   const container = document.querySelector(selector);
+
+  // สร้าง div ใหม่สำหรับ owl-carousel
+  const carouselDiv = document.createElement("div");
+  carouselDiv.classList.add("owl-carousel", "owl-theme");
+
   items.forEach((item) => {
     const div = document.createElement("div");
     div.classList.add("item");
@@ -593,10 +594,12 @@ export function renderGridCardSM(selector, items) {
       </div>
     </a>
     `;
-    container.appendChild(div);
+    carouselDiv.appendChild(div);
   });
 
-  $(selector).owlCarousel({
+  container.appendChild(carouselDiv);
+
+  $(carouselDiv).owlCarousel({
     loop: false,
     margin: 10,
     nav: true,
@@ -610,7 +613,6 @@ export function renderGridCardSM(selector, items) {
   });
 
 }
-
 
 export function renderGridCardMD(selector, items, config) {
   const container = document.querySelector(selector);
@@ -721,5 +723,5 @@ export function renderGridCardMD(selector, items, config) {
     }
   });
 }
-
+// ---------- RENDER INDEX --------------------
 
