@@ -199,7 +199,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 20px;
-            align-items: start;
+            /* เพิ่ม align-items: stretch; เพื่อให้ทุกกล่องมีความสูงเท่ากัน */
+            align-items: stretch;
         }
 
         /* Styles for Main Category Blocks */
@@ -211,6 +212,9 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             background-color: #fcfcfc;
             cursor: pointer;
             transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            /* เพิ่ม display: flex และ flex-direction: column เพื่อให้ child elements จัดเรียงและยืดตัว */
+            display: flex;
+            flex-direction: column;
         }
 
         /* เพิ่ม z-index และ transform เฉพาะเมื่อบล็อกนั้นถูก active */
@@ -255,10 +259,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             background-color: #f0f0f0;
             border-top: 1px solid #e0e0e0;
             position: relative;
+            /* เพิ่ม min-height เพื่อให้ทุกกล่องมีส่วนนี้สูงเท่ากัน */
+            min-height: 70px;
         }
 
         .main-category-block .block-title-info {
             flex-grow: 1;
+            /* เพิ่ม display: flex, flex-direction: column และ justify-content เพื่อจัดเรียงข้อความให้ชิดบน */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .main-category-block .block-title-info h3 {
@@ -266,6 +276,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             font-weight: bold;
             color: #555;
             margin: 0 0 5px 0;
+            /* เพิ่มความสูงคงที่สำหรับ h3 เพื่อให้บรรทัดไม่เกิน 2 บรรทัด */
+            height: 50px; 
+            overflow: hidden;
+        }
+        
+        /* ใช้ line-clamp สำหรับ h3 ด้วย */
+        .main-category-block .block-title-info h3.line-clamp {
+            -webkit-line-clamp: 2;
         }
 
         .main-category-block .product-count {
@@ -379,6 +397,9 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
             background-color: #fcfcfc;
+            /* เพิ่ม display: flex และ flex-direction: column */
+            display: flex;
+            flex-direction: column;
         }
 
         .box-news:hover {
@@ -405,13 +426,20 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         .box-content {
             padding: 15px;
             background-color: #ffffff;
+            /* เพิ่ม flex-grow: 1 เพื่อให้ส่วนนี้ยืดความสูงเต็มที่ */
+            flex-grow: 1;
+            /* ใช้ Flexbox เพื่อจัดการความสูงของ h5 และ p */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .box-content h5 {
             font-size: 1.1em;
             font-weight: bold;
             margin-bottom: 5px;
-            height: 40px;
+            /* กำหนดความสูงคงที่สำหรับชื่อสินค้า */
+            min-height: 40px; 
             overflow: hidden;
             color: #333;
         }
@@ -419,7 +447,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         .box-content p {
             font-size: 0.9em;
             color: #666;
-            height: 20px;
+            /* กำหนดความสูงคงที่สำหรับคำอธิบายสินค้า */
+            min-height: 20px;
             overflow: hidden;
         }
 
