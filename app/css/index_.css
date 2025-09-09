@@ -86,7 +86,7 @@ body {
 }
 
 .language-select {
-    width: 100px;
+    /* width: 100px; */
     padding: 6px;
     font-size: 15px;
     color: #555;

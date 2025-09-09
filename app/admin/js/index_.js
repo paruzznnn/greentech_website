@@ -1,4 +1,3 @@
-
 /****nationLanguages**** */
 
 function nationLanguages() {
@@ -8,19 +7,36 @@ function nationLanguages() {
         let $select = $('#language-select');
         $select.empty();
 
+        // ✅ แก้ไข: ดึงภาษาปัจจุบันจาก URL parameter ก่อน, ถ้าไม่มีค่อยใช้ localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        let initialLang = urlParams.get('lang') || (localStorage.getItem('language') || 'th');
+        initialLang = initialLang.toLowerCase();
+
+        console.log('initialLang:', initialLang);
+
         $.each(nationalities, function (index, entry) {
             let option = $('<option></option>')
                 .attr('value', entry.abbreviation)
                 .attr('data-flag', entry.flag)
                 .text(entry.name);
 
+            // mark option selected ถ้าตรงกับ initialLang
+            if (entry.abbreviation.toLowerCase() === initialLang) {
+                option.prop('selected', true);
+            }
+
             $select.append(option);
         });
 
-        if (nationalities.length > 0) {
-            $select.val(nationalities[0].abbreviation);
-            updateSelectedLanguageFlag();
+        // ถ้า initialLang จาก URL หรือ localStorage ไม่มีค่า match เลย ให้ fallback เป็น option แรก
+        if ($select.find('option:selected').length === 0 && nationalities.length > 0) {
+            let fallbackLang = nationalities[0].abbreviation;
+            $select.val(fallbackLang);
+            // ✅ บันทึก fallback ลง localStorage ด้วย
+            localStorage.setItem('language', fallbackLang); 
         }
+
+        updateSelectedLanguageFlag();
     });
 }
 
@@ -40,51 +56,48 @@ function updateSelectedLanguageFlag() {
     }
 }
 
-function changeLanguage(lang) {
-    let new_path = $('#new_path').val();
-    fetch(new_path + 'api/languages/' + lang + '.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.querySelectorAll("[data-translate][lang]").forEach(el => {
-                const key = el.getAttribute("data-translate");
 
-                el.textContent = data[key] || el.textContent;
-                // Update the lang attribute to the selected language
-                el.setAttribute('lang', lang);
+// **ฟังก์ชัน changeLanguage ไม่จำเป็นอีกต่อไปสำหรับการแปลแบบ AJAX**
+// **เพราะตอนนี้เราจะรีเฟรชหน้าเว็บแทน**
+// function changeLanguage(lang, updateUrl = true) {
+//     let new_path = $('#new_path').val();
+//     fetch(new_path + 'api/languages/' + lang + '.json')
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             document.querySelectorAll("[data-translate][lang]").forEach(el => {
+//                 const key = el.getAttribute("data-translate");
+//                 el.textContent = data[key] || el.textContent;
+//                 el.setAttribute('lang', lang);
+//             });
+//             // บันทึกภาษาลง local storage
+//             localStorage.setItem('language', lang);
+//             // ถ้า updateUrl เป็น true ก็ให้แก้ไข URL
+//             if (updateUrl) {
+//                 updateUrlWithLanguage(lang);
+//             }
+//         })
+//         .catch(error => console.error('Error loading language file:', error));
+// }
 
-            });
-        })
-        .catch(error => console.error('Error loading language file:', error));
-}
+// **ฟังก์ชัน updateUrlWithLanguage ก็ไม่จำเป็นแล้วเช่นกัน**
+// function updateUrlWithLanguage(lang) {
+//     const url = new URL(window.location.href);
+//     url.searchParams.set('lang', lang);
+//     history.pushState({}, '', url);
+// }
+
 
 /****nationLanguages**** */
 
-// sidebarContent += `
-// <div>
-//     <span style="margin: 0 10px;">
-//         <label class="toggleSwitch nolabel">
-//             <input type="checkbox" id="theme-toggle"/>
-//             <span>
-//                 <span><i class="fas fa-sun"></i></span>
-//                 <span><i class="fas fa-moon"></i></span>
-//             </span>
-//             <a></a>
-//         </label>
-//     </span>
-// </div>
-// `;
-
 const buildTabSidebar = () => {
     let sidebarItems = [];
-
     let currentPath = window.location.pathname;
     let new_path = $('#new_path').val();
-    // ✅ หน้า dashboard ใช้ path เริ่มจาก root ชัวร์ๆ
     if (currentPath.includes('dashboard.php') || currentPath.includes('profile.php')) {
         sidebarPath = new_path + 'app/admin/actions/check_sidebar.php';
     } else {
@@ -97,24 +110,19 @@ const buildTabSidebar = () => {
         dataType: 'json',
         success: function (response) {
             sidebarItems = response.sidebarItems;
-
             let sidebarContent = '<div class="sidebar">';
-
             if (Array.isArray(sidebarItems) && sidebarItems.length > 0) {
                 sidebarItems.sort((a, b) => a.order - b.order).forEach(item => {
                     const itemLink = item.link || '#';
                     const itemToggleClass = `toggle-${item.id}`;
-
                     sidebarContent += `
                         <a href="${itemLink}" class="sidebar-link ${itemToggleClass}" data-href="${itemLink}">
                             <span style="font-size: 14px;">${item.icon}</span> 
                             ${item.label}
                         </a>
                     `;
-
                     if (item.subItems && item.subItems.length > 0) {
                         sidebarContent += `<div class="sub-sidebar ${itemToggleClass}" style="display:none;">`;
-
                         item.subItems.sort((a, b) => a.order - b.order).forEach(subItem => {
                             const subItemLink = subItem.link || '#';
                             sidebarContent += `
@@ -124,36 +132,27 @@ const buildTabSidebar = () => {
                                 </a>
                             `;
                         });
-
                         sidebarContent += '</div>';
                     }
                 });
             }
-
             sidebarContent += `
-                <a href="../logout.php" class="sidebar-link" data-href="">
+                <a href="../index.php" class="sidebar-link" data-href="">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>log out</span>
                 </a>
             `;
-
             sidebarContent += '</div>';
-
             $('#showTabSidebar').html(sidebarContent);
-
-            // จัดการ toggle แสดง/ซ่อน submenu
             $('#showTabSidebar').on('click', '.sidebar-link', function (event) {
                 const itemLink = $(this).data('href');
                 const targetClass = $(this).attr('class').split(' ').find(cls => cls.startsWith('toggle-'));
                 const isActive = $(this).hasClass('active');
                 const $subSidebar = $(`.${targetClass}`);
-
                 if (itemLink === '#') {
                     event.preventDefault();
-
                     $('.sub-sidebar').slideUp(300);
                     $('.sidebar-link').removeClass('active');
-
                     if (!isActive) {
                         $subSidebar.slideDown(300);
                         $(this).addClass('active');
@@ -162,16 +161,12 @@ const buildTabSidebar = () => {
                     window.location.href = itemLink;
                 }
             });
-
-            // ระบบ theme toggle (night mode)
             const $toggleSwitch = $('#theme-toggle');
             const isNightMode = localStorage.getItem('night-mode') === 'true';
-
             if (isNightMode) {
                 $('body').addClass('night-mode');
                 $toggleSwitch.prop('checked', true);
             }
-
             $toggleSwitch.change(function () {
                 if ($(this).is(':checked')) {
                     $('body').addClass('night-mode');
@@ -186,83 +181,21 @@ const buildTabSidebar = () => {
             console.error('เกิดข้อผิดพลาด:', error);
         }
     });
-
 };
 
-
-// function cssResponsiveTable(tableId, headers) {
-
-//     const style = document.createElement('style');
-//     style.type = 'text/css';
-//     let cssContent = `
-//         @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
-//             #${tableId}, #${tableId} thead, #${tableId} tbody, #${tableId} th, #${tableId} td, #${tableId} tr {
-//                 display: block;
-//             }
-
-//             #${tableId} thead tr {
-//                 position: absolute;
-//                 top: -9999px;
-//                 left: -9999px;
-//             }
-
-//             #${tableId} tr {
-//                 margin: 0 0 1rem 0;
-//             }
-
-//             #${tableId} td {
-//                 border: none;
-//                 border-bottom: 1px solid #eee;
-//                 position: relative;
-//                 padding-left: 50%;
-//             }
-
-//             #${tableId} td:before {
-//                 position: absolute;
-//                 top: 0;
-//                 left: 6px;
-//                 width: 45%;
-//                 padding-right: 10px;
-//                 white-space: nowrap;
-//             }
-//     `;
-
-//     headers.forEach((header, index) => {
-//         cssContent += `
-//             #${tableId} td:nth-of-type(${index + 1}):before { content: "${header}"; font-weight: 700; }
-//         `;
-//     });
-
-//     cssContent += ` }`;
-
-//     style.innerHTML = cssContent;
-//     document.head.appendChild(style);
-
-// }
-
-
-
 $(document).ready(function () {
-
     $('#loading-overlay').fadeIn();
     $('#loading-overlay').fadeOut();
-
     buildTabSidebar();
-
     var $sidebar = $('#showTabSidebar');
     $sidebar.hide();
-
     $(".toggle-button").on("click", function () {
-
         $sidebar.toggle();
-
         var iconSidebar = $("#toggleIcon");
-
         var isVisible = $sidebar.is(":visible");
         iconSidebar.toggleClass("fa-bars", !isVisible);
         iconSidebar.toggleClass("fa-times", isVisible);
     });
-
     $(document).on('click', function (event) {
         if (!$(event.target).closest('#showTabSidebar').length && !$(event.target).closest('.toggle-button').length) {
             $sidebar.hide();
@@ -270,22 +203,25 @@ $(document).ready(function () {
         }
     });
 
-
     nationLanguages();
-    const selectedLanguage = localStorage.getItem('language') || 'th';
-    changeLanguage(selectedLanguage);
 
+    // ✅ ส่วนที่แก้ไข: เมื่อเลือกภาษาใหม่ ให้บันทึกและรีเฟรชหน้า
     $('#language-select').on('change', function () {
         const selectedLang = $(this).val().toLowerCase();
-        changeLanguage(selectedLang);
-        updateSelectedLanguageFlag();
+        localStorage.setItem('language', selectedLang); // บันทึกภาษาลง localStorage ทันที
+        
+        // สร้าง URL ใหม่พร้อม parameter 'lang'
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', selectedLang);
+
+        // รีเฟรชหน้าเว็บไปยัง URL ใหม่
+        window.location.href = url.toString();
     });
 
 
     $('.dropdown-btn').on('click', function (event) {
         event.stopPropagation();
         $('.dropdown-content').toggle();
-
         const icon = $(this).find('i');
         if ($('.dropdown-content').is(':visible')) {
             icon.removeClass('fa-caret-up').addClass('fa-caret-down');
@@ -293,19 +229,10 @@ $(document).ready(function () {
             icon.removeClass('fa-caret-down').addClass('fa-caret-up');
         }
     });
-
     $(document).on('click', function (event) {
         if (!$(event.target).closest('.dropdown-content').length && !$(event.target).is('.dropdown-btn')) {
             $('.dropdown-content').hide();
-
             $('.dropdown-btn').find('i').removeClass('fa-caret-down').addClass('fa-caret-up');
         }
     });
-
-
-
 });
-
-
-
-

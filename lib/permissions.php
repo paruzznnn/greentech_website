@@ -1,7 +1,6 @@
 <?php
 function checkPermissions($data)
 {
-
     if(!empty($data)){
         global $conn;
         $sql = "SELECT
@@ -32,14 +31,13 @@ function checkPermissions($data)
             AND acmp.del = ?
         GROUP BY
             mbu.user_id";
-
         $stmt = $conn->prepare($sql);
         if ($stmt === false) {
             echo json_encode(["status" => "error", "message" => "Database error: Unable to prepare statement"]);
             exit();
         }
 
-        $user_id = $data['user_id'];
+        $user_id = (int)$data['user_id'];
         $del = 0;
         $stmt->bind_param("iii", $user_id, $del, $del);
         $stmt->execute();

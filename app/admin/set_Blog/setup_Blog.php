@@ -1,5 +1,102 @@
-<?php 
+<?php
+// เริ่ม session
+session_start();
+
 include '../check_permission.php';
+
+// กำหนดภาษาเริ่มต้นและตรวจสอบค่าใน URL
+$lang = 'th';
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        unset($_SESSION['lang']);
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// สร้าง array สำหรับเก็บข้อความในแต่ละภาษา
+$texts = [
+    'th' => [
+        'title' => 'ตั้งค่าบล็อก',
+        'header' => 'เขียนบล็อก',
+        'cover_photo' => 'รูปหน้าปก',
+        'photo_size' => 'ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px',
+        'subject' => 'หัวข้อ',
+        'description' => 'คำอธิบาย',
+        'content' => 'เนื้อหา',
+        'related_projects' => 'โปรเจกต์ที่เกี่ยวข้อง (เลือกได้หลายโปรเจกต์)',
+        'back_button' => 'ย้อนกลับ',
+        'save_button' => 'บันทึกบล็อก',
+        'summernote_placeholder' => 'กรอกเนื้อหาบล็อก',
+        'select2_placeholder' => 'เลือกโปรเจกต์ที่เกี่ยวข้อง',
+    ],
+    'en' => [
+        'title' => 'Setup Blog',
+        'header' => 'Write Blog',
+        'cover_photo' => 'Cover photo',
+        'photo_size' => 'Recommended image size: width: 350px and height: 250px',
+        'subject' => 'Subject',
+        'description' => 'Description',
+        'content' => 'Content',
+        'related_projects' => 'Related Projects (multiple selections allowed)',
+        'back_button' => 'Back',
+        'save_button' => 'Save Blog',
+        'summernote_placeholder' => 'Enter blog content',
+        'select2_placeholder' => 'Select related projects',
+    ],
+    'cn' => [
+        'title' => '设置博客',
+        'header' => '撰写博客',
+        'cover_photo' => '封面照片',
+        'photo_size' => '推荐图片尺寸：宽度 350px，高度 250px',
+        'subject' => '主题',
+        'description' => '描述',
+        'content' => '内容',
+        'related_projects' => '相关项目（可多选）',
+        'back_button' => '返回',
+        'save_button' => '保存博客',
+        'summernote_placeholder' => '输入博客内容',
+        'select2_placeholder' => '选择相关项目',
+    ],
+    'jp' => [
+        'title' => 'ブログ設定',
+        'header' => 'ブログを書く',
+        'cover_photo' => 'カバー写真',
+        'photo_size' => '推奨画像サイズ：幅350px、高さ250px',
+        'subject' => '件名',
+        'description' => '説明',
+        'content' => '内容',
+        'related_projects' => '関連プロジェクト（複数選択可能）',
+        'back_button' => '戻る',
+        'save_button' => 'ブログを保存',
+        'summernote_placeholder' => 'ブログの内容を入力してください',
+        'select2_placeholder' => '関連プロジェクトを選択',
+    ],
+    'kr' => [
+        'title' => '블로그 설정',
+        'header' => '블로그 쓰기',
+        'cover_photo' => '표지 사진',
+        'photo_size' => '권장 이미지 크기: 너비 350px, 높이 250px',
+        'subject' => '제목',
+        'description' => '설명',
+        'content' => '내용',
+        'related_projects' => '관련 프로젝트 (다중 선택 가능)',
+        'back_button' => '뒤로',
+        'save_button' => '블로그 저장',
+        'summernote_placeholder' => '블로그 내용 입력',
+        'select2_placeholder' => '관련 프로젝트 선택',
+    ],
+];
+
+$current_texts = $texts[$lang];
 
 // ในความเป็นจริงต้องมีการเชื่อมต่อฐานข้อมูลตรงนี้
 // $conn = new mysqli("localhost", "user", "password", "database");
@@ -18,11 +115,11 @@ if ($result_projects->num_rows > 0) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>setup blog</title>
+    <title><?php echo $current_texts['title']; ?></title>
 
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
 
@@ -112,7 +209,7 @@ if ($result_projects->num_rows > 0) {
                 <div class="row">
                     <h4 class="line-ref mb-3">
                         <i class="fa-solid fa-pen-clip"></i>
-                        write blog
+                        <?php echo $current_texts['header']; ?>
                     </h4>
                     
                     <form id="formblog" enctype="multipart/form-data">
@@ -120,8 +217,8 @@ if ($result_projects->num_rows > 0) {
                             <div class="col-md-4">
                                 <div style="margin: 10px;">
                                     <label for="">
-                                        <span>Cover photo</span>:
-                                        <div><span>ขนาดรูปภาพที่เหมาะสม width: 350px และ height: 250px</span></div>
+                                        <span><?php echo $current_texts['cover_photo']; ?></span>:
+                                        <div><span><?php echo $current_texts['photo_size']; ?></span></div>
                                     </label>
                                     <div class="previewContainer">
                                         <img id="previewImage" src="" alt="Image Preview" style="max-width: 100%; display: none;">
@@ -132,13 +229,13 @@ if ($result_projects->num_rows > 0) {
                                 </div>
                                 <div style="margin: 10px;">
                                     <label for="">
-                                        <span>Subject</span>:
+                                        <span><?php echo $current_texts['subject']; ?></span>:
                                     </label>
                                     <input type="text" class="form-control" id="blog_subject" name="blog_subject">
                                 </div>
                                 <div style="margin: 10px;">
                                     <label for="">
-                                        <span>Description</span>:
+                                        <span><?php echo $current_texts['description']; ?></span>:
                                     </label>
                                     <div>
                                         <textarea class="form-control" id="blog_description" name="blog_description"></textarea>
@@ -146,7 +243,7 @@ if ($result_projects->num_rows > 0) {
                                 </div>
                                 
                                 <div style="margin: 10px;">
-                                    <label>โปรเจกต์ที่เกี่ยวข้อง (เลือกได้หลายโปรเจกต์)</label>
+                                    <label><?php echo $current_texts['related_projects']; ?></label>
                                     <select class="form-control select2" multiple="multiple" name="related_projects[]" style="width: 100%;">
                                         <?php foreach ($projects as $project): ?>
                                             <option value="<?= htmlspecialchars($project['project_id']) ?>">
@@ -161,7 +258,7 @@ if ($result_projects->num_rows > 0) {
                                         id="submitAddblog"
                                         class="btn btn-primary">
                                         <i class="fas fa-plus"></i>
-                                        blog
+                                        <?php echo $current_texts['save_button']; ?>
                                     </button>
                                 </div>
                             </div>
@@ -169,12 +266,12 @@ if ($result_projects->num_rows > 0) {
                             <div class="col-md-8">
                                 <div style='margin: 10px; text-align: end;'>
                                     <button type='button' id='backToprojectList' class='btn btn-secondary'> 
-                                        <i class='fas fa-arrow-left'></i> Back 
+                                        <i class='fas fa-arrow-left'></i> <?php echo $current_texts['back_button']; ?>
                                     </button>
                                 </div>
                                 <div style="margin: 10px;">
                                     <label for="">
-                                        <span>Content</span>:
+                                        <span><?php echo $current_texts['content']; ?></span>:
                                     </label>
                                     <div>
                                         <textarea class="form-control summernote" id="summernote" name="blog_content"></textarea>
@@ -195,14 +292,14 @@ if ($result_projects->num_rows > 0) {
     $(document).ready(function() {
         // Init Summernote
         $('#summernote').summernote({
-            placeholder: 'กรอกเนื้อหาโปรเจกต์',
+            placeholder: '<?php echo $current_texts['summernote_placeholder']; ?>',
             tabsize: 2,
             height: 300
         });
 
         // Init Select2
         $('.select2').select2({
-            placeholder: "เลือกโปรเจกต์ที่เกี่ยวข้อง",
+            placeholder: "<?php echo $current_texts['select2_placeholder']; ?>",
             allowClear: true
         });
 

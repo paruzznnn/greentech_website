@@ -1,0 +1,18 @@
+{
+  "th": "Thai",
+  "en": "English",
+  "store": "Home",
+  "product": "Product",
+  "detail": "Detail",
+  "list": "List",
+  "user": "User",
+  "payment": "Payment",
+  "admin": "Admin",
+  "control": "Management",
+  "actions": "Actions",
+  "setup_link": "Setup Menu",
+  "list_link": "List menu",
+  "link_name": "Menu name",
+  "link_url": "Menu path",
+  "link_icon": "Menu icon"
+}

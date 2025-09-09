@@ -1,4 +1,4 @@
-// Function to get a URL parameter (Still useful, so we'll keep it)
+// Function to get a URL parameter
 function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -32,55 +32,58 @@ function closeAllDropdowns() {
     }
 }
 
-/****nationLanguages**** */
-
-function updateSelectedLanguageFlag() {
-    let selectedOption = $('#language-select option:selected');
+// Function to update the selected language flag
+function updateSelectedLanguageFlag(langAbbr) {
+    let selectedOption = $(`#language-select option[value='${langAbbr}']`);
     let flagUrl = selectedOption.data('flag');
 
     if (flagUrl) {
-        // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM ถูกอัปเดตก่อน
-        setTimeout(function() {
-            $('#language-select').css({
-                'background-image': 'url(' + flagUrl + ')',
-                'background-repeat': 'no-repeat',
-                'background-position': 'left 8px center',
-                'background-size': '20px 15px',
-                'padding-left': '30px'
-            });
-        }, 0);
+        $('#language-select').css({
+            'background-image': 'url(' + flagUrl + ')',
+            'background-repeat': 'no-repeat',
+            'background-position': 'left 8px center',
+            'background-size': '20px 15px',
+            'padding-left': '30px'
+        });
     }
 }
 
-function nationLanguages(selectedLang) {
+// Function to populate the language dropdown
+function nationLanguages() {
     $.getJSON("../api/languages/nation.json" + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
         let $select = $('#language-select');
         $select.empty();
 
         $.each(nationalities, function (index, entry) {
-            // Convert abbreviation to lowercase when creating the option
             let abbreviation = entry.abbreviation.toLowerCase();
             let option = $('<option></option>')
-                .attr('value', abbreviation) // ใช้ค่าเป็นตัวพิมพ์เล็ก
+                .attr('value', abbreviation)
                 .attr('data-flag', entry.flag)
                 .text(entry.name);
             $select.append(option);
         });
 
-        let langToSelect = getUrlParameter('lang') || 'th';
+        // Get language from URL or localStorage, default to 'th'
+        let langToSelect = getUrlParameter('lang') || localStorage.getItem('selectedLanguage') || 'th';
+        
         $select.val(langToSelect);
 
-        updateSelectedLanguageFlag(); 
+        // Update the flag and change the language based on the selected value
+        updateSelectedLanguageFlag(langToSelect);
+        changeLanguage(langToSelect);
     });
 }
 
+// Function to change the content's language
 function changeLanguage(lang) {
     const version = Date.now();
     fetch(`../api/languages/${lang}.json?v=${version}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                // If language file not found, fall back to default (e.g., 'th')
+                console.warn(`Language file for '${lang}' not found. Falling back to 'th'.`);
+                return fetch(`../api/languages/th.json?v=${version}`).then(res => res.json());
             }
             return response.json();
         })
@@ -90,12 +93,12 @@ function changeLanguage(lang) {
                 el.textContent = data[key] || el.textContent;
                 el.setAttribute('lang', lang);
             });
+            // Save the selected language to localStorage
+            localStorage.setItem('selectedLanguage', lang);
         })
         .catch(error => console.error('Error loading language file:', error));
 }
 
-
-/****nationLanguages**** */
 
 function setupModal(modalId, btnId, closeClass) {
     var $modal = $('#' + modalId);
@@ -119,31 +122,24 @@ function setupModal(modalId, btnId, closeClass) {
 }
 
 
-
 $(document).ready(function () {
     $('#loading-overlay').fadeIn();
     $('#loading-overlay').fadeOut();
 
-    // Get language from URL parameter, default to 'th'
-    const selectedLanguage = getUrlParameter('lang') || 'th';
-    
     // Set up the language dropdown and flags
-    nationLanguages(selectedLanguage);
+    nationLanguages();
     
-    // Change static text on the page
-    changeLanguage(selectedLanguage);
-
-    // Event handler for language change
     // Event handler for language change
     $('#language-select').on('change', function () {
         const newLang = $(this).val().toLowerCase();
-        // ใช้ตัวแปร langLinks ที่เราสร้างไว้ใน header.php
-        if (langLinks[newLang]) {
-            window.location.href = langLinks[newLang];
-        } else {
-            // Fallback กรณีที่ไม่มีลิงก์สำหรับภาษานั้นๆ
-            window.location.href = window.location.pathname + '?lang=' + newLang;
-        }
+        // Change the language on the current page immediately
+       
+    // สร้าง URL ใหม่ที่มีพารามิเตอร์ lang
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('lang', newLang);
+    
+    // สั่งให้รีโหลดหน้าไปยัง URL ใหม่
+    window.location.href = currentUrl.toString();
     });
 
     setupModal("myModal-sign-in", "myBtn-sign-in", "modal-close-sign-in");
@@ -155,13 +151,6 @@ $(document).ready(function () {
         password.attr('type', type);
         $(this).find('i').toggleClass('fa-eye fa-eye-slash');
     });
-
-    // $('#togglePasswordSignup').on('click', function () {
-    //     const password = $('#signUp_password');
-    //     const type = password.attr('type') === 'password' ? 'text' : 'password';
-    //     password.attr('type', type);
-    //     $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-    // });
 
     $('#loginModal').on('submit', function (event) {
         event.preventDefault();
@@ -185,41 +174,41 @@ $(document).ready(function () {
             success: function (response) {
 
                 if (response.status === "success") {
-    sessionStorage.setItem('jwt', response.jwt);
-    const token = sessionStorage.getItem('jwt');
-    $.ajax({
-        url: 'actions/protected.php',
-        type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + token
-        },
-        success: function(response) {
-            if (response.status === "success") {
-                const roleId = parseInt(response.data.role_id); // แปลงให้ชัวร์
+                    sessionStorage.setItem('jwt', response.jwt);
+                    const token = sessionStorage.getItem('jwt');
+                    $.ajax({
+                        url: 'actions/protected.php',
+                        type: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function(response) {
+                            if (response.status === "success") {
+                                const roleId = parseInt(response.data.role_id); // แปลงให้ชัวร์
 
-                if (roleId === 1) {
-                    window.location.href = 'admin/index.php';
-                } else if (roleId === 2) {
-                    window.location.href = 'editer/index.php';
-                } else if (roleId === 3) {
-                    // viewer: reload หน้าเพื่อให้ header แสดงปุ่ม logout
-                    location.reload(); 
+                                if (roleId === 1) {
+                                    window.location.href = 'admin/index.php';
+                                } else if (roleId === 2) {
+                                    window.location.href = 'editer/index.php';
+                                } else if (roleId === 3) {
+                                    // viewer: reload หน้าเพื่อให้ header แสดงปุ่ม logout
+                                    location.reload();  
+                                } else {
+                                    window.location.href = 'index.php'; // หน้า default
+                                }
+
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Request failed:", status, error);
+                            alert("An error occurred while accessing protected resource.");
+                        }
+                    });
                 } else {
-                    window.location.href = 'index.php'; // หน้า default
+                    alert(response.message);
                 }
-
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Request failed:", status, error);
-            alert("An error occurred while accessing protected resource.");
-        }
-    });
-} else {
-    alert(response.message);
-}
 
             },
             error: function (xhr, status, error) {
@@ -255,7 +244,7 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {
-            
+
                 if (response.status == 'succeed') {
                     $('#loading-overlay').fadeOut();
                     const Toast = Swal.mixin({
@@ -274,7 +263,7 @@ $(document).ready(function () {
                         icon: "success",
                         title: response.message
                     }).then(() => {
-                        window.location.reload(); 
+                        window.location.reload();  
                     });
                 }else{
                     $('#loading-overlay').fadeOut();
@@ -294,7 +283,7 @@ $(document).ready(function () {
                         icon: "error",
                         title: response.message
                     }).then(() => {
-                        // window.location.reload(); 
+                        // window.location.reload();  
                     });
 
                 }
@@ -503,7 +492,7 @@ $(document).ready(function () {
                         icon: "success",
                         title: response.message
                     }).then(() => {
-                        window.location.reload(); 
+                        window.location.reload();  
                     });
                 }else{
                     $('#loading-overlay').fadeOut();
@@ -523,7 +512,7 @@ $(document).ready(function () {
                         icon: "error",
                         title: response.message
                     }).then(() => {
-                        // window.location.reload(); 
+                        // window.location.reload();  
                     });
 
                 }
@@ -538,6 +527,3 @@ $(document).ready(function () {
     });
 
 });
-
-
-

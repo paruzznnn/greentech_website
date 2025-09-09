@@ -94,7 +94,7 @@ function handleFileUpload($files, $is_single_file = false)
         if (isset($files['error']) && (is_array($files['error']) ? $files['error'][0] === UPLOAD_ERR_NO_FILE : $files['error'] === UPLOAD_ERR_NO_FILE)) {
             return [];
         }
-        return [['success' => false, 'error' => 'No files were uploaded or invalid file structure.']];
+        return [['success' => false, 'error' => 'No files were uploaded or invalid file structure.', 'error_en' => 'No files were uploaded or invalid file structure.', 'error_cn' => '未上传文件或文件结构无效.', 'error_jp' => 'ファイルがアップロードされていないか、ファイル構造が無効です。', 'error_kr' => '업로드된 파일이 없거나 파일 구조가 유효하지 않습니다.']];
     }
 
     foreach ($files_to_process['name'] as $key => $fileName) {
@@ -132,6 +132,10 @@ function handleFileUpload($files, $is_single_file = false)
                         'success' => false,
                         'fileName' => $fileName,
                         'error' => 'Error occurred while moving the uploaded file.',
+                        'error_en' => 'Error occurred while moving the uploaded file.',
+                        'error_cn' => '移动上传文件时出错.',
+                        'error_jp' => 'アップロードされたファイルの移動中にエラーが発生しました。',
+                        'error_kr' => '업로드된 파일을 옮기는 중 오류가 발생했습니다.',
                         'php_error' => $files_to_process['error'][$key]
                     ];
                     error_log("File upload failed: " . $files_to_process['error'][$key] . " for " . $fileName);
@@ -140,7 +144,11 @@ function handleFileUpload($files, $is_single_file = false)
                 $uploadResults[] = [
                     'success' => false,
                     'fileName' => $fileName,
-                    'error' => 'Invalid file type or file size exceeds limit.'
+                    'error' => 'Invalid file type or file size exceeds limit.',
+                    'error_en' => 'Invalid file type or file size exceeds limit.',
+                    'error_cn' => '文件类型无效或文件大小超出限制.',
+                    'error_jp' => '無効なファイルタイプまたはファイルサイズが制限を超えています。',
+                    'error_kr' => '유효하지 않은 파일 형식 또는 파일 크기가 제한을 초과했습니다.'
                 ];
             }
         } else {
@@ -148,7 +156,11 @@ function handleFileUpload($files, $is_single_file = false)
                 $uploadResults[] = [
                     'success' => false,
                     'fileName' => $fileName,
-                    'error' => 'Upload error: ' . $files_to_process['error'][$key]
+                    'error' => 'Upload error: ' . $files_to_process['error'][$key],
+                    'error_en' => 'Upload error: ' . $files_to_process['error'][$key],
+                    'error_cn' => '上传错误：' . $files_to_process['error'][$key],
+                    'error_jp' => 'アップロードエラー：' . $files_to_process['error'][$key],
+                    'error_kr' => '업로드 오류: ' . $files_to_process['error'][$key]
                 ];
                 error_log("Upload error for file " . $fileName . ": " . $files_to_process['error'][$key]);
             }
@@ -161,7 +173,7 @@ function handleFileUpload($files, $is_single_file = false)
 
 // --- ส่วนที่เพิ่มใหม่สำหรับ Summernote Callback ---
 if (isset($_POST['action']) && $_POST['action'] == 'upload_image_summernote') {
-    $response = ['status' => 'error', 'message' => ''];
+    $response = ['status' => 'error', 'message' => '', 'message_en' => '', 'message_cn' => '', 'message_jp' => '', 'message_kr' => ''];
     try {
         if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
             throw new Exception("File upload error or no file sent.");
@@ -174,20 +186,28 @@ if (isset($_POST['action']) && $_POST['action'] == 'upload_image_summernote') {
             $response = [
                 'status' => 'success',
                 'url' => $fileInfo['apiPath'],
-                'message' => 'Image uploaded successfully.'
+                'message' => 'Image uploaded successfully.',
+                'message_en' => 'Image uploaded successfully.',
+                'message_cn' => '图片上传成功.',
+                'message_jp' => '画像のアップロードに成功しました。',
+                'message_kr' => '이미지 업로드 성공.'
             ];
         } else {
             throw new Exception("Error processing uploaded file: " . ($fileInfos[0]['error'] ?? 'Unknown error'));
         }
     } catch (Exception $e) {
         $response['message'] = $e->getMessage();
+        $response['message_en'] = $e->getMessage();
+        $response['message_cn'] = '文件上传出错：' . $e->getMessage();
+        $response['message_jp'] = 'ファイルのアップロードエラー：' . $e->getMessage();
+        $response['message_kr'] = '파일 업로드 오류: ' . $e->getMessage();
         error_log("Summernote upload error: " . $e->getMessage());
     }
     echo json_encode($response);
     exit;
 }
 
-$response = array('status' => 'error', 'message' => '');
+$response = array('status' => 'error', 'message' => '', 'message_en' => '', 'message_cn' => '', 'message_jp' => '', 'message_kr' => '');
 
 try {
     if (!isset($_POST['action'])) {
@@ -204,21 +224,42 @@ try {
         $shop_description_en = $_POST['shop_description_en'] ?? '';
         $shop_content_en = $_POST['shop_content_en'] ?? '';
 
+        $shop_subject_cn = $_POST['shop_subject_cn'] ?? '';
+        $shop_description_cn = $_POST['shop_description_cn'] ?? '';
+        $shop_content_cn = $_POST['shop_content_cn'] ?? '';
+        
+        $shop_subject_jp = $_POST['shop_subject_jp'] ?? '';
+        $shop_description_jp = $_POST['shop_description_jp'] ?? '';
+        $shop_content_jp = $_POST['shop_content_jp'] ?? '';
+
+        $shop_subject_kr = $_POST['shop_subject_kr'] ?? '';
+        $shop_description_kr = $_POST['shop_description_kr'] ?? '';
+        $shop_content_kr = $_POST['shop_content_kr'] ?? '';
+
         $current_date = date('Y-m-d H:i:s');
 
-        $stmt = $conn->prepare("INSERT INTO dn_shop (subject_shop, description_shop, content_shop, subject_shop_en, description_shop_en, content_shop_en, date_create, group_id, del) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)");
+        $stmt = $conn->prepare("INSERT INTO dn_shop (subject_shop, description_shop, content_shop, subject_shop_en, description_shop_en, content_shop_en, subject_shop_cn, description_shop_cn, content_shop_cn, subject_shop_jp, description_shop_jp, content_shop_jp, subject_shop_kr, description_shop_kr, content_shop_kr, date_create, group_id, del) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
         if ($stmt === false) {
             throw new Exception("SQL Prepare failed for insert shop: " . $conn->error);
         }
 
         $stmt->bind_param(
-            "sssssssi",
+            "ssssssssssssssisi",
             $shop_subject,
             $shop_description,
             $shop_content,
             $shop_subject_en,
             $shop_description_en,
             $shop_content_en,
+            $shop_subject_cn,
+            $shop_description_cn,
+            $shop_content_cn,
+            $shop_subject_jp,
+            $shop_description_jp,
+            $shop_content_jp,
+            $shop_subject_kr,
+            $shop_description_kr,
+            $shop_content_kr,
             $current_date,
             $group_id
         );
@@ -261,7 +302,7 @@ try {
                 }
             }
         }
-        $response = array('status' => 'success', 'message' => 'Shop added successfully!', 'shop_id' => $new_shop_id);
+        $response = array('status' => 'success', 'message' => 'Shop added successfully!', 'message_en' => 'Shop added successfully!', 'message_cn' => '商品添加成功!', 'message_jp' => '商品の追加に成功しました！', 'message_kr' => '상품이 성공적으로 추가되었습니다!', 'shop_id' => $new_shop_id);
 
     } elseif ($_POST['action'] == 'editshop') {
         $group_id = $_POST['group_id'] ?? null;
@@ -276,6 +317,18 @@ try {
         $shop_description_en = $_POST['shop_description_en'] ?? '';
         $shop_content_en = $_POST['shop_content_en'] ?? '';
 
+        $shop_subject_cn = $_POST['shop_subject_cn'] ?? '';
+        $shop_description_cn = $_POST['shop_description_cn'] ?? '';
+        $shop_content_cn = $_POST['shop_content_cn'] ?? '';
+        
+        $shop_subject_jp = $_POST['shop_subject_jp'] ?? '';
+        $shop_description_jp = $_POST['shop_description_jp'] ?? '';
+        $shop_content_jp = $_POST['shop_content_jp'] ?? '';
+
+        $shop_subject_kr = $_POST['shop_subject_kr'] ?? '';
+        $shop_description_kr = $_POST['shop_description_kr'] ?? '';
+        $shop_content_kr = $_POST['shop_content_kr'] ?? '';
+
         if (empty($shop_array['shop_id'])) {
             throw new Exception("Shop ID is missing for editing.");
         }
@@ -289,7 +342,15 @@ try {
                 subject_shop_en = ?,
                 description_shop_en = ?,
                 content_shop_en = ?,
-                date_create = ?,
+                subject_shop_cn = ?,
+                description_shop_cn = ?,
+                content_shop_cn = ?,
+                subject_shop_jp = ?,
+                description_shop_jp = ?,
+                content_shop_jp = ?,
+                subject_shop_kr = ?,
+                description_shop_kr = ?,
+                content_shop_kr = ?,
                 group_id = ?
                 WHERE shop_id = ?");
 
@@ -301,17 +362,23 @@ try {
         $shop_description = $shop_array['shop_description'];
         $shop_content = $shop_array['shop_content'];
 
-        $current_date = date('Y-m-d H:i:s');
-
         $stmt->bind_param(
-            "sssssssis",
+            "sssssssssssssssii",
             $shop_subject,
             $shop_description,
             $shop_content,
             $shop_subject_en,
             $shop_description_en,
             $shop_content_en,
-            $current_date,
+            $shop_subject_cn,
+            $shop_description_cn,
+            $shop_content_cn,
+            $shop_subject_jp,
+            $shop_description_jp,
+            $shop_content_jp,
+            $shop_subject_kr,
+            $shop_description_kr,
+            $shop_content_kr,
             $group_id,
             $shop_id
         );
@@ -418,7 +485,7 @@ try {
             }
         }
         // --- End Handle content images upload (image_files) ---
-        $response = array('status' => 'success', 'message' => 'Shop updated successfully!');
+        $response = array('status' => 'success', 'message' => 'Shop updated successfully!', 'message_en' => 'Shop updated successfully!', 'message_cn' => '商品更新成功！', 'message_jp' => '商品の更新に成功しました！', 'message_kr' => '상품이 성공적으로 업데이트되었습니다!');
 
     } elseif ($_POST['action'] == 'delshop') {
         $shop_id = $_POST['id'] ?? '';
@@ -457,7 +524,7 @@ try {
             throw new Exception("Execute statement failed for delete shop doc: " . $stmt->error);
         }
 
-        $response = array('status' => 'success', 'message' => 'Shop deleted successfully!');
+        $response = array('status' => 'success', 'message' => 'Shop deleted successfully!', 'message_en' => 'Shop deleted successfully!', 'message_cn' => '商品删除成功！', 'message_jp' => '商品の削除に成功しました！', 'message_kr' => '상품이 성공적으로 삭제되었습니다!');
 
     } elseif ($_POST['action'] == 'getData_shop') {
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
@@ -465,22 +532,39 @@ try {
         $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
         $searchValue = isset($_POST['search']['value']) ? $conn->real_escape_string($_POST['search']['value']) : '';
         
-        $lang = isset($_POST['lang']) && $_POST['lang'] === 'en' ? '_en' : '';
+        $lang = isset($_POST['lang']) ? $_POST['lang'] : '';
+        $subject_col = "subject_shop";
+        $main_group_col = "main_group_name";
+        $sub_group_col = "sub_group_name";
+        
+        if ($lang === 'en') {
+            $subject_col .= "_en";
+            $main_group_col .= "_en";
+            $sub_group_col .= "_en";
+        } elseif ($lang === 'cn') {
+            $subject_col .= "_cn";
+            $main_group_col .= "_cn";
+            $sub_group_col .= "_cn";
+        } elseif ($lang === 'jp') {
+            $subject_col .= "_jp";
+            $main_group_col .= "_jp";
+            $sub_group_col .= "_jp";
+        } elseif ($lang === 'kr') {
+            $subject_col .= "_kr";
+            $main_group_col .= "_kr";
+            $sub_group_col .= "_kr";
+        }
         
         $orderIndex = isset($_POST['order'][0]['column']) ? intval($_POST['order'][0]['column']) : 0;
         $orderDir = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'asc';
 
-        $columns = ["shop_id", "subject_shop{$lang}", "date_create", "main_group_name{$lang}", "sub_group_name{$lang}"];
-        if ($orderIndex >= 0 && $orderIndex < count($columns)) {
-            $orderByColumn = $columns[$orderIndex];
-        } else {
-            $orderByColumn = 'shop_id';
-        }
+        $columns = ["shop_id", "subject_shop", "date_create", "main_group_name", "sub_group_name"];
+        $orderByColumn = $columns[$orderIndex];
 
         $whereClause = "s.del = 0";
 
         if (!empty($searchValue)) {
-            $whereClause .= " AND (s.subject_shop{$lang} LIKE '%$searchValue%' OR sub.group_name{$lang} LIKE '%$searchValue%' OR parent.group_name{$lang} LIKE '%$searchValue%')";
+            $whereClause .= " AND (s.subject_shop LIKE '%$searchValue%' OR s.subject_shop_en LIKE '%$searchValue%' OR s.subject_shop_cn LIKE '%$searchValue%' OR s.subject_shop_jp LIKE '%$searchValue%' OR s.subject_shop_kr LIKE '%$searchValue%' OR sub.group_name LIKE '%$searchValue%' OR sub.group_name_en LIKE '%$searchValue%' OR sub.group_name_cn LIKE '%$searchValue%' OR sub.group_name_jp LIKE '%$searchValue%' OR sub.group_name_kr LIKE '%$searchValue%' OR parent.group_name LIKE '%$searchValue%' OR parent.group_name_en LIKE '%$searchValue%' OR parent.group_name_cn LIKE '%$searchValue%' OR parent.group_name_jp LIKE '%$searchValue%' OR parent.group_name_kr LIKE '%$searchValue%')";
         }
 
         $orderBy = $orderByColumn . " " . $orderDir;
@@ -490,30 +574,45 @@ try {
         $totalRecords = $totalRecordsResult->fetch_row()[0];
 
         $totalFilteredQuery = "SELECT COUNT(s.shop_id)
-                                 FROM dn_shop s
-                                 LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                                 LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                                 WHERE $whereClause";
+                               FROM dn_shop s
+                               LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                               LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                               WHERE $whereClause";
         $totalFilteredResult = $conn->query($totalFilteredQuery);
         $totalFiltered = $totalFilteredResult->fetch_row()[0];
 
         $dataQuery = "SELECT
-                            s.shop_id,
-                            s.subject_shop{$lang} AS subject_shop,
-                            s.date_create,
-                            sub.group_name{$lang} AS sub_group_name,
-                            parent.group_name{$lang} AS main_group_name
-                        FROM dn_shop s
-                        LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
-                        LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
-                        WHERE $whereClause
-                        ORDER BY $orderBy
-                        LIMIT $start, $length";
+                               s.shop_id,
+                               s.subject_shop AS subject_shop,
+                               s.subject_shop_en AS subject_shop_en,
+                               s.subject_shop_cn AS subject_shop_cn,
+                               s.subject_shop_jp AS subject_shop_jp,
+                               s.subject_shop_kr AS subject_shop_kr,
+                               s.date_create,
+                               sub.group_name AS sub_group_name,
+                               sub.group_name_en AS sub_group_name_en,
+                               sub.group_name_cn AS sub_group_name_cn,
+                               sub.group_name_jp AS sub_group_name_jp,
+                               sub.group_name_kr AS sub_group_name_kr,
+                               parent.group_name AS main_group_name,
+                               parent.group_name_en AS main_group_name_en,
+                               parent.group_name_cn AS main_group_name_cn,
+                               parent.group_name_jp AS main_group_name_jp,
+                               parent.group_name_kr AS main_group_name_kr
+                           FROM dn_shop s
+                           LEFT JOIN dn_shop_groups sub ON s.group_id = sub.group_id
+                           LEFT JOIN dn_shop_groups parent ON sub.parent_group_id = parent.group_id
+                           WHERE $whereClause
+                           ORDER BY $orderBy
+                           LIMIT $start, $length";
 
         $dataResult = $conn->query($dataQuery);
         $data = [];
         if ($dataResult) {
             while ($row = $dataResult->fetch_assoc()) {
+                $row['subject_shop_display'] = $row[$subject_col];
+                $row['main_group_name_display'] = $row[$main_group_col];
+                $row['sub_group_name_display'] = $row[$sub_group_col];
                 $data[] = $row;
             }
         } else {
@@ -534,6 +633,10 @@ try {
 } catch (Exception $e) {
     $response['status'] = 'error';
     $response['message'] = $e->getMessage();
+    $response['message_en'] = $e->getMessage();
+    $response['message_cn'] = '操作失败：' . $e->getMessage();
+    $response['message_jp'] = '操作に失敗しました：' . $e->getMessage();
+    $response['message_kr'] = '작업 실패: ' . $e->getMessage();
     error_log("Error in process_shop.php: " . $e->getMessage());
 }
 

@@ -1,19 +1,50 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// เพิ่มโค้ดนี้: รับค่า lang และกำหนดชื่อคอลัมน์ตามภาษา
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
-$subject_col = $lang === 'en' ? 'subject_blog_en' : 'subject_blog';
-$description_col = $lang === 'en' ? 'description_blog_en' : 'description_blog';
-$content_col = $lang === 'en' ? 'content_blog_en' : 'content_blog'; // เผื่อไว้ใช้ในอนาคต
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'cn', 'jp', 'kr'])) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+
+// กำหนดชื่อคอลัมน์ตามภาษาที่เลือก
+$subject_col = 'subject_blog';
+$description_col = 'description_blog';
+$content_col = 'content_blog';
+
+if ($lang === 'en') {
+    $subject_col = 'subject_blog_en';
+    $description_col = 'description_blog_en';
+    $content_col = 'content_blog_en';
+} elseif ($lang === 'cn') {
+    $subject_col = 'subject_blog_cn';
+    $description_col = 'description_blog_cn';
+    $content_col = 'content_blog_cn';
+} elseif ($lang === 'jp') {
+    $subject_col = 'subject_blog_jp';
+    $description_col = 'description_blog_jp';
+    $content_col = 'content_blog_jp';
+} elseif ($lang === 'kr') {
+    $subject_col = 'subject_blog_kr';
+    $description_col = 'description_blog_kr';
+    $content_col = 'content_blog_kr';
+}
 
 // แก้ไข SQL Query ให้ใช้คอลัมน์ตามภาษาที่กำหนด
 $sql = "SELECT 
             dn.Blog_id, 
             dn.{$subject_col} AS subject_Blog, 
             dn.{$description_col} AS description_Blog,
-            dn.content_Blog, 
+            dn.{$content_col} AS content_Blog, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
             GROUP_CONCAT(dnc.api_path) AS pic_path
@@ -27,7 +58,7 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.Blog_id 
         ORDER BY dn.date_create DESC
-        LIMIT 100"; 
+        LIMIT 100";
 // ... โค้ดส่วนอื่น ๆ ที่เหลือ
 
 $result = $conn->query($sql);
@@ -47,7 +78,7 @@ if ($result->num_rows > 0) {
 
         $boxesBlog[] = [
             'id' => $row['Blog_id'],
-            'image' =>  $paths[0],
+            'image' => $paths[0],
             'title' => $row['subject_Blog'],
             'description' => $row['description_Blog'],
             'iframe' => $iframe
@@ -245,14 +276,16 @@ function scrollBlog(direction) {
         <div class="blog-scroll" id="blog-scroll-box">
             <?php foreach ($boxesBlog as $box): ?>
                 <div class="blog-card">
-                        <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
+                    <a href="Blog_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                         <div class="card">
-                            <?php if(empty($box['image'])): ?>
+                            <?php if(!empty($box['iframe'])): ?>
                                 <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="200px" class="note-video-clip" ></iframe>
-                            <?php else: ?>
+                            <?php elseif (!empty($box['image'])): ?>
                                 <div class="card-image-wrapper">
                                     <img src="<?= $box['image'] ?>" class="card-img-top" alt="บทความ <?= htmlspecialchars($box['title']) ?>">
                                 </div>
+                            <?php else: ?>
+                                <div style="width: 100%; height: 100%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc;">No Image</div>
                             <?php endif; ?>
                             <div class="card-body">
                                 <h6 class="card-title"><?= htmlspecialchars($box['title']) ?></h6>

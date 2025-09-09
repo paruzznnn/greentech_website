@@ -9,6 +9,21 @@
             "name": "English",
             "abbreviation": "EN",
             "flag": "https://flagcdn.com/w320/gb.png"
+        },
+        {
+            "name": "Chinese",
+            "abbreviation": "CN",
+            "flag": "https://flagcdn.com/w320/cn.png"
+        },
+        {
+            "name": "Japanese",
+            "abbreviation": "JP",
+            "flag": "https://flagcdn.com/w320/jp.png"
+        },
+        {
+            "name": "Korean",
+            "abbreviation": "KR",
+            "flag": "https://flagcdn.com/w320/kr.png"
         }
     ]
 }

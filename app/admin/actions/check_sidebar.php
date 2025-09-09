@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 header('Content-Type: application/json');
 
 require_once(__DIR__ . '/../../../lib/connect.php');
@@ -11,6 +10,32 @@ global $base_path;
 global $base_path_admin;
 global $isFile; // ดึงตัวแปร isFile ที่ประกาศจาก base_directory.php
 
+if (isset($_SESSION['oid']) && $_SESSION['email'] && !isset($_SESSION['user_id'])) {
+    function getUserFromEmail($conn, $email) {
+        $sql_user = "SELECT `user_id` FROM `mb_user` WHERE `email` = ? LIMIT 1;";
+        $stmt_user = $conn->prepare($sql_user);
+        
+        if ($stmt_user === false) {
+            return '';
+        }
+        
+        $stmt_user->bind_param("s", $email);
+        $stmt_user->execute();
+        $result = $stmt_user->get_result();
+        
+        // Use fetch_assoc() to get a single row as an associative array
+        $userData = $result->fetch_assoc();
+        
+        // Check if a row was returned and if the 'user_id' key exists
+        return (isset($userData['user_id'])) ? $userData['user_id'] : '';
+    }
+    
+    $userId = getUserFromEmail($conn, $_SESSION['email']);
+    
+    if ($userId) {
+        $_SESSION['user_id'] = $userId;
+    }
+}
 $arrPermiss = checkPermissions($_SESSION);
 $allowedMenus = (isset($arrPermiss) && is_array($arrPermiss) && isset($arrPermiss['menus_id'])) 
     ? explode(',', $arrPermiss['menus_id']) 

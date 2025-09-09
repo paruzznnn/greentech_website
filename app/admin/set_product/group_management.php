@@ -1,10 +1,211 @@
 <?php 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 // *** ตรวจสอบ PATH นี้ให้ถูกต้องที่สุด ***
 // สมมติว่า group_management.php อยู่ที่ /admin/set_product/
 // check_permission.php อยู่ที่ /admin/check_permission.php
-// include '../../../lib/connect.php';
-// include '../../../lib/base_directory.php';
+include '../../../lib/connect.php';
+include '../../../lib/base_directory.php';
 include '../check_permission.php';
+
+// ส่วนที่เพิ่ม: ตรวจสอบและกำหนดภาษาจาก URL หรือ Session
+// session_start();
+$lang = 'th'; // กำหนดภาษาเริ่มต้นเป็น 'th'
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['th', 'en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        $_SESSION['lang'] = $newLang;
+        $lang = $newLang;
+    } else {
+        unset($_SESSION['lang']);
+    }
+} else {
+    // ถ้าไม่มี lang ใน URL ให้ใช้ค่าจาก Session หรือค่าเริ่มต้น 'th'
+    if (isset($_SESSION['lang'])) {
+        $lang = $_SESSION['lang'];
+    }
+}
+
+// ส่วนที่เพิ่ม: กำหนดข้อความตามแต่ละภาษา
+$texts = [
+    'page_title' => [
+        'th' => 'จัดการหมวดหมู่สินค้า',
+        'en' => 'Product Category Management',
+        'cn' => '产品分类管理',
+        'jp' => '商品カテゴリー管理',
+        'kr' => '제품 카테고리 관리'
+    ],
+    'manage_categories' => [
+        'th' => 'จัดการหมวดหมู่สินค้า',
+        'en' => 'Manage Product Categories',
+        'cn' => '管理产品分类',
+        'jp' => '商品カテゴリーを管理',
+        'kr' => '제품 카테고리 관리'
+    ],
+    'add_category' => [
+        'th' => 'เพิ่มหมวดหมู่',
+        'en' => 'Add Category',
+        'cn' => '添加分类',
+        'jp' => 'カテゴリーを追加',
+        'kr' => '카테고리 추가'
+    ],
+    'table_id' => [
+        'th' => 'ID',
+        'en' => 'ID',
+        'cn' => 'ID',
+        'jp' => 'ID',
+        'kr' => 'ID'
+    ],
+    'table_image' => [
+        'th' => 'รูปภาพ',
+        'en' => 'Image',
+        'cn' => '图片',
+        'jp' => '画像',
+        'kr' => '이미지'
+    ],
+    'table_category_name' => [
+        'th' => 'ชื่อหมวดหมู่',
+        'en' => 'Category Name',
+        'cn' => '分类名称',
+        'jp' => 'カテゴリー名',
+        'kr' => '카테고리명'
+    ],
+    'table_parent_category' => [
+        'th' => 'หมวดหมู่หลัก',
+        'en' => 'Parent Category',
+        'cn' => '主分类',
+        'jp' => '親カテゴリー',
+        'kr' => '상위 카테고리'
+    ],
+    'table_actions' => [
+        'th' => 'การจัดการ',
+        'en' => 'Actions',
+        'cn' => '操作',
+        'jp' => 'アクション',
+        'kr' => '작업'
+    ],
+    'main_category_label' => [
+        'th' => '- (หมวดหมู่หลัก)',
+        'en' => '- (Main Category)',
+        'cn' => '- (主分类)',
+        'jp' => '- (親カテゴリー)',
+        'kr' => '- (상위 카테고리)'
+    ],
+    'not_found' => [
+        'th' => 'ไม่พบ',
+        'en' => 'Not found',
+        'cn' => '未找到',
+        'jp' => '見つかりません',
+        'kr' => '찾을 수 없음'
+    ],
+    'edit_button' => [
+        'th' => 'แก้ไข',
+        'en' => 'Edit',
+        'cn' => '编辑',
+        'jp' => '編集',
+        'kr' => '수정'
+    ],
+    'delete_button' => [
+        'th' => 'ลบ',
+        'en' => 'Delete',
+        'cn' => '删除',
+        'jp' => '削除',
+        'kr' => '삭제'
+    ],
+    'add_modal_title' => [
+        'th' => 'เพิ่มหมวดหมู่ใหม่',
+        'en' => 'Add New Category',
+        'cn' => '添加新分类',
+        'jp' => '新しいカテゴリーを追加',
+        'kr' => '새 카테고리 추가'
+    ],
+    'edit_modal_title' => [
+        'th' => 'แก้ไขหมวดหมู่',
+        'en' => 'Edit Category',
+        'cn' => '编辑分类',
+        'jp' => 'カテゴリーを編集',
+        'kr' => '카테고리 수정'
+    ],
+    'name_label' => [
+        'th' => 'ชื่อหมวดหมู่',
+        'en' => 'Category Name',
+        'cn' => '分类名称',
+        'jp' => 'カテゴリー名',
+        'kr' => '카테고리명'
+    ],
+    'description_label' => [
+        'th' => 'คำอธิบาย',
+        'en' => 'Description',
+        'cn' => '描述',
+        'jp' => '説明',
+        'kr' => '설명'
+    ],
+    'parent_group_label' => [
+        'th' => 'หมวดหมู่หลัก (ถ้ามี)',
+        'en' => 'Parent Category (optional)',
+        'cn' => '主分类 (可选)',
+        'jp' => '親カテゴリー (オプション)',
+        'kr' => '상위 카테고리 (선택 사항)'
+    ],
+    'select_parent_group' => [
+        'th' => '- เลือกหมวดหมู่หลัก -',
+        'en' => '- Select Parent Category -',
+        'cn' => '- 选择主分类 -',
+        'jp' => '- 親カテゴリーを選択 -',
+        'kr' => '- 상위 카테고리 선택 -'
+    ],
+    'image_label' => [
+        'th' => 'รูปภาพหมวดหมู่ (สำหรับกลุ่มหลักเท่านั้น)',
+        'en' => 'Category Image (for main groups only)',
+        'cn' => '分类图片 (仅限主分类)',
+        'jp' => 'カテゴリー画像 (親グループのみ)',
+        'kr' => '카테고리 이미지 (상위 그룹만)'
+    ],
+    'file_size_info' => [
+        'th' => 'ขนาดไฟล์ไม่เกิน 5MB (JPG, JPEG, PNG, GIF)',
+        'en' => 'File size up to 5MB (JPG, JPEG, PNG, GIF)',
+        'cn' => '文件大小不超过5MB (JPG, JPEG, PNG, GIF)',
+        'jp' => 'ファイルサイズは5MBまで (JPG, JPEG, PNG, GIF)',
+        'kr' => '파일 크기 5MB 이하 (JPG, JPEG, PNG, GIF)'
+    ],
+    'image_placeholder' => [
+        'th' => 'ปล่อยว่างหากไม่ต้องการเปลี่ยนรูปภาพ. ขนาดไฟล์ไม่เกิน 5MB (JPG, JPEG, PNG, GIF)',
+        'en' => 'Leave blank to keep the current image. File size up to 5MB (JPG, JPEG, PNG, GIF)',
+        'cn' => '留空以保留当前图片。文件大小不超过5MB (JPG, JPEG, PNG, GIF)',
+        'jp' => '画像を保持する場合は空白のままにしてください。ファイルサイズは5MBまで (JPG, JPEG, PNG, GIF)',
+        'kr' => '현재 이미지를 유지하려면 비워두십시오. 파일 크기 5MB 이하 (JPG, JPEG, PNG, GIF)'
+    ],
+    'cancel_button' => [
+        'th' => 'ยกเลิก',
+        'en' => 'Cancel',
+        'cn' => '取消',
+        'jp' => 'キャンセル',
+        'kr' => '취소'
+    ],
+    'save_button' => [
+        'th' => 'บันทึก',
+        'en' => 'Save',
+        'cn' => '保存',
+        'jp' => '保存',
+        'kr' => '저장'
+    ],
+    'save_edit_button' => [
+        'th' => 'บันทึกการแก้ไข',
+        'en' => 'Save Changes',
+        'cn' => '保存修改',
+        'jp' => '変更を保存',
+        'kr' => '수정 사항 저장'
+    ]
+];
+
+// ฟังก์ชันสำหรับเรียกใช้ข้อความตามภาษาที่เลือก
+function getTextByLang($key) {
+    global $texts, $lang;
+    return $texts[$key][$lang] ?? $texts[$key]['th'];
+}
 // require_once '../../../inc/connect_db.php'; // เชื่อมต่อฐานข้อมูล
 
 // ตรวจสอบว่าเชื่อมต่อฐานข้อมูลได้หรือไม่ (ถ้า connect_db.php ไม่ได้ die() เมื่อ error)
@@ -20,7 +221,7 @@ $base_url = 'http://localhost/trandar/';
 // ดึงข้อมูลกลุ่มทั้งหมด พร้อมกับฟิลด์ภาษาอังกฤษ
 $main_groups = [];
 $sub_groups = [];
-$sql_groups = "SELECT group_id, group_name, group_name_en, description, description_en, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
+$sql_groups = "SELECT group_id, group_name, group_name_en, group_name_cn, group_name_jp, group_name_kr, description, description_en, description_cn, description_jp, description_kr, parent_group_id, image_path FROM dn_shop_groups WHERE del = '0' ORDER BY parent_group_id ASC, group_name ASC";
 $result_groups = $conn->query($sql_groups);
 
 if ($result_groups) {
@@ -40,12 +241,11 @@ if ($result_groups) {
 ?>
 
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<?= htmlspecialchars($lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการหมวดหมู่สินค้า</title>
-
+    <title><?= getTextByLang('page_title') ?></title>
     <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
@@ -104,7 +304,7 @@ if ($result_groups) {
         .language-switcher img.active {
             border-color: #007bff;
         }
-        .lang-thai-fields, .lang-en-fields {
+        .lang-thai-fields, .lang-en-fields, .lang-cn-fields, .lang-jp-fields, .lang-kr-fields {
             display: none;
         }
     </style>
@@ -119,22 +319,24 @@ if ($result_groups) {
                         <div style="margin: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <h4 class="line-ref">
-                                    <i class="fas fa-layer-group"></i> จัดการหมวดหมู่สินค้า
+                                    <i class="fas fa-layer-group"></i> <?= getTextByLang('manage_categories') ?>
                                 </h4>
                                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addGroupModal">
-                                    <i class="fa-solid fa-plus"></i> เพิ่มหมวดหมู่
+                                    <i class="fa-solid fa-plus"></i> <?= getTextByLang('add_category') ?>
                                 </button>
                             </div>
-
                             <table id="groupsTable" class="table table-hover" style="width:100%;">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>รูปภาพ</th>
-                                        <th>ชื่อหมวดหมู่ (TH)</th>
-                                        <th>ชื่อหมวดหมู่ (EN)</th>
-                                        <th>หมวดหมู่หลัก</th>
-                                        <th>การจัดการ</th>
+                                        <th><?= getTextByLang('table_id') ?></th>
+                                        <th><?= getTextByLang('table_image') ?></th>
+                                        <th><?= getTextByLang('table_category_name') ?> (TH)</th>
+                                        <th><?= getTextByLang('table_category_name') ?> (EN)</th>
+                                        <th><?= getTextByLang('table_category_name') ?> (CN)</th>
+                                        <th><?= getTextByLang('table_category_name') ?> (JP)</th>
+                                        <th><?= getTextByLang('table_category_name') ?> (KR)</th>
+                                        <th><?= getTextByLang('table_parent_category') ?></th>
+                                        <th><?= getTextByLang('table_actions') ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,16 +349,18 @@ if ($result_groups) {
                                         echo '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
-                                        echo '<td>- (หมวดหมู่หลัก)</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_cn']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_jp']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_kr']) . '</td>';
+                                        echo '<td>' . getTextByLang('main_category_label') . '</td>';
                                         echo '<td>';
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> แก้ไข</button>';
-                                        echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_jp'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_kr'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_jp'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_kr'], ENT_QUOTES) . '\', \'main\', \'' . $group['image_path_for_js'] . '\', \'\')"><i class="fas fa-edit"></i> ' . getTextByLang('edit_button') . '</button>';
+                                        echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ' . getTextByLang('delete_button') . '</button>';
                                         echo '</td>';
                                         echo '</tr>';
                                     }
-
                                     foreach ($sub_groups as $group) {
-                                        $parent_name = 'ไม่พบ';
+                                        $parent_name = getTextByLang('not_found');
                                         foreach ($main_groups as $main_g) {
                                             if ($main_g['group_id'] == $group['parent_group_id']) {
                                                 $parent_name = $main_g['group_name'];
@@ -168,10 +372,13 @@ if ($result_groups) {
                                         echo '<td>-</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name']) . '</td>';
                                         echo '<td>' . htmlspecialchars($group['group_name_en']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_cn']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_jp']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($group['group_name_kr']) . '</td>';
                                         echo '<td>' . htmlspecialchars($parent_name) . '</td>';
                                         echo '<td>';
-                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> แก้ไข</button>';
-                                        echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ลบ</button>';
+                                        echo '<button class="btn btn-sm btn-edit me-2" onclick="myApp_editGroup(' . $group['group_id'] . ', \'' . htmlspecialchars($group['group_name'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_jp'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['group_name_kr'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_en'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_cn'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_jp'], ENT_QUOTES) . '\', \'' . htmlspecialchars($group['description_kr'], ENT_QUOTES) . '\', \'sub\', \'\', ' . (is_null($group['parent_group_id']) ? 'null' : htmlspecialchars($group['parent_group_id'])) . ')"><i class="fas fa-edit"></i> ' . getTextByLang('edit_button') . '</button>';
+                                        echo '<button class="btn btn-sm btn-del" onclick="myApp_deleteGroup(' . $group['group_id'] . ')"><i class="fas fa-trash-alt"></i> ' . getTextByLang('delete_button') . '</button>';
                                         echo '</td>';
                                         echo '</tr>';
                                     }
@@ -190,38 +397,73 @@ if ($result_groups) {
             <div class="modal-content">
                 <form id="addGroupForm" enctype="multipart/form-data">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addGroupModalLabel">เพิ่มหมวดหมู่ใหม่</h5>
+                        <h5 class="modal-title" id="addGroupModalLabel"><?= getTextByLang('add_modal_title') ?></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                         <div class="language-switcher mb-3">
+                        <div class="language-switcher mb-3">
                             <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
                             <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
+                            <img src="https://flagcdn.com/w320/cn.png" alt="Chinese" class="lang-flag" data-lang="cn">
+                            <img src="https://flagcdn.com/w320/jp.png" alt="Japanese" class="lang-flag" data-lang="jp">
+                            <img src="https://flagcdn.com/w320/kr.png" alt="Korean" class="lang-flag" data-lang="kr">
                         </div>
-                        <div class="lang-thai-fields" style="display:block;">
-                            <div class="mb-3">
-                                <label for="newGroupName" class="form-label">ชื่อหมวดหมู่ (TH)</label>
-                                <input type="text" class="form-control" id="newGroupName" name="group_name" required>
+                        <div class="lang-fields-container">
+                            <div class="lang-thai-fields" style="display:block;">
+                                <div class="mb-3">
+                                    <label for="newGroupName" class="form-label"><?= getTextByLang('name_label') ?> (TH)</label>
+                                    <input type="text" class="form-control" id="newGroupName" name="group_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newGroupDescription" class="form-label"><?= getTextByLang('description_label') ?> (TH)</label>
+                                    <textarea class="form-control" id="newGroupDescription" name="description" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="newGroupDescription" class="form-label">คำอธิบาย (TH)</label>
-                                <textarea class="form-control" id="newGroupDescription" name="description" rows="3"></textarea>
+                            <div class="lang-en-fields">
+                                <div class="mb-3">
+                                    <label for="newGroupNameEn" class="form-label"><?= getTextByLang('name_label') ?> (EN)</label>
+                                    <input type="text" class="form-control" id="newGroupNameEn" name="group_name_en">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newGroupDescriptionEn" class="form-label"><?= getTextByLang('description_label') ?> (EN)</label>
+                                    <textarea class="form-control" id="newGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="lang-en-fields">
-                            <div class="mb-3">
-                                <label for="newGroupNameEn" class="form-label">ชื่อหมวดหมู่ (EN)</label>
-                                <input type="text" class="form-control" id="newGroupNameEn" name="group_name_en">
+                            <div class="lang-cn-fields">
+                                <div class="mb-3">
+                                    <label for="newGroupNameCn" class="form-label"><?= getTextByLang('name_label') ?> (CN)</label>
+                                    <input type="text" class="form-control" id="newGroupNameCn" name="group_name_cn">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newGroupDescriptionCn" class="form-label"><?= getTextByLang('description_label') ?> (CN)</label>
+                                    <textarea class="form-control" id="newGroupDescriptionCn" name="description_cn" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="newGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
-                                <textarea class="form-control" id="newGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                            <div class="lang-jp-fields">
+                                <div class="mb-3">
+                                    <label for="newGroupNameJp" class="form-label"><?= getTextByLang('name_label') ?> (JP)</label>
+                                    <input type="text" class="form-control" id="newGroupNameJp" name="group_name_jp">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newGroupDescriptionJp" class="form-label"><?= getTextByLang('description_label') ?> (JP)</label>
+                                    <textarea class="form-control" id="newGroupDescriptionJp" name="description_jp" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="lang-kr-fields">
+                                <div class="mb-3">
+                                    <label for="newGroupNameKr" class="form-label"><?= getTextByLang('name_label') ?> (KR)</label>
+                                    <input type="text" class="form-control" id="newGroupNameKr" name="group_name_kr">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newGroupDescriptionKr" class="form-label"><?= getTextByLang('description_label') ?> (KR)</label>
+                                    <textarea class="form-control" id="newGroupDescriptionKr" name="description_kr" rows="3"></textarea>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="newParentGroupId" class="form-label">หมวดหมู่หลัก (ถ้ามี)</label>
+                            <label for="newParentGroupId" class="form-label"><?= getTextByLang('parent_group_label') ?></label>
                             <select class="form-select" id="newParentGroupId" name="parent_group_id">
-                                <option value="">- เลือกหมวดหมู่หลัก -</option>
+                                <option value=""><?= getTextByLang('select_parent_group') ?></option>
                                 <?php
                                 foreach ($main_groups as $main_g) {
                                     echo '<option value="' . $main_g['group_id'] . '">' . htmlspecialchars($main_g['group_name']) . '</option>';
@@ -230,15 +472,15 @@ if ($result_groups) {
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="newGroupImage" class="form-label">รูปภาพหมวดหมู่ (สำหรับกลุ่มหลักเท่านั้น)</label>
+                            <label for="newGroupImage" class="form-label"><?= getTextByLang('image_label') ?></label>
                             <input type="file" class="form-control" id="newGroupImage" name="group_image" accept="image/*">
                             <img id="newGroupImagePreview" src="#" alt="Image Preview" style="display:none; max-width: 150px; margin-top: 10px;">
-                            <small class="text-muted">ขนาดไฟล์ไม่เกิน 5MB (JPG, JPEG, PNG, GIF)</small>
+                            <small class="text-muted"><?= getTextByLang('file_size_info') ?></small>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= getTextByLang('cancel_button') ?></button>
+                        <button type="submit" class="btn btn-primary"><?= getTextByLang('save_button') ?></button>
                     </div>
                 </form>
             </div>
@@ -250,7 +492,7 @@ if ($result_groups) {
             <div class="modal-content">
                 <form id="editGroupForm" enctype="multipart/form-data">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editGroupModalLabel">แก้ไขหมวดหมู่</h5>
+                        <h5 class="modal-title" id="editGroupModalLabel"><?= getTextByLang('edit_modal_title') ?></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -259,34 +501,66 @@ if ($result_groups) {
                         <div class="language-switcher mb-3">
                             <img src="https://flagcdn.com/w320/th.png" alt="Thai" class="lang-flag active" data-lang="th">
                             <img src="https://flagcdn.com/w320/gb.png" alt="English" class="lang-flag" data-lang="en">
+                            <img src="https://flagcdn.com/w320/cn.png" alt="Chinese" class="lang-flag" data-lang="cn">
+                            <img src="https://flagcdn.com/w320/jp.png" alt="Japanese" class="lang-flag" data-lang="jp">
+                            <img src="https://flagcdn.com/w320/kr.png" alt="Korean" class="lang-flag" data-lang="kr">
                         </div>
-
-                        <div class="lang-thai-fields" style="display:block;">
-                            <div class="mb-3">
-                                <label for="editGroupName" class="form-label">ชื่อหมวดหมู่ (TH)</label>
-                                <input type="text" class="form-control" id="editGroupName" name="group_name" required>
+                        <div class="lang-fields-container">
+                            <div class="lang-thai-fields" style="display:block;">
+                                <div class="mb-3">
+                                    <label for="editGroupName" class="form-label"><?= getTextByLang('name_label') ?> (TH)</label>
+                                    <input type="text" class="form-control" id="editGroupName" name="group_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGroupDescription" class="form-label"><?= getTextByLang('description_label') ?> (TH)</label>
+                                    <textarea class="form-control" id="editGroupDescription" name="description" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="editGroupDescription" class="form-label">คำอธิบาย (TH)</label>
-                                <textarea class="form-control" id="editGroupDescription" name="description" rows="3"></textarea>
+                            <div class="lang-en-fields">
+                                <div class="mb-3">
+                                    <label for="editGroupNameEn" class="form-label"><?= getTextByLang('name_label') ?> (EN)</label>
+                                    <input type="text" class="form-control" id="editGroupNameEn" name="group_name_en">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGroupDescriptionEn" class="form-label"><?= getTextByLang('description_label') ?> (EN)</label>
+                                    <textarea class="form-control" id="editGroupDescriptionEn" name="description_en" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="lang-cn-fields">
+                                <div class="mb-3">
+                                    <label for="editGroupNameCn" class="form-label"><?= getTextByLang('name_label') ?> (CN)</label>
+                                    <input type="text" class="form-control" id="editGroupNameCn" name="group_name_cn">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGroupDescriptionCn" class="form-label"><?= getTextByLang('description_label') ?> (CN)</label>
+                                    <textarea class="form-control" id="editGroupDescriptionCn" name="description_cn" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="lang-jp-fields">
+                                <div class="mb-3">
+                                    <label for="editGroupNameJp" class="form-label"><?= getTextByLang('name_label') ?> (JP)</label>
+                                    <input type="text" class="form-control" id="editGroupNameJp" name="group_name_jp">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGroupDescriptionJp" class="form-label"><?= getTextByLang('description_label') ?> (JP)</label>
+                                    <textarea class="form-control" id="editGroupDescriptionJp" name="description_jp" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="lang-kr-fields">
+                                <div class="mb-3">
+                                    <label for="editGroupNameKr" class="form-label"><?= getTextByLang('name_label') ?> (KR)</label>
+                                    <input type="text" class="form-control" id="editGroupNameKr" name="group_name_kr">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGroupDescriptionKr" class="form-label"><?= getTextByLang('description_label') ?> (KR)</label>
+                                    <textarea class="form-control" id="editGroupDescriptionKr" name="description_kr" rows="3"></textarea>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="lang-en-fields">
-                            <div class="mb-3">
-                                <label for="editGroupNameEn" class="form-label">ชื่อหมวดหมู่ (EN)</label>
-                                <input type="text" class="form-control" id="editGroupNameEn" name="group_name_en">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editGroupDescriptionEn" class="form-label">คำอธิบาย (EN)</label>
-                                <textarea class="form-control" id="editGroupDescriptionEn" name="description_en" rows="3"></textarea>
-                            </div>
-                        </div>
-
                         <div class="mb-3" id="editParentGroupContainer">
-                            <label for="editParentGroupId" class="form-label">หมวดหมู่หลัก (ถ้ามี)</label>
+                            <label for="editParentGroupId" class="form-label"><?= getTextByLang('parent_group_label') ?></label>
                             <select class="form-select" id="editParentGroupId" name="parent_group_id">
-                                <option value="">- เลือกหมวดหมู่หลัก -</option>
+                                <option value=""><?= getTextByLang('select_parent_group') ?></option>
                                 <?php
                                 foreach ($main_groups as $main_g) {
                                     echo '<option value="' . $main_g['group_id'] . '">' . htmlspecialchars($main_g['group_name']) . '</option>';
@@ -295,28 +569,28 @@ if ($result_groups) {
                             </select>
                         </div>
                         <div class="mb-3" id="editImageContainer">
-                            <label for="editGroupImage" class="form-label">รูปภาพหมวดหมู่ (สำหรับกลุ่มหลักเท่านั้น)</label>
+                            <label for="editGroupImage" class="form-label"><?= getTextByLang('image_label') ?></label>
                             <input type="file" class="form-control" id="editGroupImage" name="group_image" accept="image/*">
                             <img id="editGroupImagePreview" src="#" alt="Image Preview" style="max-width: 150px; margin-top: 10px; display: none;">
-                            <p class="text-muted mt-2">ปล่อยว่างหากไม่ต้องการเปลี่ยนรูปภาพ. ขนาดไฟล์ไม่เกิน 5MB (JPG, JPEG, PNG, GIF)</p>
+                            <p class="text-muted mt-2"><?= getTextByLang('image_placeholder') ?></p>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                        <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= getTextByLang('cancel_button') ?></button>
+                        <button type="submit" class="btn btn-primary"><?= getTextByLang('save_edit_button') ?></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src='../js/index_.js?v=<?php echo time(); ?>'></script>
+<script src='../js/index_.js?v=<?php echo time(); ?>'></script>
     <script>
         const GLOBAL_APP_BASE_URL = '<?php echo $base_url; ?>';
         const GLOBAL_APP_PLACEHOLDER_IMAGE = GLOBAL_APP_BASE_URL + 'public/img/group_placeholder.jpg';
 
-        window.myApp_editGroup = function(groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId = null) {
-            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupNameEn, description, descriptionEn, groupType, imagePath, parentGroupId });
+        window.myApp_editGroup = function(groupId, groupName, groupNameEn, groupNameCn, groupNameJp, groupNameKr, description, descriptionEn, descriptionCn, descriptionJp, descriptionKr, groupType, imagePath, parentGroupId = null) {
+            console.log("DEBUG: myApp_editGroup called with:", { groupId, groupName, groupNameEn, groupNameCn, groupNameJp, groupNameKr, description, descriptionEn, descriptionCn, descriptionJp, descriptionKr, groupType, imagePath, parentGroupId });
 
             $('#editGroupId').val(groupId);
             $('#editGroupType').val(groupType);
@@ -324,8 +598,14 @@ if ($result_groups) {
             // เติมข้อมูลภาษาไทยและอังกฤษ
             $('#editGroupName').val(groupName);
             $('#editGroupNameEn').val(groupNameEn);
+            $('#editGroupNameCn').val(groupNameCn);
+            $('#editGroupNameJp').val(groupNameJp);
+            $('#editGroupNameKr').val(groupNameKr);
             $('#editGroupDescription').val(description);
             $('#editGroupDescriptionEn').val(descriptionEn);
+            $('#editGroupDescriptionCn').val(descriptionCn);
+            $('#editGroupDescriptionJp').val(descriptionJp);
+            $('#editGroupDescriptionKr').val(descriptionKr);
 
             // Reset image input and preview
             $('#editGroupImage').val('');
@@ -462,13 +742,17 @@ if ($result_groups) {
                     const lang = $(this).data('lang');
                     $(modalId + ' .lang-flag').removeClass('active');
                     $(this).addClass('active');
-
+                    $(modalId + ' .lang-thai-fields, ' + modalId + ' .lang-en-fields, ' + modalId + ' .lang-cn-fields, ' + modalId + ' .lang-jp-fields, ' + modalId + ' .lang-kr-fields').hide();
                     if (lang === 'th') {
                         $(modalId + ' .lang-thai-fields').show();
-                        $(modalId + ' .lang-en-fields').hide();
                     } else if (lang === 'en') {
-                        $(modalId + ' .lang-thai-fields').hide();
                         $(modalId + ' .lang-en-fields').show();
+                    } else if (lang === 'cn') {
+                        $(modalId + ' .lang-cn-fields').show();
+                    } else if (lang === 'jp') {
+                        $(modalId + ' .lang-jp-fields').show();
+                    } else if (lang === 'kr') {
+                        $(modalId + ' .lang-kr-fields').show();
                     }
                 });
             }

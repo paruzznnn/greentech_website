@@ -1,18 +1,34 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์เสมอ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(0);
 require_once(__DIR__ . '/../../../lib/connect.php');
 global $conn;
 
-// ตรวจสอบว่ามีการส่งค่า lang มาหรือไม่ ถ้าไม่มีให้ใช้ 'th' เป็นค่าเริ่มต้น
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'th', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
 
-// สร้างชื่อคอลัมน์ตามภาษาที่เลือก
-$subject_col = $lang === 'en' ? 'subject_project_en' : 'subject_project';
-$description_col = $lang === 'en' ? 'description_project_en' : 'description_project';
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
 
+// ดึงข้อมูลทั้งหมดในทุกภาษาเพื่อความยืดหยุ่นในการแสดงผล
 $sql = "SELECT 
             dn.project_id, 
-            dn.{$subject_col} AS subject_project, 
-            dn.{$description_col} AS description_project,
+            dn.subject_project, 
+            dn.subject_project_en, 
+            dn.subject_project_cn, 
+            dn.subject_project_jp, 
+            dn.subject_project_kr,
+            dn.description_project, 
+            dn.description_project_en,
+            dn.description_project_cn,
+            dn.description_project_jp,
+            dn.description_project_kr,
             dn.content_project, 
             dn.date_create, 
             GROUP_CONCAT(dnc.file_name) AS file_name,
@@ -27,29 +43,35 @@ $sql = "SELECT
             dnc.status = '1'
         GROUP BY dn.project_id 
         ORDER BY dn.date_create DESC
-        LIMIT 10"; // เปลี่ยนเป็น LIMIT 10 เพื่อให้มีข้อมูลสำหรับเลื่อน
+        LIMIT 10";
 
 $result = $conn->query($sql);
 $boxesproject = [];
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        // ใช้ตัวแปรภาษาเพื่อเลือกคอลัมน์ที่ถูกต้อง และใช้ภาษาไทยเป็นค่าสำรอง
+        $subject = $row['subject_project' . ($lang !== 'th' ? '_' . $lang : '')];
+        $description = $row['description_project' . ($lang !== 'th' ? '_' . $lang : '')];
+        $content = $row['content_project' . ($lang !== 'th' ? '_' . $lang : '')];
 
-        $content = $row['content_project'];
+        $subject = !empty($subject) ? $subject : $row['subject_project'];
+        $description = !empty($description) ? $description : $row['description_project'];
+        $content = !empty($content) ? $content : $row['content_project'];
+
         $iframeSrc = null;
         if (preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches)) {
             $iframeSrc = isset($matches[1]) ? explode(',', $matches[1]) : null;
         }
 
-        $paths = explode(',', $row['pic_path']);
-        $files = explode(',', $row['file_name']);
+        $paths = !empty($row['pic_path']) ? explode(',', $row['pic_path']) : [];
         $iframe = isset($iframeSrc[0]) ? $iframeSrc[0] : null;
 
         $boxesproject[] = [
             'id' => $row['project_id'],
-            'image' => $paths[0],
-            'title' => $row['subject_project'],
-            'description' => $row['description_project'],
+            'image' => !empty($paths) ? $paths[0] : null,
+            'title' => $subject,
+            'description' => $description,
             'iframe' => $iframe
         ];
     }
@@ -239,7 +261,7 @@ if ($result->num_rows > 0) {
                         <div class="col-md-3 mb-4 d-flex">
                            <a href="project_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
                                 <div class="project-card d-flex flex-column">
-                                    <?php if (empty($box['image'])): ?>
+                                    <?php if (empty($box['image']) && !empty($box['iframe'])): ?>
                                         <iframe frameborder="0" src="<?= $box['iframe'] ?>" width="100%" height="100%" class="note-video-clip" style="border-radius: 20px 20px 0 0;"></iframe>
                                     <?php else: ?>
                                         <div class="project-image-wrapper">
@@ -249,7 +271,21 @@ if ($result->num_rows > 0) {
                                     <div class="project-body d-flex flex-column">
                                         <h6 class="project-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
                                         <p class="project-text"><?= htmlspecialchars($box['description']) ?></p>
-                                        <span class="learn-more" data-translate="Learnmore" lang="th">Learn more ></span>
+                                        <span class="learn-more">
+                                            <?php 
+                                                if ($lang === 'en') {
+                                                    echo 'Learn more >';
+                                                } elseif ($lang === 'cn') {
+                                                    echo '了解更多 >';
+                                                } elseif ($lang === 'jp') {
+                                                    echo 'もっと見る >';
+                                                } elseif ($lang === 'kr') {
+                                                    echo '더 알아보기 >'; // เพิ่ม kr
+                                                } else {
+                                                    echo 'ดูเพิ่มเติม >';
+                                                }
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
                             </a>

@@ -1,12 +1,38 @@
 <?php
-// ตรวจสอบภาษาจาก URL ถ้ามี `?lang=en` จะกำหนดให้เป็นภาษาอังกฤษ
-// ถ้าไม่มี หรือเป็นค่าอื่น จะกำหนดให้เป็นภาษาไทย
-$lang = isset($_GET['lang']) && $_GET['lang'] === 'en' ? 'en' : 'th';
+// ต้องแน่ใจว่าได้เปิดใช้งาน Session ก่อนการแสดงผลใดๆ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-// กำหนดชื่อคอลัมน์ที่ต้องการดึงข้อมูล
-// ถ้าเป็นภาษาอังกฤษ ($lang === 'en') จะใช้ `subject_news_en`
-// ถ้าเป็นภาษาไทย จะใช้ `subject_news`
-$subjectColumn = ($lang === 'en') ? 'subject_news_en' : 'subject_news';
+// ตรวจสอบภาษาจาก URL
+if (isset($_GET['lang'])) {
+    $supportedLangs = ['en', 'cn', 'jp', 'kr'];
+    $newLang = $_GET['lang'];
+    if (in_array($newLang, $supportedLangs)) {
+        // ถ้าเป็นภาษาที่รองรับ ให้บันทึกใน Session
+        $_SESSION['lang'] = $newLang;
+    } else {
+        // ถ้าเป็นค่าที่ไม่ถูกต้อง ให้ล้างค่าใน Session เพื่อใช้ค่าเริ่มต้น
+        unset($_SESSION['lang']);
+    }
+}
+
+// กำหนดภาษาที่จะใช้งาน
+// ถ้ามีค่าใน Session ให้ใช้ค่าจาก Session
+// ถ้าไม่มี ให้ใช้ค่าเริ่มต้นเป็น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+
+// กำหนดชื่อคอลัมน์ที่ต้องการดึงข้อมูลตามภาษาที่เลือก
+$subjectColumn = 'subject_news';
+if ($lang === 'en') {
+    $subjectColumn = 'subject_news_en';
+} elseif ($lang === 'cn') {
+    $subjectColumn = 'subject_news_cn';
+} elseif ($lang === 'jp') {
+    $subjectColumn = 'subject_news_jp';
+} elseif ($lang === 'kr') {
+    $subjectColumn = 'subject_news_kr';
+}
 
 // ดึงข่าว 3 รายการล่าสุดจาก dn_news
 // require_once('../lib/connect.php'); // ต้องแน่ใจว่าไฟล์นี้มีการเรียกใช้และเชื่อมต่อฐานข้อมูลถูกต้อง
@@ -29,28 +55,120 @@ if (isset($conn)) {
 $isProtocol = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 $isFile = ($isProtocol === 'http') ? '.php' : '';
 
+// ข้อมูลเมนูสำหรับ Navbar ทั้งห้าภาษา
 $navbarItems = [
-    ['icon' => '', 'text' => 'หน้าแรก', 'translate' => 'Home', 'link' => 'index' . $isFile],
-    ['icon' => '', 'text' => 'เกี่ยวกับเรา', 'translate' => 'About_us', 'link' => 'about' . $isFile],
-    ['icon' => '', 'text' => 'บริการ', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
-    ['icon' => '', 'text' => 'สินค้า', 'translate' => 'product', 'link' => 'shop' . $isFile],
-    ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
-    ['icon' => '', 'text' => 'ผลงาน', 'translate' => 'project', 'link' => 'project' . $isFile],
-    ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
-    ['icon' => '', 'text' => 'ข่าว', 'translate' => 'News', 'link' => 'news' . $isFile],
-    ['icon' => '', 'text' => 'ติดต่อเรา', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    'th' => [
+        ['icon' => '', 'text' => 'หน้าแรก', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => 'เกี่ยวกับเรา', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => 'บริการ', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => 'สินค้า', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => 'ผลงาน', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => 'ข่าว', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => 'ติดต่อเรา', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
+    'en' => [
+        ['icon' => '', 'text' => 'Home', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => 'About us', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => 'Service', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => 'Product', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => 'Projects', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => 'Articles', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => 'News', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => 'Contact us', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
+    'cn' => [
+        ['icon' => '', 'text' => '主页', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => '关于我们', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => '服务', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => '产品', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => '项目', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => '文章', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => '新闻', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => '联系我们', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
+    'jp' => [
+        ['icon' => '', 'text' => 'ホームページ', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => '私たちについて', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => 'サービス', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => '製品', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => 'プロジェクト', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => '記事', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => 'ニュース', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => 'お問い合わせ', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
+    'kr' => [
+        ['icon' => '', 'text' => '홈', 'translate' => 'Home', 'link' => 'index' . $isFile],
+        ['icon' => '', 'text' => '회사 소개', 'translate' => 'About_us', 'link' => 'about' . $isFile],
+        ['icon' => '', 'text' => '서비스', 'translate' => 'Service_t', 'link' => 'service' . $isFile],
+        ['icon' => '', 'text' => '제품', 'translate' => 'product', 'link' => 'shop' . $isFile],
+        ['icon' => '', 'text' => 'insul', 'translate' => 'insul', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown3'],
+        ['icon' => '', 'text' => '프로젝트', 'translate' => 'project', 'link' => 'project' . $isFile],
+        ['icon' => '', 'text' => '기사', 'translate' => 'blog', 'link' => '#', 'isDropdown' => true, 'id' => 'dropdown4'],
+        ['icon' => '', 'text' => '뉴스', 'translate' => 'News', 'link' => 'news' . $isFile],
+        ['icon' => '', 'text' => '문의', 'translate' => 'Contact_us', 'link' => 'contact' . $isFile],
+    ],
 ];
 
+// ข้อมูลเมนูย่อย (Dropdown) สำหรับ Navbar ทั้งห้าภาษา
 $dropdownItems = [
     'dropdown3' => [
-        ['icon' => '', 'text' => 'INSUL Software', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
-        ['icon' => '', 'text' => 'Download', 'translate' => 'Download', 'link' => 'Download' . $isFile],
-        ['icon' => '', 'text' => 'Instructions', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        'th' => [
+            ['icon' => '', 'text' => 'INSUL Software', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => 'Download', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => 'Instructions', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
+        'en' => [
+            ['icon' => '', 'text' => 'INSUL Software', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => 'Download', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => 'Instructions', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
+        'cn' => [
+            ['icon' => '', 'text' => 'INSUL 软件', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => '下载', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => '使用说明', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
+        'jp' => [
+            ['icon' => '', 'text' => 'INSUL ソフトウェア', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => 'ダウンロード', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => '説明書', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
+        'kr' => [
+            ['icon' => '', 'text' => 'INSUL 소프트웨어', 'translate' => 'INSUL Software', 'link' => 'INSULSoftware' . $isFile],
+            ['icon' => '', 'text' => '다운로드', 'translate' => 'Download', 'link' => 'Download' . $isFile],
+            ['icon' => '', 'text' => '지침', 'translate' => 'Instructions', 'link' => 'Instructions' . $isFile],
+        ],
     ],
     'dropdown4' => [
-        ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
-        ['icon' => '', 'text' => 'ความรู้ด้านเสียง', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
-        ['icon' => '', 'text' => 'วีดีโอ', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        'th' => [
+            ['icon' => '', 'text' => 'บทความ', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => 'ความรู้ด้านเสียง', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => 'วีดีโอ', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
+        'en' => [
+            ['icon' => '', 'text' => 'Articles', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => 'Acoustics Knowledge', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => 'Video', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
+        'cn' => [
+            ['icon' => '', 'text' => '文章', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => '声学知识', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => '视频', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
+        'jp' => [
+            ['icon' => '', 'text' => '記事', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => '音響知識', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => 'ビデオ', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
+        'kr' => [
+            ['icon' => '', 'text' => '기사', 'translate' => 'blog', 'link' => 'Blog' . $isFile],
+            ['icon' => '', 'text' => '음향 지식', 'translate' => 'Design&Idia', 'link' => 'idia' . $isFile],
+            ['icon' => '', 'text' => '비디오', 'translate' => 'video', 'link' => 'Video' . $isFile],
+        ],
     ],
 ];
 ?>
@@ -264,7 +382,7 @@ a {
 <div class="navbar-desktop">
     <div class="container">
         <div class="desktop-menu-container">
-            <?php foreach ($navbarItems as $item): ?>
+            <?php foreach ($navbarItems[$lang] as $item): ?>
                 <?php if (isset($item['isDropdown']) && $item['isDropdown']): ?>
                     <div class="desktop-menu-item" style="text-decoration: none;">
                         <a href ="<?php echo $item['link']; ?>" style="text-decoration: none;">
@@ -276,7 +394,7 @@ a {
                             </span>
                         </a>
                         <div class="desktop-dropdown-content">
-                            <?php foreach ($dropdownItems[$item['id']] as $dropdownItem): ?>
+                            <?php foreach ($dropdownItems[$item['id']][$lang] as $dropdownItem): ?>
                                 <a href="<?php echo $dropdownItem['link']; ?>">
                                     <i class="<?php echo $dropdownItem['icon']; ?>"></i>
                                     <span data-translate="<?php echo $dropdownItem['translate']; ?>" lang="th">
@@ -331,11 +449,21 @@ document.addEventListener('click', function(event) {
 </script>
 
 <div id="navbar-news">
-    <div style="margin-left:10%;">
+    <div style="margin-left:5%;">
         <div class="news-ticker">
             <span class="text-ticker">
                 <span class="blinking-icon"></span>
-                <?= $lang === 'en' ? 'Daily News' : 'ข่าวประจำวัน'; ?>
+                <?php
+                // แสดงข้อความ "ข่าวประจำวัน" ตามภาษาที่เลือก
+                $newsText = [
+                    'th' => 'ข่าวประจำวัน',
+                    'en' => 'Daily News',
+                    'cn' => '每日新闻',
+                    'jp' => 'デイリーニュース',
+                    'kr' => '일일 뉴스'
+                ];
+                echo $newsText[$lang] ?? 'ข่าวประจำวัน'; // ใช้ ?? เพื่อป้องกัน error ถ้า $lang ไม่มีค่า
+                ?>
             </span>
             <marquee id="newsMarquee" scrollamount="4" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
                 <div id="newsMarquee-link" style="display: inline;">

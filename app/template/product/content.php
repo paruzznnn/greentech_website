@@ -1,4 +1,9 @@
 <?php
+// เริ่มการใช้งาน Session ต้องอยู่บรรทัดแรกสุดของไฟล์เสมอ
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // ตรวจสอบว่าได้มีการเชื่อมต่อฐานข้อมูลและตัวแปร $conn พร้อมใช้งานแล้ว
 if (!isset($conn)) {
     $conn = new mysqli('localhost', 'user', 'password', 'database');
@@ -7,14 +12,23 @@ if (!isset($conn)) {
     }
 }
 
-// 1. กำหนดตัวแปรภาษา
-$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'th']) ? $_GET['lang'] : 'th';
+// --- ส่วนที่แก้ไข: จัดการภาษาด้วย Session ---
+// 1. ตรวจสอบพารามิเตอร์ lang ใน URL และบันทึกใน Session
+$supportedLangs = ['en', 'th', 'cn', 'jp', 'kr'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supportedLangs)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// 2. กำหนดค่า lang จาก Session หรือค่าเริ่มต้น 'th'
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th';
+// --- สิ้นสุดส่วนที่แก้ไข ---
+
 
 // 2. สร้างตัวแปรสำหรับชื่อคอลัมน์
-$subject_col = ($lang === 'en') ? 'subject_shop_en' : 'subject_shop';
-$description_col = ($lang === 'en') ? 'description_shop_en' : 'description_shop';
-$content_col = ($lang === 'en') ? 'content_shop_en' : 'content_shop';
-$group_name_col = ($lang === 'en') ? 'group_name_en' : 'group_name';
+$subject_col = 'subject_shop' . ($lang !== 'th' ? '_' . $lang : '');
+$description_col = 'description_shop' . ($lang !== 'th' ? '_' . $lang : '');
+$content_col = 'content_shop' . ($lang !== 'th' ? '_' . $lang : '');
+$group_name_col = 'group_name' . ($lang !== 'th' ? '_' . $lang : '');
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 $selectedGroupId = isset($_GET['group_id']) ? (int)$_GET['group_id'] : 0;
@@ -23,16 +37,36 @@ $selectedSubGroupId = isset($_GET['sub_group_id']) ? (int)$_GET['sub_group_id'] 
 $allProductsData = [];
 $sqlAllProducts = "SELECT
     dn.shop_id,
-    dn.$subject_col AS subject_shop,
-    dn.$description_col AS description_shop,
-    dn.$content_col AS content_shop,
+    dn.subject_shop,
+    dn.subject_shop_en,
+    dn.subject_shop_cn,
+    dn.subject_shop_jp,
+    dn.subject_shop_kr,
+    dn.description_shop,
+    dn.description_shop_en,
+    dn.description_shop_cn,
+    dn.description_shop_jp,
+    dn.description_shop_kr,
+    dn.content_shop,
+    dn.content_shop_en,
+    dn.content_shop_cn,
+    dn.content_shop_jp,
+    dn.content_shop_kr,
     dn.date_create,
     dn.group_id,
     sub_group.group_id AS sub_group_id,
-    sub_group.$group_name_col AS sub_group_name,
+    sub_group.group_name,
+    sub_group.group_name_en,
+    sub_group.group_name_cn,
+    sub_group.group_name_jp,
+    sub_group.group_name_kr,
     sub_group.parent_group_id,
     main_group.group_id AS main_group_id,
-    main_group.$group_name_col AS main_group_name,
+    main_group.group_name AS main_group_name,
+    main_group.group_name_en AS main_group_name_en,
+    main_group.group_name_cn AS main_group_name_cn,
+    main_group.group_name_jp AS main_group_name_jp,
+    main_group.group_name_kr AS main_group_name_kr,
     main_group.image_path AS main_group_image_path,
     (SELECT dnc.api_path FROM dn_shop_doc dnc WHERE dnc.shop_id = dn.shop_id AND dnc.del = '0' AND dnc.status = '1' ORDER BY dnc.id ASC LIMIT 1) AS first_image_path
 FROM dn_shop dn
@@ -42,8 +76,8 @@ WHERE dn.del = '0' AND sub_group.parent_group_id IS NOT NULL";
 
 if ($searchQuery) {
     $safeQuery = $conn->real_escape_string($searchQuery);
-    // ปรับปรุงการค้นหาให้ครอบคลุมคอลัมน์ภาษาอังกฤษด้วย
-    $sqlAllProducts .= " AND (dn.$subject_col LIKE '%$safeQuery%' OR dn.$description_col LIKE '%$safeQuery%')";
+    // ปรับปรุงการค้นหาให้ครอบคลุมทุกคอลัมน์ภาษา
+    $sqlAllProducts .= " AND (dn.subject_shop LIKE '%$safeQuery%' OR dn.subject_shop_en LIKE '%$safeQuery%' OR dn.subject_shop_cn LIKE '%$safeQuery%' OR dn.subject_shop_jp LIKE '%$safeQuery%' OR dn.subject_shop_kr LIKE '%$safeQuery%' OR dn.description_shop LIKE '%$safeQuery%' OR dn.description_shop_en LIKE '%$safeQuery%' OR dn.description_shop_cn LIKE '%$safeQuery%' OR dn.description_shop_jp LIKE '%$safeQuery%' OR dn.description_shop_kr LIKE '%$safeQuery%')";
 }
 
 if ($selectedSubGroupId > 0) {
@@ -66,10 +100,10 @@ if ($resultAllProducts && $resultAllProducts->num_rows > 0) {
 $organizedGroups = [];
 foreach ($allProductsData as $product) {
     $mainGroupId = $product['main_group_id'];
-    $mainGroupName = $product['main_group_name'];
+    $mainGroupName = $product['main_group_name' . ($lang !== 'th' ? '_' . $lang : '')];
     $mainGroupImage = $product['main_group_image_path'];
     $subGroupId = $product['sub_group_id'];
-    $subGroupName = $product['sub_group_name'];
+    $subGroupName = $product['group_name' . ($lang !== 'th' ? '_' . $lang : '')];
 
     if (!$mainGroupId || !$subGroupId) continue;
 
@@ -94,9 +128,9 @@ foreach ($allProductsData as $product) {
     $organizedGroups[$mainGroupId]['total_products']++;
     $organizedGroups[$mainGroupId]['sub_groups'][$subGroupId]['products'][] = [
         'id' => $product['shop_id'],
-        'title' => $product['subject_shop'],
-        'description' => $product['description_shop'],
-        'iframe' => preg_match('/<iframe.*?src=[\"\'](.*?)[\"\'].*?>/i', $product['content_shop'], $matches) ? $matches[1] : null,
+        'title' => $product['subject_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['subject_shop'],
+        'description' => $product['description_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['description_shop'],
+        'iframe' => preg_match('/<iframe.*?src=[\"\'](.*?)[\"\'].*?>/i', $product['content_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['content_shop'], $matches) ? $matches[1] : null,
         'image' => $product['first_image_path']
     ];
 }
@@ -114,9 +148,12 @@ $finalDisplayItems = array_values($organizedGroups);
 if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
     $tempDisplayItems = [];
     foreach ($allProductsData as $product) {
-        // ใช้ชื่อคอลัมน์ที่ถูกเลือกตามภาษาที่เลือก
+        $subject = $product['subject_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['subject_shop'];
+        $description = $product['description_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['description_shop'];
+        $content = $product['content_shop' . ($lang !== 'th' ? '_' . $lang : '')] ?: $product['content_shop'];
         $shouldAddProduct = false;
-        if ($searchQuery && (stripos($product['subject_shop'], $searchQuery) !== false || stripos($product['description_shop'], $searchQuery) !== false)) {
+
+        if ($searchQuery && (stripos($subject, $searchQuery) !== false || stripos($description, $searchQuery) !== false)) {
             $shouldAddProduct = true;
         } elseif ($selectedSubGroupId > 0 && $product['sub_group_id'] == $selectedSubGroupId) {
             $shouldAddProduct = true;
@@ -130,9 +167,9 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         if ($shouldAddProduct) {
             $tempDisplayItems[] = [
                 'id' => $product['shop_id'],
-                'title' => $product['subject_shop'],
-                'description' => $product['description_shop'],
-                'iframe' => preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $product['content_shop'], $matches) ? $matches[1] : null,
+                'title' => $subject,
+                'description' => $description,
+                'iframe' => preg_match('/<iframe.*?src=["\'](.*?)["\'].*?>/i', $content, $matches) ? $matches[1] : null,
                 'image' => $product['first_image_path']
             ];
         }
@@ -148,7 +185,7 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo htmlspecialchars($lang); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -162,7 +199,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 20px;
-            align-items: start;
+            /* เพิ่ม align-items: stretch; เพื่อให้ทุกกล่องมีความสูงเท่ากัน */
+            align-items: stretch;
         }
 
         /* Styles for Main Category Blocks */
@@ -174,6 +212,9 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             background-color: #fcfcfc;
             cursor: pointer;
             transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            /* เพิ่ม display: flex และ flex-direction: column เพื่อให้ child elements จัดเรียงและยืดตัว */
+            display: flex;
+            flex-direction: column;
         }
 
         /* เพิ่ม z-index และ transform เฉพาะเมื่อบล็อกนั้นถูก active */
@@ -218,10 +259,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             background-color: #f0f0f0;
             border-top: 1px solid #e0e0e0;
             position: relative;
+            /* เพิ่ม min-height เพื่อให้ทุกกล่องมีส่วนนี้สูงเท่ากัน */
+            min-height: 70px;
         }
 
         .main-category-block .block-title-info {
             flex-grow: 1;
+            /* เพิ่ม display: flex, flex-direction: column และ justify-content เพื่อจัดเรียงข้อความให้ชิดบน */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .main-category-block .block-title-info h3 {
@@ -229,6 +276,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             font-weight: bold;
             color: #555;
             margin: 0 0 5px 0;
+            /* เพิ่มความสูงคงที่สำหรับ h3 เพื่อให้บรรทัดไม่เกิน 2 บรรทัด */
+            height: 50px; 
+            overflow: hidden;
+        }
+        
+        /* ใช้ line-clamp สำหรับ h3 ด้วย */
+        .main-category-block .block-title-info h3.line-clamp {
+            -webkit-line-clamp: 2;
         }
 
         .main-category-block .product-count {
@@ -342,6 +397,9 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
             background-color: #fcfcfc;
+            /* เพิ่ม display: flex และ flex-direction: column */
+            display: flex;
+            flex-direction: column;
         }
 
         .box-news:hover {
@@ -368,13 +426,20 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         .box-content {
             padding: 15px;
             background-color: #ffffff;
+            /* เพิ่ม flex-grow: 1 เพื่อให้ส่วนนี้ยืดความสูงเต็มที่ */
+            flex-grow: 1;
+            /* ใช้ Flexbox เพื่อจัดการความสูงของ h5 และ p */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .box-content h5 {
             font-size: 1.1em;
             font-weight: bold;
             margin-bottom: 5px;
-            height: 40px;
+            /* กำหนดความสูงคงที่สำหรับชื่อสินค้า */
+            min-height: 40px; 
             overflow: hidden;
             color: #333;
         }
@@ -382,7 +447,8 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         .box-content p {
             font-size: 0.9em;
             color: #666;
-            height: 20px;
+            /* กำหนดความสูงคงที่สำหรับคำอธิบายสินค้า */
+            min-height: 20px;
             overflow: hidden;
         }
 
@@ -407,14 +473,14 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
             margin: 0;
         }
     </style>
+    
 </head>
 <body>
 
 <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
     <form method="GET" action="">
         <div class="input-group">
-            <input type="hidden" name="lang" value="<?php echo htmlspecialchars($lang); ?>">
-            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo $lang === 'en' ? 'Search product...' : 'ค้นหาสินค้า...'; ?>">
+            <input type="text" name="search" class="form-control" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="<?php echo getPlaceholderText($lang); ?>">
             <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
@@ -422,39 +488,88 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
 
 <h2 style="font-size: 28px; font-weight: bold; margin-top: 20px;">
     <?php
-    if ($searchQuery) {
-        $text = $lang === 'en' ? 'Search Results for' : 'ผลการค้นหาสำหรับ';
-        echo $text . ' "' . htmlspecialchars($searchQuery) . '"';
-    } elseif ($selectedSubGroupId > 0) {
-        $groupName = '';
-        foreach ($allProductsData as $prod) {
-            if ($prod['sub_group_id'] == $selectedSubGroupId) {
-                $groupName = $prod['sub_group_name'];
-                break;
-            }
+    function getPlaceholderText($lang) {
+        switch ($lang) {
+            case 'en': return 'Search product...';
+            case 'cn': return '搜索产品...';
+            case 'jp': return '製品を検索...';
+            case 'kr': return '제품 검색...';
+            case 'th':
+            default: return 'ค้นหาสินค้า...';
         }
-        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"';
-        echo $text;
-    } elseif ($selectedGroupId > 0) {
-        $groupName = '';
-        foreach ($allProductsData as $prod) {
-            if ($prod['main_group_id'] == $selectedGroupId || ($prod['sub_group_id'] == $selectedGroupId && $prod['parent_group_id'] === NULL)) {
-                $groupName = $prod['main_group_name'];
-                break;
-            }
-        }
-        $text = $lang === 'en' ? 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"' : 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"';
-        echo $text;
-    } else {
-        echo $lang === 'en' ? 'Product Categories' : 'หมวดหมู่สินค้า';
     }
+    
+    function getDisplayText($lang, $searchQuery, $selectedSubGroupId, $selectedGroupId, $allProductsData) {
+        if ($searchQuery) {
+            $text = [
+                'th' => 'ผลการค้นหาสำหรับ',
+                'en' => 'Search Results for',
+                'cn' => '搜索结果',
+                'jp' => '検索結果',
+                'kr' => '검색 결과'
+            ];
+            return $text[$lang] . ' "' . htmlspecialchars($searchQuery) . '"';
+        } elseif ($selectedSubGroupId > 0) {
+            $groupName = '';
+            foreach ($allProductsData as $prod) {
+                if ($prod['sub_group_id'] == $selectedSubGroupId) {
+                    $groupName = $prod['group_name' . ($lang !== 'th' ? '_' . $lang : '')] ?: $prod['group_name'];
+                    break;
+                }
+            }
+            $text = [
+                'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มย่อยที่เลือก') . '"',
+                'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Sub-Group') . '"',
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的子组') . '"',
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたサブグループ') . '" の製品',
+                'kr' => '"' . htmlspecialchars($groupName ?: '선택된 하위 그룹') . '"의 제품'
+            ];
+            return $text[$lang];
+        } elseif ($selectedGroupId > 0) {
+            $groupName = '';
+            foreach ($allProductsData as $prod) {
+                if ($prod['main_group_id'] == $selectedGroupId) {
+                    $groupName = $prod['main_group_name' . ($lang !== 'th' ? '_' . $lang : '')] ?: $prod['main_group_name'];
+                    break;
+                }
+            }
+            $text = [
+                'th' => 'สินค้าในกลุ่ม "' . htmlspecialchars($groupName ?: 'กลุ่มหลักที่เลือก') . '"',
+                'en' => 'Products in "' . htmlspecialchars($groupName ?: 'Selected Main Group') . '"',
+                'cn' => '产品在 "' . htmlspecialchars($groupName ?: '选定的主组') . '"',
+                'jp' => '"' . htmlspecialchars($groupName ?: '選択されたメイングループ') . '" の製品',
+                'kr' => '"' . htmlspecialchars($groupName ?: '선택된 메인 그룹') . '"의 제품'
+            ];
+            return $text[$lang];
+        } else {
+            $text = [
+                'th' => 'หมวดหมู่สินค้า',
+                'en' => 'Product Categories',
+                'cn' => '产品分类',
+                'jp' => '製品カテゴリ',
+                'kr' => '제품 카테고리'
+            ];
+            return $text[$lang];
+        }
+    }
+
+    echo getDisplayText($lang, $searchQuery, $selectedSubGroupId, $selectedGroupId, $allProductsData);
     ?>
 </h2>
 
 <div class="product-grid-container">
     <?php if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0): ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p><?php echo $lang === 'en' ? 'No products found for your criteria.' : 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ'; ?></p>
+            <?php
+            $noProductsText = [
+                'th' => 'ไม่พบสินค้าตามเงื่อนไขที่ระบุ',
+                'en' => 'No products found for your criteria.',
+                'cn' => '未找到符合您条件的产品',
+                'jp' => '条件に一致する製品が見つかりませんでした。',
+                'kr' => '귀하의 조건에 맞는 제품을 찾을 수 없습니다.'
+            ];
+            ?>
+            <p><?php echo $noProductsText[$lang]; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $product): ?>
                 <div class="box-news">
@@ -466,7 +581,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                             <?php elseif (!empty($product['image'])): ?>
                                 <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                             <?php else: ?>
-                                <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $lang === 'en' ? 'No image available' : 'ไม่มีรูปภาพ'; ?>">
+                                <?php
+                                $noImageText = [
+                                    'th' => 'ไม่มีรูปภาพ',
+                                    'en' => 'No image available',
+                                    'cn' => '没有图片',
+                                    'jp' => '画像なし',
+                                    'kr' => '이미지 없음'
+                                ];
+                                ?>
+                                <img src="path/to/default/shop_placeholder.jpg" alt="<?php echo $noImageText[$lang]; ?>">
                             <?php endif; ?>
                         </a>
                     </div>
@@ -481,7 +605,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
         <?php endif; ?>
     <?php else: // ไม่ใช่การค้นหาหรือกรองกลุ่ม ให้แสดงบล็อกหมวดหมู่หลัก ?>
         <?php if (empty($finalDisplayItems)): ?>
-            <p><?php echo $lang === 'en' ? 'No categories found with assigned products.' : 'ไม่พบหมวดหมู่ที่มีสินค้า'; ?></p>
+            <?php
+            $noCategoriesText = [
+                'th' => 'ไม่พบหมวดหมู่ที่มีสินค้า',
+                'en' => 'No categories found with assigned products.',
+                'cn' => '未找到包含产品的分类',
+                'jp' => '製品が割り当てられているカテゴリが見つかりません。',
+                'kr' => '제품이 할당된 카테고리를 찾을 수 없습니다.'
+            ];
+            ?>
+            <p><?php echo $noCategoriesText[$lang]; ?></p>
         <?php else: ?>
             <?php foreach ($finalDisplayItems as $mainGroupData): ?>
                 <div class="main-category-block" data-main-group-id="<?php echo htmlspecialchars($mainGroupData['id']); ?>">
@@ -491,7 +624,16 @@ if ($searchQuery || $selectedGroupId > 0 || $selectedSubGroupId > 0) {
                     <div class="block-header-bottom">
                         <div class="block-title-info">
                             <h3><?php echo htmlspecialchars($mainGroupData['name']); ?></h3>
-                            <p class="product-count"><?php echo $mainGroupData['total_products'] . ($lang === 'en' ? ' products' : ' รายการ'); ?></p>
+                            <?php
+                            $productsText = [
+                                'th' => 'รายการ',
+                                'en' => 'products',
+                                'cn' => '个产品',
+                                'jp' => '製品',
+                                'kr' => '개 제품'
+                            ];
+                            ?>
+                            <p class="product-count"><?php echo $mainGroupData['total_products'] . ' ' . $productsText[$lang]; ?></p>
                         </div>
                         <span class="toggle-arrow"><i class="fas fa-chevron-down"></i></span>
                     </div>

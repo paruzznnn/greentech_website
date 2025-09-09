@@ -1,0 +1,505 @@
+/* ==========================
+Cover Photo
+=========================== */
+.partner_cover_photo img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+/* ==========================
+Controls
+=========================== */
+.controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.controls button {
+    padding: 0.1rem 0.3rem;
+    border: 1px solid #ddd;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+}
+
+.controls button:hover {
+    background: #e5e7eb;
+}
+
+.controls button.active {
+    background: #FF9800;
+    color: white;
+    border-color: #FF9800;
+}
+
+/* ==========================
+Stores Container
+=========================== */
+.stores-container {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.stores-container.grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stores-container.list {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ==========================
+Store Card
+=========================== */
+.stores-card {
+    background: #ffffff;
+    border-radius: 3px;
+    padding: 1.5rem;
+    border: 1px solid #eaeaea;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stores-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ff9902;
+}
+
+.store-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+}
+
+.stores-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.category-container {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.category-tag {
+    background-color: #e5e7eb;
+    color: #374151;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.details-container {
+    margin-top: 1rem;
+    color: #4b5563;
+    text-align: center;
+}
+
+.delivery-info,
+.distance-info {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.distance-info {
+    margin-top: 0.25rem;
+    color: #2563eb;
+}
+
+/* ==========================
+List View Layout
+=========================== */
+.stores-container.list .stores-card,
+.stores-container.list .stores-card-product {
+    display: flex;            /* ทำเป็น flex row */
+    flex-direction: row;      
+    align-items: center;      /* จัดกลางแนวตั้ง */
+    text-align: left;         /* ตัวหนังสือชิดซ้าย */
+    gap: 1rem;                /* ระยะห่างระหว่าง logo กับข้อมูล */
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #eee;
+}
+
+.stores-container.list .store-logo,
+.stores-container.list .store-logo-product {
+    width: 80px;             /* ปรับขนาดโลโก้ */
+    height: 80px;
+    object-fit: contain;
+    margin: 0;               /* ลบ margin เดิม */
+    flex-shrink: 0;          /* ไม่ให้ logo ย่อ */
+}
+
+.stores-container.list .stores-name,
+.stores-container.list .category-container,
+.stores-container.list .details-container {
+    text-align: left;
+}
+
+.stores-container.list .category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: flex-start;
+    margin-top: 0.25rem;
+}
+
+.stores-container.list .details-container {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+/* ==========================
+Pagination
+=========================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: 0.1rem 0.6rem;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.pagination button:hover {
+    background: #f3f4f6;
+}
+
+.pagination button.active {
+    background: #FF9800;
+    color: white;
+    border-color: #FF9800;
+}
+
+.pagination button:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+    color: #9ca3af;
+}
+
+/* ==========================
+Showing Entries
+=========================== */
+.showing-entries {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* ==========================
+Sidebar
+=========================== */
+
+
+/* ==========================
+Responsive
+=========================== */
+@media (max-width: 1024px) {
+
+    .stores-container.grid,
+    .stores-container.list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+
+    .stores-container.grid,
+    .stores-container.list {
+        grid-template-columns: 1fr;
+    }
+
+    .stores-container.list .stores-card {
+        flex-direction: row;
+    }
+}
+
+.features-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+    width: 100% 1387.5px;
+    background-color: #ffffff;
+    padding: 0.5rem;
+}
+
+.feature-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
+    border: 1px solid #eaeaea;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 220px;
+    /* Ensure consistent height */
+    box-sizing: border-box;
+}
+
+.feature-icon {
+    color: #f28b20;
+    /* Green color for icons */
+    font-size: 34px;
+    margin-bottom: 20px;
+    display: inline-block;
+    line-height: 1;
+    /* Adjust line height for better icon centering */
+}
+
+.feature-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.feature-description {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.feature-description a {
+    color: #f28b20;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.feature-description a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .features-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .features-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .features-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==========================
+My Stores
+=========================== */
+.stores-card-info {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    /* max-width: 400px; */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.stores-logo-info {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+}
+
+#stores-menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#stores-menu li a {
+    font-size: 14px;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: black;
+    display: block;
+    border-radius: 0.5rem;
+}
+
+#stores-menu li a:hover {
+    background-color: #FF9800;
+    padding: 5px 10px;
+    color: #ffffff;
+}
+
+#stores-menu li a.active {
+    font-weight: bold;
+    color: #FF9800;
+    background-color: #fff7eb;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 5px;
+}
+
+/* header ของหมวดหมู่ */
+.cat-header {
+    font-size: 14px;
+    padding: 8px 10px;
+    cursor: pointer;
+    position: relative;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    transition: background 0.2s;
+}
+
+.cat-header:hover {
+    background: #eee;
+}
+
+.cat-sub-menu a {
+    text-decoration: none !important;
+}
+
+/* sub menu */
+.sidebar li ul {
+    display: none;
+    margin: 5px 0 10px 15px;
+    padding-left: 10px;
+    border-left: 1px solid #ddd;
+}
+
+.sidebar li.open>ul {
+    display: block;
+}
+
+/* ลูกศร */
+.cat-header::after {
+    content: "▸";
+    position: absolute;
+    right: 10px;
+    transition: transform 0.3s;
+}
+
+.sidebar li.open>.cat-header::after {
+    transform: rotate(90deg);
+}
+
+/* ==========================
+Store Card Product
+=========================== */
+.stores-card-product {
+    background: #ffffff;
+    border-radius: 3px;
+    padding: 0.5rem;
+    border: 1px solid #eaeaea;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stores-card-product:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ff9902;
+}
+
+.store-logo-product {
+    width: 100%;
+    height: auto;
+    min-height: 145px;
+    max-height: 145px;
+    object-fit: cover;
+    margin-bottom: 0.75rem;
+    /* border: 1px solid #e5e7eb; */
+    background: white;
+}
+
+.stores-name-product {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+
+.category-container-product {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.category-tag-product {
+    background-color: #e5e7eb;
+    color: #374151;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.details-container-product {
+    margin-top: 1rem;
+    color: #4b5563;
+    text-align: center;
+}
+
+.delivery-info-product,
+.distance-info-product {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.distance-info-product {
+    margin-top: 0.25rem;
+    color: #2563eb;
+}
