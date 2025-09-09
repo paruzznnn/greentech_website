@@ -14,39 +14,30 @@
 
 <body>
     <?php include '../../template/head-bar.php'; ?>
-
     <main>
-        <div id="sections_root_partner_list" class="section-space">
+        <div id="sections_root_partner_detail" class="section-space">
             <div class="container">
                 <div class="row">
-                    <!-- เมนูด้านข้าง -->
                     <div class="col-md-3">
                         <aside class="sidebar">
                             <div class="stores-card-info" id="storeContainer"></div>
                         </aside>
                     </div>
-
-                    <!-- เนื้อหาหลัก -->
                     <div class="col-md-9">
                         <section>
                             <div class="partner_cover_photo">
                                 <img src="https://www.trandar.com//public/img/6891aee0f22e6.jpg" alt="Partner Cover" />
                             </div>
                         </section>
-                        <section id="mainContent">
-                            <!-- <div style="background:#fff; padding:0.5rem; border-radius:4px;">
-                                <h4>Welcome</h4>
-                                <p>กรุณาเลือกเมนูจากด้านซ้าย</p>
-                            </div> -->
+                        <section>
+                            <div id="mainContent"></div>
                         </section>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
     <?php include '../../template/footer-bar.php'; ?>
-
 
     <script>
         const StoreApp = {

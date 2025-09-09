@@ -46,3 +46,7 @@ define('BASE_PATH', $scheme . '://' . $host . $path);
 <link href="<?php echo BASE_PATH ?>node_modules/datatables/media/css/dataTables.min.css" rel="stylesheet">
 <script src="<?php echo BASE_PATH ?>node_modules/datatables/media/js/dataTables.min.js"></script>
 
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+<!-- Fancybox JS -->
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>

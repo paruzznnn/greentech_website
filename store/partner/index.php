@@ -1,4 +1,4 @@
-<?php include '../../routes.php'; ?>
+<?php include '../routes.php'; ?>
 <!DOCTYPE html>
 <html lang="th">
 
@@ -6,27 +6,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-STORE</title>
-    <?php include '../../inc-meta.php'; ?>
-    <link href="../../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../../css/partner/template-partner.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <?php include '../../inc-cdn.php'; ?>
+    <?php include '../inc-meta.php'; ?>
+    <link href="../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../css/partner/template-partner.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../inc-cdn.php'; ?>
 
 </head>
 
 <body>
-    <?php include '../../template/head-bar.php'; ?>
-
+    <?php include '../template/head-bar.php'; ?>
     <main>
         <div id="sections_root_partner_list">
-            <section id="sections_partner_cover_photo" class="section-space">
-                <div class="container">
+            <div class="container">
+                <section class="section-space">
                     <div class="partner_cover_photo">
                         <img src="https://www.trandar.com//public/img/6891aee0f22e6.jpg" alt="Partner Cover" />
                     </div>
-                </div>
-            </section>
-            <section id="sections_partner_list" class="section-space">
-                <div class="container">
+                </section>
+                <section class="section-space">
                     <div style="background-color:#ffffff; padding:0.5rem; border-radius:4px;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div id="showing-entries" class="showing-entries"></div>
@@ -38,11 +35,8 @@
                         <div id="stores-container" class="stores-container grid"></div>
                         <div id="pagination" class="pagination"></div>
                     </div>
-                </div>
-            </section>
-            
-            <section class="section-space">
-                <div class="container">
+                </section>
+                <section class="section-space">
                     <div class="features-container">
                         <div class="feature-card">
                             <div class="feature-icon"><i class="far fa-clock"></i></div>
@@ -92,15 +86,13 @@
                             </p>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </main>
-
-    <?php include '../../template/footer-bar.php'; ?>
+    <?php include '../template/footer-bar.php'; ?>
 
     <script>
-
         const StoreApp = {
             stores: [{
                     name: "แทรนดาร์ อะคูสติก",

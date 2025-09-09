@@ -1,4 +1,4 @@
-<?php include '../../routes.php'; ?>
+<?php include '../routes.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,16 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>E-STORE</title>
-    <?php include '../../inc-meta.php'; ?>
-    <link href="../../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../../css/product/template-product.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <?php include '../../inc-cdn.php'; ?>
+    <?php include '../inc-meta.php'; ?>
+    <link href="../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../css/product/template-product.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../inc-cdn.php'; ?>
 
 </head>
 
 <body>
 
-    <?php include '../../template/head-bar.php'; ?>
+    <?php include '../template/head-bar.php'; ?>
     <main>
         <div id="sections_root_product_list">
             <section id="sections_products_list" class="section-space-search">
@@ -55,7 +55,7 @@
             </section>
         </div>
     </main>
-    <?php include '../../template/footer-bar.php'; ?>
+    <?php include '../template/footer-bar.php'; ?>
 
     <!-- <script>
         const filters = [{
