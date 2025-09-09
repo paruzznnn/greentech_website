@@ -549,8 +549,6 @@ export function renderCarouselLG(selector, items) {
       <img src="${item.image}" class="custom-card-img" alt="">
       <div class="custom-card-body">
         <h5 class="custom-card-title">Card title</h5>
-        <p class="custom-card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        <a href="#" class="custom-card-btn btn btn-primary">Go somewhere</a>
       </div>
     </div>
     `;

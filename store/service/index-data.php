@@ -49,7 +49,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "carousel_popular",
             "isSlide" => true,
             "type" => "crssm",
-            "sort" => 2,
+            "sort" => 1,
             "req" => "getPopularItems"
         ],
         // [
@@ -82,7 +82,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "carousel_products",
             "isSlide" => false,
             "type" => "gcmd",
-            "sort" => 3,
+            "sort" => 4,
             "req" => "getProductItems"
         ],
         [
@@ -103,7 +103,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "introduce_store",
             "isSlide" => false,
             "type" => "intd",
-            "sort" => 1,
+            "sort" => 2,
             "req" => "getIntroItems"
         ],
         [
@@ -114,7 +114,7 @@ if ($action == 'getSectionItems') {
             "carouselId" => "brand_store",
             "isSlide" => true,
             "type" => "gcsm",
-            "sort" => 4,
+            "sort" => 3,
             "req" => "getBrandItems"
         ],
         // [

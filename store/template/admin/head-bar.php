@@ -161,99 +161,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script type="module">
     Promise.all([
-            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
-            import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
-        ])
-        .then(async ([formHandler, menuBuilder]) => {
-            const {
-                handleFormSubmit
-            } = formHandler;
-            const {
-                fetchHeader,
-                buildLinkmenuSlideAdmin
-            } = menuBuilder;
+        import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+        import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
+    ])
+    .then(async ([formHandler, menuBuilder]) => {
+        const {
+            handleFormSubmit
+        } = formHandler;
+        const {
+            fetchHeader,
+            buildLinkmenuSlideAdmin
+        } = menuBuilder;
 
-            const service = pathConfig.BASE_WEB + 'service/admin/header-data.php?';
-            const menuData = await fetchHeader("getMenuHeaderSideItems", service);
+        const service = pathConfig.BASE_WEB + 'service/admin/header-data.php?';
+        const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
-            if (menuData) {
-                buildLinkmenuSlideAdmin(menuData, pathConfig);
+        if (menuData) {
+            buildLinkmenuSlideAdmin(menuData, pathConfig);
+        }
+
+        // ============= Responsive ==================
+        const checkDeviceSize = () => {
+            const width = window.innerWidth;
+            if (width > 480) {
+                leftSlideClose();
+            } else {
+                leftSlideCloseAdmin();
             }
 
-            // ============= Responsive ==================
-            const checkDeviceSize = () => {
-                const width = window.innerWidth;
-                if (width > 480) {
-                    leftSlideClose();
-                } else {
-                    leftSlideCloseAdmin();
-                }
-
-                document.body.classList.remove("is-mobile", "is-tablet", "is-desktop");
-                if (width <= 480) {
-                    document.body.classList.add("is-mobile");
-                } else if (width <= 768) {
-                    document.body.classList.add("is-tablet");
-                } else {
-                    document.body.classList.add("is-desktop");
-                }
-            };
-
-            // =============== Menu Slide Functions =======================
-            const leftSlide = () => {
-                document.getElementById("sidenav-store2")?.classList.add("open");
-                document.getElementById("overlay-store2")?.classList.add("active");
-                document.getElementById("menu-open-store2")?.classList.add("hidden");
-                document.getElementById("menu-close-store2")?.classList.remove("hidden");
-            };
-
-            const leftSlideClose = () => {
-                document.getElementById("sidenav-store2")?.classList.remove("open");
-                document.getElementById("overlay-store2")?.classList.remove("active");
-                document.getElementById("menu-open-store2")?.classList.remove("hidden");
-                document.getElementById("menu-close-store2")?.classList.add("hidden");
-            };
-
-            const leftSlideAdmin = () => {
-                document.getElementById("sidenav-store1")?.classList.add("open");
-                document.getElementById("menu-open-store1")?.classList.add("hidden");
-                document.getElementById("menu-close-store1")?.classList.remove("hidden");
-            };
-
-            const leftSlideCloseAdmin = () => {
-                document.getElementById("sidenav-store1")?.classList.remove("open");
-                document.getElementById("menu-open-store1")?.classList.remove("hidden");
-                document.getElementById("menu-close-store1")?.classList.add("hidden");
+            document.body.classList.remove("is-mobile", "is-tablet", "is-desktop");
+            if (width <= 480) {
+                document.body.classList.add("is-mobile");
+            } else if (width <= 768) {
+                document.body.classList.add("is-tablet");
+            } else {
+                document.body.classList.add("is-desktop");
             }
+        };
 
-            // ============ Right menu =================
-            document.getElementById("menu-open-store1")?.addEventListener("click", leftSlideAdmin);
-            document.getElementById("menu1-open-store1")?.addEventListener("click", leftSlideAdmin);
-            document.getElementById("menu-close-store1")?.addEventListener("click", leftSlideCloseAdmin);
+        // =============== Menu Slide Functions =======================
+        const leftSlide = () => {
+            document.getElementById("sidenav-store2")?.classList.add("open");
+            document.getElementById("overlay-store2")?.classList.add("active");
+            document.getElementById("menu-open-store2")?.classList.add("hidden");
+            document.getElementById("menu-close-store2")?.classList.remove("hidden");
+        };
 
-            // ============ Left menu ===================
-            document.getElementById("menu-open-store2")?.addEventListener("click", leftSlide);
-            document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
-            document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
+        const leftSlideClose = () => {
+            document.getElementById("sidenav-store2")?.classList.remove("open");
+            document.getElementById("overlay-store2")?.classList.remove("active");
+            document.getElementById("menu-open-store2")?.classList.remove("hidden");
+            document.getElementById("menu-close-store2")?.classList.add("hidden");
+        };
 
-            document.addEventListener("click", (e) => {
-                const menu = document.getElementById("sidenav-store1");
-                const menuOpen = document.getElementById("menu-open-store1");
+        const leftSlideAdmin = () => {
+            document.getElementById("sidenav-store1")?.classList.add("open");
+            document.getElementById("menu-open-store1")?.classList.add("hidden");
+            document.getElementById("menu-close-store1")?.classList.remove("hidden");
+        };
 
-                // เช็คว่าคลิกอยู่นอกเมนู และไม่ใช่ปุ่มเปิดเมนู
-                if (
-                    menu && 
-                    !menu.contains(e.target) && 
-                    !menuOpen.contains(e.target)
-                ) {
-                    leftSlideCloseAdmin();
-                }
-            });
+        const leftSlideCloseAdmin = () => {
+            document.getElementById("sidenav-store1")?.classList.remove("open");
+            document.getElementById("menu-open-store1")?.classList.remove("hidden");
+            document.getElementById("menu-close-store1")?.classList.add("hidden");
+        }
 
-            window.addEventListener("resize", checkDeviceSize);
+        // ============ Right menu =================
+        document.getElementById("menu-open-store1")?.addEventListener("click", leftSlideAdmin);
+        document.getElementById("menu1-open-store1")?.addEventListener("click", leftSlideAdmin);
+        document.getElementById("menu-close-store1")?.addEventListener("click", leftSlideCloseAdmin);
 
-        })
-        .catch((e) => {
-            console.error("One or more module imports failed", e);
+        // ============ Left menu ===================
+        document.getElementById("menu-open-store2")?.addEventListener("click", leftSlide);
+        document.getElementById("menu-close-store2")?.addEventListener("click", leftSlideClose);
+        document.getElementById("overlay-store2")?.addEventListener("click", leftSlideClose);
+
+        document.addEventListener("click", (e) => {
+            const menu = document.getElementById("sidenav-store1");
+            const menuOpen = document.getElementById("menu-open-store1");
+
+            // เช็คว่าคลิกอยู่นอกเมนู และไม่ใช่ปุ่มเปิดเมนู
+            if (
+                menu && 
+                !menu.contains(e.target) && 
+                !menuOpen.contains(e.target)
+            ) {
+                leftSlideCloseAdmin();
+            }
         });
+
+        window.addEventListener("resize", checkDeviceSize);
+
+    })
+    .catch((e) => {
+        console.error("One or more module imports failed", e);
+    });
 </script>
