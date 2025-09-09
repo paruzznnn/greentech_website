@@ -2502,7 +2502,7 @@ body.modal-open {
 
 .carousel-wrapper {
   display: flex;
-  gap: 16px;
+  gap: 15px;
   align-items: flex-start;
   flex-wrap: nowrap;
 }
@@ -2535,11 +2535,11 @@ body.modal-open {
 .carousel-right .custom-card {
   flex: 0 0 250px;   
   width: 250px;
-  height: 400px;
+  height: 375px;
   display: flex;
   flex-direction: column;
   border-radius: 8px;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   overflow: hidden;
   border: 1px solid #ddd;
   background: #fff;
@@ -2586,7 +2586,7 @@ body.modal-open {
 @media (max-width: 768px) {
   .carousel-wrapper {
     flex-direction: column;
-    gap: 16px;
+    gap: 15px;
   }
 
   .carousel-left,
