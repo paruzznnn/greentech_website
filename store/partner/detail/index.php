@@ -19,8 +19,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-3">
-                        <aside class="sidebar">
-                            <div class="stores-card-info" id="storeContainer"></div>
+                        <aside>
+                            <div class="sidebar">
+                                <div class="stores-card-info" id="storeContainer"></div>
+                            </div>
                         </aside>
                     </div>
                     <div class="col-md-9">
