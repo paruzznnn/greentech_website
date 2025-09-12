@@ -1,21 +1,24 @@
 .accordion-section {
     background-color: #ffffff;
-    padding: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.7rem;
 }
+
+/* .label-required {
+    color: #ff9800;
+} */
 
 .checkout-card {
     background: #fff;
     border-radius: 4px;
     border: 1px solid #eaeaea;
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-    /* padding: 1rem 1.5rem; */
-    padding: 0.5rem;
+    padding: 1rem;
     margin-bottom: 0.7rem;
 }
 
 .checkout-step-header {
     font-weight: bold;
-    margin-bottom: 0.75rem;
+    color: #444;
 }
 
 .checkout-panel {
@@ -34,6 +37,14 @@
     gap: 0.75rem;
 }
 
+#add-address-btn {
+    padding: 0.3rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: #2563eb;
+    color: white;
+}
+
 .checkout-address-card {
     border: 1px solid #ddd;
     border-radius: 0.5rem;
@@ -42,8 +53,13 @@
 }
 
 .checkout-address-card.active {
-    border-color: #ff9800;
-    background: #fffaf0;
+    border-color: #007bff0a;
+    background-color: #f0f8ff6e;
+}
+
+.address-header {
+    display: flex;
+    justify-content: space-between;
 }
 
 .checkout-address-actions {
@@ -52,20 +68,146 @@
 
 .checkout-address-actions button {
     margin-right: 0.5rem;
-    padding: 0.25rem 0.6rem;
+    padding: 0.5rem 0.6rem;
     border: 1px solid #ddd;
     border-radius: 0.4rem;
-    background: #f3f4f6;
     cursor: pointer;
+}
+
+.edit-btn {
+    /* background: #FFC107; */
+    /* border: none !important; */
+}
+
+.delete-btn {
+    /* background: #dc3545; */
+    /* border: none !important; */
+}
+
+.set-default-btn {
+    /* background: #22c55e; */
+    /* border: none !important; */
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 20px 0;
+}
+
+.payment-methods label {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    /* border: 1px solid #ccc; */
+    /* border-radius: 8px; */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.payment-methods label:hover {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+}
+
+.payment-methods input[type="radio"] {
+    margin-right: 12px;
+    accent-color: #007bff;
+    /* เปลี่ยนสี radio */
+}
+
+.payment-methods input[type="radio"]:checked+label {
+    border-color: #007bff;
+    background-color: #e6f0ff;
+}
+
+/* =========================
+    ตารางคำสั่งซื้อ
+========================= */
+.order-table {
+    width: 100%;
+    /* กินเต็มความกว้างคอนเทนเนอร์ */
+    border-collapse: collapse;
+    /* ลบช่องว่างระหว่างเส้นขอบ */
+    margin-bottom: 1rem;
+    /* เว้นระยะด้านล่าง */
+}
+
+.order-table th,
+.order-table td {
+    border-bottom: 1px solid #ddd;
+    /* เส้นขอบด้านล่างของแต่ละเซลล์ */
+    padding: 0.5rem;
+    /* ระยะห่างด้านในเซลล์ */
+}
+
+.order-table th {
+    background-color: #f7f7f7;
+    /* สีพื้นหลังหัวตาราง */
+    text-align: left;
+    /* จัดข้อความชิดซ้าย */
+}
+
+/* ชื่อสินค้า */
+.order-table td.product-name {
+    white-space: nowrap;
+    /* ข้อความไม่ขึ้นบรรทัดใหม่ */
+    overflow: hidden;
+    /* ตัดข้อความส่วนเกิน */
+    text-overflow: ellipsis;
+    /* แสดง ... ถ้าข้อความยาวเกิน */
+    max-width: 6vw;
+    /* กำหนดความกว้างสูงสุดเป็น 6% ของหน้าจอ */
+}
+
+/* ปรับสำหรับหน้าจอมือถือ */
+@media (max-width: 576px) {
+    .order-table td.product-name {
+        white-space: normal;
+        /* ให้ข้อความขึ้นบรรทัดใหม่ได้ */
+        max-width: 50vw;
+        /* ให้ความกว้างสูงสุด 50% ของหน้าจอมือถือ */
+        word-wrap: break-word;
+        /* ตัดคำถ้ายาวเกิน */
+    }
+
+    .order-table th,
+    .order-table td {
+        padding: 0.4rem;
+        /* ปรับระยะห่างให้พอดีกับมือถือ */
+    }
+}
+
+
+
+/* =========================
+การจัดข้อความทั่วไป
+========================= */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* =========================
+เซคชันแยกส่วน
+========================= */
+.order-section {
+    padding: 0.5rem 0;
+    /* เว้นด้านบนและล่าง */
+    border-bottom: 1px dashed #ccc;
+    /* เส้นแบ่งแบบ dashed */
 }
 
 .summary-card {
     background: #fff;
     border-radius: 4px;
-    padding: 0.5rem;
-    /* padding: 1rem 1.5rem; */
+    padding: 1rem;
     border: 1px solid #eaeaea;
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
     margin-bottom: 0.7rem;
 }
 
@@ -80,13 +222,49 @@
     font-size: 1.1rem;
 }
 
-.billing-form input {
+#confirmOrders {
+    width: 100%;
+    background-color: #22c55e;
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+#confirmOrders:disabled {
+    background-color: #16a34a;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+#backCheckoutOrders {
+    width: 100%;
+    background-color: #ccc;
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.terms-text {
+    font-size: 0.8rem;
+}
+
+/* .billing-form input {
     width: 100%;
     margin-bottom: 0.5rem;
     padding: 0.4rem;
     border: 1px solid #ccc;
     border-radius: 0.4rem;
-}
+} */
 
 .step-buttons {
     margin-top: 1rem;
@@ -108,7 +286,7 @@
 }
 
 /* Modal */
-.modal {
+/* .modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -151,9 +329,9 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
+} */
 
-#modal-cancel {
+/* #modal-cancel {
     background: #ccc;
     margin-right: 8px;
 }
@@ -161,7 +339,7 @@
 #modal-save {
     background: #ff9800;
     color: #fff;
-}
+} */
 
 .error-message {
     color: red;

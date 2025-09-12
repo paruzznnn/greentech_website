@@ -85,6 +85,464 @@
     </main>
     <?php include '../../template/footer-bar.php'; ?>
 
+    <!-- <script>
+        const CartApp = {
+            cartItems: [{
+                    id: 1,
+                    name: "แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว",
+                    size: "",
+                    price: 21.6,
+                    qty: 4,
+                    image: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg"
+                },
+                {
+                    id: 2,
+                    name: "แทรนดาร์ เอเอ็มเอฟ ไฟน์ เฟรสโค",
+                    size: "",
+                    price: 24,
+                    qty: 1,
+                    image: "https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg"
+                },
+                {
+                    id: 3,
+                    name: "แทรนดาร์ เอเอ็มเอฟ สตาร์",
+                    size: "",
+                    price: 33.25,
+                    qty: 1,
+                    image: "https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg"
+                },
+                {
+                    id: 4,
+                    name: "แทรนดาร์ ทีบาร์ ที15",
+                    size: "",
+                    price: 3,
+                    qty: 1,
+                    image: "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg"
+                },
+                {
+                    id: 5,
+                    name: "แทรนดาร์ ทีบาร์ ที24",
+                    size: "",
+                    price: 11.7,
+                    qty: 1,
+                    image: "https://www.trandar.com//public/shop_img/687b31d91b97e_T24.png"
+                }
+            ],
+            coupons: [{
+                    code: "SAVE10",
+                    type: "percent",
+                    value: 10,
+                    label: "ลด 10%"
+                },
+                {
+                    code: "FREESHIP",
+                    type: "shipping",
+                    value: 0,
+                    label: "ส่งฟรี"
+                },
+                {
+                    code: "DISCOUNT50",
+                    type: "fixed",
+                    value: 50,
+                    label: "ลด 50 บาท"
+                }
+            ],
+            services: [{
+                    name: "giftWrap",
+                    label: "ห่อของขวัญ",
+                    price: 20
+                },
+                {
+                    name: "insurance",
+                    label: "ประกันสินค้า",
+                    price: 50
+                },
+                {
+                    name: "expressDelivery",
+                    label: "จัดส่งด่วน",
+                    price: 100
+                }
+            ],
+            shipping: [{
+                    value: "delivery",
+                    label: "จัดส่ง",
+                    checked: true
+                },
+                {
+                    value: "pickup",
+                    label: "รับเองที่สาขา",
+                    checked: false
+                }
+            ],
+            shippingOptionsData: {
+                delivery: [{
+                        value: "lalamove",
+                        name: "Lalamove",
+                        price: 500
+                    },
+                    {
+                        value: "truck4",
+                        name: "รถบรรทุก 4 ล้อ",
+                        price: 500
+                    },
+                    {
+                        value: "truck6",
+                        name: "รถบรรทุก 6 ล้อ",
+                        price: 1000
+                    }
+                ],
+                pickup: [{
+                    value: "branch1",
+                    name: "แทรนดาร์ อินเตอร์เนชั่นแนล",
+                    price: 0
+                },
+                {
+                    value: "branch2",
+                    name: "Allable",
+                    price: 0
+                }
+            ]
+            },
+
+            viewMode: "list",
+            selectedServices: [],
+            selectedShippingType: "delivery",
+            selectedShippingOptions: {},
+            appliedCoupon: {},
+
+            calculateSummary() {
+                let subtotal = this.cartItems.reduce((sum, item) => sum + item.qty * item.price, 0);
+                let shipping = this.selectedShippingOptions?.price || 0;
+                let discount = 0;
+                if (this.appliedCoupon) {
+                    if (this.appliedCoupon.type === "percent") discount = subtotal * (this.appliedCoupon.value / 100);
+                    else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
+                    else if (this.appliedCoupon.type === "shipping") shipping = 0;
+                }
+                const serviceFee = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
+                const tax = (subtotal - discount + shipping + serviceFee) * 0.07;
+                const total = subtotal - discount + shipping + serviceFee + tax;
+                return { subtotal, discount, shipping, serviceFee, tax, total };
+            },
+
+            saveToStorage() {
+                const summary = this.calculateSummary();
+                const data = {
+                    cartItems: this.cartItems,
+                    appliedCoupon: this.appliedCoupon,
+                    selectedServices: this.selectedServices,
+                    selectedShippingType: this.selectedShippingType,
+                    selectedShippingOptions: this.selectedShippingOptions,
+                    viewMode: this.viewMode,
+                    shipping: this.shipping,
+                    summary
+                };
+                localStorage.setItem("cartAppData", JSON.stringify(data));
+            },
+
+            loadFromStorage() {
+                const data = localStorage.getItem("cartAppData");
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        this.cartItems = parsed.cartItems || this.cartItems;
+                        this.appliedCoupon = parsed.appliedCoupon || {};
+                        this.selectedServices = parsed.selectedServices || [];
+                        this.selectedShippingType = parsed.selectedShippingType || "delivery";
+                        this.selectedShippingOptions = parsed.selectedShippingOptions || {};
+                        this.viewMode = parsed.viewMode || "list";
+                        this.shipping = parsed.shipping || this.shipping;
+                    } catch (e) {
+                        console.error("โหลด localStorage ผิดพลาด", e);
+                    }
+                }
+            },
+
+            renderCart() {
+                const list = document.getElementById("cartItemList");
+                list.innerHTML = "";
+                list.className = `cart-item-list ${this.viewMode}-mode`;
+
+                this.cartItems.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "cart-item";
+
+                    if (this.viewMode === "list") {
+                        div.innerHTML = `
+                        <div class="cart-item-info">
+                            <img src="${item.image}" alt="${item.name}" class="item-image">
+                            <div class="item-details">
+                                <p class="item-name">${item.name}</p>
+                                <p class="item-size">${item.size}</p>
+                                <button class="item-remove" data-id="${item.id}">Remove</button>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <div class="item-quantity">
+                                <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
+                                <span class="quantity-value">${item.qty}</span>
+                                <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
+                            </div>
+                            <span class="item-price">${(item.qty * item.price).toFixed(2)}</span>
+                        </div>
+                    `;
+                    } else {
+                        div.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}" class="item-image">
+                        <p class="item-name">${item.name}</p>
+                        <p class="item-size">${item.size}</p>
+                        <p class="item-price">$${(item.qty * item.price).toFixed(2)}</p>
+                        <div class="item-quantity">
+                            <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
+                            <span class="quantity-value">${item.qty}</span>
+                            <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
+                        </div>
+                        <button class="item-remove" data-id="${item.id}">Remove</button>
+                    `;
+                    }
+
+                    list.appendChild(div);
+                });
+
+                this.bindEvents();
+                this.renderSummary();
+                this.renderCouponList();
+                this.renderShipping();
+                this.renderDeliveryOptions();
+                this.renderServiceOptions();
+            },
+
+            bindEvents() {
+                document.querySelectorAll(".quantity-button").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const id = parseInt(btn.dataset.id);
+                        const action = btn.dataset.action;
+                        const item = this.cartItems.find(i => i.id === id);
+                        if (!item) return;
+                        if (action === "increase") item.qty++;
+                        if (action === "decrease" && item.qty > 1) item.qty--;
+                        this.renderCart();
+                    });
+                });
+
+                document.querySelectorAll(".item-remove").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const id = parseInt(btn.dataset.id);
+                        this.cartItems = this.cartItems.filter(i => i.id !== id);
+                        this.renderCart();
+                    });
+                });
+
+                document.getElementById("applyDiscount").addEventListener("click", () => {
+                    const code = document.getElementById("discountCode").value.trim().toUpperCase();
+                    this.applyCoupon(code);
+                });
+
+                document.getElementById("checkoutOrders").addEventListener("click", () => {
+                    this.saveToStorage();
+                });
+            },
+
+            bindViewToggle() {
+                const listBtn = document.getElementById("listModeBtn");
+                const gridBtn = document.getElementById("gridModeBtn");
+
+                const setActive = (mode) => {
+                    this.viewMode = mode;
+                    listBtn.classList.toggle("active", mode === "list");
+                    gridBtn.classList.toggle("active", mode === "grid");
+                    this.renderCart();
+                };
+
+                listBtn.addEventListener("click", () => setActive("list"));
+                gridBtn.addEventListener("click", () => setActive("grid"));
+
+                setActive(this.viewMode);
+            },
+
+            renderCouponList() {
+                const couponContainer = document.getElementById("couponList");
+                couponContainer.innerHTML = "";
+
+                this.coupons.forEach(coupon => {
+                    const btn = document.createElement("button");
+                    btn.className = "coupon-btn";
+
+                    if (this.appliedCoupon && this.appliedCoupon.code === coupon.code) {
+                        btn.classList.add("active");
+                    }
+
+                    btn.innerText = coupon.label;
+                    btn.addEventListener("click", () => this.applyCoupon(coupon.code));
+                    couponContainer.appendChild(btn);
+                });
+
+                const msg = document.getElementById("discountMessage");
+                if (this.appliedCoupon) {
+                    msg.innerText = `ใช้คูปอง ${this.appliedCoupon.label} แล้ว`;
+                    msg.style.color = "green";
+                } else {
+                    msg.innerText = "";
+                }
+            },
+
+            applyCoupon(code) {
+                const coupon = this.coupons.find(c => c.code === code);
+                const msg = document.getElementById("discountMessage");
+                if (coupon) {
+                    this.appliedCoupon = coupon;
+                    msg.innerText = `ใช้คูปอง ${coupon.label} แล้ว`;
+                    msg.style.color = "green";
+                } else {
+                    this.appliedCoupon = null;
+                    msg.innerText = "คูปองไม่ถูกต้อง";
+                    msg.style.color = "red";
+                }
+                this.saveToStorage();
+                this.renderCouponList();
+                this.renderSummary();
+            },
+
+            renderSummary() {
+                const {
+                    subtotal,
+                    discount,
+                    shipping,
+                    serviceFee,
+                    tax,
+                    total
+                } = this.calculateSummary();
+                document.getElementById("summaryDetails").innerHTML = `
+                <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
+                <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
+                <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
+                <div class="summary-row"><span>บริการเสริม</span><span>${serviceFee.toFixed(2)}</span></div>
+                <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
+                <div class="summary-row summary-subtotal"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
+            `;
+            },
+
+            renderShipping() {
+                const container = document.getElementById("shipping");
+                container.innerHTML = "";
+
+                this.shipping.forEach(item => {
+                    const checked = this.selectedShippingType === item.value ? "checked" : "";
+                    const label = document.createElement("label");
+                    label.classList.add("shipping-label");
+                    label.innerHTML = `
+                        <input type="radio" name="shipping" value="${item.value}" ${checked}>
+                        ${item.label}
+                    `;
+                    container.appendChild(label);
+                });
+
+                document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+                    radio.addEventListener("change", (e) => {
+                        this.selectedShippingType = e.target.value;
+
+                        const options = this.shippingOptionsData[this.selectedShippingType];
+                        this.selectedShippingOptions = options[0];  
+
+                        this.saveToStorage();
+                        this.renderDeliveryOptions(this.selectedShippingType);
+                        this.renderSummary();
+                    });
+                });
+            },
+
+            renderDeliveryOptions(method) {
+                const container = document.getElementById("deliveryOptions");
+                container.innerHTML = "";
+
+                const shippingMethod = method || this.selectedShippingType || "delivery";
+                const options = this.shippingOptionsData[shippingMethod] || [];
+
+                if (!this.selectedShippingOptions || !options.some(o => o.name === this.selectedShippingOptions.name)) {
+                    this.selectedShippingOptions = options[0];
+                }
+
+                const selectedOption = this.selectedShippingOptions;
+
+                options.forEach(opt => {
+                    const label = document.createElement("label");
+                    label.classList.add("delivery-label");
+
+                    const checked = selectedOption?.name === opt.name ? "checked" : "";
+
+                    label.innerHTML = `
+                        <input type="radio" name="deliveryOption" value="${opt.name}" ${checked}>
+                        ${opt.name} (+${opt.price})
+                    `;
+                    container.appendChild(label);
+                });
+
+                document.querySelectorAll('input[name="deliveryOption"]').forEach(input => {
+                    input.addEventListener("change", (e) => {
+                        const selected = options.find(o => o.name === e.target.value);
+                        if (selected) {
+                            this.selectedShippingOptions = selected; 
+                            this.saveToStorage();
+                            this.renderSummary();
+                        }
+                    });
+                });
+            },
+
+            renderServiceOptions() {
+                const container = document.querySelector(".service-section .service-options");
+                container.innerHTML = "";
+
+                this.services.forEach(service => {
+                    const label = document.createElement("label");
+                    label.classList.add("service-label");
+
+                    const isChecked = this.selectedServices.some(s => s.name === service.name) ? "checked" : "";
+
+                    label.innerHTML = `
+                    <input type="checkbox" name="service" value="${service.name}" data-price="${service.price}" ${isChecked}>
+                    ${service.label} (+${service.price})
+                `;
+                    container.appendChild(label);
+                });
+
+                this.bindServiceEvents();
+            },
+
+            bindServiceEvents() {
+                document.querySelectorAll('input[name="service"]').forEach(input => {
+                    input.addEventListener("change", (e) => {
+                        const price = parseFloat(e.target.dataset.price);
+                        const label = e.target.closest("label")?.innerText.trim();
+
+                        if (e.target.checked) {
+                            if (!this.selectedServices.some(s => s.name === e.target.value)) {
+                                this.selectedServices.push({
+                                    name: e.target.value,
+                                    price,
+                                    label
+                                });
+                            }
+                        } else {
+                            this.selectedServices = this.selectedServices.filter(s => s.name !== e.target.value);
+                        }
+                        this.saveToStorage();
+                        this.renderSummary();
+                    });
+                });
+            },
+
+            init() {
+                this.loadFromStorage();
+                this.renderServiceOptions();
+                this.renderCart();
+                this.bindViewToggle();
+            }
+        };
+
+        CartApp.init();
+    </script> -->
+
     <script>
         const CartApp = {
             cartItems: [{
@@ -174,71 +632,97 @@
                     checked: false
                 }
             ],
-            deliveryOptionsData: {
+            shippingOptionsData: {
                 delivery: [{
+                        value: "lalamove",
                         name: "Lalamove",
                         price: 500
                     },
                     {
+                        value: "truck4",
                         name: "รถบรรทุก 4 ล้อ",
                         price: 500
                     },
                     {
+                        value: "truck6",
                         name: "รถบรรทุก 6 ล้อ",
                         price: 1000
                     }
                 ],
                 pickup: [{
+                        value: "branch1",
                         name: "แทรนดาร์ อินเตอร์เนชั่นแนล",
                         price: 0
                     },
-                    // { name: "สาขาเซ็นทรัล", price: 0 },
-                    // { name: "สาขาเอ็มควอเทียร์", price: 0 }
+                    {
+                        value: "branch2",
+                        name: "Allable",
+                        price: 0
+                    }
                 ]
             },
-            appliedCoupon: null,
             viewMode: "list",
-            selectedShippingName: "delivery",
-            selectedDeliveryPrice: 50,
-            selectedDeliveryName: "Lalamove",
             selectedServices: [],
+            selectedShippingType: "delivery",
+            selectedShippingOptions: {},
+            appliedCoupon: {},
 
-            // --- saveToStorage()
+            calculateSummary() {
+                let subtotal = this.cartItems.reduce((sum, item) => sum + item.qty * item.price, 0);
+                let shipping = this.selectedShippingOptions?.price || 0;
+                let discount = 0;
+
+                if (this.appliedCoupon && this.appliedCoupon.code) {
+                    if (this.appliedCoupon.type === "percent") discount = subtotal * (this.appliedCoupon.value / 100);
+                    else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
+                    else if (this.appliedCoupon.type === "shipping") shipping = 0;
+                }
+
+                const serviceFee = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
+                const tax = (subtotal - discount + shipping + serviceFee) * 0.07;
+                const total = subtotal - discount + shipping + serviceFee + tax;
+                return {
+                    subtotal,
+                    discount,
+                    shipping,
+                    serviceFee,
+                    tax,
+                    total
+                };
+            },
+
             saveToStorage() {
+                const summary = this.calculateSummary();
                 const data = {
                     cartItems: this.cartItems,
                     appliedCoupon: this.appliedCoupon,
                     selectedServices: this.selectedServices,
-                    selectedDeliveryPrice: this.selectedDeliveryPrice,
-                    selectedDeliveryName: this.selectedDeliveryName,
-                    selectedShippingName: this.selectedShippingName, // เก็บ shipping
+                    selectedShippingType: this.selectedShippingType,
+                    selectedShippingOptions: this.selectedShippingOptions,
                     viewMode: this.viewMode,
-                    shipping: this.shipping
+                    shipping: this.shipping,
+                    summary
                 };
                 localStorage.setItem("cartAppData", JSON.stringify(data));
             },
 
-            // --- loadFromStorage()
             loadFromStorage() {
                 const data = localStorage.getItem("cartAppData");
-                if (data) {
-                    try {
-                        const parsed = JSON.parse(data);
-                        this.cartItems = parsed.cartItems || this.cartItems;
-                        this.appliedCoupon = parsed.appliedCoupon || null;
-                        this.selectedServices = parsed.selectedServices || [];
-                        this.selectedDeliveryPrice = parsed.selectedDeliveryPrice ?? 50;
-                        this.selectedDeliveryName = parsed.selectedDeliveryName || "Lalamove";
-                        this.selectedShippingName = parsed.selectedShippingName || "delivery"; // โหลด shipping
-                        this.viewMode = parsed.viewMode || "list";
-                        this.shipping = parsed.shipping || this.shipping;
-                    } catch (e) {
-                        console.error("โหลด localStorage ผิดพลาด", e);
-                    }
+                if (!data) return;
+                try {
+                    const parsed = JSON.parse(data);
+                    this.cartItems = parsed.cartItems || this.cartItems;
+                    this.appliedCoupon = parsed.appliedCoupon || {};
+                    this.selectedServices = parsed.selectedServices || [];
+                    this.selectedShippingType = parsed.selectedShippingType || "delivery";
+                    this.selectedShippingOptions = parsed.selectedShippingOptions || {};
+                    this.viewMode = parsed.viewMode || "list";
+                    this.shipping = parsed.shipping || this.shipping;
+                } catch (e) {
+                    console.error("localStorage ผิดพลาด", e);
                 }
             },
 
-            // Render cart items
             renderCart() {
                 const list = document.getElementById("cartItemList");
                 list.innerHTML = "";
@@ -250,36 +734,36 @@
 
                     if (this.viewMode === "list") {
                         div.innerHTML = `
-                            <div class="cart-item-info">
-                                <img src="${item.image}" alt="${item.name}" class="item-image">
-                                <div class="item-details">
-                                    <p class="item-name">${item.name}</p>
-                                    <p class="item-size">${item.size}</p>
-                                    <button class="item-remove" data-id="${item.id}">Remove</button>
-                                </div>
-                            </div>
-                            <div class="item-actions">
-                                <div class="item-quantity">
-                                    <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
-                                    <span class="quantity-value">${item.qty}</span>
-                                    <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
-                                </div>
-                                <span class="item-price">${(item.qty * item.price).toFixed(2)}</span>
-                            </div>
-                        `;
-                    } else {
-                        div.innerHTML = `
-                            <img src="${item.image}" alt="${item.name}" class="item-image">
+                    <div class="cart-item-info">
+                        <img src="${item.image}" alt="${item.name}" class="item-image">
+                        <div class="item-details">
                             <p class="item-name">${item.name}</p>
                             <p class="item-size">${item.size}</p>
-                            <p class="item-price">$${(item.qty * item.price).toFixed(2)}</p>
-                            <div class="item-quantity">
-                                <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
-                                <span class="quantity-value">${item.qty}</span>
-                                <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
-                            </div>
                             <button class="item-remove" data-id="${item.id}">Remove</button>
-                        `;
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <div class="item-quantity">
+                            <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
+                            <span class="quantity-value">${item.qty}</span>
+                            <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
+                        </div>
+                        <span class="item-price">${(item.qty * item.price).toFixed(2)}</span>
+                    </div>
+                `;
+                    } else {
+                        div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="item-image">
+                    <p class="item-name">${item.name}</p>
+                    <p class="item-size">${item.size}</p>
+                    <p class="item-price">$${(item.qty * item.price).toFixed(2)}</p>
+                    <div class="item-quantity">
+                        <button class="quantity-button" data-action="decrease" data-id="${item.id}">-</button>
+                        <span class="quantity-value">${item.qty}</span>
+                        <button class="quantity-button" data-action="increase" data-id="${item.id}">+</button>
+                    </div>
+                    <button class="item-remove" data-id="${item.id}">Remove</button>
+                `;
                     }
 
                     list.appendChild(div);
@@ -288,40 +772,39 @@
                 this.bindEvents();
                 this.renderSummary();
                 this.renderCouponList();
-                this.renderShipping(); // Render shipping radio
-                this.renderDeliveryOptions(); // Render delivery options
+                this.renderShipping();
+                this.renderDeliveryOptions();
                 this.renderServiceOptions();
             },
 
             bindEvents() {
-                document.querySelectorAll(".quantity-button").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const id = parseInt(btn.dataset.id);
-                        const action = btn.dataset.action;
-                        const item = this.cartItems.find(i => i.id === id);
-                        if (!item) return;
-                        if (action === "increase") item.qty++;
-                        if (action === "decrease" && item.qty > 1) item.qty--;
-                        this.renderCart();
-                    });
-                });
+                const list = document.getElementById("cartItemList");
 
-                document.querySelectorAll(".item-remove").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const id = parseInt(btn.dataset.id);
+                // ใช้ event delegation แทน bind แต่ละปุ่ม
+                list.addEventListener("click", (e) => {
+                    const btn = e.target;
+                    const id = parseInt(btn.dataset.id);
+                    const item = this.cartItems.find(i => i.id === id);
+                    if (!item) return;
+
+                    if (btn.classList.contains("quantity-button")) {
+                        if (btn.dataset.action === "increase") item.qty++;
+                        if (btn.dataset.action === "decrease" && item.qty > 1) item.qty--;
+                    } else if (btn.classList.contains("item-remove")) {
                         this.cartItems = this.cartItems.filter(i => i.id !== id);
-                        this.renderCart();
-                    });
+                    }
+
+                    this.renderCart();
                 });
 
-                document.getElementById("applyDiscount").addEventListener("click", () => {
+                const applyBtn = document.getElementById("applyDiscount");
+                applyBtn.onclick = () => {
                     const code = document.getElementById("discountCode").value.trim().toUpperCase();
                     this.applyCoupon(code);
-                });
+                };
 
-                document.getElementById("checkoutOrders").addEventListener("click", () => {
-                    this.saveToStorage();
-                });
+                const checkoutBtn = document.getElementById("checkoutOrders");
+                checkoutBtn.onclick = () => this.saveToStorage();
             },
 
             bindViewToggle() {
@@ -335,8 +818,8 @@
                     this.renderCart();
                 };
 
-                listBtn.addEventListener("click", () => setActive("list"));
-                gridBtn.addEventListener("click", () => setActive("grid"));
+                listBtn.onclick = () => setActive("list");
+                gridBtn.onclick = () => setActive("grid");
 
                 setActive(this.viewMode);
             },
@@ -348,20 +831,14 @@
                 this.coupons.forEach(coupon => {
                     const btn = document.createElement("button");
                     btn.className = "coupon-btn";
-
-                    // ถ้าเป็น coupon ที่ใช้อยู่ ให้แสดง active
-                    if (this.appliedCoupon && this.appliedCoupon.code === coupon.code) {
-                        btn.classList.add("active");
-                    }
-
+                    btn.classList.toggle("active", this.appliedCoupon?.code === coupon.code);
                     btn.innerText = coupon.label;
-                    btn.addEventListener("click", () => this.applyCoupon(coupon.code));
+                    btn.onclick = () => this.applyCoupon(coupon.code);
                     couponContainer.appendChild(btn);
                 });
 
-                // แสดงข้อความคูปอง
                 const msg = document.getElementById("discountMessage");
-                if (this.appliedCoupon) {
+                if (this.appliedCoupon?.code) {
                     msg.innerText = `ใช้คูปอง ${this.appliedCoupon.label} แล้ว`;
                     msg.style.color = "green";
                 } else {
@@ -377,124 +854,101 @@
                     msg.innerText = `ใช้คูปอง ${coupon.label} แล้ว`;
                     msg.style.color = "green";
                 } else {
-                    this.appliedCoupon = null;
+                    this.appliedCoupon = {};
                     msg.innerText = "คูปองไม่ถูกต้อง";
                     msg.style.color = "red";
                 }
-                this.saveToStorage(); // ✅ บันทึกไป localStorage ทุกครั้ง
+                this.saveToStorage();
                 this.renderCouponList();
                 this.renderSummary();
             },
 
             renderSummary() {
-                let subtotal = this.cartItems.reduce((sum, item) => sum + item.qty * item.price, 0);
-                let shipping = 0;
-                const deliveryMethod = document.querySelector('input[name="shipping"]:checked')?.value || "delivery";
-                if (deliveryMethod === "delivery") shipping = this.selectedDeliveryPrice;
-
-                let discount = 0;
-                if (this.appliedCoupon) {
-                    if (this.appliedCoupon.type === "percent") discount = subtotal * (this.appliedCoupon.value / 100);
-                    else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
-                    else if (this.appliedCoupon.type === "shipping") shipping = 0;
-                }
-
-                const serviceFee = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
-                const tax = (subtotal - discount + shipping + serviceFee) * 0.07;
-                const total = subtotal - discount + shipping + serviceFee + tax;
-
+                const {
+                    subtotal,
+                    discount,
+                    shipping,
+                    serviceFee,
+                    tax,
+                    total
+                } = this.calculateSummary();
                 document.getElementById("summaryDetails").innerHTML = `
-                    <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
-                    <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
-                    <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
-                    <div class="summary-row"><span>บริการเสริม</span><span>${serviceFee.toFixed(2)}</span></div>
-                    <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
-                    <div class="summary-row summary-subtotal"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
-                `;
+            <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
+            <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
+            <div class="summary-row"><span>บริการเสริม</span><span>${serviceFee.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
+            <div class="summary-row summary-subtotal"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
+        `;
             },
 
-            // --- renderShipping()
             renderShipping() {
                 const container = document.getElementById("shipping");
                 container.innerHTML = "";
 
                 this.shipping.forEach(item => {
-                    const checked = this.selectedShippingName === item.value ? "checked" : "";
+                    const checked = this.selectedShippingType === item.value ? "checked" : "";
                     const label = document.createElement("label");
                     label.classList.add("shipping-label");
-                    label.innerHTML = `
-                        <input type="radio" name="shipping" value="${item.value}" ${checked}>
-                        ${item.label}
-                    `;
+                    label.innerHTML = `<input type="radio" name="shipping" value="${item.value}" ${checked}> ${item.label}`;
                     container.appendChild(label);
                 });
 
-                // bind change
-                document.querySelectorAll('input[name="shipping"]').forEach(radio => {
-                    radio.addEventListener("change", (e) => {
-                        this.selectedShippingName = e.target.value; // อัพเดทค่า
-                        this.saveToStorage(); // บันทึกทุกครั้ง
-                        this.renderDeliveryOptions(e.target.value);
+                container.querySelectorAll('input[name="shipping"]').forEach(radio => {
+                    radio.onchange = (e) => {
+                        this.selectedShippingType = e.target.value;
+                        const options = this.shippingOptionsData[this.selectedShippingType] || [];
+                        this.selectedShippingOptions = options.length ? options[0] : {};
+                        this.saveToStorage();
+                        this.renderDeliveryOptions(this.selectedShippingType);
                         this.renderSummary();
-                    });
+                    };
                 });
             },
 
-            // Render delivery options based on shipping method
             renderDeliveryOptions(method) {
                 const container = document.getElementById("deliveryOptions");
                 container.innerHTML = "";
 
-                const deliveryMethod = method || document.querySelector('input[name="shipping"]:checked')?.value || "delivery";
-                const options = this.deliveryOptionsData[deliveryMethod];
+                const shippingMethod = method || this.selectedShippingType || "delivery";
+                const options = this.shippingOptionsData[shippingMethod] || [];
 
-                options.forEach((opt, idx) => {
+                if (!options.length) {
+                    this.selectedShippingOptions = {};
+                } else if (!this.selectedShippingOptions || !options.some(o => o.name === this.selectedShippingOptions.name)) {
+                    this.selectedShippingOptions = options[0];
+                }
+
+                const selectedOption = this.selectedShippingOptions;
+
+                options.forEach(opt => {
                     const label = document.createElement("label");
                     label.classList.add("delivery-label");
-
-                    // ถ้า localStorage มีชื่อ selectedDeliveryName ให้เช็คตัวนั้น
-                    const checked = this.selectedDeliveryName === opt.name ? "checked" : (idx === 0 && !this.selectedDeliveryName ? "checked" : "");
-                    
-                    label.innerHTML = `
-                        <input type="radio" name="deliveryOption" value="${opt.name}" ${checked}>
-                        ${opt.name} (+${opt.price})
-                    `;
+                    const checked = selectedOption?.name === opt.name ? "checked" : "";
+                    label.innerHTML = `<input type="radio" name="deliveryOption" value="${opt.name}" ${checked}> ${opt.name} (+${opt.price})`;
                     container.appendChild(label);
                 });
 
-                // set selectedDeliveryPrice ตาม checked
-                const selectedOption = options.find(o => o.name === this.selectedDeliveryName) || options[0];
-                this.selectedDeliveryPrice = selectedOption.price;
-                this.selectedDeliveryName = selectedOption.name;
-
-                document.querySelectorAll('input[name="deliveryOption"]').forEach(input => {
-                    input.addEventListener("change", (e) => {
+                container.querySelectorAll('input[name="deliveryOption"]').forEach(input => {
+                    input.onchange = (e) => {
                         const selected = options.find(o => o.name === e.target.value);
-                        if (selected) {
-                            this.selectedDeliveryPrice = selected.price;
-                            this.selectedDeliveryName = selected.name;
-                            this.saveToStorage(); // บันทึกทุกครั้ง
-                            this.renderSummary();
-                        }
-                    });
+                        if (selected) this.selectedShippingOptions = selected;
+                        this.saveToStorage();
+                        this.renderSummary();
+                    };
                 });
             },
 
             renderServiceOptions() {
                 const container = document.querySelector(".service-section .service-options");
+                if (!container) return;
                 container.innerHTML = "";
 
                 this.services.forEach(service => {
                     const label = document.createElement("label");
                     label.classList.add("service-label");
-
-                    // ถ้า localStorage มี selectedServices ให้ checked ตัวนั้น
                     const isChecked = this.selectedServices.some(s => s.name === service.name) ? "checked" : "";
-
-                    label.innerHTML = `
-                        <input type="checkbox" name="service" value="${service.name}" data-price="${service.price}" ${isChecked}>
-                        ${service.label} (+${service.price})
-                    `;
+                    label.innerHTML = `<input type="checkbox" name="service" value="${service.name}" data-price="${service.price}" ${isChecked}> ${service.label} (+${service.price})`;
                     container.appendChild(label);
                 });
 
@@ -503,19 +957,24 @@
 
             bindServiceEvents() {
                 document.querySelectorAll('input[name="service"]').forEach(input => {
-                    input.addEventListener("change", (e) => {
+                    input.onchange = (e) => {
                         const price = parseFloat(e.target.dataset.price);
+                        const label = e.target.closest("label")?.innerText.trim();
+
                         if (e.target.checked) {
-                            // เพิ่มลง selectedServices
                             if (!this.selectedServices.some(s => s.name === e.target.value)) {
-                                this.selectedServices.push({ name: e.target.value, price });
+                                this.selectedServices.push({
+                                    name: e.target.value,
+                                    price,
+                                    label
+                                });
                             }
                         } else {
                             this.selectedServices = this.selectedServices.filter(s => s.name !== e.target.value);
                         }
-                        this.saveToStorage(); // บันทึกทุกครั้ง
+                        this.saveToStorage();
                         this.renderSummary();
-                    });
+                    };
                 });
             },
 
@@ -524,6 +983,7 @@
                 this.renderServiceOptions();
                 this.renderCart();
                 this.bindViewToggle();
+                this.renderSummary();
             }
         };
 
