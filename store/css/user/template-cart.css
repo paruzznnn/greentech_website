@@ -92,13 +92,14 @@ Cover Photo
 
 .cart-item-info {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     gap: 1rem;
 }
 
 .item-image {
     width: 5rem;
     height: 5rem;
+    margin-bottom: 5px;
     border-radius: 0.75rem;
     object-fit: cover;
     border: 1px solid #e5e7eb;
@@ -152,6 +153,17 @@ Cover Photo
     border-radius: 9999px;
     background: #f9fafb;
     overflow: hidden;
+}
+
+.quantity-input {
+    border: none !important;
+    background: #f9fafb !important;
+    text-align: right !important;
+}
+
+.quantity-input:focus,
+.quantity-input:focus-visible {
+    outline: 2px solid #3b82f6;
 }
 
 .quantity-button {
