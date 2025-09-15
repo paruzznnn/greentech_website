@@ -224,14 +224,14 @@
                     else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
                     else if (this.appliedCoupon.type === "shipping") shipping = 0;
                 }
-                const serviceFee = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
-                const tax = (subtotal - discount + shipping + serviceFee) * 0.07;
-                const total = subtotal - discount + shipping + serviceFee + tax;
+                const service = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
+                const tax = (subtotal - discount + shipping + service) * 0.07;
+                const total = subtotal - discount + shipping + service + tax;
                 return {
                     subtotal,
                     discount,
                     shipping,
-                    serviceFee,
+                    service,
                     tax,
                     total
                 };
@@ -454,7 +454,7 @@
                     subtotal,
                     discount,
                     shipping,
-                    serviceFee,
+                    service,
                     tax,
                     total
                 } = this.calculateSummary();
@@ -462,7 +462,7 @@
                     <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
                     <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
                     <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
-                    <div class="summary-row"><span>บริการเสริม</span><span>${serviceFee.toFixed(2)}</span></div>
+                    <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
                     <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
                     <div class="summary-row summary-subtotal"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
                 `;

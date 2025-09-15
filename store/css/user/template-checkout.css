@@ -128,63 +128,37 @@
 ========================= */
 .order-table {
     width: 100%;
-    /* กินเต็มความกว้างคอนเทนเนอร์ */
     border-collapse: collapse;
-    /* ลบช่องว่างระหว่างเส้นขอบ */
     margin-bottom: 1rem;
-    /* เว้นระยะด้านล่าง */
 }
 
 .order-table th,
 .order-table td {
     border-bottom: 1px solid #ddd;
-    /* เส้นขอบด้านล่างของแต่ละเซลล์ */
     padding: 0.5rem;
-    /* ระยะห่างด้านในเซลล์ */
 }
 
 .order-table th {
     background-color: #f7f7f7;
-    /* สีพื้นหลังหัวตาราง */
     text-align: left;
-    /* จัดข้อความชิดซ้าย */
 }
 
-/* ชื่อสินค้า */
 .order-table td.product-name {
-    white-space: nowrap;
-    /* ข้อความไม่ขึ้นบรรทัดใหม่ */
-    overflow: hidden;
-    /* ตัดข้อความส่วนเกิน */
-    text-overflow: ellipsis;
-    /* แสดง ... ถ้าข้อความยาวเกิน */
-    max-width: 6vw;
-    /* กำหนดความกว้างสูงสุดเป็น 6% ของหน้าจอ */
+    white-space: normal;
+    max-width: 50vw;
+    word-wrap: break-word;
 }
 
-/* ปรับสำหรับหน้าจอมือถือ */
-@media (max-width: 576px) {
+/* ยกเว้นแท็บเล็ต (กลับไปใช้ ellipsis) */
+@media (min-width: 577px) and (max-width: 991px) {
     .order-table td.product-name {
-        white-space: normal;
-        /* ให้ข้อความขึ้นบรรทัดใหม่ได้ */
-        max-width: 50vw;
-        /* ให้ความกว้างสูงสุด 50% ของหน้าจอมือถือ */
-        word-wrap: break-word;
-        /* ตัดคำถ้ายาวเกิน */
-    }
-
-    .order-table th,
-    .order-table td {
-        padding: 0.4rem;
-        /* ปรับระยะห่างให้พอดีกับมือถือ */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 6vw;
     }
 }
 
-
-
-/* =========================
-การจัดข้อความทั่วไป
-========================= */
 .text-center {
     text-align: center;
 }
@@ -193,14 +167,9 @@
     text-align: right;
 }
 
-/* =========================
-เซคชันแยกส่วน
-========================= */
 .order-section {
     padding: 0.5rem 0;
-    /* เว้นด้านบนและล่าง */
     border-bottom: 1px dashed #ccc;
-    /* เส้นแบ่งแบบ dashed */
 }
 
 .summary-card {
@@ -222,24 +191,24 @@
     font-size: 1.1rem;
 }
 
-#confirmOrders {
-    width: 100%;
-    background-color: #22c55e;
-    color: white;
-    font-weight: 700;
-    padding: 0.5rem;
-    border-radius: 0.75rem;
-    border: none;
-    transition: all 0.2s ease-in-out;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+.confirmOrders {
+    /* width: 100% !important; */
+    background-color: #22c55e !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 0.5rem !important;
+    border-radius: 0.75rem !important;
+    border: none !important;
+    transition: all 0.2s ease-in-out !important;
+    margin-bottom: 1rem !important;
+    font-size: 1rem !important;
 }
 
-#confirmOrders:disabled {
-    background-color: #16a34a;
-    color: #aaa;
-    cursor: not-allowed;
-}
+/* .confirmOrders:disabled {
+    background-color: #16a34a !important;
+    color: #aaa !important;
+    cursor: not-allowed !important;
+} */
 
 #backCheckoutOrders {
     width: 100%;
@@ -258,13 +227,6 @@
     font-size: 0.8rem;
 }
 
-/* .billing-form input {
-    width: 100%;
-    margin-bottom: 0.5rem;
-    padding: 0.4rem;
-    border: 1px solid #ccc;
-    border-radius: 0.4rem;
-} */
 
 .step-buttons {
     margin-top: 1rem;
