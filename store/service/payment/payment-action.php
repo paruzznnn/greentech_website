@@ -41,147 +41,266 @@ $userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 $timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
 $dateNow = date('Y-m-d H:i:s');
 
-// echo '<pre>';
-// print_r($_SESSION);
-// print_r($dataJson);
-// echo '</pre>';
-// exit;
-
-if ($action == 'getQRPromptPay') {
+function generateQRpromptPay ($dataJson) {
     $PromptPayQR = new PromptPayQR();
     $PromptPayQR->size = 8;
     $PromptPayQR->id = $dataJson['phone'];
     $PromptPayQR->amount = $dataJson['amount'];
     $QRCode = $PromptPayQR->generate('../../PromptPay/TMP_FILE_QRCODE_PROMPTPAY.png');
-    $response = [
-        "qrCodeImageBase64" => $QRCode
-    ];
-    http_response_code(200);
-    echo json_encode($response);
-    exit;
-} else if ($action == 'payOrder') {
+    return $QRCode;
+}
 
-    $order_code = isset($dataJson['order_id']) ? (string) $dataJson['order_id'] : '';
-    $delivery_option = isset($dataJson['delivery_option']) ? (string) $dataJson['delivery_option'] : '';
+if ($action == 'payOrder') {
 
-    $full_name = isset($dataJson['full_name']) ? (string) $dataJson['full_name'] : '';
-    $phone_number = isset($dataJson['phone_number']) ? (string) $dataJson['phone_number'] : '';
-    $address_detail = isset($dataJson['address_detail']) ? (string) $dataJson['address_detail'] : '';
+try {
+    // เริ่ม Transaction
+    $conn_cloudpanel->begin_transaction();
 
-    $province_name = isset($dataJson['province_name']) ? (string) $dataJson['province_name'] : '';
-    $district_name = isset($dataJson['district_name']) ? (string) $dataJson['district_name'] : '';
-    $subdistrict_name = isset($dataJson['subdistrict_name']) ? (string) $dataJson['subdistrict_name'] : '';
+    // -----------------------
+    // STEP 1: Validate Billing
+    // -----------------------
+    if (empty($dataJson['billing']['first_name'])) {
+        throw new Exception("Billing: first_name is required.");
+    }
+    $first_name = (string)$dataJson['billing']['first_name'];
 
-    $province = isset($dataJson['province']) ? (int) $dataJson['province'] : '';
-    $district = isset($dataJson['district']) ? (int) $dataJson['district'] : '';
-    $subdistrict = isset($dataJson['subdistrict']) ? (int) $dataJson['subdistrict'] : '';
-    $postalCode = isset($dataJson['postalCode']) ? (string) $dataJson['postalCode'] : '';
+    if (empty($dataJson['billing']['last_name'])) {
+        throw new Exception("Billing: last_name is required.");
+    }
+    $last_name = (string)$dataJson['billing']['last_name'];
 
-    $payment_method = isset($dataJson['payment_method']) ? (string) $dataJson['payment_method'] : '';
+    if (empty($dataJson['billing']['phone_number'])) {
+        throw new Exception("Billing: phone_number is required.");
+    }
+    $phone_number = (string)$dataJson['billing']['phone_number'];
 
-    $product_items = isset($dataJson['product_item']) ? json_decode($dataJson['product_item'], true) : null;
-    if (!is_array($product_items)) {
-        die("Invalid product_item format.");
+    // -----------------------
+    // STEP 2: Validate Address
+    // -----------------------
+    if (!isset($dataJson['addresses'][0])) {
+        throw new Exception("Addresses: missing address.");
     }
 
-    $sub_total = isset($dataJson['sub_total']) ? (float) $dataJson['sub_total'] : 0;
-    $vat_amount = isset($dataJson['vat_amount']) ? (float) $dataJson['vat_amount'] : 0;
-    $shipping_amount = isset($dataJson['shipping_amount']) ? (float) $dataJson['shipping_amount'] : 0;
-    $discount_amount = isset($dataJson['discount_amount']) ? (float) $dataJson['discount_amount'] : 0;
-    $total_amount = isset($dataJson['total_amount']) ? (float) $dataJson['total_amount'] : 0;
+    $addresses_detail       = (string)($dataJson['addresses'][0]['detail'] ?? '');
+    $addresses_provinces    = (string)($dataJson['addresses'][0]['provinces'] ?? '');
+    $addresses_districts    = (string)($dataJson['addresses'][0]['districts'] ?? '');
+    $addresses_subdistricts = (string)($dataJson['addresses'][0]['subdistricts'] ?? '');
+    $addresses_postalCode   = (string)($dataJson['addresses'][0]['postalCode'] ?? '');
 
-    switch ($payment_method) {
-        case 'bank_transfer':
-            $payMethod = 1;
-            break;
-        case 'promptpay':
-            $payMethod = 2;
-            break;
-        default:
-            $payMethod = 0;
-            break;
+    if ($addresses_detail === '' || $addresses_provinces === '' || $addresses_postalCode === '') {
+        throw new Exception("Addresses: required fields are missing.");
     }
-    switch ($delivery_option) {
-        case 'shipping':
-            $deliveryMethod = 1;
-            break;
-        case 'pickup':
-            $deliveryMethod = 2;
-            break;
-        default:
-            $deliveryMethod = 0;
-            break;
+
+    // -----------------------
+    // STEP 3: Validate Shipping
+    // -----------------------
+    if (!isset($dataJson['selectedShippingOptions'])) {
+        throw new Exception("Shipping: missing selectedShippingOptions.");
     }
-    $orderKey = time();
+    $shipping_name  = (string)($dataJson['selectedShippingOptions']['name'] ?? '');
+    $shipping_type  = (string)($dataJson['selectedShippingOptions']['value'] ?? '');
+    $shipping_price = (float)($dataJson['selectedShippingOptions']['price'] ?? 0);
+
+    // -----------------------
+    // STEP 4: Validate Cart Items
+    // -----------------------
+    $order_items = $dataJson['cartItems'] ?? [];
+    if (!is_array($order_items) || count($order_items) === 0) {
+        throw new Exception("Cart: must have at least one item.");
+    }
+
+    // -----------------------
+    // STEP 5: Validate Discount
+    // -----------------------
+    if (!isset($dataJson['appliedCoupon'])) {
+        throw new Exception("Discount: missing appliedCoupon.");
+    }
+    $discount_code  = (string)($dataJson['appliedCoupon']['code'] ?? '');
+    $discount_name  = (string)($dataJson['appliedCoupon']['label'] ?? '');
+    $discount_type  = (string)($dataJson['appliedCoupon']['type'] ?? '');
+    $discount_price = (float)($dataJson['appliedCoupon']['value'] ?? 0);
+
+    // -----------------------
+    // STEP 6: Validate Services
+    // -----------------------
+    $order_service = $dataJson['selectedServices'] ?? [];
+    if (!is_array($order_service)) {
+        throw new Exception("Services: invalid format.");
+    }
+
+    // -----------------------
+    // STEP 7: Validate Summary
+    // -----------------------
+    if (!isset($dataJson['summary'])) {
+        throw new Exception("Summary: missing data.");
+    }
+    $subtotal = (float)($dataJson['summary']['subtotal'] ?? 0);
+    $discount = (float)($dataJson['summary']['discount'] ?? 0);
+    $shipping = (float)($dataJson['summary']['shipping'] ?? 0);
+    $service  = (float)($dataJson['summary']['service'] ?? 0);
+    $vat      = (float)($dataJson['summary']['tax'] ?? 0);
+    $total    = (float)($dataJson['summary']['total'] ?? 0);
+
+    if ($total <= 0) {
+        throw new Exception("Summary: total must be greater than 0.");
+    }
+
+    // -----------------------
+    // STEP 8: Generate Order Number
+    // -----------------------
+    $gencode    = "ODR";
+    $newOrderNo = generateOrderNumber($conn_cloudpanel, $gencode);
+
+    // -----------------------
+    // STEP 9: Insert ecm_orders
+    // -----------------------
     $order_data = [
-        'member_id' => $userId,
-        'order_id' => $orderKey,
-        'order_code' => $order_code,
-        'payment_method' => $payMethod,
-        'sub_total' => $sub_total,
-        'vat_amount' => $vat_amount,
-        'shipping_amount' => $shipping_amount,
-        'discount_amount' => $discount_amount,
-        'delivery_method' => $deliveryMethod,
-        'timezone' => $timeZone,
-        'created_at' => $dateNow
+        'member_id'      => $userId,
+        'order_id'       => $newOrderNo,
+        'order_subtotal' => $subtotal,
+        'order_discount' => $discount,
+        'order_shipping' => $shipping,
+        'order_service'  => $service,
+        'order_vat'      => $vat,
+        'order_total'    => $total,
+        'order_notes'    => $dataJson['orderNotes'] ?? '',
+        'timezone'       => $timeZone,
+        'created_at'     => $dateNow
     ];
+    if (!insertData($conn_cloudpanel, 'ecm_orders', $order_data)) {
+        throw new Exception("Insert ecm_orders failed.");
+    }
 
-    if (insertData($conn_cloudpanel, 'ecm_orders', $order_data)) {
-        $checkIns = true;
-        foreach ($product_items as $item) {
-            $product_id = (int)$item['id'];
-            $product_name = $item['name'];
-            $price = (float)$item['price'];
-            $quantity = (int)$item['quantity'];
-            $image = $item['imageUrl'];
-            $totalPrice = $price * $quantity;
-            $product_data = [
-                'member_id' => $userId,
-                'order_id' => $orderKey,
-                'order_code' => $order_code,
-                'product_id' => $product_id,
-                'product_name' => $product_name,
-                'product_pic' => $image,
-                'price' => $price,
-                'quantity' => $quantity,
-                'total_price' => $totalPrice,
-                'timezone' => $timeZone,
-                'created_at' => $dateNow
-            ];
-            insertData($conn_cloudpanel, 'ecm_orders_detail', $product_data);
+    // -----------------------
+    // STEP 10: Insert ecm_orders_item
+    // -----------------------
+    foreach ($order_items as $item) {
+        if (!isset($item['id'], $item['name'], $item['price'], $item['qty'])) {
+            throw new Exception("Invalid order item data.");
         }
 
-        $shipping_data = [
-            'member_id' => $userId,
-            'order_id' => $orderKey,
-            'order_code' => $order_code,
-            'full_name' => $full_name,
-            'phone_number' => $phone_number,
-            'address_detail' => $address_detail,
-            'province_code' => $province,
-            'province_name' => $province_name,
-            'district_code' => $district,
-            'district_name' => $district_name,
-            'subdistrict_code' => $subdistrict,
-            'subdistrict_name' => $subdistrict_name,
-            'post_code' => $postalCode,
-            'timezone' => $timeZone,
-            'created_at' => $dateNow
+        $product_id   = (int)$item['id'];
+        $product_name = (string)$item['name'];
+        $price        = (float)$item['price'];
+        $quantity     = (int)$item['qty'];
+        $image        = (string)($item['image'] ?? '');
+        $totalPrice   = $price * $quantity;
+
+        $product_data = [
+            'member_id'    => $userId,
+            'order_id'     => $newOrderNo,
+            'product_id'   => $product_id,
+            'product_name' => $product_name,
+            'product_pic'  => $image,
+            'price'        => $price,
+            'quantity'     => $quantity,
+            'total_price'  => $totalPrice,
+            'timezone'     => $timeZone,
+            'created_at'   => $dateNow
         ];
-        insertData($conn_cloudpanel, 'ecm_shipping', $shipping_data);
-        
-    } else {
-        $checkIns = false;
+        if (!insertData($conn_cloudpanel, 'ecm_orders_item', $product_data)) {
+            throw new Exception("Insert ecm_orders_item failed.");
+        }
     }
 
-    $response = [
-        "status" => $checkIns
+    // -----------------------
+    // STEP 11: Insert ecm_orders_shipping
+    // -----------------------
+    $shipping_data = [
+        'member_id'       => $userId,
+        'order_id'        => $newOrderNo,
+        'shipping_name'   => $shipping_name,
+        'shipping_price'  => $shipping_price,
+        'shipping_type'   => $shipping_type,
+        'timezone'        => $timeZone,
+        'created_at'      => $dateNow
     ];
+    if (!insertData($conn_cloudpanel, 'ecm_orders_shipping', $shipping_data)) {
+        throw new Exception("Insert ecm_orders_shipping failed.");
+    }
+
+    // -----------------------
+    // STEP 12: Insert ecm_orders_service
+    // -----------------------
+    foreach ($order_service as $item) {
+        if (!isset($item['label'], $item['name'], $item['price'])) {
+            throw new Exception("Invalid order service data.");
+        }
+
+        $service_name  = (string)$item['label'];
+        $service_type  = (string)$item['name'];
+        $service_price = (float)$item['price'];
+
+        $service_data = [
+            'member_id'     => $userId,
+            'order_id'      => $newOrderNo,
+            'service_name'  => $service_name,
+            'service_price' => $service_price,
+            'service_type'  => $service_type,
+            'timezone'      => $timeZone,
+            'created_at'    => $dateNow
+        ];
+        if (!insertData($conn_cloudpanel, 'ecm_orders_service', $service_data)) {
+            throw new Exception("Insert ecm_orders_service failed.");
+        }
+    }
+
+    // -----------------------
+    // STEP 13: Insert ecm_orders_discount
+    // -----------------------
+    $discount_data = [
+        'member_id'       => $userId,
+        'order_id'        => $newOrderNo,
+        'discount_code'   => $discount_code,
+        'discount_name'   => $discount_name,
+        'discount_price'  => $discount_price,
+        'discount_type'   => $discount_type,
+        'timezone'        => $timeZone,
+        'created_at'      => $dateNow
+    ];
+    if (!insertData($conn_cloudpanel, 'ecm_orders_discount', $discount_data)) {
+        throw new Exception("Insert ecm_orders_discount failed.");
+    }
+
+    // -----------------------
+    // STEP 14: Insert ecm_orders_payment
+    // -----------------------
+    $payment_data = [
+        'member_id'       => $userId,
+        'order_id'        => $newOrderNo,
+        'timezone'        => $timeZone,
+        'created_at'      => $dateNow
+    ];
+    if (!insertData($conn_cloudpanel, 'ecm_orders_payment', $payment_data)) {
+        throw new Exception("Insert ecm_orders_discount failed.");
+    }
+
+    // Commit เมื่อสำเร็จทุกขั้นตอน
+    $conn_cloudpanel->commit();
+
+    $response = ["status" => true, "order_id" => $newOrderNo];
     http_response_code(200);
     echo json_encode($response);
-    $conn_cloudpanel->close();
+
+} catch (Exception $e) {
+    // Rollback เมื่อมี Error
+    if ($conn_cloudpanel->errno) {
+        $conn_cloudpanel->rollback();
+    }
+
+    http_response_code(500);
+    echo json_encode([
+        "status" => false,
+        "error"  => $e->getMessage()
+    ]);
+
+} finally {
+    if (isset($conn_cloudpanel) && $conn_cloudpanel instanceof mysqli) {
+        $conn_cloudpanel->close();
+    }
     exit;
+}
+
 } else {
 
     http_response_code(400);

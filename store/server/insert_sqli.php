@@ -1,4 +1,40 @@
 <?php
+
+function generateOrderNumber(mysqli $conn, string $gencode): string {
+    // SQL query (ใช้ ? placeholder แทนการใส่ค่าตรง ๆ)
+    $sql = "
+        SELECT COALESCE(
+            MAX(CONVERT(SUBSTRING_INDEX(order_id, '-', -1), UNSIGNED INTEGER)), 
+            0
+        ) + 1 AS maxcode
+        FROM ecm_orders
+        WHERE order_id LIKE CONCAT(?, '-%')
+        LIMIT 1
+    ";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
+
+    // bind_param: "s" = string
+    $stmt->bind_param("s", $gencode);
+
+    if (!$stmt->execute()) {
+        die("Execute failed: " . $stmt->error);
+    }
+
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    // ดึง maxcode จาก query
+    $maxcode = $row['maxcode'] ?? 1;
+
+    // สร้าง order_id ใหม่ เช่น ORD-001, ORD-002
+    return $gencode . '-' . str_pad($maxcode, 3, "0", STR_PAD_LEFT);
+}
+
 function insertData(
     mysqli $conn,
     string $table_name,
