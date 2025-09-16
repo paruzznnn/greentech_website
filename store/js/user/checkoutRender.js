@@ -378,10 +378,10 @@ const CheckoutApp = {
                 "Content-Type": "application/json"
             }
         })
-            .then(res => res.json()).then(res => {
-                this.provincesData = res;
-                this.populateProvinces();
-            }).catch(err => console.error(err));
+        .then(res => res.json()).then(res => {
+            this.provincesData = res;
+            this.populateProvinces();
+        }).catch(err => console.error(err));
     },
 
     loadDistricts() {
