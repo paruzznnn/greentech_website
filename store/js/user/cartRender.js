@@ -301,7 +301,7 @@ const CartApp = {
     bindCheckoutEvents() {
         document.getElementById("checkoutOrders").onclick = () => {
         this.saveToStorage();
-        redirectGet(pathConfig.BASE_WEB + '/user/checkout/');
+        redirectGet(pathConfig.BASE_WEB + 'user/checkout/');
     };
     },
 
