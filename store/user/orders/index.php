@@ -159,8 +159,8 @@
 
         .rcp-action-buttons a {
             text-align: center;
-            background-color: #2563eb;
-            color: #fff;
+            /* background-color: #2563eb; */
+            /* color: #fff; */
             border: none;
             border-radius: 6px;
             padding: 0.5rem 1rem;
@@ -171,7 +171,7 @@
         }
 
         .rcp-action-buttons a:hover {
-            background-color: #1d4ed8;
+            /* background-color: #1d4ed8; */
         }
 
         @media (max-width: 480px) {
@@ -308,9 +308,9 @@
                             <p>ใบเสร็จนี้ถูกสร้างขึ้นโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน</p>
                         </div>
                         <div class="rcp-action-buttons">
-                            <a href="#">กลับไปหน้าหลัก</a>
-                            <a href="#">ไปที่รายการสั่งซื้อ</a>
-                            <a href="#">การชำระเงิน</a>
+                            <a href="<?php echo $GLOBALS['BASE_WEB']; ?>">กลับไปหน้าหลัก</a>
+                            <a href="<?php echo $GLOBALS['BASE_WEB']; ?>user/">ไปที่รายการสั่งซื้อ</a>
+                            <a href="<?php echo $GLOBALS['BASE_WEB']; ?>user/payment/">การชำระเงิน</a>
                         </div>
                     </div>
                 </div>
@@ -373,10 +373,11 @@
                 this.cartItems.forEach(item => {
                     const total = item.price * item.qty;
                     const row = document.createElement('tr');
-                    row.innerHTML = `<td>${item.name}</td>
-                             <td class="text-center">${item.qty}</td>
-                             <td class="text-right">${this.formatPrice(item.price)}</td>
-                             <td class="text-right">${this.formatPrice(total)}</td>`;
+                    row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td class="text-center">${item.qty}</td>
+                    <td class="text-right">${this.formatPrice(item.price)}</td>
+                    <td class="text-right">${this.formatPrice(total)}</td>`;
                     tbody.appendChild(row);
                 });
             },
