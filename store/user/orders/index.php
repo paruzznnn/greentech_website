@@ -20,7 +20,6 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
-        /* --- Header --- */
         .rcp-header {
             display: flex;
             flex-direction: column;
@@ -48,7 +47,6 @@
             height: auto;
         }
 
-        /* --- Details Section --- */
         .rcp-details {
             display: grid;
             grid-template-columns: 1fr;
@@ -64,15 +62,6 @@
 
         .rcp-right-align {
             text-align: left;
-        }
-
-        /* --- Items Section --- */
-        .rcp-items-section h3,
-        .rcp-services-section h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 0.75rem;
         }
 
         .rcp-items-table {
@@ -105,8 +94,7 @@
             text-align: right;
         }
 
-        /* --- Services Section --- */
-        #order-services-list {
+        .rcp-list {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -116,7 +104,7 @@
             font-size: 0.875rem;
         }
 
-        #order-services-list li {
+        .rcp-list li {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 1rem;
@@ -124,21 +112,13 @@
             color: #4b5563;
         }
 
-        #order-services-list li:last-child {
+        .rcp-list li:last-child {
             border-bottom: none;
         }
 
-        #order-services-list li.text-center {
+        .rcp-list li.text-center {
             text-align: center;
             justify-content: center;
-        }
-
-        /* --- Totals Section --- */
-        .rcp-summary-content {
-            width: 100%;
-            max-width: 320px;
-            margin-left: auto;
-            margin-top: 1rem;
         }
 
         #order-totals-list {
@@ -162,7 +142,6 @@
             border-top: 2px dashed #d1d5db;
         }
 
-        /* --- Footer Notes --- */
         .rcp-footer-notes {
             text-align: center;
             font-size: 0.75rem;
@@ -170,7 +149,6 @@
             margin-top: 1.5rem;
         }
 
-        /* --- Action Buttons --- */
         .rcp-action-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -179,7 +157,8 @@
             justify-content: center;
         }
 
-        .rcp-action-buttons button {
+        .rcp-action-buttons a {
+            text-align: center;
             background-color: #2563eb;
             color: #fff;
             border: none;
@@ -188,9 +167,10 @@
             cursor: pointer;
             font-size: 0.875rem;
             transition: background-color 0.3s ease;
+            text-decoration: none;
         }
 
-        .rcp-action-buttons button:hover {
+        .rcp-action-buttons a:hover {
             background-color: #1d4ed8;
         }
 
@@ -199,12 +179,12 @@
                 flex-direction: column;
                 width: 100%;
             }
-            .rcp-action-buttons button {
+
+            .rcp-action-buttons a {
                 width: 100%;
             }
         }
 
-        /* --- Responsive Media Queries --- */
         @media (min-width: 640px) {
             .rcp-header {
                 flex-direction: row;
@@ -218,6 +198,20 @@
 
             .rcp-right-align {
                 text-align: right;
+            }
+
+            .rcp-billing-summary {
+                display: flex;
+                justify-content: space-between;
+                gap: 2rem;
+                align-items: flex-start;
+                margin-top: 1.5rem;
+            }
+
+            .rcp-services-section,
+            .rcp-summary-content {
+                flex: 1;
+                margin-top: 0;
             }
         }
 
@@ -239,6 +233,14 @@
                 max-width: 400px;
             }
         }
+
+        .rcp-items-section h3,
+        .rcp-services-section h3,
+        .rcp-summary-content h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
     </style>
 </head>
 
@@ -249,33 +251,27 @@
             <div class="container">
                 <div class="rcp-card">
                     <div class="rcp-card-body">
-
-                        <!-- Header -->
                         <div class="rcp-header">
                             <div>
                                 <h1 class="rcp-header-title">ใบเสร็จการสั่งซื้อ</h1>
                                 <p class="rcp-header-subtitle">ขอบคุณสำหรับการสั่งซื้อของคุณ!</p>
                             </div>
                             <div class="rcp-logo">
-                                <img src="http://localhost:3000/trandar_website/store/trandar_logo.png" alt="">
+                                <img src="http://localhost:3000/trandar_website/store/trandar_logo.png" alt="Logo">
                             </div>
                         </div>
-
-                        <!-- Details -->
                         <div class="rcp-details">
                             <div>
-                                <p><strong>หมายเลขออเดอร์:</strong> <span id="order-id">#123456789</span></p>
-                                <p><strong>วันที่:</strong> 16 กันยายน 2568</p>
-                                <p><strong>สถานะการชำระเงิน:</strong> ชำระเงินเรียบร้อยแล้ว</p>
+                                <p><strong>หมายเลขออเดอร์:</strong> <span id="order-id">#N/A</span></p>
+                                <p><strong>วันที่:</strong> <span id="order-date"></span></p>
+                                <p><strong>สถานะการชำระเงิน:</strong> <span id="payment-status"></span></p>
                             </div>
                             <div class="rcp-right-align">
-                                <p><strong>ลูกค้า:</strong> สมชาย ใจดี</p>
-                                <p><strong>ที่อยู่จัดส่ง:</strong> 123 ถนนสุขสบาย แขวงดีจัง เขตสบายดี กรุงเทพฯ 10110</p>
-                                <p><strong>เบอร์โทรศัพท์:</strong> 081-234-5678</p>
+                                <p><strong>ลูกค้า:</strong> <span id="customer-name"></span></p>
+                                <p><strong>ที่อยู่จัดส่ง:</strong> <span id="customer-address"></span></p>
+                                <p><strong>เบอร์โทรศัพท์:</strong> <span id="customer-phone"></span></p>
                             </div>
                         </div>
-
-                        <!-- Items -->
                         <div class="rcp-items-section">
                             <h3>รายละเอียดสินค้า</h3>
                             <div class="rcp-table-responsive">
@@ -292,33 +288,30 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="rcp-billing-summary">
+                            <div class="rcp-services-section">
+                                <h3>บริการเสริม</h3>
+                                <ul id="order-services-list" class="rcp-list"></ul>
 
-                        <!-- Services -->
-                        <div class="rcp-services-section">
-                            <h3>บริการเสริม</h3>
-                            <ul id="order-services-list">
-                                <li class="text-center">ไม่มีบริการเสริม</li>
-                            </ul>
+                                <h3>ส่วนลด</h3>
+                                <ul id="order-discounts-list" class="rcp-list"></ul>
+
+                                <h3>การจัดส่ง</h3>
+                                <ul id="order-shipping-list" class="rcp-list"></ul>
+                            </div>
+                            <div class="rcp-summary-content">
+                                <h3>สรุปยอด</h3>
+                                <ul id="order-totals-list"></ul>
+                            </div>
                         </div>
-
-                        <!-- Totals -->
-                        <div class="rcp-summary-content">
-                            <ul id="order-totals-list"></ul>
-                        </div>
-
-                        <!-- Footer -->
                         <div class="rcp-footer-notes">
                             <p>ใบเสร็จนี้ถูกสร้างขึ้นโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน</p>
                         </div>
-
-                        <!-- Action Buttons -->
                         <div class="rcp-action-buttons">
-                            <button onclick="window.location.href='../../index.php'">กลับไปหน้าหลัก</button>
-                            <button onclick="window.location.href='order-list.php'">ไปที่รายการสั่งซื้อ</button>
-                            <button onclick="document.getElementById('payment-file').click()">แนบไฟล์การชำระเงิน</button>
-                            <input type="file" id="payment-file" style="display:none" onchange="handlePaymentFile(event)">
+                            <a href="#">กลับไปหน้าหลัก</a>
+                            <a href="#">ไปที่รายการสั่งซื้อ</a>
+                            <a href="#">การชำระเงิน</a>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -330,28 +323,44 @@
         const OrderSummaryRenderer = {
             cartItems: [],
             services: [],
+            discounts: {},
+            shipping: {},
             summary: {},
             orderId: '',
+            customer: {},
+            paymentStatus: 'รอดำเนินการ',
 
             formatPrice(value) {
                 return Number(value).toLocaleString('th-TH', {
-                    style: 'currency',
-                    currency: 'THB'
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 });
             },
 
-            loadFromStorage() {
-                const data = localStorage.getItem("checkoutAppData");
-                if (!data) return;
-                try {
-                    const parsed = JSON.parse(data);
-                    this.cartItems = parsed.cartItems || [];
-                    this.services = parsed.services || [];
-                    this.summary = parsed.summary || {};
-                    this.orderId = parsed.order_id || '#N/A';
-                } catch (e) {
-                    console.error(e);
+            loadData() {
+                const dataRaw = localStorage.getItem("checkoutAppData");
+                if (!dataRaw) return;
+                const data = JSON.parse(dataRaw);
+
+                this.cartItems = data.cartItems || [];
+                this.services = data.selectedServices || [];
+                this.discounts = data.appliedCoupon || {};
+                this.shipping = data.selectedShippingOptions || {};
+                this.summary = data.summary || {};
+                this.orderId = data.order_id || '#N/A';
+                this.paymentStatus = data.paymentStatus || 'รอดำเนินการ';
+
+                // ถ้า appliedCoupon เป็น shipping ให้ตั้ง shipping.price = 0
+                if (this.discounts.type === 'shipping' && this.shipping) {
+                    this.shipping.price = 0;
                 }
+
+                const addr = data.addresses?.[0] || {};
+                this.customer = {
+                    name: `${data.billing?.first_name || ''} ${data.billing?.last_name || ''}`,
+                    phone: data.billing?.phone_number || '',
+                    address: `${addr.detail || ''}, ${addr.subdistricts || ''} ${addr.districts || ''}, ${addr.provinces || ''} ${addr.postalCode || ''}`
+                };
             },
 
             renderItems() {
@@ -362,9 +371,12 @@
                     return;
                 }
                 this.cartItems.forEach(item => {
-                    const row = document.createElement('tr');
                     const total = item.price * item.qty;
-                    row.innerHTML = `<td>${item.name}</td><td class="text-center">${item.qty}</td><td class="text-right">${this.formatPrice(item.price)}</td><td class="text-right">${this.formatPrice(total)}</td>`;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${item.name}</td>
+                             <td class="text-center">${item.qty}</td>
+                             <td class="text-right">${this.formatPrice(item.price)}</td>
+                             <td class="text-right">${this.formatPrice(total)}</td>`;
                     tbody.appendChild(row);
                 });
             },
@@ -376,38 +388,84 @@
                     list.innerHTML = '<li class="text-center">ไม่มีบริการเสริม</li>';
                     return;
                 }
-                this.services.forEach(service => {
+                this.services.forEach(s => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<span>${service.name}</span><span>${this.formatPrice(service.price)}</span>`;
+                    li.innerHTML = `<span>${s.label}</span><span>${this.formatPrice(s.price)}</span>`;
                     list.appendChild(li);
                 });
+            },
+
+            renderDiscounts() {
+                const list = document.getElementById('order-discounts-list');
+                list.innerHTML = '';
+                const {
+                    label = '', type = '', value = 0
+                } = this.discounts || {};
+
+                if (!label) {
+                    list.innerHTML = '<li class="text-center">ไม่มีส่วนลด</li>';
+                    return;
+                }
+
+                // กรณี shipping coupon แสดง label แต่ไม่แสดงราคา
+                let display;
+                if (type === 'percent') {
+                    display = `- ${value}%`;
+                } else if (type === 'shipping') {
+                    display = this.formatPrice(0);
+                } else {
+                    display = `- ${this.formatPrice(value)}`;
+                }
+
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${label}</span><span>${display}</span>`;
+                list.appendChild(li);
+            },
+
+            renderShipping() {
+                const list = document.getElementById('order-shipping-list');
+                list.innerHTML = '';
+                if (this.shipping && Object.keys(this.shipping).length) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${this.shipping.name}</span><span>${this.formatPrice(this.shipping.price)}</span>`;
+                    list.appendChild(li);
+                    return;
+                }
+                list.innerHTML = '<li class="text-center">ไม่มีค่าจัดส่ง</li>';
             },
 
             renderTotals() {
                 const list = document.getElementById('order-totals-list');
                 list.innerHTML = '';
-
-                let subtotalItems = this.summary.subtotal || 0;
-                let subtotalServices = this.services.reduce((acc, s) => acc + s.price, 0);
-                let totalSubtotal = subtotalItems + subtotalServices;
-
                 const {
-                    discount = 0,
-                    shipping = 0,
-                    tax = 0
+                    subtotal = 0, service = 0, discount = 0, shipping = 0, tax = 0, total = 0
                 } = this.summary;
-
-                const total = totalSubtotal - discount + shipping + tax;
-
-                const totals = [
-                    { label: 'ยอดรวมสินค้า:', value: subtotalItems },
-                    { label: 'รวมบริการเสริม:', value: subtotalServices },
-                    { label: 'ส่วนลด:', value: -discount },
-                    { label: 'ค่าจัดส่ง:', value: shipping },
-                    { label: 'ภาษีมูลค่าเพิ่ม:', value: tax },
-                    { label: 'ยอดชำระทั้งหมด:', value: total, isTotal: true }
+                const totals = [{
+                        label: 'ยอดรวมสินค้า:',
+                        value: subtotal
+                    },
+                    {
+                        label: 'รวมบริการเสริม:',
+                        value: service
+                    },
+                    {
+                        label: 'ส่วนลด:',
+                        value: -discount
+                    },
+                    {
+                        label: 'ค่าจัดส่ง:',
+                        value: shipping
+                    },
+                    {
+                        label: 'ภาษีมูลค่าเพิ่ม:',
+                        value: tax
+                    },
+                    {
+                        label: 'ยอดชำระทั้งหมด:',
+                        value: total,
+                        isTotal: true
+                    }
                 ];
-
                 totals.forEach(item => {
                     const li = document.createElement('li');
                     if (item.isTotal) li.className = 'rcp-total';
@@ -418,44 +476,33 @@
 
             updateUI() {
                 document.getElementById('order-id').textContent = this.orderId;
+                document.getElementById('customer-name').textContent = this.customer.name;
+                document.getElementById('customer-phone').textContent = this.customer.phone;
+                document.getElementById('customer-address').textContent = this.customer.address;
+                document.getElementById('order-date').textContent = new Date().toLocaleDateString('th-TH', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                document.getElementById('payment-status').textContent = this.paymentStatus;
             },
 
             init() {
-                this.loadFromStorage();
+                this.loadData();
                 this.renderItems();
                 this.renderServices();
+                this.renderDiscounts();
+                this.renderShipping();
                 this.renderTotals();
                 this.updateUI();
             }
         };
 
-        function handlePaymentFile(event) {
-            const file = event.target.files[0];
-            if (file) {
-                alert('คุณได้แนบไฟล์: ' + file.name);
-                // สามารถส่งไฟล์ไป server ด้วย fetch หรือ form ตามต้องการ
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            // ตัวอย่าง mock data สำหรับทดสอบ
-            const mockData = {
-                cartItems: [
-                    { name: 'เสื้อยืดลายสวย (ขนาด: M, สี: เทา)', price: 590, qty: 1 },
-                    { name: 'กางเกงยีนส์สุดเท่ (ขนาด: L, สี: ดำ)', price: 1250, qty: 1 }
-                ],
-                services: [
-                    { name: 'บริการห่อของขวัญ', price: 50 },
-                    { name: 'บริการจัดส่งด่วน', price: 100 }
-                ],
-                summary: { subtotal: 1840, discount: 0, shipping: 50, tax: 0 },
-                order_id: 'ORDER-987654321'
-            };
-            localStorage.setItem('checkoutAppData', JSON.stringify(mockData));
-
             OrderSummaryRenderer.init();
         });
     </script>
+
 </body>
 
 </html>

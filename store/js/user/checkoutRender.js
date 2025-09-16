@@ -122,7 +122,7 @@ const CheckoutApp = {
                 const parsed = data ? JSON.parse(data) : {}; 
                 parsed.order_id = response.order_id;
                 localStorage.setItem("checkoutAppData", JSON.stringify(parsed));
-                redirectGet(pathConfig.BASE_WEB + '/user/orders/');
+                redirectGet(pathConfig.BASE_WEB + 'user/orders/');
                 
             })
             .catch(err => {
@@ -475,7 +475,7 @@ const CheckoutApp = {
 
     bindbackCartEvents() {
         document.getElementById("backCart").onclick = () => {
-            redirectGet(pathConfig.BASE_WEB + '/user/cart/'); 
+            redirectGet(pathConfig.BASE_WEB + 'user/cart/'); 
         };
     },
 

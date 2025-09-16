@@ -1,15 +1,14 @@
+<?php include '../../routes.php'; ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ข้อมูลการชำระเงิน</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-STORE</title>
+    <?php include '../../inc-meta.php'; ?>
+    <link href="../../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../../inc-cdn.php'; ?>
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; color: #1f2937; padding: 2rem; }
-        .rcp-container { max-width: 960px; margin: auto; padding: 1rem; }
         .rcp-card { background-color: #fff; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05); padding: 2.5rem; margin-bottom: 2rem; }
         
         /* Flexbox for the new combined card's content */
@@ -67,20 +66,6 @@
         .rcp-btn-primary { background-color: #4f46e5; color: #fff; }
         .rcp-btn-primary:hover { background-color: #4338ca; }
 
-        /* Custom message box styles */
-        .rcp-message-box {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            text-align: center;
-        }
         
         @media (min-width:640px){
             .rcp-action-buttons{flex-direction:row;}
@@ -94,72 +79,66 @@
     </style>
 </head>
 <body>
-    <div class="rcp-message-box" id="message-box">
-        <p id="message-text"></p>
-    </div>
-    <div class="rcp-container">
-        <!-- Combined Payment Info Card -->
-        <div class="rcp-card">
-            <div class="rcp-payment-container">
-                <div class="rcp-payment-section">
-                    <h3>วิธีการชำระเงิน</h3>
-                    <p>กรุณาชำระเงินตามช่องทางด้านล่างนี้</p>
+    <?php include '../../template/head-bar.php'; ?>
+    <main>
+        <div id="sections_root_payment" class="section-space">
+            <div class="container">
+
+                <div class="rcp-card">
+                    <div class="rcp-payment-container">
+                        <div class="rcp-payment-section">
+                            <h3>วิธีการชำระเงิน</h3>
+                            <p>กรุณาชำระเงินตามช่องทางด้านล่างนี้</p>
+                            
+                            <div class="rcp-bank-select-container">
+                                <label for="bank-select">เลือกธนาคาร:</label>
+                                <select id="bank-select">
+                                    <option value="bbl">ธนาคารกรุงเทพ</option>
+                                    <option value="kbank">ธนาคารกสิกรไทย</option>
+                                    <option value="scb">ธนาคารไทยพาณิชย์</option>
+                                    <option value="ktb">ธนาคารกรุงไทย</option>
+                                </select>
+                            </div>
+
+                            <!-- <div class="rcp-bank-details">
+                                <img id="bank-logo" src="https://placehold.co/120x120/004B8F/ffffff?text=BBL" alt="โลโก้ธนาคาร">
+                                <div class="rcp-bank-details-info">
+                                    <p id="bank-name">ธนาคารกรุงเทพ</p>
+                                    <p><strong>ชื่อบัญชี:</strong> บริษัท ขายดี จำกัด</p>
+                                    <p><strong>เลขที่บัญชี:</strong> <span id="account-number">123-4-56789-0</span></p>
+                                </div>
+                            </div> -->
+
+                        </div>
+
+                        <div class="rcp-payment-proof-section">
+                            <h3>หลักฐานการชำระเงิน</h3>
+                            <div class="rcp-file-input-container">
+                                <div class="rcp-proof-preview" id="proof-preview-container">
+                                    <img id="proof-img-preview" src="" alt="แสดงตัวอย่างหลักฐาน" class="rcp-proof-img" style="display:none;">
+                                    <span id="proof-placeholder">กรุณาเลือกไฟล์รูปภาพ</span>
+                                </div>
+                                <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div class="rcp-bank-select-container">
-                        <label for="bank-select">เลือกธนาคาร:</label>
-                        <select id="bank-select">
-                            <option value="bbl">ธนาคารกรุงเทพ</option>
-                            <option value="kbank">ธนาคารกสิกรไทย</option>
-                            <option value="scb">ธนาคารไทยพาณิชย์</option>
-                            <option value="ktb">ธนาคารกรุงไทย</option>
-                        </select>
+                    <div class="rcp-footer-notes">
+                        <p>ใบเสร็จนี้ถูกสร้างขึ้นโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน</p>
                     </div>
 
-                    <div class="rcp-bank-details">
-                        <img id="bank-logo" src="https://placehold.co/120x120/004B8F/ffffff?text=BBL" alt="โลโก้ธนาคาร">
-                        <div class="rcp-bank-details-info">
-                            <p id="bank-name">ธนาคารกรุงเทพ</p>
-                            <p><strong>ชื่อบัญชี:</strong> บริษัท ขายดี จำกัด</p>
-                            <p><strong>เลขที่บัญชี:</strong> <span id="account-number">123-4-56789-0</span></p>
-                        </div>
+                    <div class="rcp-action-buttons">
+                        <button id="save-proof-btn" class="rcp-btn rcp-btn-primary">บันทึกการแนบไฟล์</button>
+                        <a href="#" class="rcp-btn rcp-btn-secondary">กลับหน้าหลัก</a>
                     </div>
                 </div>
-
-                <div class="rcp-payment-proof-section">
-                    <h3>หลักฐานการชำระเงิน</h3>
-                    <div class="rcp-file-input-container">
-                        <div class="rcp-proof-preview" id="proof-preview-container">
-                            <img id="proof-img-preview" src="" alt="แสดงตัวอย่างหลักฐาน" class="rcp-proof-img" style="display:none;">
-                            <span id="proof-placeholder">กรุณาเลือกไฟล์รูปภาพ</span>
-                        </div>
-                        <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rcp-footer-notes">
-                <p>ใบเสร็จนี้ถูกสร้างขึ้นโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน</p>
-            </div>
-
-            <div class="rcp-action-buttons">
-                <button id="save-proof-btn" class="rcp-btn rcp-btn-primary">บันทึกการแนบไฟล์</button>
-                <a href="#" class="rcp-btn rcp-btn-secondary">กลับหน้าหลัก</a>
             </div>
         </div>
-    </div>
+    </main>
+    <?php include '../../template/footer-bar.php'; ?>
 
     <script>
-        // Custom function to show a message instead of alert
-        function showMessage(message) {
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
-            messageBox.textContent = message;
-            messageBox.style.display = 'block';
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 3000); // Hide after 3 seconds
-        }
-
+    
         document.addEventListener('DOMContentLoaded', ()=>{
             // Handle payment proof upload
             const fileInput = document.getElementById('proof-file-input');
