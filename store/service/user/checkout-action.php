@@ -50,6 +50,11 @@ function generateQRpromptPay($phoneNo = '0988971593', $total = 68) {
     return $QRCode;
 }
 
+// echo '<pre>';
+// print_r($dataJson);
+// echo '</pre>';
+// exit;
+
 if ($action == 'payOrder') {
 
 try {
@@ -100,6 +105,8 @@ try {
     $shipping_name  = (string)($dataJson['selectedShippingOptions']['name'] ?? '');
     $shipping_type  = (string)($dataJson['selectedShippingOptions']['value'] ?? '');
     $shipping_price = (float)($dataJson['selectedShippingOptions']['price'] ?? 0);
+    $shipping_timeSlot = (string)($dataJson['selectedShippingOptions']['timeSlot'] ?? '');
+    
 
     // -----------------------
     // STEP 4: Validate Cart Items
@@ -211,6 +218,7 @@ try {
         'shipping_name'   => $shipping_name,
         'shipping_price'  => $shipping_price,
         'shipping_type'   => $shipping_type,
+        'time_slot'       => $shipping_timeSlot,
         'timezone'        => $timeZone,
         'created_at'      => $dateNow
     ];

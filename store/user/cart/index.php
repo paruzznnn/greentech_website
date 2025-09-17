@@ -24,7 +24,6 @@
                             <div class="cart-items-section">
                                 <div class="cart-view-toggle">
                                     <h2 class="cart-title"><i class="bi bi-cart3"></i> <span>ตะกร้าสินค้า</span></h2>
-                                    <!-- <h5><i class="bi bi-cart3"></i> <span>ตะกร้าสินค้า</span></h5> -->
                                     <div>
                                         <button id="listModeBtn">List</button>
                                         <button id="gridModeBtn">Grid</button>
@@ -40,6 +39,11 @@
                                 <h3 class="delivery-title">วิธีรับสินค้า</h3>
                                 <div id="shipping"></div>
                                 <div class="delivery-options" id="deliveryOptions"></div>
+                                <div class="pickup-options" id="pickupOptions"></div>
+                                <div id="shippingRecommendation" class="alert alert-info"></div>
+                                <div class="summary-weight-card">
+                                    <p><strong>น้ำหนักรวม:</strong> <span id="totalWeightDisplay">0.00 กก.</span></p>
+                                </div>
                             </div>
                         </aside>
                         <aside>
