@@ -49,6 +49,28 @@ const CheckoutApp = {
     }
     ],
 
+    branches: [{
+            value: "branch1",
+            name: "แทรนดาร์ อินเตอร์เนชั่นแนล",
+            detail: "102 ซอย พัฒนาการ 40",
+            provinces: "กรุงเทพมหานคร",
+            districts: "สวนหลวง",
+            subdistricts: "สวนหลวง",
+            postalCode: 10250,
+            timeSlots: ["10:00 - 12:00", "13:00 - 15:00", "16:00 - 18:00"]
+        },
+        {
+            value: "branch2",
+            name: "แทรนดาร์ ร่มเกล้า",
+            detail: "102 ซอย พัฒนาการ 40",
+            provinces: "กรุงเทพมหานคร",
+            districts: "วัฒนา",
+            subdistricts: "คลองเตย",
+            postalCode: 10110,
+            timeSlots: ["11:00 - 13:00", "14:00 - 16:00"]
+        },
+    ],
+
     cartItems: [],
     selectedShippingType: "delivery",
     selectedShippingOptions: {},
@@ -72,7 +94,9 @@ const CheckoutApp = {
                 last_name: document.getElementById("last_name").value,
                 phone_number: document.getElementById("phone_number").value
             },
-            addresses: this.selectedShippingType === "pickup" ? [] : (this.selectedAddressIndex !== null ? [this.addresses[this.selectedAddressIndex]] : []),
+            addresses: this.selectedShippingType === "pickup" ? 
+            [this.branches.find(branch => branch.value === this.selectedShippingOptions.value)] : 
+            (this.selectedAddressIndex !== null ? [this.addresses[this.selectedAddressIndex]] : []),
             selectedShippingOptions: this.selectedShippingOptions,
             selectedServices: this.selectedServices,
             appliedCoupon: this.appliedCoupon,
@@ -102,7 +126,6 @@ const CheckoutApp = {
         }
     },
 
-    /* ========== SERVER ========== */
     sendOrderToServer(data) {
         data.action = "payOrder";
         fetch(pathConfig.BASE_WEB + "service/user/checkout-action.php", {
@@ -123,7 +146,7 @@ const CheckoutApp = {
                 parsed.order_id = response.order_id;
                 localStorage.setItem("checkoutAppData", JSON.stringify(parsed));
                 redirectGet(pathConfig.BASE_WEB + 'user/orders/');
-                
+
             })
             .catch(err => {
                 console.error("Error sending order:", err);
@@ -131,7 +154,6 @@ const CheckoutApp = {
             });
     },
 
-    /* ========== ACCORDION & NAVIGATION ========== */
     renderAccordion() {
         const container = document.getElementById("accordion-items");
         if (!container) return;
@@ -225,12 +247,28 @@ const CheckoutApp = {
         return valid;
     },
 
-    /* ========== ADDRESS ========== */
     renderAddresses() {
         const container = document.getElementById("delivery-address-container");
         container.innerHTML = "";
+
         if (this.selectedShippingType === "pickup") {
-            container.innerHTML = `<p><strong>รับสินค้าเองที่สาขา</strong></p>`;
+            const selectedBranch = this.branches.find(branch => branch.value === this.selectedShippingOptions.value);
+
+            if (selectedBranch) {
+                container.innerHTML = `
+                    <div class="checkout-address-card active">
+                        <div class="address-header">
+                            <span class="label-text">รับสินค้าที่สาขา</span>
+                        </div>
+                        <p><strong>${selectedBranch.name}</strong></p>
+                        <p>${selectedBranch.detail}</p>
+                        <p>${selectedBranch.subdistricts} ${selectedBranch.districts} ${selectedBranch.provinces} ${selectedBranch.postalCode}</p>
+                        <p><strong>ช่วงเวลาที่นัดรับ:</strong> ${this.selectedShippingOptions.timeSlot}</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<p>ไม่พบข้อมูลสาขาที่เลือก</p>`;
+            }
             return;
         }
 
@@ -369,7 +407,6 @@ const CheckoutApp = {
         document.querySelector(".modal-close").onclick = () => modal.style.display = "none";
     },
 
-    /* ========== LOAD PROVINCE/DISTRICT/SUBDISTRICT ========== */
     loadProvinces() {
         fetch(pathConfig.BASE_WEB + 'locales/provinces.json', {
             method: "GET",
@@ -458,7 +495,6 @@ const CheckoutApp = {
         };
     },
 
-    /* ========== ORDER DETAILS ========== */
     renderOrderDetails() {
         const container = document.getElementById("order-details");
         if (!container) return;
@@ -490,12 +526,12 @@ const CheckoutApp = {
             subtotal = 0, discount = 0, shipping = 0, service = 0, tax = 0, total = 0
         } = this.summary;
         summaryItems.innerHTML = `
-                <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
-                <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
-                <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
-                <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
-                <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
-                <div class="summary-row total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>`;
+        <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
+        <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
+        <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
+        <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
+        <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
+        <div class="summary-row total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>`;
     },
 
     init() {

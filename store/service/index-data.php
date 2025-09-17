@@ -85,16 +85,16 @@ if ($action == 'getSectionItems') {
             "sort" => 4,
             "req" => "getProductItems"
         ],
-        [
-            "id" => "section_news",
-            "class" => "section-space",
-            "title" => "สินค้าขายดีประจำวัน",
-            "carouselId" => "carousel_news",
-            "isSlide" => true,
-            "type" => "crslg",
-            "sort" => 5,
-            "req" => "getNewsItems"
-        ],
+        // [
+        //     "id" => "section_news",
+        //     "class" => "section-space",
+        //     "title" => "สินค้าขายดีประจำวัน",
+        //     "carouselId" => "carousel_news",
+        //     "isSlide" => true,
+        //     "type" => "crslg",
+        //     "sort" => 5,
+        //     "req" => "getNewsItems"
+        // ],
         [
             "id" => "section_introduce",
             "class" => "section-space",
@@ -106,17 +106,17 @@ if ($action == 'getSectionItems') {
             "sort" => 2,
             "req" => "getIntroItems"
         ],
-        [
-            "id" => "section_brand",
-            "class" => "section-space",
-            "title" => "แบรนด์ยอดนิยม",
-            "detail" => "แบรนด์ชั้นนำที่เข้ามาร่วมกับเราและอีกมากมาย",
-            "carouselId" => "brand_store",
-            "isSlide" => true,
-            "type" => "gcsm",
-            "sort" => 3,
-            "req" => "getBrandItems"
-        ],
+        // [
+        //     "id" => "section_brand",
+        //     "class" => "section-space",
+        //     "title" => "แบรนด์ยอดนิยม",
+        //     "detail" => "แบรนด์ชั้นนำที่เข้ามาร่วมกับเราและอีกมากมาย",
+        //     "carouselId" => "brand_store",
+        //     "isSlide" => true,
+        //     "type" => "gcsm",
+        //     "sort" => 3,
+        //     "req" => "getBrandItems"
+        // ],
         // [
         //     "id" => "section_baner2",
         //     "class" => "section-space",
