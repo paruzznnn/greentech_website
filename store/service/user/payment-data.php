@@ -48,8 +48,14 @@ if ($action == 'getOrdersItems') {
 
         $combinedData[$orderId] = [
             'orderId' => $orderId,
+            'subtotal' => $order['order_subtotal'],
+            'discount' => $order['order_discount'],
+            'shipping' => $order['order_shipping'],
+            'service' => $order['order_service'],
+            'vat' => $order['order_vat'],
             'total' => $order['order_total'],
             'payments' => array_map(fn($p) => [
+                'status' => $p['status'],
                 'type' => $p['payment_type'],
                 'pic' => $p['payment_pic'],
                 'date' => $p['created_at']

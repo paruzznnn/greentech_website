@@ -501,7 +501,7 @@ const CartApp = {
         }
 
         if (recommendedOption && !this.selectedShippingOptions.name) {
-             this.selectedShippingOptions = recommendedOption;
+            this.selectedShippingOptions = recommendedOption;
         }
         
         if (!options.length) {

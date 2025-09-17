@@ -78,7 +78,7 @@
                         <div class="rcp-action-buttons">
                             <a href="<?php echo $GLOBALS['BASE_WEB']; ?>">กลับไปหน้าหลัก</a>
                             <a href="<?php echo $GLOBALS['BASE_WEB']; ?>user/">ไปที่รายการสั่งซื้อ</a>
-                            <a href="<?php echo $GLOBALS['BASE_WEB']; ?>user/payment/">การชำระเงิน</a>
+                            <a href="#" type="button" id="payOrders" >การชำระเงิน</a>
                         </div>
                     </div>
                 </div>
@@ -256,6 +256,13 @@
                 document.getElementById('payment-status').textContent = this.paymentStatus;
             },
 
+            bindPayEvents() {
+                document.getElementById("payOrders").onclick = () => {
+                    window.location.href = pathConfig.BASE_WEB + 'user/payment/?id='+ this.orderId;
+                    // redirectGet(pathConfig.BASE_WEB + 'user/payment/');
+                };
+            },
+
             init() {
                 this.loadData();
                 this.renderItems();
@@ -264,6 +271,7 @@
                 this.renderShipping();
                 this.renderTotals();
                 this.updateUI();
+                this.bindPayEvents();
             }
         };
 

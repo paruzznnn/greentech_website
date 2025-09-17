@@ -59,8 +59,8 @@
                                 <button id="checkoutOrders" class="checkout-button">ไปที่การชำระเงิน</button>
                                 <p class="terms-text">
                                     การสั่งซื้อของคุณถือเป็นการยอมรับ
-                                    <a href="#" class="terms-link">ข้อกำหนดการให้บริการ</a> และ
-                                    <a href="#" class="terms-link">นโยบายความเป็นส่วนตัว</a>
+                                    <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ
+                                    <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">นโยบายความเป็นส่วนตัว</a>
                                     ของเรา กรุณาตรวจสอบข้อมูลการสั่งซื้อให้ถูกต้อง
                                     เวลาจัดส่งเป็นการประมาณการณ์และอาจมีการเปลี่ยนแปลงตามความพร้อมของสินค้า.
                                 </p>
