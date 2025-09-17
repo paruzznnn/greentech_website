@@ -429,7 +429,8 @@ const CheckoutApp = {
                 "Content-Type": "application/json"
             }
         })
-            .then(res => res.json()).then(res => {
+            .then(res => res.json())
+            .then(res => {
                 this.districtsData = res;
             }).catch(err => console.error(err));
     },

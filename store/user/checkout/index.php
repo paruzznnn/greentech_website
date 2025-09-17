@@ -19,13 +19,7 @@
     <div id="address-modal" class="store-modal">
         <div class="store-modal-content">
             <span class="modal-close store-close-modal">&times;</span>
-            <!-- <h3 id="modal-title"><span>Add Address</span></h3> -->
             <form id="address-form">
-                <!-- <input type="text" id="addr-title" class="form-input" placeholder="Title (Home/Office/etc)" required>
-                <input type="text" id="addr-name" class="form-input" placeholder="Full Name" required> -->
-                <!-- <input type="text" id="addr-line" class="form-input" placeholder="Address Line" required> -->
-                <!-- <input type="text" id="addr-phone" class="form-input" placeholder="Phone Number" required> -->
-
                 <div class="form-group">
                     <label for="province" class="form-label">จังหวัด:</label>
                     <select id="province" name="province" class="form-input" required>
@@ -77,11 +71,10 @@
                         <div class="summary-card" id="order-summary">
                             <h5>สรุปคำสั่งซื้อ</h5>
                             <div id="summary-items"></div>
-                            <!-- <button id="confirmOrders" disabled>ยันยืนคำสั่งซื้อ</button> -->
                             <p class="terms-text">
                                 การสั่งซื้อของคุณถือเป็นการยอมรับ
-                                <a href="#" class="terms-link">ข้อกำหนดการให้บริการ</a> และ
-                                <a href="#" class="terms-link">นโยบายความเป็นส่วนตัว</a>
+                                <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ
+                                <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">นโยบายความเป็นส่วนตัว</a>
                                 ของเรา กรุณาตรวจสอบข้อมูลการสั่งซื้อให้ถูกต้อง
                                 เวลาจัดส่งเป็นการประมาณการณ์และอาจมีการเปลี่ยนแปลงตามความพร้อมของสินค้า.
                             </p>
