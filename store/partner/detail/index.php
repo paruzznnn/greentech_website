@@ -46,7 +46,7 @@
             // ==========================
             // Data
             // ==========================
-            store: {
+            storeData: {
                 name: "แทรนดาร์ อะคูสติก",
                 logo: "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
                 description: "วัสดุดูดซับเสียง ระบบ ผนัง เพดาน หลังคา กันเสียง",
@@ -84,7 +84,7 @@
                         icon: "bi bi-clipboard",
                         text: "Policy",
                         link: "#"
-                    },
+                    }
                 ],
                 categories: [{
                         name: "วัสดุอะคูสติก",
@@ -99,102 +99,109 @@
 
             stores: [{
                     name: "แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว",
-                    logo: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg",
-                    // categories: ["Organic", "Groceries", "Butcher Shop"],
-                    // delivery: "Pickup available",
-                    // distance: "7.5 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg"
                 },
                 {
                     name: "แผ่นกันเสียง แทรนดาร์ ซาวด์บอร์ด 10 mm.",
-                    logo: "https://www.trandar.com//public/shop_img/687a3420a32fa_Zound_Borad_223.png",
-                    // categories: ["Alcohol", "Groceries"],
-                    // delivery: "Delivery",
-                    // distance: "7.2 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687a3420a32fa_Zound_Borad_223.png"
                 },
                 {
                     name: "Trandar  dBphon S50",
-                    logo: "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png",
-                    // categories: ["Groceries", "Bakery", "Deli"],
-                    // delivery: "Delivery by 10:30pm",
-                    // distance: "9.3 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png"
                 },
                 {
                     name: "แทรนดาร์ ทีบาร์ ที15",
-                    logo: "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg",
-                    // categories: ["Meal Kits", "Prepared Meals", "Organic"],
-                    // delivery: "Delivery",
-                    // distance: "40.5 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg"
                 },
                 {
                     name: "แทรนดาร์ ไฮเทค วอลล์",
-                    logo: "https://www.trandar.com//public/shop_img/687dde881193e_render_HITECWALL_Png_2366.png",
-                    // categories: ["Snacks", "Beverages"],
-                    // delivery: "Pickup only",
-                    // distance: "2.3 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687dde881193e_render_HITECWALL_Png_2366.png"
                 },
                 {
                     name: "Trandar Prime Coat",
-                    logo: "https://www.trandar.com//public/shop_img/687e1c0470c40_trandar_prime_coat_new_label.jpg",
-                    // categories: ["Fruits", "Vegetables"],
-                    // delivery: "Same day delivery",
-                    // distance: "5.1 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687e1c0470c40_trandar_prime_coat_new_label.jpg"
                 },
                 {
                     name: "Trandar Seamless Acoustics Solution",
-                    logo: "https://www.trandar.com//public/shop_img/687df83a53198_seamless_acoustic-01.jpg",
-                    // categories: ["Dairy", "Groceries"],
-                    // delivery: "Pickup & Delivery",
-                    // distance: "6.7 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687df83a53198_seamless_acoustic-01.jpg"
                 },
                 {
                     name: "Trandar Acoustics Plaster Solution",
-                    logo: "https://www.trandar.com//public/shop_img/687dfa2242223_system_Acoustic_plaster.png",
-                    // categories: ["Snacks", "Soft Drinks"],
-                    // delivery: "Instant delivery",
-                    // distance: "1.8 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/687dfa2242223_system_Acoustic_plaster.png"
                 },
                 {
                     name: "แทรนดาร์ ซิวาน่า",
-                    logo: "https://www.trandar.com//public/shop_img/6883502b859d7_ZIVANA_25_mm._full.jpg",
-                    // categories: ["Organic", "Health Products"],
-                    // delivery: "Delivery",
-                    // distance: "8.4 mi away"
+                    logo: "https://www.trandar.com//public/shop_img/6883502b859d7_ZIVANA_25_mm._full.jpg"
                 }
             ],
 
             pages: {
-                "Shop": `
-            <div style="background:#fff; padding:0.5rem; border-radius:4px;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div id="showing-entries" class="showing-entries"></div>
-                    <div class="controls">
-                        <button id="gridViewBtn" class="active">Grid</button>
-                        <button id="listViewBtn">List</button>
-                    </div>
-                </div>
-                <div id="stores-container" class="stores-container grid"></div>
-                <div id="pagination" class="pagination"></div>
-            </div>
-        `,
-                "Deals": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-gift"></i> Deals</h4><p>โปรโมชั่นและส่วนลดพิเศษ...</p></div>`,
-                "Buy It Again": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-geo-alt"></i> Buy It Again</h4><p>สินค้าที่คุณเคยสั่งซื้อ...</p></div>`,
-                "Reviews": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-star"></i> Reviews</h4><p>รีวิวจากลูกค้า...</p></div>`,
-                "Article": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-grid"></i> Article</h4><p>บทความและข่าวสาร...</p></div>`,
-                "Contact": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-telephone"></i> Contact</h4><p>ติดต่อร้านค้า เบอร์โทร อีเมล แผนที่...</p></div>`,
-                "Policy": `<div style="background:#fff; padding:1rem; border-radius:4px;"><h4><i class="bi bi-clipboard"></i> Policy</h4><p>นโยบายการซื้อขายและการรับประกัน...</p></div>`
+                "Shop": {
+                    template: `
+                    <div style="background:#fff; padding:0.5rem; border-radius:4px;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div id="showing-entries" class="showing-entries"></div>
+                            <div class="controls">
+                                <button id="gridViewBtn" class="active">Grid</button>
+                                <button id="listViewBtn">List</button>
+                            </div>
+                        </div>
+                        <div id="stores-container" class="stores-container grid"></div>
+                        <div id="pagination" class="pagination mt-2"></div>
+                    </div>`,
+                    render() {
+                        // Cache elements
+                        this.containers = {
+                            storesContainer: document.getElementById('stores-container'),
+                            gridBtn: document.getElementById("gridViewBtn"),
+                            listBtn: document.getElementById("listViewBtn"),
+                            pagination: document.getElementById("pagination"),
+                            showingEntries: document.getElementById("showing-entries")
+                        };
+                        this.bindShopControls();
+                        this.renderStores();
+                    }
+                },
+                "Deals": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Deals content...</div>`,
+                    render: null
+                },
+                "Buy It Again": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Buy It Again content...</div>`,
+                    render: null
+                },
+                "Reviews": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Reviews content...</div>`,
+                    render: null
+                },
+                "Article": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Article content...</div>`,
+                    render: null
+                },
+                "Contact": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Contact content...</div>`,
+                    render: null
+                },
+                "Policy": {
+                    template: `<div style="background:#fff; padding:1rem; border-radius:4px;">Policy content...</div>`,
+                    render: null
+                }
             },
 
             currentPage: 1,
             itemsPerPage: 8,
             viewMode: "grid",
+            containers: {},
 
+            // ==========================
+            // Methods
+            // ==========================
             init() {
                 this.renderStoreInfo();
                 this.renderMenu();
                 this.renderCategories();
                 this.bindMenuEvents();
 
-                // Active Shop เป็นค่าเริ่มต้น
                 const firstMenu = document.querySelector('#stores-menu li a');
                 if (firstMenu) {
                     firstMenu.classList.add("active");
@@ -205,44 +212,40 @@
             renderStoreInfo() {
                 const container = document.getElementById("storeContainer");
                 container.innerHTML = `
-            <div>
-                <img src="${this.store.logo}" alt="${this.store.name}" class="stores-logo-info">
-            </div>
-            <div style="border-bottom: 1px solid #dddddd;">
-                <h5>${this.store.name}</h5>
-                <p>${this.store.description}</p>
-            </div>
-        `;
+                    <div><img src="${this.storeData.logo}" alt="${this.storeData.name}" class="stores-logo-info"></div>
+                    <div style="border-bottom: 1px solid #ddd;">
+                        <h5>${this.storeData.name}</h5>
+                        <p>${this.storeData.description}</p>
+                    </div>
+                `;
             },
 
             renderMenu() {
                 const container = document.getElementById("storeContainer");
-                let menuHTML = `<div><ul id="stores-menu">`;
-                this.store.menu.forEach(item => {
+                let menuHTML = `<ul id="stores-menu">`;
+                this.storeData.menu.forEach(item => {
                     menuHTML += `<li><a href="${item.link}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
                 });
-                menuHTML += `</ul></div>`;
+                menuHTML += `</ul>`;
                 container.innerHTML += menuHTML;
             },
 
             renderCategories() {
                 const container = document.getElementById("storeContainer");
                 let catHTML = `<div><h6>หมวดหมู่</h6><ul>`;
-                this.store.categories.forEach(cat => {
+                this.storeData.categories.forEach(cat => {
                     catHTML += `
-                <li>
-                    <div class="cat-header">${cat.name}</div>
-                    ${cat.sub && cat.sub.length ? `<ul>${cat.sub.map(sub => `<li class="cat-sub-menu"><a href="#">${sub}</a></li>`).join("")}</ul>` : ""}
-                </li>`;
+                    <li>
+                        <div class="cat-header">${cat.name}</div>
+                        ${cat.sub && cat.sub.length ? `<ul>${cat.sub.map(sub => `<li class="cat-sub-menu"><a href="#">${sub}</a></li>`).join("")}</ul>` : ""}
+                    </li>`;
                 });
                 catHTML += `</ul></div>`;
                 container.innerHTML += catHTML;
 
-                // toggle sub menu
+                // Toggle sub menu
                 document.querySelectorAll(".cat-header").forEach(header => {
-                    header.addEventListener("click", () => {
-                        header.parentElement.classList.toggle("open");
-                    });
+                    header.addEventListener("click", () => header.parentElement.classList.toggle("open"));
                 });
             },
 
@@ -251,41 +254,23 @@
                 document.querySelectorAll("#stores-menu li a").forEach(link => {
                     link.addEventListener("click", e => {
                         e.preventDefault();
-
                         document.querySelectorAll("#stores-menu li a").forEach(a => a.classList.remove("active"));
                         link.classList.add("active");
 
-                        const text = link.innerText.trim();
-                        if (this.pages[text]) {
-                            mainContent.innerHTML = this.pages[text];
-                            if (text === "Shop") {
-                                this.cacheShopElements();
-                                this.bindShopControls();
-                                this.renderStores();
+                        const key = link.innerText.trim();
+                        if (this.pages[key]) {
+                            mainContent.innerHTML = this.pages[key].template;
+                            if (typeof this.pages[key].render === "function") {
+                                this.pages[key].render.call(this);
                             }
                         }
                     });
                 });
             },
 
-            cacheShopElements() {
-                this.containers = {
-                    storesContainer: document.getElementById('stores-container'),
-                    gridBtn: document.getElementById("gridViewBtn"),
-                    listBtn: document.getElementById("listViewBtn"),
-                    pagination: document.getElementById("pagination"),
-                    showingEntries: document.getElementById("showing-entries")
-                };
-            },
-
             bindShopControls() {
                 this.containers.gridBtn.addEventListener("click", () => this.switchView('grid'));
                 this.containers.listBtn.addEventListener("click", () => this.switchView('list'));
-            },
-
-            handleCardClick(store) {
-                // const url = "/partner/detail/?name=" + encodeURIComponent(store.name);
-                // window.location.href = url;
             },
 
             renderStores() {
@@ -295,24 +280,14 @@
 
                 this.containers.storesContainer.innerHTML = "";
                 paginatedStores.forEach(store => {
-                    // const categoriesHtml = store.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('');
-                    const storeElement = document.createElement("div");
-                    storeElement.classList.add("stores-card-product");
-                    storeElement.innerHTML = `
+                    const storeEl = document.createElement("div");
+                    storeEl.classList.add("stores-card-product");
+                    storeEl.innerHTML = `
                         <img src="${store.logo}" alt="${store.name}" class="store-logo-product" />
-                        <div>
-                            <p class="stores-name-product">${store.name}</p>
-                        </div>
+                        <div><p class="stores-name-product">${store.name}</p></div>
                     `;
-
-                    // <div class="category-container-product">${categoriesHtml}</div>
-                    // <div class="details-container-product">
-                    //     <p class="delivery-info-product">${store.delivery}</p>
-                    //     <p class="distance-info-product">${store.distance}</p>
-                    // </div>
-
-                    storeElement.addEventListener("click", () => this.handleCardClick(store));
-                    this.containers.storesContainer.appendChild(storeElement);
+                    storeEl.addEventListener("click", () => this.handleCardClick(store));
+                    this.containers.storesContainer.appendChild(storeEl);
                 });
 
                 this.containers.showingEntries.innerText = `Showing ${start+1} to ${Math.min(end,this.stores.length)} of ${this.stores.length} entries`;
@@ -356,12 +331,18 @@
                 }
                 this.currentPage = 1;
                 this.renderStores();
+            },
+
+            handleCardClick(store) {
+                console.log("Clicked store:", store.name);
+                // สามารถ redirect หรือแสดงรายละเอียดเพิ่มเติมได้
             }
         };
 
-        // start app
+        // Start app
         StoreApp.init();
     </script>
+
 
 
 </body>
