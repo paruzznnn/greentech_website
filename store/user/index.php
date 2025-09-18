@@ -8,11 +8,135 @@
     <title>E-STORE</title>
     <?php include '../inc-meta.php'; ?>
     <link href="../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../css/user/template-user.css?v=<?php echo time(); ?>" rel="stylesheet">
     <?php include '../inc-cdn.php'; ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .controls button {
+            padding: 0.1rem 0.3rem;
+            border: 1px solid #ddd;
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .controls button:hover {
+            background: #e5e7eb;
+        }
+
+        .controls button.active {
+            background: #FF9800;
+            color: white;
+            border-color: #FF9800;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 0.1rem 0.6rem;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .pagination button:hover {
+            background: #f3f4f6;
+        }
+
+        .pagination button.active {
+            background: #FF9800;
+            color: white;
+            border-color: #FF9800;
+        }
+
+        .pagination button:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+            color: #9ca3af;
+        }
+
+        .showing-entries {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .user-card-info {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .stores-logo-info {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin-bottom: 0.75rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+        }
+
+        #user-menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #user-menu li a {
+            font-size: 14px;
+            padding: 5px 10px;
+            text-decoration: none;
+            color: black;
+            display: block;
+            border-radius: 0.5rem;
+        }
+
+        #user-menu li a:hover {
+            background-color: #FF9800;
+            padding: 5px 10px;
+            color: #ffffff;
+        }
+
+        #user-menu li a.active {
+            font-weight: bold;
+            color: #FF9800;
+            background-color: #fff7eb;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 5px;
+        }
+
         .tab-order-navigation {
             display: flex;
             flex-wrap: nowrap;
@@ -60,15 +184,6 @@
             border-bottom: 2px solid #2563eb;
         }
 
-        .tab-order-content {
-            padding-top: 1.5rem;
-            display: none;
-        }
-
-        .tab-order-content.active {
-            display: block;
-        }
-
         .order-card {
             background-color: #f9fafb;
             padding: 1.5rem;
@@ -99,6 +214,8 @@
         }
 
         .status-badge {
+            text-align: center;
+            width: 100px;
             font-size: 0.75rem;
             line-height: 1;
             padding: 0.25rem 0.625rem;
@@ -194,13 +311,16 @@
 
         .list-view .product-summary {
             flex-grow: 1;
-            padding: 0 2rem;
+            padding: 0;
+            min-width: 150px;
+            margin-left: 2rem;
         }
 
         .list-view .product-summary ul {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             gap: 1rem;
+            align-items: center;
         }
         
         .list-view .product-summary li {
@@ -264,17 +384,17 @@
         const userApp = {
             userData: {
                 name: "กิตตินันท์ธนัช สีแก้วน้ำใส",
-                profile: "",
+                profile: "https://placehold.co/60x60/888/fff?text=User",
                 menu: [{
-                    icon: "",
+                    icon: '<i class="bi bi-person-circle"></i>',
                     text: "Account",
                     link: "#"
                 }, {
-                    icon: '<i class="bi bi-shop"></i>',
+                    icon: '<i class="bi bi-box-seam"></i>',
                     text: "Orders",
                     link: "#"
                 }, {
-                    icon: "",
+                    icon: '<i class="bi bi-box-arrow-right"></i>',
                     text: "Logout",
                     link: "#"
                 }]
@@ -284,92 +404,92 @@
                 orders: [{
                     id: 'ORD12346',
                     status: 'pending',
-                    statusText: 'Pending',
+                    statusText: 'ที่ต้องชำระ',
                     products: [{
-                        name: 'กางเกงยีนส์เดนิม',
+                        name: 'แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว',
                         quantity: 2,
-                        price: '1,500.00',
-                        image: 'https://placehold.co/80x80/007bff/ffffff?text=Product'
+                        price: '1500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
                     }, {
-                        name: 'เสื้อยืดลายมินิมอลสีขาว',
+                        name: 'แทรนดาร์ เอเอ็มเอฟ ไฟน์ เฟรสโค',
                         quantity: 1,
                         price: '350.00',
-                        image: 'https://placehold.co/80x80/28a745/ffffff?text=Product'
+                        image: 'https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg'
                     }]
                 }, {
                     id: 'ORD12347',
                     status: 'shipped',
-                    statusText: 'Shipped',
+                    statusText: 'จัดเตรียมสินค้า',
                     products: [{
-                        name: 'รองเท้าวิ่งสีดำ',
+                        name: 'แทรนดาร์ เอเอ็มเอฟ สตาร์',
                         quantity: 1,
-                        price: '2,200.00',
-                        image: 'https://placehold.co/80x80/ffc107/ffffff?text=Product'
+                        price: '2200.00',
+                        image: 'https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg'
                     }]
                 }, {
                     id: 'ORD12348',
                     status: 'delivered',
-                    statusText: 'Delivered',
+                    statusText: 'กำลังส่งมอบ',
                     products: [{
-                        name: 'นาฬิกาข้อมือ',
+                        name: 'แทรนดาร์ ทีบาร์ ที15',
                         quantity: 1,
-                        price: '3,500.00',
-                        image: 'https://placehold.co/80x80/20c997/ffffff?text=Product'
+                        price: '3500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg'
                     }]
                 }, {
                     id: 'ORD12349',
                     status: 'cancelled',
-                    statusText: 'Cancelled',
+                    statusText: 'ยกเลิกสินค้า',
                     products: [{
-                        name: 'กระเป๋าเดินทาง',
+                        name: 'แทรนดาร์ ทีบาร์ ที24',
                         quantity: 1,
-                        price: '4,500.00',
-                        image: 'https://placehold.co/80x80/dc3545/ffffff?text=Product'
+                        price: '4500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687b31d91b97e_T24.png'
                     }]
                 }, {
                     id: 'ORD12350',
                     status: 'finished',
-                    statusText: 'Finished',
+                    statusText: 'ส่งสินค้าสำเร็จ',
                     products: [{
-                        name: 'หูฟังไร้สาย',
+                        name: 'แทรนดาร์ ไพรม์โคท',
                         quantity: 1,
-                        price: '2,800.00',
-                        image: 'https://placehold.co/80x80/28a745/ffffff?text=Product'
+                        price: '2800.00',
+                        image: 'https://www.trandar.com//public/shop_img/687e1c0470c40_trandar_prime_coat_new_label.jpg'
                     }]
                 }, {
                     id: 'ORD12351',
                     status: 'return',
-                    statusText: 'Return',
+                    statusText: 'คืนสินค้า',
                     products: [{
                         name: 'เครื่องฟอกอากาศ',
                         quantity: 1,
-                        price: '5,900.00',
+                        price: '5900.00',
                         image: 'https://placehold.co/80x80/fd7e14/ffffff?text=Product'
                     }]
                 }, {
                     id: 'ORD12352',
                     status: 'pending',
-                    statusText: 'Pending',
+                    statusText: 'ที่ต้องชำระ',
                     products: [{
                         name: 'สมาร์ทโฟน',
                         quantity: 1,
-                        price: '12,000.00',
+                        price: '12000.00',
                         image: 'https://placehold.co/80x80/3498db/ffffff?text=Product'
                     }]
                 },
                 {
                     id: 'ORD12353',
                     status: 'pending',
-                    statusText: 'Pending',
+                    statusText: 'ที่ต้องชำระ',
                     products: [{
                         name: 'นาฬิกาข้อมือ',
                         quantity: 1,
-                        price: '3,500.00',
+                        price: '3500.00',
                         image: 'https://placehold.co/80x80/20c997/ffffff?text=Product'
                     }, {
                         name: 'กางเกงยีนส์เดนิม',
                         quantity: 2,
-                        price: '1,500.00',
+                        price: '1500.00',
                         image: 'https://placehold.co/80x80/007bff/ffffff?text=Product'
                     }, {
                         name: 'เสื้อยืดลายมินิมอลสีขาว',
@@ -379,7 +499,7 @@
                     }, {
                         name: 'รองเท้าวิ่งสีดำ',
                         quantity: 1,
-                        price: '2,200.00',
+                        price: '2200.00',
                         image: 'https://placehold.co/80x80/ffc107/ffffff?text=Product'
                     }]
                 }]
@@ -389,6 +509,7 @@
                 "Account": {
                     template: `
                     <div style="background:#fff; padding:1rem; border-radius:4px;">
+                        <h4 class="fw-semibold mb-3">ข้อมูลบัญชี</h4>
                         <div id="account-container"></div>
                     </div>`,
                     render() {
@@ -419,14 +540,36 @@
                 }
             },
 
-            renderMenu() {
+            // Pagination state and settings
+            pagination: {
+                currentPage: 1,
+                itemsPerPage: 5,
+                totalPages: 0,
+                totalItems: 0,
+                filteredData: []
+            },
+
+            renderUserCard() {
                 const container = document.getElementById("userContainer");
-                let menuHTML = `<ul id="user-menu">`;
+                container.innerHTML = `
+                    <div class="user-card-info">
+                        <img src="${this.userData.profile}" alt="User profile" class="stores-logo-info">
+                        <h5 class="fw-semibold">${this.userData.name}</h5>
+                    </div>
+                    <div class="sidebar-menu">
+                        <ul id="user-menu"></ul>
+                    </div>
+                `;
+                this.renderMenu();
+            },
+
+            renderMenu() {
+                const menuContainer = document.getElementById("user-menu");
+                let menuHTML = '';
                 this.userData.menu.forEach(item => {
                     menuHTML += `<li><a href="${item.link}">${item.icon} ${item.text}</a></li>`;
                 });
-                menuHTML += `</ul>`;
-                container.innerHTML = menuHTML;
+                menuContainer.innerHTML = menuHTML;
             },
 
             bindMenuEvents() {
@@ -449,7 +592,7 @@
             },
 
             init() {
-                this.renderMenu();
+                this.renderUserCard();
                 this.bindMenuEvents();
 
                 const firstMenu = document.querySelector('#user-menu li a');
@@ -498,96 +641,196 @@
                 };
 
                 let tabButtonsHTML = '';
-                let tabContentsHTML = '';
-                let isFirstTab = true;
-
                 for (const key in tabMap) {
-                    if (tabMap.hasOwnProperty(key)) {
-                        const value = tabMap[key];
-                        const isActive = isFirstTab ? 'active' : '';
-                        tabButtonsHTML += `<button data-tab-key="${key}" class="tab-order-button ${isActive}">${value.icon} ${value.text}</button>`;
-
-                        let filteredOrders = [];
-                        if (key === 'all') {
-                            filteredOrders = this.data.orders;
-                        } else {
-                            filteredOrders = this.data.orders.filter(order => order.status === key);
-                        }
-
-                        let orderCardsHTML = filteredOrders.map(order => this.renderOrderCard(order)).join('');
-                        tabContentsHTML += `<div data-content-key="${key}" class="tab-order-content ${isActive}"><div class="order-view-container grid-view"><div class="order-cards">${orderCardsHTML}</div></div></div>`;
-
-                        isFirstTab = false;
-                    }
+                    const value = tabMap[key];
+                    const isActive = key === 'all' ? 'active' : '';
+                    tabButtonsHTML += `<button data-tab-key="${key}" class="tab-order-button ${isActive}">${value.icon} ${value.text}</button>`;
                 }
 
                 this.containers.ordersContainer.innerHTML = `
                 <div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="header mb-0">รายการคำสั่งซื้อของคุณ</h5>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm active" id="gridBtn"><i class="bi bi-grid-3x3-gap-fill"></i></button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="listBtn"><i class="bi bi-list-task"></i></button>
-                        </div>
-                    </div>
+                    <h4 class="header mb-3">รายการคำสั่งซื้อของคุณ</h4>
                     <div class="tab-order-navigation">
                         ${tabButtonsHTML}
                     </div>
-                    <div id="tab-order-content">
-                        ${tabContentsHTML}
+                    <div class="d-flex justify-content-between mt-4">
+                        <div id="showingEntries" class="showing-entries"></div>
+                        <div class="controls">
+                            <button id="gridBtn" class="active"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                            <button id="listBtn"><i class="bi bi-list-task"></i></button>
+                        </div>
                     </div>
+                    <div id="tab-order-content">
+                        <div class="order-view-container grid-view" id="order-list-container"></div>
+                    </div>
+                    <div id="paginationContainer" class="pagination"></div>
                 </div>
-            `;
+                `;
+
                 this.bindTabEvents();
                 this.bindViewToggleEvents();
+                this.filterAndRenderOrders('all');
             },
 
             renderOrderCard(order) {
                 const totalItems = order.products.length;
+                const productToDisplay = order.products[0];
+                const totalPrice = order.products.reduce((sum, product) => {
+                    const price = parseFloat(product.price.replace(/,/g, ''));
+                    return sum + (price * product.quantity);
+                }, 0).toFixed(2);
+
                 let productListHTML = '';
-                let displayCount = 3;
+                if (productToDisplay) {
+                    productListHTML = `
+                        <ul>
+                            <li>
+                                <div class="d-flex align-items-center" style="gap:10px;">
+                                    <img src="${productToDisplay.image}" alt="${productToDisplay.name}" width="50" height="50" class="rounded border">
+                                    <div>
+                                        <span class="fw-semibold">${productToDisplay.name}</span>
+                                        <br>
+                                        <span class="text-muted small">x${productToDisplay.quantity}</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    `;
+                }
 
-                if (totalItems > 0) {
-                    const productsToDisplay = order.products.slice(0, displayCount);
-                    productListHTML = `<ul>` + productsToDisplay.map(product => `
-                        <li>${product.name} (x${product.quantity})</li>
-                    `).join('') + `</ul>`;
-
-                    if (totalItems > displayCount) {
-                        productListHTML += `<a href="#" class="view-all-link">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>`;
-                    }
-                } else {
-                    productListHTML = `<ul><li>ไม่มีรายการสินค้า</li></ul>`;
+                let trackLink = '';
+                if (totalItems > 1) {
+                    trackLink += `
+                        <a href="#" class="view-all-link">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
+                    `;
                 }
 
                 return `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div class="order-info">
-                            <span class="text-muted small">หมายเลขคำสั่งซื้อ</span>
-                            <span class="fw-semibold text-dark">#${order.id}</span>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <span class="text-muted small">หมายเลขคำสั่งซื้อ</span>
+                                <span class="fw-semibold text-dark">#${order.id}</span>
+                            </div>
+                            <span class="status-badge ${order.status}">${order.statusText}</span>
                         </div>
-                        <span class="status-badge ${order.status}">${order.statusText}</span>
+                        <div class="product-summary">
+                            ${productListHTML}
+                            <div class="d-flex justify-content-between">
+                                <a href="#" class="view-all-link">ติดตาม</a>
+                                ${trackLink}
+                            </div>
+                        </div>
+                        <div class="product-total-price">
+                            <span>ยอดรวม: ${totalPrice} บาท</span>
+                        </div>
                     </div>
-                    <div class="product-summary">
-                        ${productListHTML}
-                    </div>
-                </div>
                 `;
             },
             
+            filterAndRenderOrders(status) {
+                let filteredOrders = (status === 'all')
+                    ? this.data.orders
+                    : this.data.orders.filter(order => order.status === status);
+                
+                this.pagination.filteredData = filteredOrders;
+                this.pagination.totalItems = filteredOrders.length;
+                this.pagination.totalPages = Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage);
+
+                this.renderCurrentPage();
+            },
+
+            renderCurrentPage() {
+                const {
+                    currentPage,
+                    itemsPerPage,
+                    filteredData
+                } = this.pagination;
+
+                const start = (currentPage - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const currentData = filteredData.slice(start, end);
+
+                const orderCardsHTML = currentData.map(order => this.renderOrderCard(order)).join('');
+                const container = document.getElementById('order-list-container');
+                container.innerHTML = `<div class="order-cards">${orderCardsHTML}</div>`;
+                
+                this.renderPaginationControls();
+                this.renderShowingEntries();
+            },
+
+            renderPaginationControls() {
+                const {
+                    currentPage,
+                    totalPages
+                } = this.pagination;
+                const container = document.getElementById('paginationContainer');
+                container.innerHTML = ''; // Clear previous buttons
+
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = 'ย้อนกลับ';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    this.pagination.currentPage--;
+                    this.renderCurrentPage();
+                });
+                container.appendChild(prevBtn);
+
+                // Numbered pages
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.classList.toggle('active', i === currentPage);
+                    pageBtn.addEventListener('click', () => {
+                        this.pagination.currentPage = i;
+                        this.renderCurrentPage();
+                    });
+                    container.appendChild(pageBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = 'ถัดไป';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    this.pagination.currentPage++;
+                    this.renderCurrentPage();
+                });
+                container.appendChild(nextBtn);
+            },
+
+            renderShowingEntries() {
+                const {
+                    currentPage,
+                    itemsPerPage,
+                    totalItems
+                } = this.pagination;
+
+                const startEntry = (totalItems > 0) ? (currentPage - 1) * itemsPerPage + 1 : 0;
+                const endEntry = Math.min(startEntry + itemsPerPage - 1, totalItems);
+                const showingEntriesText = `แสดง ${startEntry} ถึง ${endEntry} จาก ${totalItems} รายการ`;
+
+                document.getElementById('showingEntries').textContent = showingEntriesText;
+            },
+
+            resetPagination() {
+                this.pagination.currentPage = 1;
+            },
+
             bindTabEvents() {
                 const tabButtons = document.querySelectorAll('.tab-order-navigation .tab-order-button');
-                const tabContents = document.querySelectorAll('#tab-order-content .tab-order-content');
-
                 tabButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         tabButtons.forEach(btn => btn.classList.remove('active'));
-                        tabContents.forEach(content => content.classList.remove('active'));
-
                         button.classList.add('active');
                         const tabKey = button.getAttribute('data-tab-key');
-                        document.querySelector(`[data-content-key="${tabKey}"]`).classList.add('active');
+                        this.resetPagination();
+                        this.filterAndRenderOrders(tabKey);
                     });
                 });
             },
@@ -595,24 +838,20 @@
             bindViewToggleEvents() {
                 const gridBtn = document.getElementById('gridBtn');
                 const listBtn = document.getElementById('listBtn');
-                const orderViewContainers = document.querySelectorAll('.order-view-container');
+                const orderViewContainer = document.getElementById('order-list-container');
 
                 gridBtn.addEventListener('click', () => {
                     gridBtn.classList.add('active');
                     listBtn.classList.remove('active');
-                    orderViewContainers.forEach(container => {
-                        container.classList.add('grid-view');
-                        container.classList.remove('list-view');
-                    });
+                    orderViewContainer.classList.add('grid-view');
+                    orderViewContainer.classList.remove('list-view');
                 });
 
                 listBtn.addEventListener('click', () => {
                     listBtn.classList.add('active');
                     gridBtn.classList.remove('active');
-                    orderViewContainers.forEach(container => {
-                        container.classList.add('list-view');
-                        container.classList.remove('grid-view');
-                    });
+                    orderViewContainer.classList.add('list-view');
+                    orderViewContainer.classList.remove('grid-view');
                 });
             }
         };

@@ -25,8 +25,8 @@
                                 <div class="cart-view-toggle">
                                     <h2 class="cart-title"><i class="bi bi-cart3"></i> <span>ตะกร้าสินค้า</span></h2>
                                     <div>
-                                        <button id="listModeBtn">List</button>
-                                        <button id="gridModeBtn">Grid</button>
+                                        <button id="listModeBtn"><i class="bi bi-list-task"></i></button>
+                                        <button id="gridModeBtn"><i class="bi bi-grid-3x3-gap-fill"></i></button>
                                     </div>
                                 </div>
                                 <div id="cartItemList" class="cart-item-list list-mode"></div>

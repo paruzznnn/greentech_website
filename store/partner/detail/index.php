@@ -51,37 +51,37 @@
                 logo: "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
                 description: "วัสดุดูดซับเสียง ระบบ ผนัง เพดาน หลังคา กันเสียง",
                 menu: [{
-                        icon: "bi bi-shop",
+                        icon: '<i class="bi bi-shop"></i>',
                         text: "Shop",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-gift",
+                        icon: '<i class="bi bi-gift"></i>',
                         text: "Deals",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-geo-alt",
+                        icon: '<i class="bi bi-geo-alt"></i>',
                         text: "Buy It Again",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-star",
+                        icon: '<i class="bi bi-star"></i>',
                         text: "Reviews",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-grid",
+                        icon: '<i class="bi bi-grid"></i>',
                         text: "Article",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-telephone",
+                        icon: '<i class="bi bi-telephone"></i>',
                         text: "Contact",
                         link: "#"
                     },
                     {
-                        icon: "bi bi-clipboard",
+                        icon: '<i class="bi bi-clipboard"></i>',
                         text: "Policy",
                         link: "#"
                     }
@@ -142,8 +142,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div id="showing-entries" class="showing-entries"></div>
                             <div class="controls">
-                                <button id="gridViewBtn" class="active">Grid</button>
-                                <button id="listViewBtn">List</button>
+                                <button id="gridViewBtn" class="active"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                <button id="listViewBtn"><i class="bi bi-list-task"></i></button>
                             </div>
                         </div>
                         <div id="stores-container" class="stores-container grid"></div>
@@ -224,7 +224,7 @@
                 const container = document.getElementById("storeContainer");
                 let menuHTML = `<ul id="stores-menu">`;
                 this.storeData.menu.forEach(item => {
-                    menuHTML += `<li><a href="${item.link}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
+                    menuHTML += `<li><a href="${item.link}">${item.icon} ${item.text}</a></li>`;
                 });
                 menuHTML += `</ul>`;
                 container.innerHTML += menuHTML;
