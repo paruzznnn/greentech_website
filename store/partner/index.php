@@ -28,8 +28,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div id="showing-entries" class="showing-entries"></div>
                             <div class="controls">
-                                <button id="gridViewBtn" class="active">Grid</button>
-                                <button id="listViewBtn">List</button>
+                                <button id="gridViewBtn" class="active"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                <button id="listViewBtn"><i class="bi bi-list-task"></i></button>
                             </div>
                         </div>
                         <div id="stores-container" class="stores-container grid"></div>
