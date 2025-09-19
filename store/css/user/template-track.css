@@ -38,8 +38,6 @@
     height: 4px;
     background: linear-gradient(to right, #22c55e var(--progress, 0%), #e5e7eb var(--progress, 0%));
     top: 25px;
-    /* left: 5%; */
-    /* right: 5%; */
     z-index: 0;
     transition: background 0.5s ease-in-out;
 }
@@ -67,7 +65,6 @@
     transition: .3s;
 }
 
-
 .large-step-text {
     font-size: 16px;
     color: #9ca3af;
@@ -78,6 +75,9 @@
     color: #d1d5db;
 }
 
+/* ========================
+   Active Step
+======================== */
 .large-step-item.active .large-step-icon {
     background: #22c55e;
     border-color: #22c55e;
@@ -92,6 +92,52 @@
 .large-step-item.active .large-step-date {
     color: #6b7280;
 }
+
+/* ========================
+   Responsive
+======================== */
+@media (max-width: 768px) {
+    .large-steps::before {
+        height: 3px;
+        top: 20px;
+    }
+
+    .large-step-icon {
+        font-size: 1.2rem;
+        width: 40px;
+        height: 40px;
+    }
+
+    .large-step-text {
+        font-size: 14px;
+    }
+
+    .large-step-date {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .large-steps::before {
+        height: 2px;
+        top: 15px;
+    }
+
+    .large-step-icon {
+        font-size: 1rem;
+        width: 32px;
+        height: 32px;
+    }
+
+    .large-step-text {
+        font-size: 12px;
+    }
+
+    .large-step-date {
+        font-size: 10px;
+    }
+}
+
 
 /* --- Shipping Info & Timeline --- */
 .shipping-info {

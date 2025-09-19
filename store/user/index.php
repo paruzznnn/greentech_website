@@ -8,352 +8,8 @@
     <title>E-STORE</title>
     <?php include '../inc-meta.php'; ?>
     <link href="../css/template-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../css/user/template-user.css?v=<?php echo time(); ?>" rel="stylesheet">
     <?php include '../inc-cdn.php'; ?>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <style>
-        .controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .controls button {
-            padding: 0.1rem 0.3rem;
-            border: 1px solid #ddd;
-            background: #f3f4f6;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .controls button:hover {
-            background: #e5e7eb;
-        }
-
-        .controls button.active {
-            background: #FF9800;
-            color: white;
-            border-color: #FF9800;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .pagination button {
-            padding: 0.1rem 0.6rem;
-            border: 1px solid #ddd;
-            background: #fff;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s, border-color 0.2s;
-        }
-
-        .pagination button:hover {
-            background: #f3f4f6;
-        }
-
-        .pagination button.active {
-            background: #FF9800;
-            color: white;
-            border-color: #FF9800;
-        }
-
-        .pagination button:disabled {
-            background: #f3f4f6;
-            cursor: not-allowed;
-            color: #9ca3af;
-        }
-
-        .showing-entries {
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: #374151;
-        }
-
-        .user-card-info {
-            display: flex;
-            gap: 15px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #fff;
-            flex-direction: column;
-            margin-bottom: 10px;
-        }
-
-        .stores-logo-info {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: contain;
-            margin-bottom: 0.75rem;
-            border: 2px solid #e5e7eb;
-            background: white;
-        }
-
-        #user-menu {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        #user-menu li a {
-            font-size: 14px;
-            padding: 5px 10px;
-            text-decoration: none;
-            color: black;
-            display: block;
-            border-radius: 0.5rem;
-        }
-
-        #user-menu li a:hover {
-            background-color: #FF9800;
-            padding: 5px 10px;
-            color: #ffffff;
-        }
-
-        #user-menu li a.active {
-            font-weight: bold;
-            color: #FF9800;
-            background-color: #fff7eb;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar li {
-            margin-bottom: 5px;
-        }
-
-        .tab-order-navigation {
-            display: flex;
-            flex-wrap: nowrap;
-            text-align: center;
-            border-bottom: 1px solid #e5e7eb;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: thin;    
-            scrollbar-color: #9ca3af #f3f4f6;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-order-navigation::-webkit-scrollbar {
-            height: 6px;
-        }
-        .tab-order-navigation::-webkit-scrollbar-track {
-            background: #f3f4f6;
-        }
-        .tab-order-navigation::-webkit-scrollbar-thumb {
-            background-color: #9ca3af;
-            border-radius: 9999px;
-        }
-
-        .tab-order-button {
-            min-width: 120px;
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6b7280;
-            cursor: pointer;
-            background: none;
-            border: none;
-            transition: color 0.3s, background-color 0.3s;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-order-button:hover {
-            color: #4b5563;
-            background-color: #f9fafb;
-        }
-
-        .tab-order-button.active {
-            background-color: #ffffff;
-            color: #2563eb;
-            border-bottom: 2px solid #2563eb;
-        }
-
-        .order-card {
-            background-color: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            margin-bottom: 1rem;
-        }
-
-        .order-header {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        @media (min-width: 576px) {
-            .order-header {
-                flex-direction: row;
-                align-items: center;
-            }
-        }
-
-        .order-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .status-badge {
-            text-align: center;
-            width: 100px;
-            font-size: 0.75rem;
-            line-height: 1;
-            padding: 0.25rem 0.625rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-top: 0.5rem;
-        }
-
-        @media (min-width: 576px) {
-            .status-badge {
-                margin-top: 0;
-            }
-        }
-
-        .status-badge.pending {
-            background-color: #facc15;
-        }
-
-        .status-badge.shipped {
-            background-color: #60a5fa;
-        }
-
-        .status-badge.delivered {
-            background-color: #34d399;
-        }
-
-        .status-badge.cancelled {
-            background-color: #ef4444;
-        }
-
-        .status-badge.finished {
-            background-color: #22c55e;
-        }
-
-        .status-badge.return {
-            background-color: #f97316;
-        }
-
-        .product-summary {
-            font-size: 0.95rem;
-            color: #4b5563;
-        }
-
-        .product-summary ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .product-summary li {
-            padding: 0.25rem 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .product-summary li:last-child {
-            border-bottom: none;
-        }
-
-        .product-summary .view-all-link {
-            display: inline-block;
-            margin-top: 0.5rem;
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .product-total-price {
-            text-align: right;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-top: 1rem;
-        }
-
-        /* --- New Grid & List View Styles --- */
-        .order-view-container {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .list-view .order-card {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.25rem 1.5rem;
-        }
-        
-        .list-view .order-header {
-            margin-bottom: 0;
-        }
-
-        .list-view .product-summary {
-            flex-grow: 1;
-            padding: 0;
-            min-width: 150px;
-            margin-left: 2rem;
-        }
-
-        .list-view .product-summary ul {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 1rem;
-            align-items: center;
-        }
-        
-        .list-view .product-summary li {
-            border-bottom: none;
-        }
-        
-        .grid-view .order-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .grid-view .order-card {
-            margin-bottom: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        /* Ensure responsive layout in list view */
-        @media (max-width: 767px) {
-            .list-view .order-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            .list-view .product-summary {
-                padding: 0;
-            }
-        }
-    </style>
-
 </head>
 
 <body>
@@ -389,11 +45,18 @@
                     icon: '<i class="bi bi-person-circle"></i>',
                     text: "Account",
                     link: "#"
-                }, {
+                }, 
+                {
                     icon: '<i class="bi bi-box-seam"></i>',
                     text: "Orders",
                     link: "#"
-                }, {
+                }, 
+                {
+                    icon: '<i class="bi bi-receipt"></i>',
+                    text: "Coupon",
+                    link: "#"
+                },
+                {
                     icon: '<i class="bi bi-box-arrow-right"></i>',
                     text: "Logout",
                     link: "#"
@@ -553,7 +216,7 @@
                 const container = document.getElementById("userContainer");
                 container.innerHTML = `
                     <div class="user-card-info">
-                        <img src="${this.userData.profile}" alt="User profile" class="stores-logo-info">
+                        <img src="${this.userData.profile}" alt="User profile" class="user-logo-info">
                         <h5 class="fw-semibold">${this.userData.name}</h5>
                     </div>
                     <div class="sidebar-menu">
@@ -717,7 +380,7 @@
                         <div class="product-summary">
                             ${productListHTML}
                             <div class="d-flex justify-content-between">
-                                <a href="#" class="view-all-link">ติดตาม</a>
+                                <a href="${pathConfig.BASE_WEB}user/track/" class="view-all-link">ติดตาม</a>
                                 ${trackLink}
                             </div>
                         </div>

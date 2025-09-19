@@ -315,11 +315,14 @@ const CartApp = {
         };
     },
 
+    // =================== EVENTS ===================
     bindCheckoutEvents() {
         document.getElementById("checkoutOrders").onclick = () => {
             if (this.selectedShippingType === "pickup") {
-                if (!this.selectedShippingOptions?.timeSlot) {
-                    alert("กรุณาเลือกสาขาและช่วงเวลาในการรับสินค้าให้ครบถ้วน");
+                // MODIFIED: Check for both pickupDate and timeSlot
+                if (!this.selectedShippingOptions?.pickupDate || !this.selectedShippingOptions?.timeSlot) {
+                    // MODIFIED: Updated alert message
+                    alert("กรุณาเลือกวันที่ สาขา และช่วงเวลาในการรับสินค้าให้ครบถ้วน");
                     return; // หยุดการทำงาน
                 }
             }
@@ -327,6 +330,7 @@ const CartApp = {
             redirectGet(pathConfig.BASE_WEB + 'user/checkout/');
         };
     },
+
 
     bindEvents() {
         this.bindQuantityEvents();
@@ -503,7 +507,7 @@ const CartApp = {
         if (recommendedOption && !this.selectedShippingOptions.name) {
             this.selectedShippingOptions = recommendedOption;
         }
-        
+
         if (!options.length) {
             container.innerHTML = `<p>ไม่มีตัวเลือกการจัดส่ง</p>`;
         } else {
@@ -530,7 +534,7 @@ const CartApp = {
         });
         this.renderSummary();
     },
-    
+
     // =================== PICKUP OPTIONS ===================
     renderPickupOptions() {
         const container = document.getElementById("pickupOptions");
@@ -540,27 +544,63 @@ const CartApp = {
             container.style.display = 'none';
             return;
         }
-        
+
         container.style.display = 'block';
 
         const options = this.shippingOptionsData.pickup || [];
-        
+
         if (options.length === 0) {
             container.innerHTML = `<p class="alert alert-warning">ไม่พบตัวเลือกสาขา</p>`;
             return;
         }
-        
+
+        // =================== START: ADDED CODE ===================
+        // Render วันที่
+        const dateContainer = document.createElement("div");
+        const dateLabel = document.createElement("label");
+        dateLabel.setAttribute("for", "pickupDateSelect");
+        dateLabel.className = "form-label";
+        dateLabel.innerHTML = `<strong>เลือกวันที่รับสินค้า:</strong>`;
+
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.id = "pickupDateSelect";
+        dateInput.className = "form-input mb-2";
+
+        // Set min date to today to prevent selecting past dates
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Set the value from storage if it exists
+        if (this.selectedShippingOptions?.pickupDate) {
+            dateInput.value = this.selectedShippingOptions.pickupDate;
+        }
+
+        // Event listener สำหรับการเลือกวันที่
+        dateInput.onchange = (e) => {
+            // Create selectedShippingOptions if it doesn't exist
+            if (!this.selectedShippingOptions) {
+                this.selectedShippingOptions = {};
+            }
+            this.selectedShippingOptions.pickupDate = e.target.value;
+            this.saveToStorage();
+        };
+
+        dateContainer.appendChild(dateLabel);
+        dateContainer.appendChild(dateInput);
+        container.appendChild(dateContainer);
+        // =================== END: ADDED CODE ===================
+
         // Render สาขา
         const branchSelect = document.createElement("select");
         branchSelect.id = "pickupBranchSelect";
         branchSelect.className = "form-input mb-2";
         branchSelect.innerHTML = `<option value="">เลือกสาขา</option>`;
-        
+
         options.forEach(branch => {
             const option = document.createElement("option");
             option.value = branch.value;
             option.innerText = branch.name;
-            // Check if the current branch is the one saved in selectedShippingOptions
             if (this.selectedShippingOptions?.value === branch.value) {
                 option.selected = true;
             }
@@ -584,8 +624,12 @@ const CartApp = {
         // Event listener สำหรับการเปลี่ยนสาขา
         branchSelect.onchange = (e) => {
             const selectedBranch = options.find(b => b.value === e.target.value);
-            // Update selectedShippingOptions with the full branch object and a new timeSlot property
-            this.selectedShippingOptions = { ...selectedBranch, timeSlot: "" };
+            // Preserve the selected date, but reset the time slot
+            this.selectedShippingOptions = { 
+                ...selectedBranch, 
+                pickupDate: this.selectedShippingOptions?.pickupDate || "", 
+                timeSlot: "" 
+            };
             this.saveToStorage();
             this.renderPickupTimeSlots();
             this.renderSummary();
@@ -600,19 +644,19 @@ const CartApp = {
 
         // Check the selectedShippingOptions object for a timeSlots array
         const selectedTimeSlots = this.selectedShippingOptions?.timeSlots;
-        
+
         if (!selectedTimeSlots || selectedTimeSlots.length === 0) {
             container.style.display = 'none';
             return;
         }
-        
+
         container.style.display = 'block';
 
         const timeSlotSelect = document.createElement("select");
         timeSlotSelect.id = "pickupTimeSlotSelect";
         timeSlotSelect.className = "form-input mb-3";
         timeSlotSelect.innerHTML = `<option value="">เลือกช่วงเวลา</option>`;
-        
+
         selectedTimeSlots.forEach(slot => {
             const option = document.createElement("option");
             option.value = slot;
@@ -627,7 +671,7 @@ const CartApp = {
         timeSlotLabel.setAttribute("for", "pickupTimeSlotSelect");
         timeSlotLabel.className = "form-label";
         timeSlotLabel.innerHTML = `<strong>เลือกช่วงเวลา:</strong>`;
-        
+
         container.appendChild(timeSlotLabel);
         container.appendChild(timeSlotSelect);
 
@@ -690,3 +734,4 @@ const CartApp = {
 document.addEventListener("DOMContentLoaded", () => {
     CartApp.init();
 });
+
