@@ -5,6 +5,10 @@
     margin-bottom: 24px;
 }
 
+.section-coupon-title {
+    font-size: 1.7rem;
+}
+
 .section-coupon {
     background-color: #fff;
     border-radius: 4px;
@@ -115,6 +119,35 @@
     width: 16px;
     height: 16px;
     margin-right: 4px;
+}
+
+.btn-get-coupon {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 0.4rem;
+}
+
+.btn-coupon {
+    font-size: 0.8rem;
+    border: 1px solid #FF9800;
+    border-radius: 10px;
+    padding: 0.1rem 1rem;
+    background-color: #ff980057;
+}
+
+.btn-coupon:hover {
+    background-color: #FF9800;
+    color: #ffffff
+}
+
+.btn-collected {
+    font-size: 0.8rem;
+    border: 1px solid #ff4d4f;
+    color: #ffffff;
+    background-color: #ff4d4fbf;
+    border-radius: 10px;
+    padding: 0.2rem 1rem;
 }
 
 .tab-coupon-menu {

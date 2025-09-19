@@ -38,7 +38,7 @@
             coupon: {
                 title: 'คูปองส่วนลดพิเศษ',
                 buttonText: 'กดรับทั้งหมด',
-                buttonClass: 'btn-gray',
+                buttonClass: 'btn-get-coupon',
                 coupons: [{
                     code: "SAVE10",
                     type: "percent",
@@ -72,7 +72,7 @@
             couponpro: {
                 title: 'คูปองส่วนลดออนไลน์',
                 buttonText: 'เก็บทั้งหมด',
-                buttonClass: 'bg-orange',
+                buttonClass: 'btn-get-coupon',
                 coupons: [{
                     code: "ONLINE15",
                     type: "percent",
@@ -96,7 +96,7 @@
 
             store: {
                 title: 'คูปองส่วนลดร้านค้า',
-                buttonClass: 'bg-orange',
+                buttonClass: 'btn-get-coupon',
                 tabs: {
                     electronics: {
                         text: 'วัสดุดูดซับเสียง',
@@ -137,58 +137,6 @@
                             logo: 'http://localhost:3000/trandar_website/store/trandar_logo.png'
                         }]
                     },
-                    appliances: {
-                        text: 'เครื่องใช้ไฟฟ้าขนาดเล็ก',
-                        coupons: [{
-                            code: "SMALL50",
-                            type: "cash",
-                            value: 50,
-                            label: "ส่วนลด 50 บาท",
-                            desc: 'ใช้ได้กับเครื่องใช้ไฟฟ้าขนาดเล็กทุกประเภท',
-                            expiry: 'หมดอายุ 05/11/2025 23:59',
-                            available: '2,000 สิทธิ์',
-                            logo: 'http://localhost:3000/trandar_website/store/trandar_logo.png'
-                        }]
-                    },
-                    kitchen: {
-                        text: 'ห้องครัวและอุปกรณ์',
-                        coupons: [{
-                            code: "KITCHEN100",
-                            type: "cash",
-                            value: 100,
-                            label: "ลด 100 บาท สำหรับห้องครัว",
-                            desc: 'เมื่อซื้อสินค้าครัวครบ 1,200 บาท',
-                            expiry: 'หมดอายุ 15/10/2025 23:59',
-                            available: '600 สิทธิ์',
-                            logo: 'http://localhost:3000/trandar_website/store/trandar_logo.png'
-                        }]
-                    },
-                    bedroom: {
-                        text: 'ห้องนอนและเครื่องนอน',
-                        coupons: [{
-                            code: "BED15",
-                            type: "percent",
-                            value: 15,
-                            label: "ลด 15% เครื่องนอน",
-                            desc: 'เฉพาะผ้าปูที่นอนและผ้านวม',
-                            expiry: 'หมดอายุ 01/10/2025 23:59',
-                            available: '900 สิทธิ์',
-                            logo: 'http://localhost:3000/trandar_website/store/trandar_logo.png'
-                        }]
-                    },
-                    bathroom: {
-                        text: 'ห้องน้ำ',
-                        coupons: [{
-                            code: "BATH80",
-                            type: "cash",
-                            value: 80,
-                            label: "ส่วนลด 80 บาท ห้องน้ำ",
-                            desc: 'ใช้ได้กับอุปกรณ์สุขภัณฑ์',
-                            expiry: 'หมดอายุ 18/10/2025 23:59',
-                            available: '400 สิทธิ์',
-                            logo: 'http://localhost:3000/trandar_website/store/trandar_logo.png'
-                        }]
-                    },
                     more: {
                         text: 'เพิ่มเติม',
                         coupons: [{
@@ -212,10 +160,10 @@
                 if (!data || !container) return;
                 let html = `
                     <div class="section-coupon-header">
-                        <h2>${data.title}</h2>
+                        <h2 class="section-coupon-title">${data.title}</h2>
                         <a href="#" class="history-btn">
                             <i class="bi bi-ticket"></i>
-                            <span>คูปองที่ใช้แล้ว</span>
+                            <span>คูปองที่ใช้ได้</span>
                         </a>
                     </div>
                     <div class="coupon-grid">
@@ -224,11 +172,11 @@
                     html += data.coupons.map(coupon => this.createCouponCardHtml(coupon)).join('');
                 }
                 html += `</div>
-                    <button class="btn btn-block ${data.buttonClass}" style="margin-top: 24px;">${data.buttonText}</button>
+                    <button class="${data.buttonClass}" style="margin-top: 24px;">${data.buttonText}</button>
                 `;
                 container.innerHTML = html;
 
-                const collectAllBtn = container.querySelector('.btn-block');
+                const collectAllBtn = container.querySelector('.btn-get-coupon');
                 if (collectAllBtn) {
                     collectAllBtn.addEventListener('click', () => {
                         this.collectAllCoupons(this.coupon.coupons);
@@ -244,10 +192,10 @@
                 if (!data || !container) return;
                 let html = `
                     <div class="section-coupon-header">
-                        <h2>${data.title}</h2>
+                        <h2 class="section-coupon-title">${data.title}</h2>
                         <a href="#" class="history-btn">
                             <i class="bi bi-ticket"></i>
-                            <span>คูปองที่ใช้แล้ว</span>
+                            <span>คูปองที่ใช้ได้</span>
                         </a>
                     </div>
                     <div class="coupon-grid">
@@ -256,11 +204,11 @@
                     html += data.coupons.map(coupon => this.createCouponCardHtml(coupon)).join('');
                 }
                 html += `</div>
-                <button class="${data.buttonClass}" style="margin-top: 24px;">${data.buttonText}</button>
+                <button class="${data.buttonClass}" style="margin-top: 24px; background-color: #f28b20;">${data.buttonText}</button>
                 `;
                 container.innerHTML = html;
 
-                const collectAllBtn = container.querySelector('.bg-orange');
+                const collectAllBtn = container.querySelector('.btn-get-coupon');
                 if (collectAllBtn) {
                     collectAllBtn.addEventListener('click', () => {
                         this.collectAllCoupons(this.couponpro.coupons);
@@ -277,7 +225,7 @@
 
                 let html = `
                     <div class="section-coupon-header">
-                        <h2>${data.title}</h2>
+                        <h2 class="section-coupon-title">${data.title}</h2>
                         <a href="#" class="history-btn">
                             <i class="bi bi-ticket"></i>
                             <span>คูปองที่ใช้แล้ว</span>
@@ -311,7 +259,7 @@
 
             createCouponCardHtml(coupon) {
                 const isCollected = this.selectedCode.some(item => item.code === coupon.code);
-                const buttonClass = isCollected ? 'btn-collected' : '';
+                const buttonClass = isCollected ? 'btn-collected' : 'btn-coupon';
                 const buttonText = isCollected ? 'เก็บแล้ว' : 'เก็บ';
                 return `
                     <div class="coupon-card">
@@ -319,9 +267,11 @@
                         <div class="coupon-info">
                             <h3 class="coupon-title">${coupon.label}</h3>
                             <p class="coupon-desc">${coupon.desc}</p>
-                            <p class="coupon-expiry">${coupon.expiry}</p>
-                            <div class="expires-info">
+                            <p class="coupon-expiry">
                                 <i class="bi bi-clock-history"></i>
+                                ${coupon.expiry}
+                            </p>
+                            <div class="expires-info">
                                 <span>${coupon.available}</span>
                             </div>
                         </div>
@@ -382,7 +332,6 @@
                     });
                     this.saveToStorage();
                     console.log(`Coupon ${couponObject.code} collected!`);
-
                     this.renderCoupon();
                     this.renderCouponPro();
                     this.showCategory(this.currentTab);
