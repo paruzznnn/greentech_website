@@ -52,14 +52,24 @@
                     link: "#"
                 }, 
                 {
+                    icon: '<i class="bi bi-cart3"></i>',
+                    text: "Cart",
+                    link: pathConfig.BASE_WEB+"user/cart/"
+                },
+                {
+                    icon: '<i class="bi bi-cash-coin"></i>',
+                    text: "Payment",
+                    link: pathConfig.BASE_WEB+"user/payment/"
+                },
+                {
                     icon: '<i class="bi bi-receipt"></i>',
                     text: "Coupon",
-                    link: "#"
+                    link: pathConfig.BASE_WEB+"user/coupon/"
                 },
                 {
                     icon: '<i class="bi bi-box-arrow-right"></i>',
                     text: "Logout",
-                    link: "#"
+                    link: pathConfig.BASE_WEB+"logout.php"
                 }]
             },
 
@@ -193,14 +203,14 @@
                         };
                         this.renderListOrders();
                     }
-                },
-                "Logout": {
-                    template: `
-                <div style="background:#fff; padding:1rem; border-radius:4px;">
-                    ออกจากระบบ
-                </div>`,
-                    render: null
                 }
+                // "Logout": {
+                //     template: `
+                // <div style="background:#fff; padding:1rem; border-radius:4px;">
+                //     ออกจากระบบ
+                // </div>`,
+                //     render: null
+                // }
             },
 
             // Pagination state and settings
@@ -239,20 +249,32 @@
                 const mainContent = document.getElementById("mainContent");
                 document.querySelectorAll("#user-menu li a").forEach(link => {
                     link.addEventListener("click", e => {
-                        e.preventDefault();
-                        document.querySelectorAll("#user-menu li a").forEach(a => a.classList.remove("active"));
-                        link.classList.add("active");
+                        const href = link.getAttribute("href");
 
-                        const key = link.innerText.trim();
-                        if (this.pages[key]) {
-                            mainContent.innerHTML = this.pages[key].template;
-                            if (typeof this.pages[key].render === "function") {
-                                this.pages[key].render.call(this);
+                        // ถ้าเป็น # = ใช้ระบบ SPA (render หน้าใน JS)
+                        if (href === "#") {
+                            e.preventDefault();
+
+                            document.querySelectorAll("#user-menu li a")
+                                .forEach(a => a.classList.remove("active"));
+                            link.classList.add("active");
+
+                            const key = link.innerText.trim();
+                            if (this.pages[key]) {
+                                mainContent.innerHTML = this.pages[key].template;
+                                if (typeof this.pages[key].render === "function") {
+                                    this.pages[key].render.call(this);
+                                }
                             }
+                        } else {
+                            // ถ้าไม่ใช่ # = เปิดลิงก์ตามปกติ
+                            // e.preventDefault();  <-- ไม่ต้องใช้
+                            window.location.href = href; 
                         }
                     });
                 });
             },
+
 
             init() {
                 this.renderUserCard();
@@ -364,7 +386,7 @@
                 let trackLink = '';
                 if (totalItems > 1) {
                     trackLink += `
-                        <a href="#" class="view-all-link">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
+                        <a href="${pathConfig.BASE_WEB}user/orders/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
                     `;
                 }
 

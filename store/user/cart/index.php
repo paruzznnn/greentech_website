@@ -56,7 +56,7 @@
                             <div class="summary-section">
                                 <h2 class="summary-title">สรุป</h2>
                                 <div id="summaryDetails" class="summary-details"></div>
-                                <button id="checkoutOrders" class="checkout-button">ไปที่การชำระเงิน</button>
+                                <button id="checkoutOrders" class="checkout-button">ดำเนินการต่อ</button>
                                 <p class="terms-text">
                                     การสั่งซื้อของคุณถือเป็นการยอมรับ
                                     <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ

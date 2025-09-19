@@ -18,11 +18,11 @@
     <main>
         <div id="sections_root_track" class="section-space">
             <div class="container">
-                <section>
+                <section style="background: #ffffff; padding: 1rem; padding-top: 3rem;">
                     <div class="large-steps" id="large-steps-container"></div>
                 </section>
-                <hr class="dashed-line">
                 <section style="background: #ffffff; padding: 1rem;">
+                    <hr class="dashed-line">
                     <div class="section-header">
                         <h2 style="font-size: 18px; color: #1f2937; font-weight: bold;">ที่อยู่ในการจัดส่ง</h2>
                         <div class="text-right small-text">
@@ -32,8 +32,8 @@
                         </div>
                     </div>
                 </section>
-                <hr class="dashed-line">
                 <section style="background: #ffffff; padding: 1rem;">
+                    <hr class="dashed-line">
                     <div class="shipping-info">
                         <div class="address-box">
                             <p class="font-semibold" style="color:#1f2937;">กิตตินันท์ธนัช สีแก้วน้ำใส</p>

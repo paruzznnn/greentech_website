@@ -145,7 +145,7 @@ const CheckoutApp = {
                 const parsed = data ? JSON.parse(data) : {}; 
                 parsed.order_id = response.order_id;
                 localStorage.setItem("checkoutAppData", JSON.stringify(parsed));
-                redirectGet(pathConfig.BASE_WEB + 'user/orders/');
+                redirectGet(pathConfig.BASE_WEB + 'user/');
 
             })
             .catch(err => {
@@ -204,8 +204,9 @@ const CheckoutApp = {
                 <div class="error-message" id="error-3"></div>
                 <div class="step-buttons">
                     <button class="back-btn" data-back="2">Back</button>
-                    <button id="place-order-btn" class="confirmOrders" data-step="3">สั่งซื้อรายการสินค้า</button>
                 </div>`;
+
+                // <button id="place-order-btn" class="confirmOrders" data-step="3">สั่งซื้อรายการสินค้า</button>
 
         container.querySelectorAll(".next-btn").forEach(btn => {
             btn.onclick = () => {
@@ -225,10 +226,10 @@ const CheckoutApp = {
             };
         });
 
-        document.getElementById("place-order-btn").onclick = () => {
-            if (!this.validateStep(3)) return;
-            this.saveToStorage();
-        };
+        // document.getElementById("place-order-btn").onclick = () => {
+        //     if (!this.validateStep(3)) return;
+        //     this.saveToStorage();
+        // };
     },
 
     validateStep(stepIndex) {

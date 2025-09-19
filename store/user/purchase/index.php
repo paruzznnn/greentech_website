@@ -21,7 +21,7 @@
                     <div class="rcp-card-body">
                         <div class="rcp-header">
                             <div>
-                                <h1 class="rcp-header-title">ใบเสร็จการสั่งซื้อ</h1>
+                                <h1 class="rcp-header-title">เอกสารการสั่งซื้อ</h1>
                                 <p class="rcp-header-subtitle">ขอบคุณสำหรับการสั่งซื้อของคุณ!</p>
                             </div>
                             <div class="rcp-logo">
@@ -60,10 +60,8 @@
                             <div class="rcp-services-section">
                                 <h3>บริการเสริม</h3>
                                 <ul id="order-services-list" class="rcp-list"></ul>
-
                                 <h3>ส่วนลด</h3>
                                 <ul id="order-discounts-list" class="rcp-list"></ul>
-
                                 <h3>การจัดส่ง</h3>
                                 <ul id="order-shipping-list" class="rcp-list"></ul>
                             </div>
