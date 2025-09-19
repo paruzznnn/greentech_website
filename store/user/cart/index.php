@@ -70,6 +70,10 @@
                             <div class="discount-section">
                                 <p id="discountMessage"></p>
                                 <h3 class="discount-title">ใช้คูปอง</h3>
+                                <a href="<?php echo $GLOBALS['BASE_WEB'];?>user/coupon/">
+                                    <i class="bi bi-tags"></i>
+                                    เก็บคูปองส่วนลดที่นี้
+                                </a>
                                 <div id="couponList"></div>
                                 <h3 class="discount-title">รหัสส่วนลด</h3>
                                 <div class="discount-code-group">

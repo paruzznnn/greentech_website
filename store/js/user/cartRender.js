@@ -47,22 +47,7 @@ const CartApp = {
         weight: 0.5,
         image: "https://www.trandar.com//public/shop_img/687b31d91b97e_T24.png"
     }],
-    coupons: [{
-        code: "SAVE10",
-        type: "percent",
-        value: 10,
-        label: "ลด 10%"
-    }, {
-        code: "FREESHIP",
-        type: "shipping",
-        value: 0,
-        label: "ส่งฟรี"
-    }, {
-        code: "DISCOUNT50",
-        type: "fixed",
-        value: 50,
-        label: "ลด 50 บาท"
-    }],
+    coupons: [],
     services: [{
         name: "giftWrap",
         label: "ห่อของขวัญ",
@@ -176,17 +161,27 @@ const CartApp = {
     },
 
     loadFromStorage() {
-        const data = localStorage.getItem("cartAppData");
-        if (!data) return;
+        const cart = localStorage.getItem("cartAppData");
+        const coupon = localStorage.getItem("couponsAppData");
+
         try {
-            const parsed = JSON.parse(data);
-            this.cartItems = parsed.cartItems || this.cartItems;
-            this.appliedCoupon = parsed.appliedCoupon || {};
-            this.selectedServices = parsed.selectedServices || [];
-            this.selectedShippingType = parsed.selectedShippingType || "delivery";
-            this.selectedShippingOptions = parsed.selectedShippingOptions || {};
-            this.viewMode = parsed.viewMode || "list";
-            this.shipping = parsed.shipping || this.shipping;
+
+            if (cart) {
+                const parsedCart = JSON.parse(cart);
+                this.cartItems = parsedCart.cartItems || this.cartItems;
+                this.appliedCoupon = parsedCart.appliedCoupon || {};
+                this.selectedServices = parsedCart.selectedServices || [];
+                this.selectedShippingType = parsedCart.selectedShippingType || "delivery";
+                this.selectedShippingOptions = parsedCart.selectedShippingOptions || {};
+                this.viewMode = parsedCart.viewMode || "list";
+                this.shipping = parsedCart.shipping || this.shipping;
+            }
+
+            if (coupon) {
+                const parsedCoupon = JSON.parse(coupon);
+                this.coupons = parsedCoupon;  
+            }
+
         } catch (e) {
             console.error("localStorage ผิดพลาด", e);
         }
@@ -357,6 +352,10 @@ const CartApp = {
     renderCouponList() {
         const container = document.getElementById("couponList");
         container.innerHTML = "";
+
+        console.log('coupons', this.coupons);
+        
+
         this.coupons.forEach(coupon => {
             const btn = document.createElement("button");
             btn.className = "coupon-btn";
