@@ -52,6 +52,16 @@
                     link: "#"
                 }, 
                 {
+                    icon: '<i class="bi bi-file-earmark-text"></i>',
+                    text: "Quotation",
+                    link: "#"
+                }, 
+                {
+                    icon: '<i class="bi bi-file-earmark-text"></i>',
+                    text: "Invoice",
+                    link: "#"
+                }, 
+                {
                     icon: '<i class="bi bi-cart3"></i>',
                     text: "Cart",
                     link: pathConfig.BASE_WEB+"user/cart/"
@@ -386,7 +396,7 @@
                 let trackLink = '';
                 if (totalItems > 1) {
                     trackLink += `
-                        <a href="${pathConfig.BASE_WEB}user/orders/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
+                        <a href="${pathConfig.BASE_WEB}user/purchase/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
                     `;
                 }
 
