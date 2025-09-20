@@ -8,7 +8,7 @@ const CartApp = {
         price: 21.6,
         qty: 4,
         maxQty: 10,
-        weight: 1.2,
+        weight: 100.2,
         image: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg"
     }, {
         id: 2,
@@ -86,12 +86,14 @@ const CartApp = {
             name: "รถบรรทุก 6 ล้อ",
             price: 1000,
             capacity: 15000
-        }, {
-            value: "truck",
-            name: "ติดต่อเจ้าหน้าที่",
-            price: 0,
-            capacity: 20000
-        }],
+        }
+            // {
+            //     value: "truck",
+            //     name: "ติดต่อเจ้าหน้าที่",
+            //     price: 0,
+            //     capacity: 20000
+            // }
+        ],
         pickup: [{
             value: "branch1",
             name: "แทรนดาร์ อินเตอร์เนชั่นแนล",
@@ -179,7 +181,7 @@ const CartApp = {
 
             if (coupon) {
                 const parsedCoupon = JSON.parse(coupon);
-                this.coupons = parsedCoupon;  
+                this.coupons = parsedCoupon;
             }
 
         } catch (e) {
@@ -326,7 +328,6 @@ const CartApp = {
         };
     },
 
-
     bindEvents() {
         this.bindQuantityEvents();
         this.bindRemoveEvents();
@@ -352,10 +353,6 @@ const CartApp = {
     renderCouponList() {
         const container = document.getElementById("couponList");
         container.innerHTML = "";
-
-        console.log('coupons', this.coupons);
-        
-
         this.coupons.forEach(coupon => {
             const btn = document.createElement("button");
             btn.className = "coupon-btn";
@@ -364,7 +361,6 @@ const CartApp = {
             btn.onclick = () => this.applyCoupon(coupon.code);
             container.appendChild(btn);
         });
-
         const msg = document.getElementById("discountMessage");
         if (this.appliedCoupon?.code) {
             msg.innerText = `ใช้คูปอง ${this.appliedCoupon.label} แล้ว`;
@@ -470,7 +466,7 @@ const CartApp = {
         container.querySelectorAll('input[name="shipping"]').forEach(radio => {
             radio.onchange = (e) => {
                 this.selectedShippingType = e.target.value;
-                this.selectedShippingOptions = {}; // Reset selected options when changing shipping type
+                this.selectedShippingOptions = {};
                 this.saveToStorage();
                 this.renderDeliveryOptions();
                 this.renderPickupOptions();
@@ -493,6 +489,11 @@ const CartApp = {
         const options = this.shippingOptionsData.delivery || [];
         const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
 
+        const currentSelected = this.selectedShippingOptions;
+        if (currentSelected?.capacity && totalWeight > currentSelected.capacity) {
+            this.selectedShippingOptions = {};
+        }
+
         let recommendedOption = null;
         const sortedOptions = [...options].sort((a, b) => a.capacity - b.capacity);
         const suitableOption = sortedOptions.find(opt => totalWeight <= opt.capacity);
@@ -503,7 +504,7 @@ const CartApp = {
             recommendedOption = sortedOptions[sortedOptions.length - 1];
         }
 
-        if (recommendedOption && !this.selectedShippingOptions.name) {
+        if (!this.selectedShippingOptions.name) {
             this.selectedShippingOptions = recommendedOption;
         }
 
@@ -514,10 +515,8 @@ const CartApp = {
                 const isTooHeavy = totalWeight > opt.capacity;
                 const label = document.createElement("label");
                 label.classList.add("delivery-label");
-
                 const disabled = isTooHeavy ? "disabled" : "";
                 const checked = this.selectedShippingOptions?.value === opt.value && !isTooHeavy ? "checked" : "";
-
                 label.innerHTML = `<input type="radio" name="deliveryOption" value="${opt.value}" ${checked} ${disabled}> ${opt.name} (+${opt.price})`;
                 container.appendChild(label);
             });
@@ -624,10 +623,10 @@ const CartApp = {
         branchSelect.onchange = (e) => {
             const selectedBranch = options.find(b => b.value === e.target.value);
             // Preserve the selected date, but reset the time slot
-            this.selectedShippingOptions = { 
-                ...selectedBranch, 
-                pickupDate: this.selectedShippingOptions?.pickupDate || "", 
-                timeSlot: "" 
+            this.selectedShippingOptions = {
+                ...selectedBranch,
+                pickupDate: this.selectedShippingOptions?.pickupDate || "",
+                timeSlot: ""
             };
             this.saveToStorage();
             this.renderPickupTimeSlots();

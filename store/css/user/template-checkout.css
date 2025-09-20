@@ -192,7 +192,7 @@
 }
 
 .confirmOrders {
-    /* width: 100% !important; */
+    width: 100% !important;
     background-color: #22c55e !important;
     color: white !important;
     font-weight: 700 !important;
@@ -233,6 +233,7 @@
 }
 
 .step-buttons button {
+    width: 100%;
     margin-right: 0.5rem;
     padding: 0.5rem 1rem;
     border: none;
@@ -243,7 +244,8 @@
 }
 
 .step-buttons .back-btn {
-    background: #ccc;
+    margin-bottom: 5px;
+    background: #efefef;
     color: #333;
 }
 

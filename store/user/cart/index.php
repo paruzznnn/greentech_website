@@ -15,6 +15,47 @@
 <body>
 
     <?php include '../../template/head-bar.php'; ?>
+
+    <!-- <div id="address-modal" class="store-modal">
+        <div class="store-modal-content">
+            <span class="modal-close store-close-modal">&times;</span>
+            <form id="address-form">
+                <div class="form-group">
+                    <label for="province" class="form-label">จังหวัด:</label>
+                    <select id="province" name="province" class="form-input" required>
+                        <option value="">เลือกจังหวัด</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="district" class="form-label">อำเภอ/เขต</label>
+                    <select id="district" name="district" class="form-input" required disabled>
+                        <option value="">เลือกอำเภอ/เขต</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subdistrict" class="form-label">ตำบล/แขวง</label>
+                    <select id="subdistrict" name="subdistrict" class="form-input" required disabled>
+                        <option value="">เลือกตำบล/แขวง</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postalCode" class="form-label">รหัสไปรษณีย์:</label>
+                    <input type="text" id="postalCode" name="postalCode" class="form-input" value="" readonly>
+                </div>
+
+                <div class="full-width form-group">
+                    <label for="address_detail" class="form-label">ที่อยู่:</label>
+                    <textarea id="address_detail" name="address_detail" class="form-input" style="min-height: 60px !important;" required></textarea>
+                </div>
+
+                <div style="margin-top:10px; text-align:right;">
+                    <button type="button" id="modal-cancel">Cancel</button>
+                    <button type="submit" id="modal-save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div> -->
+
     <main>
         <div id="sections_root_cart" class="section-space">
             <div class="container">
@@ -56,7 +97,8 @@
                             <div class="summary-section">
                                 <h2 class="summary-title">สรุป</h2>
                                 <div id="summaryDetails" class="summary-details"></div>
-                                <button id="checkoutOrders" class="checkout-button">ดำเนินการต่อ</button>
+                                <button id="checkoutOrders" class="checkout-button">สั่งซื้อรายการสินค้า</button>
+                                <button id="" class="">ขอใบเสนอราคา</button>
                                 <p class="terms-text">
                                     การสั่งซื้อของคุณถือเป็นการยอมรับ
                                     <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ

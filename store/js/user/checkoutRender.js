@@ -1,55 +1,27 @@
 import { redirectGet, redirectPostForm } from '../formHandler.js';
 
+
 const CheckoutApp = {
-    accordions: [{
-        icon: '<i class="bi bi-person-vcard"></i>',
-        title: "ผู้รับสินค้า",
-        content: ""
-    },
-    {
-        icon: '<i class="bi bi-geo-alt"></i>',
-        title: "ที่อยู่จัดส่ง",
-        content: ""
-    },
-    {
-        icon: '<i class="bi bi-credit-card"></i>',
-        title: "วิธีการชำระเงิน",
-        content: ""
-    },
-    {
-        icon: '<i class="bi bi-pen"></i>',
-        title: "จดบันทึก",
-        content: ""
-    }
-    ],
-
+    lang: 'th',
+    cartItems: [],
+    summary: {},
     billing: {
-        first_name: "กิตตินันท์ธนัช",
-        last_name: "สีแก้วน้ำใส",
-        phone_number: "0838945256"
+        first_name: "",
+        last_name: "",
+        phone_number: ""
     },
-
-    addresses: [{
-        detail: "102 ซอย พัฒนาการ 40",
-        provinces: "กรุงเทพมหานคร",
-        districts: "สวนหลวง",
-        subdistricts: "สวนหลวง",
-        postalCode: 10250,
-        default: true
-    }],
-
-    paymentMethods: [{
-        value: "krungsri_bank",
-        label: "โอนเงินผ่าน ธ.กรุงศรีอยุธยา",
-        checked: true
-    },
-    {
-        value: "promptpay",
-        label: "สแกน QR Code (พร้อมเพย์)"
-    }
+    addresses: [
+        {
+            detail: "102 ซอย พัฒนาการ 40",
+            provinces: "กรุงเทพมหานคร",
+            districts: "สวนหลวง",
+            subdistricts: "สวนหลวง",
+            postalCode: 10250,
+            default: true
+        }
     ],
-
-    branches: [{
+    branches: [
+        {
             value: "branch1",
             name: "แทรนดาร์ อินเตอร์เนชั่นแนล",
             detail: "102 ซอย พัฒนาการ 40",
@@ -70,21 +42,25 @@ const CheckoutApp = {
             timeSlots: ["11:00 - 13:00", "14:00 - 16:00"]
         },
     ],
-
-    cartItems: [],
-    selectedShippingType: "delivery",
-    selectedShippingOptions: {},
-    selectedServices: [],
-    appliedCoupon: {},
-    summary: {},
+    paymentMethods: [
+        { label: 'โอนเงิน', value: 'bank_transfer', checked: true },
+        { label: 'บัตรเครดิต', value: 'credit_card', checked: false }
+    ],
+    selectedShippingType: 'delivery',
     selectedAddressIndex: null,
-
-    lang: 'th',
+    selectedShippingOptions: {},
     provincesData: [],
     districtsData: [],
     subdistrictsData: [],
-    provinceActive: null,
-    districtActive: null,
+    provinceActive: '',
+    districtActive: '',
+
+    accordions: [
+        { icon: '<i class="bi bi-person-vcard"></i>', title: 'ข้อมูลผู้สั่งซื้อ', content: '' },
+        { icon: '<i class="bi bi-geo-alt"></i>', title: 'ที่อยู่จัดส่ง', content: '' },
+        { icon: '<i class="bi bi-credit-card"></i>', title: 'วิธีการชำระเงิน', content: '' },
+        { icon: '<i class="bi bi-pen"></i>', title: 'บันทึกเพิ่มเติม', content: '' }
+    ],
 
     /* ========== STORAGE ========== */
     saveToStorage() {
@@ -94,9 +70,9 @@ const CheckoutApp = {
                 last_name: document.getElementById("last_name").value,
                 phone_number: document.getElementById("phone_number").value
             },
-            addresses: this.selectedShippingType === "pickup" ? 
-            [this.branches.find(branch => branch.value === this.selectedShippingOptions.value)] : 
-            (this.selectedAddressIndex !== null ? [this.addresses[this.selectedAddressIndex]] : []),
+            addresses: this.selectedShippingType === "pickup" ?
+                [this.branches.find(branch => branch.value === this.selectedShippingOptions.value)] :
+                (this.selectedAddressIndex !== null ? [this.addresses[this.selectedAddressIndex]] : []),
             selectedShippingOptions: this.selectedShippingOptions,
             selectedServices: this.selectedServices,
             appliedCoupon: this.appliedCoupon,
@@ -126,95 +102,115 @@ const CheckoutApp = {
         }
     },
 
-    sendOrderToServer(data) {
+    async sendOrderToServer(data) {
         data.action = "payOrder";
-        fetch(pathConfig.BASE_WEB + "service/user/checkout-action.php", {
-            method: "POST",
-            headers: {
-                'Authorization': 'Bearer my_secure_token_123',
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then(response => {
-                // localStorage.removeItem("cartAppData");
-                // localStorage.removeItem("checkoutAppData");
-
-                const data = localStorage.getItem("checkoutAppData");
-                const parsed = data ? JSON.parse(data) : {}; 
-                parsed.order_id = response.order_id;
-                localStorage.setItem("checkoutAppData", JSON.stringify(parsed));
-                redirectGet(pathConfig.BASE_WEB + 'user/');
-
-            })
-            .catch(err => {
-                console.error("Error sending order:", err);
-                alert("เกิดข้อผิดพลาดในการส่งข้อมูลไป server");
+        try {
+            const response = await fetch(pathConfig.BASE_WEB + "service/user/checkout-action.php", {
+                method: "POST",
+                headers: {
+                    'Authorization': 'Bearer my_secure_token_123',
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
             });
+            const responseData = await response.json();
+
+            const savedData = JSON.parse(localStorage.getItem("checkoutAppData")) || {};
+            savedData.order_id = responseData.order_id;
+            localStorage.setItem("checkoutAppData", JSON.stringify(savedData));
+
+            redirectGet(pathConfig.BASE_WEB + 'user/');
+        } catch (err) {
+            console.error("Error sending order:", err);
+            alert("เกิดข้อผิดพลาดในการส่งข้อมูลไป server");
+        }
+    },
+
+    /* ========== RENDER & EVENTS ========== */
+    renderAll() {
+        this.renderAccordion();
+        this.renderOrderDetails();
+        this.renderSummary();
+    },
+
+    bindEvents() {
+        this.bindPopulate();
+        this.bindbackCartEvents();
+        this.bindEventsPlaceOrder();
     },
 
     renderAccordion() {
         const container = document.getElementById("accordion-items");
         if (!container) return;
 
-        let html = "";
-        this.accordions.forEach((acc, i) => {
-            html += `<div class="checkout-card">
-                        <div class="checkout-step-header">${acc.icon} : ${acc.title}</div>
-                        <div class="checkout-panel ${i === 0 ? 'active' : ''}" id="panel-${i}">${acc.content}</div>
-                    </div>`;
-        });
+        const html = this.accordions.map((acc, i) => `
+            <div class="checkout-card">
+                <div class="checkout-step-header">${acc.icon} : ${acc.title}</div>
+                <div class="checkout-panel ${i === 0 ? 'active' : ''}" id="panel-${i}">
+                    ${this.getPanelContent(i)}
+                </div>
+            </div>
+        `).join('');
+
         container.innerHTML = html;
-
-        // Step 1: Billing
-        document.getElementById("panel-0").innerHTML = `
-                <div class="row">
-                    <div class="col-md-6"><label>ชื่อ:</label><input type="text" id="first_name" class="form-input" value="${this.billing.first_name}" required></div>
-                    <div class="col-md-6"><label>นามสกุล:</label><input type="text" id="last_name" class="form-input" value="${this.billing.last_name}" required></div>
-                    <div class="col-md-6"><label>เบอร์โทร:</label><input type="text" id="phone_number" class="form-input" value="${this.billing.phone_number}" required></div>
-                </div>
-                <div class="error-message" id="error-0"></div>
-                <div class="step-buttons"><button class="next-btn" data-next="1" data-step="0">Next</button></div>
-                `;
-
-        // Step 2: Delivery
-        document.getElementById("panel-1").innerHTML = `<div id="delivery-address-container"></div>
-                <div class="error-message" id="error-1"></div>
-                <div class="step-buttons">
-                    <button class="back-btn" data-back="0">Back</button>
-                    <button class="next-btn" data-next="2" data-step="1">Next</button>
-                </div>`;
+        this.bindPanelNavigation(container);
         this.renderAddresses();
+    },
 
-        // Step 3: Payment
-        document.getElementById("panel-2").innerHTML = `
-                <div class="payment-methods">
-                    ${this.paymentMethods.map(m => `<label><input type="radio" name="payment" value="${m.value}" ${m.checked ? "checked" : ""} required>${m.label}</label>`).join("")}
-                </div>
-                <div class="error-message" id="error-2"></div>
-                <div class="step-buttons">
-                    <button class="back-btn" data-back="1">Back</button>
-                    <button class="next-btn" data-next="3" data-step="2">Next</button>
-                </div>`;
+    getPanelContent(stepIndex) {
+        switch (stepIndex) {
+            case 0:
+                return `
+                    <div class="row">
+                        <div class="col-md-6"><label>ชื่อ:</label><input type="text" id="first_name" class="form-input" value="${this.billing.first_name || ''}" required></div>
+                        <div class="col-md-6"><label>นามสกุล:</label><input type="text" id="last_name" class="form-input" value="${this.billing.last_name || ''}" required></div>
+                        <div class="col-md-6"><label>เบอร์โทร:</label><input type="text" id="phone_number" class="form-input" value="${this.billing.phone_number || ''}" required></div>
+                    </div>
+                    <div class="error-message" id="error-0"></div>
+                    <div class="step-buttons"><button class="next-btn" data-next="1" data-step="0">Next</button></div>
+                `;
+            case 1:
+                return `
+                    <div id="delivery-address-container"></div>
+                    <div class="error-message" id="error-1"></div>
+                    <div class="step-buttons">
+                        <button class="back-btn" data-back="0">Back</button>
+                        <button class="next-btn" data-next="2" data-step="1">Next</button>
+                    </div>
+                `;
+            case 2:
+                return `
+                    <div class="payment-methods">
+                        ${this.paymentMethods.map(m => `<label><input type="radio" name="payment" value="${m.value}" ${m.checked ? "checked" : ""} required>${m.label}</label>`).join("")}
+                    </div>
+                    <div class="error-message" id="error-2"></div>
+                    <div class="step-buttons">
+                        <button class="back-btn" data-back="1">Back</button>
+                        <button class="next-btn" data-next="3" data-step="2">Next</button>
+                    </div>
+                `;
+            case 3:
+                return `
+                    <textarea id="order-notes" class="form-input" placeholder="จดบันทึกความจำ (ไม่บังคับ)"></textarea>
+                    <div class="error-message" id="error-3"></div>
+                    <div class="step-buttons">
+                        <button class="back-btn" data-back="2">Back</button>
+                        <button id="place-order-step" class="confirmOrders">ยืนยันการสั่งซื้อ</button>
+                    </div>
+                `;
+            default:
+                return '';
+        }
+    },
 
-        // Step 4: Notes
-        document.getElementById("panel-3").innerHTML = `
-                <textarea id="order-notes" class="form-input" placeholder="จดบันทึกความจำ (ไม่บังคับ)"></textarea>
-                <div class="error-message" id="error-3"></div>
-                <div class="step-buttons">
-                    <button class="back-btn" data-back="2">Back</button>
-                </div>`;
-
-                // <button id="place-order-btn" class="confirmOrders" data-step="3">สั่งซื้อรายการสินค้า</button>
-
+    bindPanelNavigation(container) {
         container.querySelectorAll(".next-btn").forEach(btn => {
             btn.onclick = () => {
                 const step = parseInt(btn.dataset.step);
                 if (!this.validateStep(step)) return;
                 const next = parseInt(btn.dataset.next);
                 container.querySelectorAll(".checkout-panel").forEach(p => p.classList.remove("active"));
-                document.getElementById("panel-" + next).classList.add("active");
+                document.getElementById(`panel-${next}`).classList.add("active");
             };
         });
 
@@ -222,39 +218,61 @@ const CheckoutApp = {
             btn.onclick = () => {
                 const back = parseInt(btn.dataset.back);
                 container.querySelectorAll(".checkout-panel").forEach(p => p.classList.remove("active"));
-                document.getElementById("panel-" + back).classList.add("active");
+                document.getElementById(`panel-${back}`).classList.add("active");
             };
         });
-
-        // document.getElementById("place-order-btn").onclick = () => {
-        //     if (!this.validateStep(3)) return;
-        //     this.saveToStorage();
-        // };
     },
 
     validateStep(stepIndex) {
         const panel = document.getElementById(`panel-${stepIndex}`);
         const errorBox = document.getElementById(`error-${stepIndex}`);
-        const inputs = panel.querySelectorAll("input[required], textarea[required]");
         let valid = true;
         errorBox.innerText = "";
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                input.style.border = "1px solid red";
+
+        switch (stepIndex) {
+            case 0:
+                const billingInputs = panel.querySelectorAll("#first_name, #last_name, #phone_number");
+                billingInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.style.border = "1px solid red";
+                        valid = false;
+                    } else {
+                        input.style.border = "";
+                    }
+                });
+                if (!valid) {
+                    errorBox.innerText = "กรุณากรอกข้อมูลชื่อ, นามสกุล และเบอร์โทร";
+                }
+                break;
+            case 1:
+                if (this.selectedShippingType === "delivery" && this.selectedAddressIndex === null) {
+                    valid = false;
+                    errorBox.innerText = "กรุณาเลือกที่อยู่จัดส่ง";
+                } else if (this.selectedShippingType === "pickup" && (!this.selectedShippingOptions || !this.selectedShippingOptions.value)) {
+                    valid = false;
+                    errorBox.innerText = "กรุณาเลือกสาขาสำหรับรับสินค้า";
+                }
+                break;
+            case 2:
+                const paymentRadio = panel.querySelector('input[name="payment"]:checked');
+                if (!paymentRadio) {
+                    valid = false;
+                    errorBox.innerText = "กรุณาเลือกวิธีการชำระเงิน";
+                }
+                break;
+            default:
                 valid = false;
-            } else input.style.border = "";
-        });
-        if (!valid) errorBox.innerText = "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
+        }
         return valid;
     },
 
     renderAddresses() {
         const container = document.getElementById("delivery-address-container");
+        if (!container) return;
         container.innerHTML = "";
 
         if (this.selectedShippingType === "pickup") {
             const selectedBranch = this.branches.find(branch => branch.value === this.selectedShippingOptions.value);
-
             if (selectedBranch) {
                 container.innerHTML = `
                     <div class="checkout-address-card active">
@@ -355,35 +373,42 @@ const CheckoutApp = {
         const subdistrictEl = document.getElementById("subdistrict");
         const postalEl = document.getElementById("postalCode");
 
+        form.reset();
+        districtEl.disabled = true;
+        subdistrictEl.disabled = true;
+
+        if (this.provincesData.length > 0) {
+            this.populateProvinces();
+        } else {
+            console.warn("Location data is not loaded yet.");
+            return;
+        }
+
         if (addr) {
             document.getElementById("address_detail").value = addr.detail || "";
 
-            // province
             const provinceObj = this.provincesData.find(p => (this.lang === 'en' ? p.provinceNameEn : p.provinceNameTh) === addr.provinces);
-            provinceEl.value = provinceObj?.provinceCode || "";
-            this.provinceActive = provinceEl.value;
+            if (provinceObj) {
+                provinceEl.value = provinceObj.provinceCode;
+                this.provinceActive = provinceEl.value;
+                this.populateDistricts();
+                districtEl.disabled = false;
+            }
 
-            // populate districts
-            this.populateDistricts();
             const districtObj = this.districtsData.find(d => (this.lang === 'en' ? d.districtNameEn : d.districtNameTh) === addr.districts);
-            districtEl.value = districtObj?.districtCode || "";
-            this.districtActive = districtEl.value;
+            if (districtObj) {
+                districtEl.value = districtObj.districtCode;
+                this.districtActive = districtEl.value;
+                this.populateSubDistricts();
+                subdistrictEl.disabled = false;
+            }
 
-            // populate subdistricts
-            this.populateSubDistricts();
             const subObj = this.subdistrictsData.find(s => (this.lang === 'en' ? s.subdistrictNameEn : s.subdistrictNameTh) === addr.subdistricts);
-            subdistrictEl.value = subObj?.subdistrictCode || "";
+            if (subObj) {
+                subdistrictEl.value = subObj.subdistrictCode;
+            }
 
-            // postal code
             postalEl.value = addr.postalCode || "";
-
-            // ปลดล็อก dropdown
-            districtEl.disabled = !this.provinceActive ? true : false;
-            subdistrictEl.disabled = !this.districtActive ? true : false;
-        } else {
-            form.reset();
-            districtEl.disabled = true;
-            subdistrictEl.disabled = true;
         }
 
         modal.style.display = "flex";
@@ -398,8 +423,11 @@ const CheckoutApp = {
                 postalCode: postalEl.value || "",
                 default: addr ? addr.default : false
             };
-            if (addr) this.addresses[index] = newAddr;
-            else this.addresses.push(newAddr);
+            if (index !== null) {
+                this.addresses[index] = newAddr;
+            } else {
+                this.addresses.push(newAddr);
+            }
             this.renderAddresses();
             modal.style.display = "none";
         };
@@ -408,65 +436,51 @@ const CheckoutApp = {
         document.querySelector(".modal-close").onclick = () => modal.style.display = "none";
     },
 
-    loadProvinces() {
-        fetch(pathConfig.BASE_WEB + 'locales/provinces.json', {
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer my_secure_token_123',
-                "Content-Type": "application/json"
-            }
-        })
-        .then(res => res.json()).then(res => {
-            this.provincesData = res;
-            this.populateProvinces();
-        }).catch(err => console.error(err));
+    async loadData(dataType) {
+        try {
+            const response = await fetch(`${pathConfig.BASE_WEB}locales/${dataType}.json`, {
+                method: "GET",
+                headers: {
+                    'Authorization': 'Bearer my_secure_token_123',
+                    "Content-Type": "application/json"
+                }
+            });
+            return await response.json();
+        } catch (err) {
+            console.error(`Error fetching ${dataType}:`, err);
+            return [];
+        }
     },
 
-    loadDistricts() {
-        fetch(pathConfig.BASE_WEB + 'locales/districts.json', {
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer my_secure_token_123',
-                "Content-Type": "application/json"
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                this.districtsData = res;
-            }).catch(err => console.error(err));
-    },
+    populateDropdown(elementId, data, valueKey, textKey, defaultEn, defaultTh) {
+        const element = document.getElementById(elementId);
 
-    loadSubdistricts() {
-        fetch(pathConfig.BASE_WEB + 'locales/subdistricts.json', {
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer my_secure_token_123',
-                "Content-Type": "application/json"
-            }
-        })
-            .then(res => res.json()).then(res => {
-                this.subdistrictsData = res;
-            }).catch(err => console.error(err));
+        // Check if the dropdown is for subdistricts to add the postal code
+        if (elementId === 'subdistrict') {
+            const options = data.map(item =>
+                `<option value="${item[valueKey]}" data-code="${item.postalCode}">${item[textKey]}</option>`
+            );
+            element.innerHTML = `<option value="">${this.lang === 'en' ? defaultEn : defaultTh}</option>` + options.join('');
+        } else {
+            const options = data.map(item =>
+                `<option value="${item[valueKey]}">${item[textKey]}</option>`
+            );
+            element.innerHTML = `<option value="">${this.lang === 'en' ? defaultEn : defaultTh}</option>` + options.join('');
+        }
     },
 
     populateProvinces() {
-        const province = document.getElementById("province");
-        const optionList = this.provincesData.map(p => `<option value="${p.provinceCode}">${this.lang === 'en' ? p.provinceNameEn : p.provinceNameTh}</option>`);
-        province.innerHTML = `<option value="">${this.lang === 'en' ? 'Select Province' : 'เลือกจังหวัด'}</option>` + optionList.join('');
+        this.populateDropdown('province', this.provincesData, 'provinceCode', this.lang === 'en' ? 'provinceNameEn' : 'provinceNameTh', 'Select Province', 'เลือกจังหวัด');
     },
 
     populateDistricts() {
-        const district = document.getElementById("district");
-        const options = this.districtsData.filter(d => d.provinceCode == this.provinceActive)
-            .map(d => `<option value="${d.districtCode}">${this.lang === 'en' ? d.districtNameEn : d.districtNameTh}</option>`);
-        district.innerHTML = `<option value="">${this.lang === 'en' ? 'Select District' : 'เลือกอำเภอ/เขต'}</option>` + options.join('');
+        const filteredData = this.districtsData.filter(d => d.provinceCode == this.provinceActive);
+        this.populateDropdown('district', filteredData, 'districtCode', this.lang === 'en' ? 'districtNameEn' : 'districtNameTh', 'Select District', 'เลือกอำเภอ/เขต');
     },
 
     populateSubDistricts() {
-        const sub = document.getElementById("subdistrict");
-        const options = this.subdistrictsData.filter(s => s.districtCode == this.districtActive)
-            .map(s => `<option value="${s.subdistrictCode}" data-code="${s.postalCode}">${this.lang === 'en' ? s.subdistrictNameEn : s.subdistrictNameTh}</option>`);
-        sub.innerHTML = `<option value="">${this.lang === 'en' ? 'Select Subdistrict' : 'เลือกตำบล/แขวง'}</option>` + options.join('');
+        const filteredData = this.subdistrictsData.filter(s => s.districtCode == this.districtActive);
+        this.populateDropdown('subdistrict', filteredData, 'subdistrictCode', this.lang === 'en' ? 'subdistrictNameEn' : 'subdistrictNameTh', 'Select Subdistrict', 'เลือกตำบล/แขวง');
     },
 
     bindPopulate() {
@@ -475,26 +489,34 @@ const CheckoutApp = {
         const subdistrict = document.getElementById("subdistrict");
         const postal = document.getElementById("postalCode");
 
-        province.onchange = e => {
-            this.provinceActive = e.target.value;
-            this.populateDistricts();
-            district.value = "";
-            subdistrict.value = "";
-            if (postal) postal.value = "";
-            district.disabled = !this.provinceActive;
-            subdistrict.disabled = true;
-        };
-        district.onchange = e => {
-            this.districtActive = e.target.value;
-            this.populateSubDistricts();
-            subdistrict.value = "";
-            if (postal) postal.value = "";
-            subdistrict.disabled = !this.districtActive;
-        };
-        subdistrict.onchange = e => {
-            const option = e.target.selectedOptions[0];
-            if (option && postal) postal.value = option.dataset.code || "";
-        };
+        if (province) {
+            province.onchange = e => {
+                this.provinceActive = e.target.value;
+                this.populateDistricts();
+                district.value = "";
+                subdistrict.value = "";
+                if (postal) postal.value = "";
+                district.disabled = !this.provinceActive;
+                subdistrict.disabled = true;
+            };
+        }
+
+        if (district) {
+            district.onchange = e => {
+                this.districtActive = e.target.value;
+                this.populateSubDistricts();
+                subdistrict.value = "";
+                if (postal) postal.value = "";
+                subdistrict.disabled = !this.districtActive;
+            };
+        }
+
+        if (subdistrict) {
+            subdistrict.onchange = e => {
+                const option = e.target.selectedOptions[0];
+                if (option && postal) postal.value = option.dataset.code || "";
+            };
+        }
     },
 
     renderOrderDetails() {
@@ -513,7 +535,7 @@ const CheckoutApp = {
 
     bindbackCartEvents() {
         document.getElementById("backCart").onclick = () => {
-            redirectGet(pathConfig.BASE_WEB + 'user/cart/'); 
+            redirectGet(pathConfig.BASE_WEB + 'user/cart/');
         };
     },
 
@@ -524,40 +546,58 @@ const CheckoutApp = {
             summaryItems.innerHTML = '<div>ไม่มีข้อมูลสรุป</div>';
             return;
         }
-        const {
-            subtotal = 0, discount = 0, shipping = 0, service = 0, tax = 0, total = 0
-        } = this.summary;
+        const { subtotal = 0, discount = 0, shipping = 0, service = 0, tax = 0, total = 0 } = this.summary;
         summaryItems.innerHTML = `
-        <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
-        <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
-        <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
-        <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
-        <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
-        <div class="summary-row total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>`;
+            <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
+            <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
+            <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
+            <div class="summary-row total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>`;
     },
 
-    init() {
-        this.loadFromStorage();
-        this.loadProvinces();
-        this.loadDistricts();
-        this.loadSubdistricts();
-        this.renderAccordion();
-        this.bindPopulate();
-        this.renderOrderDetails();
-        this.renderSummary();
-        this.bindbackCartEvents();
+    bindEventsPlaceOrder() {
+        const elements = document.querySelectorAll("#place-order-btn, #place-order-step");
+        
+        elements.forEach(element => {
+            element.onclick = () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        window.addEventListener("storage", e => {
+                const steps = ['Billing', 'Delivery', 'Payment'];
+                for (let i = 0; i < steps.length; i++) {
+                    if (!this.validateStep(i)) {
+                        console.log(`Validation failed for Step ${i}: ${steps[i]}`);
+                        document.getElementById(`panel-${i}`).classList.add("active");
+                        return;
+                    }
+                }
+
+                console.log("All steps are valid. Proceeding to save data and place order.");
+                this.saveToStorage();
+            };
+        });
+    },
+
+    async init() {
+        this.loadFromStorage();
+        [this.provincesData, this.districtsData, this.subdistrictsData] = await Promise.all([
+            this.loadData('provinces'),
+            this.loadData('districts'),
+            this.loadData('subdistricts')
+        ]);
+
+        this.renderAll();
+        this.bindEvents();
+
+        window.addEventListener("storage", (e) => {
             if (e.key === "cartAppData") {
                 this.loadFromStorage();
-                this.renderAccordion();
-                this.renderOrderDetails();
-                this.renderSummary();
+                this.renderAll();
             }
         });
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => 
+document.addEventListener("DOMContentLoaded", () =>
     CheckoutApp.init()
 );

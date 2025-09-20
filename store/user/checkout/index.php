@@ -71,6 +71,7 @@
                         <div class="summary-card" id="order-summary">
                             <h5>สรุปคำสั่งซื้อ</h5>
                             <div id="summary-items"></div>
+                            <button id="place-order-btn" class="confirmOrders">ยืนยันการสั่งซื้อ</button>
                             <p class="terms-text">
                                 การสั่งซื้อของคุณถือเป็นการยอมรับ
                                 <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ
