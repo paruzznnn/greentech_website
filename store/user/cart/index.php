@@ -98,7 +98,7 @@
                                 <h2 class="summary-title">สรุป</h2>
                                 <div id="summaryDetails" class="summary-details"></div>
                                 <button id="checkoutOrders" class="checkout-button">สั่งซื้อรายการสินค้า</button>
-                                <button id="" class="">ขอใบเสนอราคา</button>
+                                <!-- <button id="" class="">ขอใบเสนอราคา</button> -->
                                 <p class="terms-text">
                                     การสั่งซื้อของคุณถือเป็นการยอมรับ
                                     <a href="<?php echo $GLOBALS['BASE_WEB']; ?>" class="terms-link">ข้อกำหนดการให้บริการ</a> และ

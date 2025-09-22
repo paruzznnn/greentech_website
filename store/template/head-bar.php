@@ -457,12 +457,12 @@
 <script type="module">
 
   Promise.all([
-    import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
+    import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time();?>`),
     import(`${pathConfig.BASE_WEB}js/modalBuilder.js?v=<?php echo time();?>`),
     import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time();?>`)
   ])
-  .then( async ([formHandler, modalBuilder, menuBuilder]) => {
-    const { handleFormSubmit } = formHandler;
+  .then( async ([centerHandler, modalBuilder, menuBuilder]) => {
+    const { handleFormSubmit } = centerHandler;
     const { setupAuthModal, setupPasswordValidation, exposeTogglePassword } = modalBuilder;
     const { fetchHeader, buildLinkmenu, buildLinkmenuSlide } = menuBuilder;
 

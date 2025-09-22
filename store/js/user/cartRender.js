@@ -1,4 +1,4 @@
-import { redirectGet } from '../formHandler.js';
+import { redirectGet } from '../centerHandler.js';
 
 const CartApp = {
     cartItems: [{

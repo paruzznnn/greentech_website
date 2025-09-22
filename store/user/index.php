@@ -41,7 +41,8 @@
             userData: {
                 name: "กิตตินันท์ธนัช สีแก้วน้ำใส",
                 profile: "https://placehold.co/60x60/888/fff?text=User",
-                menu: [{
+                menu: [
+                {
                     icon: '<i class="bi bi-person-circle"></i>',
                     text: "Account",
                     link: "#"
@@ -51,16 +52,16 @@
                     text: "Orders",
                     link: "#"
                 }, 
-                {
-                    icon: '<i class="bi bi-file-earmark-text"></i>',
-                    text: "Quotation",
-                    link: "#"
-                }, 
-                {
-                    icon: '<i class="bi bi-file-earmark-text"></i>',
-                    text: "Invoice",
-                    link: "#"
-                }, 
+                // {
+                //     icon: '<i class="bi bi-file-earmark-text"></i>',
+                //     text: "Quotation",
+                //     link: "#"
+                // }, 
+                // {
+                //     icon: '<i class="bi bi-file-earmark-text"></i>',
+                //     text: "Invoice",
+                //     link: "#"
+                // }, 
                 {
                     icon: '<i class="bi bi-cart3"></i>',
                     text: "Cart",

@@ -161,13 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script type="module">
     Promise.all([
-        import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+        import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
         import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
     ])
-    .then(async ([formHandler, menuBuilder]) => {
+    .then(async ([centerHandler, menuBuilder]) => {
         const {
             handleFormSubmit
-        } = formHandler;
+        } = centerHandler;
         const {
             fetchHeader,
             buildLinkmenuSlideAdmin
