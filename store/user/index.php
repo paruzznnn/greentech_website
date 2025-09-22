@@ -1,6 +1,6 @@
 <?php include '../routes.php'; ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 
 <head>
     <meta charset="UTF-8" />
@@ -13,562 +13,546 @@
 </head>
 
 <body>
-
     <?php include '../template/head-bar.php'; ?>
     <main>
-        <div id="sections_root_profile">
-            <section id="sections_cover_photo" class="section-space">
-                <div class="container">
-                    <div class="cover-photo">
-                        <div class="profile-avatar">
-                            <img src="https://dev.origami.life/uploads/employee/20140715173028man20key.png" alt="Profile Picture" />
-                        </div>
+        <div id="sections_root_user" class="section-space">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <aside>
+                            <div class="sidebar">
+                                <div class="user-card-info" id="userContainer"></div>
+                            </div>
+                        </aside>
+                    </div>
+                    <div class="col-md-9">
+                        <section>
+                            <div id="mainContent"></div>
+                        </section>
                     </div>
                 </div>
-            </section>
-
-            <section id="sections_profile_layout" class="section-space-profile">
-                <div class="container">
-                    <div class="profile-layout">
-                        <div class="sidebar">
-                            <ul id="profileMenu">
-                                <li data-tab="info">
-                                    <span><i class="bi bi-person-gear"></i> บัญชีของฉัน</span>
-                                </li>
-                                <!-- <li data-tab="payment">
-                                    <span><i class="bi bi-cash-coin"></i>ชำระเงิน</span>
-                                </li> -->
-                                <li class="active" data-tab="orders">
-                                    <span><i class="bi bi-tag"></i> รายการสั่งซื้อ</span>
-                                </li>
-                                <li data-tab="addresses">
-                                    <span><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</span>
-                                </li>
-                                <li data-tab="wishlist">
-                                    <span><i class="bi bi-heart"></i> สินค้าที่ถูกใจ</span>
-                                </li>
-                                <li data-tab="cart">
-                                    <span><i class="bi bi-cart3"></i> สินค้าในตะกร้า</span>
-                                </li>
-
-                                <!-- <li data-tab="coupon">
-                                    <span><i class="bi bi-lightning-charge"></i> ส่วนลด</span>
-                                </li>
-                                <li data-tab="reviews">
-                                    <span><i class="bi bi-chat-right-text"></i> รีวิวของฉัน</span>
-                                </li> -->
-                                
-                                <li data-tab="logout">
-                                    <span><i class="bi bi-door-open"></i> ออกจากระบบ</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="content">
-                            <div class="tabContent active" id="orders">
-                                <div class="main-container">
-                                    <div id="tab-order-list" class="tab-bar"></div>
-                                    <div id="orders-list" class="orders-list-container"></div>
-                                </div>
-                            </div>
-                            <!-- <div class="tabContent" id="payment">
-                            </div> -->
-                            <div class="tabContent" id="addresses">
-                                <div class="main-container">
-                                    <form id="shippingAddressForm" class="mb-4" data-url="<?php echo $BASE_WEB ?>service/user/user-action.php" data-redir="<?php echo $BASE_WEB ?>user/" data-type="address">
-                                        <input type="text" name="action" value="addAddress" hidden>
-                                        <div id="addressesContainer"></div>
-                                        <button type="button" id="addAddressCardBtn" class="add-address w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
-                                            <i class="fas fa-plus"></i> เพิ่มที่อยู่ใหม่
-                                        </button>
-                                        <button id="confirmAddress" type="submit" class="saved-address w-100 mt-4">บันทึกการตั้งค่า</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="tabContent" id="wishlist">
-                                <div class="main-container">
-                                    <div id="likedProductsGrid" class="products-grid"></div>
-                                </div>
-                            </div>
-                            <div class="tabContent" id="cart">
-                                <div class="main-container">
-                                    <div id="cartContent" class="cart-content">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- <div class="tabContent" id="coupon">
-                                <div class="main-container">
-                                    <div class="mb-5">
-                                        <h2 class="section-heading">คูปองที่ฉันมี</h2>
-                                        <div id="myCouponsContainer" class="coupon-grid"></div>
-                                    </div>
-                                    <div>
-                                        <h2 class="section-heading">คูปองที่สามารถเก็บได้</h2>
-                                        <div id="availableCouponsContainer" class="coupon-grid"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tabContent" id="reviews">
-                                <div class="main-container">
-                                    <div id="review-cards-container" class="review-cards-container"></div>
-                                </div>
-                            </div> -->
-
-                            <div class="tabContent" id="info">
-                                <div class="profile-card">
-                                    <div class="profile-header-section">
-                                        <div class="profile-picture-container">
-                                            <img id="profileImage" src="" alt="" class="profile-picture">
-                                            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                                            <div class="edit-icon" id="editImageIcon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                                                    <path d="M15 5l4 4" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div class="user-info-text">
-                                            <h2 class="user-name">ชื่อผู้ใช้: </h2>
-                                            <p class="user-detail-text">อีเมล: </p>
-                                            <p class="user-detail-text">สถานะ: สมาชิก</p>
-                                        </div>
-                                    </div>
-
-                                    <form class="profile-form">
-                                        <div>
-                                            <label for="firstName" class="form-label">ชื่อจริง</label>
-                                            <input type="text" id="firstName" name="firstName" value="" class="form-input" placeholder="ชื่อจริง">
-                                        </div>
-                                        <div>
-                                            <label for="lastName" class="form-label">นามสกุล</label>
-                                            <input type="text" id="lastName" name="lastName" value="" class="form-input" placeholder="นามสกุล">
-                                        </div>
-                                        <div>
-                                            <label for="email" class="form-label">อีเมล</label>
-                                            <input type="email" id="email" name="email" value="" class="form-input" placeholder="อีเมล" readonly>
-                                        </div>
-                                        <div>
-                                            <label for="phone" class="form-label">เบอร์โทรศัพท์</label>
-                                            <input type="tel" id="phone" name="phone" value="" class="form-input" placeholder="เบอร์โทรศัพท์">
-                                        </div>
-                                        <div class="full-width-field">
-                                            <label for="address" class="form-label">ที่อยู่</label>
-                                            <textarea id="address" name="address" rows="3" class="form-input" placeholder="ที่อยู่ปัจจุบัน"></textarea>
-                                        </div>
-                                        <div>
-                                            <label for="birthdate" class="form-label">วันเกิด</label>
-                                            <input type="date" id="birthdate" name="birthdate" value="" class="form-input">
-                                        </div>
-                                        <div>
-                                            <label for="gender" class="form-label">เพศ</label>
-                                            <select id="gender" name="gender" class="form-input">
-                                                <option value="male">ชาย</option>
-                                                <option value="female">หญิง</option>
-                                                <option value="other">อื่นๆ</option>
-                                            </select>
-                                        </div>
-                                        <div class="save-button-container">
-                                            <button type="submit" class="save-button">บันทึกการเปลี่ยนแปลง</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="tabContent" id="logout">
-                                <h2>Logout</h2>
-                                <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
-                                <a class="btn-user-logout" href="../logout.php">
-                                    ยืนยันการออกจากระบบ
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
+            </div>
         </div>
     </main>
     <?php include '../template/footer-bar.php'; ?>
 
-    <script type="module">
-
-        Promise.all([
-            import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/userRender.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/addressRender.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/tabBuilder.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/orderListRender.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/wishlistRender.js?v=<?php echo time();?>`),
-            import(`${pathConfig.BASE_WEB}js/user/cartRender.js?v=<?php echo time();?>`)
-        ])
-        .then(async (
-            [
-                formModule,
-                profileModule,
-                addressModule,
-                tabBuilderModule, 
-                orderListModule, 
-                wishlistModule, 
-                cartModule
-            ]
-        ) => {
-            const { handleFormSubmit } = formModule;
-            const { setupProfileImageUpload } = profileModule;
-            const { 
-                AddressUI, 
-                fetchAddressData, 
-                fetchProvincesData, 
-                fetchDistrictsData, 
-                fetchSubdistricts
-            } = addressModule;
-            const { setupTabs } = tabBuilderModule;
-            const { fetchOrders, OrderListUI } = orderListModule;
-            const { LikedProducts } = wishlistModule;
-            const { ShoppingCart } = cartModule;
-
-            //===== Profile ==================================
-            setupProfileImageUpload();
-
-            //===== Address ==================================
-            const address = await fetchAddressData("getAddressItems", pathConfig.BASE_WEB + 'service/user/user-data.php?');
-            const provinces = await fetchProvincesData(pathConfig.BASE_WEB + 'locales/provinces.json');
-            const districts = await fetchDistrictsData(pathConfig.BASE_WEB + 'locales/districts.json');
-            const subdistricts = await fetchSubdistricts(pathConfig.BASE_WEB + 'locales/subdistricts.json');
-            AddressUI.init(
-                provinces,
-                districts,
-                subdistricts,
-                address
-            );
-
-            const formAddress = document.querySelector("#shippingAddressForm");
-            formAddress?.addEventListener("submit", handleFormSubmit);
-            
-            //===== Order List ==================================
-            setupTabs();
-            const service = pathConfig.BASE_WEB + 'service/user/user-data.php?';
-            const orders = await fetchOrders("getOrdersItems", service);
-            OrderListUI.displayTabOrders('tab-order-list');
-
-            const tabButtonsHandler = () => {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        event.currentTarget.classList.add('active');
-                        const selectedStatus = event.currentTarget.dataset.status;
-                        OrderListUI.displayOrders(selectedStatus, 'orders-list', orders);
-                    });
-                });
-            };
-            tabButtonsHandler();
-            OrderListUI.displayOrders('All', 'orders-list', orders);
-
-            //===== Cart ==================================
-            window.ShoppingCart = ShoppingCart;
-            ShoppingCart.init(pathConfig.BASE_WEB);
-
-            //===== Like ==================================
-            LikedProducts.init();
-            LikedProducts.renderProducts(ShoppingCart);
-
-            console.log('window', window);
-
-        })
-        .catch((e) => console.error("Module import failed", e));
-    </script>
-
-
-    <!-- <script>
-        const initialMyCouponsData = [{
-                id: 'user_cpn_001',
-                name: 'ส่วนลด 15%',
-                description: 'ลดสูงสุด ฿100 สำหรับทุกหมวดหมู่',
-                minSpend: 300,
-                expiry: '31 ธ.ค. 2567',
-                type: 'green',
-                status: 'active',
-                icon: 'percent'
+    <script>
+        const userApp = {
+            userData: {
+                name: "กิตตินันท์ธนัช สีแก้วน้ำใส",
+                profile: "https://placehold.co/60x60/888/fff?text=User",
+                menu: [
+                {
+                    icon: '<i class="bi bi-person-circle"></i>',
+                    text: "Account",
+                    link: "#"
+                }, 
+                {
+                    icon: '<i class="bi bi-box-seam"></i>',
+                    text: "Orders",
+                    link: "#"
+                }, 
+                // {
+                //     icon: '<i class="bi bi-file-earmark-text"></i>',
+                //     text: "Quotation",
+                //     link: "#"
+                // }, 
+                // {
+                //     icon: '<i class="bi bi-file-earmark-text"></i>',
+                //     text: "Invoice",
+                //     link: "#"
+                // }, 
+                {
+                    icon: '<i class="bi bi-cart3"></i>',
+                    text: "Cart",
+                    link: pathConfig.BASE_WEB+"user/cart/"
+                },
+                {
+                    icon: '<i class="bi bi-cash-coin"></i>',
+                    text: "Payment",
+                    link: pathConfig.BASE_WEB+"user/payment/"
+                },
+                {
+                    icon: '<i class="bi bi-receipt"></i>',
+                    text: "Coupon",
+                    link: pathConfig.BASE_WEB+"user/coupon/"
+                },
+                {
+                    icon: '<i class="bi bi-box-arrow-right"></i>',
+                    text: "Logout",
+                    link: pathConfig.BASE_WEB+"logout.php"
+                }]
             },
-            {
-                id: 'user_cpn_002',
-                name: 'ส่งฟรี',
-                description: 'สำหรับคำสั่งซื้อขั้นต่ำ ฿99',
-                minSpend: 99,
-                expiry: '15 พ.ย. 2567',
-                type: 'gray',
-                status: 'expired',
-                icon: 'truck'
+
+            data: {
+                orders: [{
+                    id: 'ORD12346',
+                    status: 'pending',
+                    statusText: 'ที่ต้องชำระ',
+                    products: [{
+                        name: 'แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว',
+                        quantity: 2,
+                        price: '1500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg'
+                    }, {
+                        name: 'แทรนดาร์ เอเอ็มเอฟ ไฟน์ เฟรสโค',
+                        quantity: 1,
+                        price: '350.00',
+                        image: 'https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg'
+                    }]
+                }, {
+                    id: 'ORD12347',
+                    status: 'shipped',
+                    statusText: 'จัดเตรียมสินค้า',
+                    products: [{
+                        name: 'แทรนดาร์ เอเอ็มเอฟ สตาร์',
+                        quantity: 1,
+                        price: '2200.00',
+                        image: 'https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg'
+                    }]
+                }, {
+                    id: 'ORD12348',
+                    status: 'delivered',
+                    statusText: 'กำลังส่งมอบ',
+                    products: [{
+                        name: 'แทรนดาร์ ทีบาร์ ที15',
+                        quantity: 1,
+                        price: '3500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg'
+                    }]
+                }, {
+                    id: 'ORD12349',
+                    status: 'cancelled',
+                    statusText: 'ยกเลิกสินค้า',
+                    products: [{
+                        name: 'แทรนดาร์ ทีบาร์ ที24',
+                        quantity: 1,
+                        price: '4500.00',
+                        image: 'https://www.trandar.com//public/shop_img/687b31d91b97e_T24.png'
+                    }]
+                }, {
+                    id: 'ORD12350',
+                    status: 'finished',
+                    statusText: 'ส่งสินค้าสำเร็จ',
+                    products: [{
+                        name: 'แทรนดาร์ ไพรม์โคท',
+                        quantity: 1,
+                        price: '2800.00',
+                        image: 'https://www.trandar.com//public/shop_img/687e1c0470c40_trandar_prime_coat_new_label.jpg'
+                    }]
+                }, {
+                    id: 'ORD12351',
+                    status: 'return',
+                    statusText: 'คืนสินค้า',
+                    products: [{
+                        name: 'เครื่องฟอกอากาศ',
+                        quantity: 1,
+                        price: '5900.00',
+                        image: 'https://placehold.co/80x80/fd7e14/ffffff?text=Product'
+                    }]
+                }, {
+                    id: 'ORD12352',
+                    status: 'pending',
+                    statusText: 'ที่ต้องชำระ',
+                    products: [{
+                        name: 'สมาร์ทโฟน',
+                        quantity: 1,
+                        price: '12000.00',
+                        image: 'https://placehold.co/80x80/3498db/ffffff?text=Product'
+                    }]
+                },
+                {
+                    id: 'ORD12353',
+                    status: 'pending',
+                    statusText: 'ที่ต้องชำระ',
+                    products: [{
+                        name: 'นาฬิกาข้อมือ',
+                        quantity: 1,
+                        price: '3500.00',
+                        image: 'https://placehold.co/80x80/20c997/ffffff?text=Product'
+                    }, {
+                        name: 'กางเกงยีนส์เดนิม',
+                        quantity: 2,
+                        price: '1500.00',
+                        image: 'https://placehold.co/80x80/007bff/ffffff?text=Product'
+                    }, {
+                        name: 'เสื้อยืดลายมินิมอลสีขาว',
+                        quantity: 1,
+                        price: '350.00',
+                        image: 'https://placehold.co/80x80/28a745/ffffff?text=Product'
+                    }, {
+                        name: 'รองเท้าวิ่งสีดำ',
+                        quantity: 1,
+                        price: '2200.00',
+                        image: 'https://placehold.co/80x80/ffc107/ffffff?text=Product'
+                    }]
+                }]
             },
-            {
-                id: 'user_cpn_003',
-                name: 'คูปองของขวัญ ฿50',
-                description: 'สำหรับสินค้าทุกชนิด',
-                minSpend: 0,
-                expiry: '20 ธ.ค. 2567',
-                type: 'purple',
-                status: 'used',
-                icon: 'gift'
-            }
-        ];
 
-        const initialAvailableCouponsData = [{
-                id: 'claim_cpn_001',
-                name: 'ส่วนลด ฿200',
-                description: 'สำหรับสินค้าหมวดหมู่แฟชั่น',
-                minSpend: 1000,
-                expiry: '31 ม.ค. 2568',
-                type: 'yellow',
-                status: 'claimable',
-                icon: 'tags'
-            },
-            {
-                id: 'claim_cpn_002',
-                name: 'แฟลชเซลล์ 50%',
-                description: 'ลดสูงสุด ฿500 สำหรับสินค้าที่ร่วมรายการ',
-                minSpend: 200,
-                expiry: '25 ธ.ค. 2567',
-                type: 'red',
-                status: 'claimable',
-                icon: 'fire'
-            },
-            {
-                id: 'claim_cpn_003',
-                name: 'คูปองพิเศษ ฿100',
-                description: 'สำหรับลูกค้าใหม่เท่านั้น',
-                minSpend: 500,
-                expiry: '31 ม.ค. 2568',
-                type: 'blue',
-                status: 'claimable',
-                icon: 'star'
-            }
-        ];
-
-        let myCouponsData = [];
-        let availableCouponsData = [];
-
-        const myCouponsContainer = document.getElementById('myCouponsContainer');
-        const availableCouponsContainer = document.getElementById('availableCouponsContainer');
-
-        function saveCouponsToLocalStorage() {
-            localStorage.setItem('myCoupons', JSON.stringify(myCouponsData));
-            localStorage.setItem('availableCoupons', JSON.stringify(availableCouponsData));
-        }
-
-        function loadCouponsFromLocalStorage() {
-            const storedMyCoupons = localStorage.getItem('myCoupons');
-            const storedAvailableCoupons = localStorage.getItem('availableCoupons');
-
-            if (storedMyCoupons) {
-                myCouponsData = JSON.parse(storedMyCoupons);
-            } else {
-                myCouponsData = initialMyCouponsData;
-            }
-
-            if (storedAvailableCoupons) {
-                availableCouponsData = JSON.parse(storedAvailableCoupons);
-            } else {
-                availableCouponsData = initialAvailableCouponsData;
-            }
-            saveCouponsToLocalStorage();
-        }
-
-        function renderCoupons(container, coupons, isClaimableSection = false) {
-            container.innerHTML = '';
-            if (coupons.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-500 w-full p-4 text-lg">ไม่มีคูปองในส่วนนี้</p>`;
-                return;
-            }
-
-            coupons.forEach(coupon => {
-                let buttonText = '';
-                let buttonClasses = 'btn-custom';
-                let cardBgClass = '';
-                let expiryText = '';
-
-                if (isClaimableSection) {
-                    buttonText = 'เก็บเลย';
-                    buttonClasses += ' claim-coupon-btn';
-                } else {
-                    switch (coupon.status) {
-                        case 'active':
-                            buttonText = 'ใช้ตอนนี้';
-                            expiryText = `หมดอายุ ${coupon.expiry}`;
-                            break;
-                        case 'used':
-                            buttonText = 'ใช้แล้ว';
-                            buttonClasses += ' disabled';
-                            expiryText = `ใช้ไปแล้วเมื่อ ${coupon.expiry}`;
-                            break;
-                        case 'expired':
-                            buttonText = 'หมดอายุแล้ว';
-                            buttonClasses += ' disabled';
-                            expiryText = `หมดอายุ ${coupon.expiry}`;
-                            break;
+            pages: {
+                "Account": {
+                    template: `
+                    <div style="background:#fff; padding:1rem; border-radius:4px;">
+                        <h4 class="fw-semibold mb-3">ข้อมูลบัญชี</h4>
+                        <div id="account-container"></div>
+                    </div>`,
+                    render() {
+                        this.containers = {
+                            accountContainer: document.getElementById('account-container')
+                        };
+                        this.renderAccount();
+                    }
+                },
+                "Orders": {
+                    template: `
+                    <div style="background:#fff; padding:1rem; border-radius:4px;">
+                        <div id="orders-container"></div>
+                    </div>`,
+                    render() {
+                        this.containers = {
+                            ordersContainer: document.getElementById('orders-container')
+                        };
+                        this.renderListOrders();
                     }
                 }
+                // "Logout": {
+                //     template: `
+                // <div style="background:#fff; padding:1rem; border-radius:4px;">
+                //     ออกจากระบบ
+                // </div>`,
+                //     render: null
+                // }
+            },
 
-                switch (coupon.type) {
-                    case 'green':
-                        cardBgClass = 'coupon-green';
-                        break;
-                    case 'yellow':
-                        cardBgClass = 'coupon-yellow';
-                        break;
-                    case 'red':
-                        cardBgClass = 'coupon-red';
-                        break;
-                    case 'blue':
-                        cardBgClass = 'coupon-blue';
-                        break;
-                    case 'purple':
-                        cardBgClass = 'coupon-purple';
-                        break;
-                    case 'gray':
-                        cardBgClass = 'coupon-gray';
-                        break;
-                    default:
-                        cardBgClass = 'bg-gray-200 text-gray-800';
-                }
+            // Pagination state and settings
+            pagination: {
+                currentPage: 1,
+                itemsPerPage: 5,
+                totalPages: 0,
+                totalItems: 0,
+                filteredData: []
+            },
 
-                const couponCardHtml = `
-                    <div class="coupon-card-wrapper">
-                        <div class="coupon-card ${cardBgClass}" data-coupon-id="${coupon.id}">
-                            <div>
-                                <div class="icon-and-title">
-                                    <i class="fas fa-${coupon.icon}"></i>
-                                    <h3 class="title">${coupon.name}</h3>
-                                </div>
-                                <p class="description">${coupon.description}</p>
-                                <p class="details">
-                                    ${coupon.minSpend > 0 ? `ขั้นต่ำ ฿${coupon.minSpend.toLocaleString()} | ` : ''}${expiryText}
-                                </p>
-                            </div>
-                            <button class="${buttonClasses}">
-                                ${buttonText}
-                            </button>
-                        </div>
+            renderUserCard() {
+                const container = document.getElementById("userContainer");
+                container.innerHTML = `
+                    <div class="user-card-info">
+                        <img src="${this.userData.profile}" alt="User profile" class="user-logo-info">
+                        <h5 class="fw-semibold">${this.userData.name}</h5>
+                    </div>
+                    <div class="sidebar-menu">
+                        <ul id="user-menu"></ul>
                     </div>
                 `;
-                container.insertAdjacentHTML('beforeend', couponCardHtml);
-            });
+                this.renderMenu();
+            },
 
-            if (isClaimableSection) {
-                document.querySelectorAll('.claim-coupon-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const cardElement = event.target.closest('.coupon-card');
-                        const couponId = cardElement.dataset.couponId;
+            renderMenu() {
+                const menuContainer = document.getElementById("user-menu");
+                let menuHTML = '';
+                this.userData.menu.forEach(item => {
+                    menuHTML += `<li><a href="${item.link}">${item.icon} ${item.text}</a></li>`;
+                });
+                menuContainer.innerHTML = menuHTML;
+            },
 
-                        const claimedCouponIndex = availableCouponsData.findIndex(c => c.id === couponId);
-                        if (claimedCouponIndex > -1) {
-                            const claimedCoupon = availableCouponsData[claimedCouponIndex];
+            bindMenuEvents() {
+                const mainContent = document.getElementById("mainContent");
+                document.querySelectorAll("#user-menu li a").forEach(link => {
+                    link.addEventListener("click", e => {
+                        const href = link.getAttribute("href");
 
-                            claimedCoupon.status = 'active';
-                            myCouponsData.push(claimedCoupon);
-                            availableCouponsData.splice(claimedCouponIndex, 1);
+                        // ถ้าเป็น # = ใช้ระบบ SPA (render หน้าใน JS)
+                        if (href === "#") {
+                            e.preventDefault();
 
-                            saveCouponsToLocalStorage();
+                            document.querySelectorAll("#user-menu li a")
+                                .forEach(a => a.classList.remove("active"));
+                            link.classList.add("active");
 
-                            renderCoupons(myCouponsContainer, myCouponsData);
-                            renderCoupons(availableCouponsContainer, availableCouponsData, true);
+                            const key = link.innerText.trim();
+                            if (this.pages[key]) {
+                                mainContent.innerHTML = this.pages[key].template;
+                                if (typeof this.pages[key].render === "function") {
+                                    this.pages[key].render.call(this);
+                                }
+                            }
+                        } else {
+                            // ถ้าไม่ใช่ # = เปิดลิงก์ตามปกติ
+                            // e.preventDefault();  <-- ไม่ต้องใช้
+                            window.location.href = href; 
                         }
                     });
                 });
-            }
-        }
+            },
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCouponsFromLocalStorage();
-            renderCoupons(myCouponsContainer, myCouponsData);
-            renderCoupons(availableCouponsContainer, availableCouponsData, true);
-        });
-    </script>
 
-    <script>
-        const reviews = [{
-                productName: "Trandar AMF Mercure แทรนดาร์ เอเอ็มเอฟ เมอร์เคียว",
-                rating: 5,
-                reviewText: "สินค้าดี แข็งแรง พนักงานบริการดี",
-                reviewDate: "15 กรกฎาคม 2567",
-                imageUrl: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg"
-            },
-            {
-                productName: "Trandar Focus F แทรนดาร์ โฟกัส เอฟ",
-                rating: 4,
-                reviewText: "สินค้าดี แข็งแรง พนักงานบริการดี",
-                reviewDate: "10 กรกฎาคม 2567",
-                imageUrl: "https://www.trandar.com//public/shop_img/687a21f2467de_Ecophon_Focus_F.jpg"
-            },
-            {
-                productName: "Trandar T-Bar Grooveline แทรนดาร์ ที บาร์ กรูฟไลน์ (T24)",
-                rating: 3,
-                reviewText: "สินค้าดี แข็งแรง พนักงานบริการดี",
-                reviewDate: "01 กรกฎาคม 2567",
-                imageUrl: "https://www.trandar.com//public/shop_img/687dc5bd01057_Grooveline-main3.png"
-            },
-            {
-                productName: "Trandar Prime Coat แทรนดาร์ ไพรม์โคท",
-                rating: 5,
-                reviewText: "สีน้ำรองพื้นปูนใหม่คุณภาพ สำหรับทาภายใน Non VOC",
-                reviewDate: "28 มิถุนายน 2567",
-                imageUrl: "https://www.trandar.com//public/shop_img/687e1c0470c40_trandar_prime_coat_new_label.jpg"
-            },
-            {
-                productName: "Trandar  dBphon S50 ฉนวนแทรนดาร์ ดีบีโฟน S50",
-                rating: 4,
-                reviewText: "กันไฟ กันเสียง กันความร้อน",
-                reviewDate: "20 มิถุนายน 2567",
-                imageUrl: "https://www.trandar.com//public/shop_img/687dcff11c5df_dbPhon2.png"
-            }
-        ];
+            init() {
+                this.renderUserCard();
+                this.bindMenuEvents();
 
-        function createStarRating(rating) {
-            let starsHtml = '';
-            for (let i = 0; i < 5; i++) {
-                if (i < rating) {
-                    starsHtml += '<span class="star">&#9733;</span>';
-                } else {
-                    starsHtml += '<span class="empty-star">&#9733;</span>';
+                const firstMenu = document.querySelector('#user-menu li a');
+                if (firstMenu) {
+                    firstMenu.classList.add("active");
+                    firstMenu.click();
                 }
-            }
-            return starsHtml;
-        }
+            },
 
-        function renderReviews() {
-            const container = document.getElementById('review-cards-container');
-            container.innerHTML = '';
+            renderAccount() {
+                this.containers.accountContainer.innerHTML = `
+                <p>หน้าข้อมูลบัญชี</p>
+            `;
+            },
 
-            reviews.forEach(review => {
-                const reviewCard = document.createElement('div');
-                reviewCard.className = 'review-card';
+            renderListOrders() {
+                const tabMap = {
+                    'all': {
+                        text: 'ทั้งหมด',
+                        icon: '<i class="bi bi-card-list"></i>'
+                    },
+                    'pending': {
+                        text: 'ที่ต้องชำระ',
+                        icon: '<i class="bi bi-clock-history"></i>'
+                    },
+                    'shipped': {
+                        text: 'จัดเตรียมสินค้า',
+                        icon: '<i class="bi bi-bag-check"></i>'
+                    },
+                    'delivered': {
+                        text: 'กำลังส่งมอบ',
+                        icon: '<i class="bi bi-truck"></i>'
+                    },
+                    'finished': {
+                        text: 'ส่งสินค้าสำเร็จ',
+                        icon: '<i class="bi bi-check-circle"></i>'
+                    },
+                    'cancelled': {
+                        text: 'ยกเลิกสินค้า',
+                        icon: '<i class="bi bi-x-circle"></i>'
+                    },
+                    'return': {
+                        text: 'คืนสินค้า',
+                        icon: '<i class="bi bi-arrow-return-left"></i>'
+                    }
+                };
 
-                reviewCard.innerHTML = `
-                    <div class="review-card-image-wrapper">
-                        <img src="${review.imageUrl}" alt="${review.productName}">
+                let tabButtonsHTML = '';
+                for (const key in tabMap) {
+                    const value = tabMap[key];
+                    const isActive = key === 'all' ? 'active' : '';
+                    tabButtonsHTML += `<button data-tab-key="${key}" class="tab-order-button ${isActive}">${value.icon} ${value.text}</button>`;
+                }
+
+                this.containers.ordersContainer.innerHTML = `
+                <div>
+                    <h4 class="header mb-3">รายการคำสั่งซื้อของคุณ</h4>
+                    <div class="tab-order-navigation">
+                        ${tabButtonsHTML}
                     </div>
-                    <div class="review-card-content">
-                        <div class="review-card-header">
-                            <h2>${review.productName}</h2>
-                            <div class="star-rating">
-                                ${createStarRating(review.rating)}
+                    <div class="d-flex justify-content-between mt-4">
+                        <div id="showingEntries" class="showing-entries"></div>
+                        <div class="controls">
+                            <button id="gridBtn" class="active"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                            <button id="listBtn"><i class="bi bi-list-task"></i></button>
+                        </div>
+                    </div>
+                    <div id="tab-order-content">
+                        <div class="order-view-container grid-view" id="order-list-container"></div>
+                    </div>
+                    <div id="paginationContainer" class="pagination"></div>
+                </div>
+                `;
+
+                this.bindTabEvents();
+                this.bindViewToggleEvents();
+                this.filterAndRenderOrders('all');
+            },
+
+            renderOrderCard(order) {
+                const totalItems = order.products.length;
+                const productToDisplay = order.products[0];
+                const totalPrice = order.products.reduce((sum, product) => {
+                    const price = parseFloat(product.price.replace(/,/g, ''));
+                    return sum + (price * product.quantity);
+                }, 0).toFixed(2);
+
+                let productListHTML = '';
+                if (productToDisplay) {
+                    productListHTML = `
+                        <ul>
+                            <li>
+                                <div class="d-flex align-items-center" style="gap:10px;">
+                                    <img src="${productToDisplay.image}" alt="${productToDisplay.name}" width="50" height="50" class="rounded border">
+                                    <div>
+                                        <span class="fw-semibold">${productToDisplay.name}</span>
+                                        <br>
+                                        <span class="text-muted small">x${productToDisplay.quantity}</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    `;
+                }
+
+                let trackLink = '';
+                if (totalItems > 1) {
+                    trackLink += `
+                        <a href="${pathConfig.BASE_WEB}user/purchase/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
+                    `;
+                }
+
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <span class="text-muted small">หมายเลขคำสั่งซื้อ</span>
+                                <span class="fw-semibold text-dark">#${order.id}</span>
+                            </div>
+                            <span class="status-badge ${order.status}">${order.statusText}</span>
+                        </div>
+                        <div class="product-summary">
+                            ${productListHTML}
+                            <div class="d-flex justify-content-between">
+                                <a href="${pathConfig.BASE_WEB}user/track/" class="view-all-link">ติดตาม</a>
+                                ${trackLink}
                             </div>
                         </div>
-                        <p class="review-text">
-                            "${review.reviewText}"
-                        </p>
-                        <div class="review-footer">
-                            <span>รีวิวเมื่อ: ${review.reviewDate}</span>
-                            <div class="review-actions">
-                                <button class="edit-button">แก้ไข</button>
-                                <button class="delete-button">ลบ</button>
-                            </div>
+                        <div class="product-total-price">
+                            <span>ยอดรวม: ${totalPrice} บาท</span>
                         </div>
                     </div>
                 `;
-                container.appendChild(reviewCard);
-            });
-        }
-        window.onload = renderReviews;
-    </script> -->
+            },
+            
+            filterAndRenderOrders(status) {
+                let filteredOrders = (status === 'all')
+                    ? this.data.orders
+                    : this.data.orders.filter(order => order.status === status);
+                
+                this.pagination.filteredData = filteredOrders;
+                this.pagination.totalItems = filteredOrders.length;
+                this.pagination.totalPages = Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage);
+
+                this.renderCurrentPage();
+            },
+
+            renderCurrentPage() {
+                const {
+                    currentPage,
+                    itemsPerPage,
+                    filteredData
+                } = this.pagination;
+
+                const start = (currentPage - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const currentData = filteredData.slice(start, end);
+
+                const orderCardsHTML = currentData.map(order => this.renderOrderCard(order)).join('');
+                const container = document.getElementById('order-list-container');
+                container.innerHTML = `<div class="order-cards">${orderCardsHTML}</div>`;
+                
+                this.renderPaginationControls();
+                this.renderShowingEntries();
+            },
+
+            renderPaginationControls() {
+                const {
+                    currentPage,
+                    totalPages
+                } = this.pagination;
+                const container = document.getElementById('paginationContainer');
+                container.innerHTML = ''; // Clear previous buttons
+
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = 'ย้อนกลับ';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    this.pagination.currentPage--;
+                    this.renderCurrentPage();
+                });
+                container.appendChild(prevBtn);
+
+                // Numbered pages
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.classList.toggle('active', i === currentPage);
+                    pageBtn.addEventListener('click', () => {
+                        this.pagination.currentPage = i;
+                        this.renderCurrentPage();
+                    });
+                    container.appendChild(pageBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = 'ถัดไป';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    this.pagination.currentPage++;
+                    this.renderCurrentPage();
+                });
+                container.appendChild(nextBtn);
+            },
+
+            renderShowingEntries() {
+                const {
+                    currentPage,
+                    itemsPerPage,
+                    totalItems
+                } = this.pagination;
+
+                const startEntry = (totalItems > 0) ? (currentPage - 1) * itemsPerPage + 1 : 0;
+                const endEntry = Math.min(startEntry + itemsPerPage - 1, totalItems);
+                const showingEntriesText = `แสดง ${startEntry} ถึง ${endEntry} จาก ${totalItems} รายการ`;
+
+                document.getElementById('showingEntries').textContent = showingEntriesText;
+            },
+
+            resetPagination() {
+                this.pagination.currentPage = 1;
+            },
+
+            bindTabEvents() {
+                const tabButtons = document.querySelectorAll('.tab-order-navigation .tab-order-button');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        const tabKey = button.getAttribute('data-tab-key');
+                        this.resetPagination();
+                        this.filterAndRenderOrders(tabKey);
+                    });
+                });
+            },
+
+            bindViewToggleEvents() {
+                const gridBtn = document.getElementById('gridBtn');
+                const listBtn = document.getElementById('listBtn');
+                const orderViewContainer = document.getElementById('order-list-container');
+
+                gridBtn.addEventListener('click', () => {
+                    gridBtn.classList.add('active');
+                    listBtn.classList.remove('active');
+                    orderViewContainer.classList.add('grid-view');
+                    orderViewContainer.classList.remove('list-view');
+                });
+
+                listBtn.addEventListener('click', () => {
+                    listBtn.classList.add('active');
+                    gridBtn.classList.remove('active');
+                    orderViewContainer.classList.add('list-view');
+                    orderViewContainer.classList.remove('grid-view');
+                });
+            }
+        };
+        userApp.init();
+    </script>
 
 </body>
 
