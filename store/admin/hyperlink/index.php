@@ -1,4 +1,4 @@
-<?php include '../../../routes.php'; ?>
+<?php include '../../routes.php'; ?>
 <!DOCTYPE html>
 <html lang="th">
 
@@ -6,11 +6,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-STORE</title>
-    <?php include '../../../inc-meta.php'; ?>
-    <link href="../../../css/admin/template-admin.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <?php include '../../../inc-cdn.php'; ?>
-    <link href="../../../css/admin/alertMessage-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../../inc-meta.php'; ?>
+    <link href="../../css/admin/template-admin.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <?php include '../../inc-cdn.php'; ?>
+    <link href="../../css/admin/template-notify.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../../css/admin/template-dataTable.css?v=<?php echo time(); ?>" rel="stylesheet">
     <style>
         .card-list-link {
             border: 1px solid #dee2e6;
@@ -24,11 +24,12 @@
 
 <body>
 
-    <?php include '../../../template/admin/head-bar.php'; ?>
+    <?php include '../../template/admin/head-bar.php'; ?>
     <main>
-        <div>
-            <section id="" class="section-space-admin">
-                <div class="container">
+        <div id="section_root_hyperlink_list" class="section-space-admin">
+            <div class="container">
+                <section></section>
+                <section>
                     <div class="card-list-link">
                         <table id="tb_listLink" class="table table-hover">
                             <thead>
@@ -43,14 +44,15 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </main>
+    <?php include '../../template/admin/footer-bar.php'; ?>
 
     <script type="module">
         Promise.all([
-                import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+                import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
                 import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
             ])
             .then(async ([formModule, linkModule]) => {
@@ -137,11 +139,11 @@
                                 e.preventDefault();
                                 const rowData = table.row($(this).closest('tr')).data();
                                 redirectGet(
-                                    `${pathConfig.BASE_WEB}admin/control/setup_link/`, 
+                                    `${pathConfig.BASE_WEB}admin/hyperlink/setup/`, 
                                     {
                                         id: rowData.link_id
                                     },
-                                    '_blank'
+                                    '_self'
                                 );
                                 // console.log('Edit Click:', rowData);
                             });
@@ -191,8 +193,6 @@
             })
             .catch((e) => console.error("Module import failed", e));
     </script>
-
-    <?php include '../../../template/admin/footer-bar.php'; ?>
 
 </body>
 

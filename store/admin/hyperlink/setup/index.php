@@ -9,8 +9,8 @@
     <?php include '../../../inc-meta.php'; ?>
     <link href="../../../css/admin/template-admin.css?v=<?php echo time(); ?>" rel="stylesheet">
     <?php include '../../../inc-cdn.php'; ?>
-    <link href="../../../css/admin/alertMessage-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <link href="../../../css/admin/dataTable-e-store.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../../../css/admin/template-notify.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <link href="../../../css/admin/template-dataTable.css?v=<?php echo time(); ?>" rel="stylesheet">
 
     <style>
         .card-hyperlink {
@@ -50,10 +50,10 @@
 
     <?php include '../../../template/admin/head-bar.php'; ?>
     <main>
-        <div>
-            <section id="" class="section-space-admin">
-                <div class="container">
-                    <form id="setupFormLink" data-url="<?php echo $BASE_WEB ?>service/admin/control/setup-link-action.php" data-redir="<?php echo $BASE_WEB ?>admin/control/setup_link" data-type="setupLink">
+        <div id="section_root_hyperlink_setup" class="section-space-admin">
+            <div class="container">
+                <section>
+                    <form id="setupFormLink" data-url="<?php echo $BASE_WEB ?>service/admin/control/setup-link-action.php" data-redir="<?php echo $BASE_WEB ?>admin/hyperlink/" data-type="setupLink">
                         <?php
                         if (isset($_GET['id'])) { ?>
                             <input type="text" name="action" value="editSetupLink" hidden>
@@ -150,14 +150,15 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </main>
+    <?php include '../../../template/admin/footer-bar.php'; ?>
 
     <script type="module">
         Promise.all([
-                import(`${pathConfig.BASE_WEB}js/formHandler.js?v=<?php echo time(); ?>`),
+                import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
                 import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
             ])
             .then(async ([formModule, linkModule]) => {
@@ -305,8 +306,6 @@
         //     () => console.log("กดยกเลิก")
         // );
     </script>
-
-    <?php include '../../../template/admin/footer-bar.php'; ?>
 
 </body>
 

@@ -14,12 +14,9 @@
 <body>
     <?php include '../template/admin/head-bar.php'; ?>
     <main>
-        <div>
-            <section id="" class="section-space">
-                <div class="container">
-                    
-                </div>
-            </section>
+        <div id="" class="section-space">
+            <div class="container">
+            </div>
         </div>
     </main>
     <?php include '../template/admin/footer-bar.php'; ?>
