@@ -309,12 +309,11 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
   const defaultMenu = [
     {
       title: "การจัดการเมนู", 
-      // link: config.BASE_WEB + "admin/control/", 
-      link: '#', 
+      link: config.BASE_WEB + "admin/hyperlink/", 
       icon: '<i class="bi bi-gear"></i>',
       subMenu: [
-        { title: "รายการเมนู", link: config.BASE_WEB + "admin/control/list_link/" },
-        { title: "ติดตั้งเมนู", link: config.BASE_WEB + "admin/control/setup_link/" },
+        // { title: "รายการเมนู", link: config.BASE_WEB + "admin/control/" },
+        // { title: "ติดตั้งเมนู", link: config.BASE_WEB + "admin/control/setup_link/" },
         // { title: "ระบบสำรองข้อมูล", link: config.BASE_WEB + "admin/control_link/backup" }
       ]
     },
