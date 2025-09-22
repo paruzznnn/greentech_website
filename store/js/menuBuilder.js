@@ -141,15 +141,13 @@ export function buildLinkmenu(data, contentArray) {
 function adjustPosition(box) {
   const rect = box.getBoundingClientRect();
   const vw = window.innerWidth;
-  const margin = 20; // ระยะปลอดภัยจากขอบ
+  const margin = 20;
 
-  // ถ้าด้านขวาเกินขอบ → เลื่อนเข้ามาทางซ้าย
   if (rect.right > vw - margin) {
     const shift = rect.right - (vw - margin);
     box.style.left = `${box.offsetLeft - shift}px`;
   }
 
-  // ถ้าด้านซ้ายเกินขอบ → เลื่อนเข้ามาทางขวา
   if (rect.left < margin) {
     const shift = margin - rect.left;
     box.style.left = `${box.offsetLeft + shift}px`;
@@ -330,7 +328,6 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
   containers.forEach((container, index) => {
     container.innerHTML = '';
 
-    // เพิ่มช่องค้นหา พร้อม id
     const searchInput = document.createElement("input");
     searchInput.type = "text";
     searchInput.placeholder = "ค้นหาเมนู...";
@@ -339,16 +336,13 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
 
     container.appendChild(searchInput);
 
-    // เมนูจาก menuData
     const menu = createMenu(menuData);
     container.appendChild(menu);
 
-    // เมนูค่าเริ่มต้นอยู่ด้านล่างสุด
     const fixedMenu = createMenu(defaultMenu);
     fixedMenu.classList.add("default-menu");
     container.appendChild(fixedMenu);
 
-    // Event filter
     searchInput.addEventListener("input", () => {
       filterMenu(container, searchInput.value.toLowerCase());
     });

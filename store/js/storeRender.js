@@ -1,4 +1,4 @@
-import { redirectGet, showNotification } from './formHandler.js';
+import { redirectGet, showNotification } from './centerHandler.js';
 import { formatPrice } from './formatHandler.js';
 
 // ---------- API -----------------------------
@@ -572,7 +572,6 @@ export function renderCarouselLG(selector, items) {
     }
   });
 }
-
 
 export function renderGridCardSM(selector, items) {
 

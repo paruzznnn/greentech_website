@@ -88,13 +88,13 @@
                                         <input type="text" id="link_label" name="link_label" class="form-input">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="link_path" class="form-label">เส้นทาง (Path)</label>
                                         <input type="text" id="link_path" name="link_path" class="form-input">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="link_role" class="form-label">ให้สิทธิเมนูส่วน</label>
                                         <select id="link_role" name="link_role" class="form-input" required>
@@ -104,8 +104,8 @@
                                             <option value="3">ผู้เยี่ยมชม</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
+                                </div> -->
+                                <!-- <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="link_comp" class="form-label">ประเภทบริษัท</label>
                                         <select id="link_comp" name="link_comp" class="form-input" required>
@@ -115,7 +115,7 @@
                                             <option value="3">อาหาร</option>
                                         </select>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="col-md-12">
                                     <div class="d-flex flex-row-reverse mb-2" style="gap: 1rem">
                                         <label class="toggle-switch">

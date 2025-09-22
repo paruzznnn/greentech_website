@@ -42,11 +42,6 @@ $userId = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
 $timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
 $dateNow = date('Y-m-d H:i:s');
 
-// echo '<pre>';
-// print_r($dataJson);
-// echo '</pre>';
-// exit;
-
 if ($action == 'setupAddLink') {
 
     try {
@@ -54,16 +49,16 @@ if ($action == 'setupAddLink') {
         $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : null;
         $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : null;
 
-        $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
-        $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
+        // $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
+        // $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
         $open_type  = isset($dataJson['open_type']) ? (string) 'Y' : 'N';
 
         $link_data = [
             'link_name' => $link_label,
             'link_url'  => $link_path,
             'link_icon' => $link_icon,
-            'link_role' => $link_role,
-            'link_comp' => $link_comp,
+            // 'link_role' => $link_role,
+            // 'link_comp' => $link_comp,
             'link_sub_active' => $open_type
         ];
 
@@ -164,8 +159,8 @@ if ($action == 'setupAddLink') {
         $link_label = isset($dataJson['link_label']) ? (string) $dataJson['link_label'] : null;
         $link_path  = isset($dataJson['link_path']) ? (string) $dataJson['link_path'] : null;
 
-        $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
-        $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
+        // $link_role  = isset($dataJson['link_role']) ? (string) $dataJson['link_role'] : null;
+        // $link_comp  = isset($dataJson['link_comp']) ? (string) $dataJson['link_comp'] : null;
         $open_type  = isset($dataJson['open_type']) ? (string) 'Y' : 'N';
 
         if (empty($link_id)) {
@@ -176,8 +171,8 @@ if ($action == 'setupAddLink') {
             'link_name' => $link_label,
             'link_url'  => $link_path,
             'link_icon' => $link_icon,
-            'link_role' => $link_role,
-            'link_comp' => $link_comp,
+            // 'link_role' => $link_role,
+            // 'link_comp' => $link_comp,
             'link_sub_active' => $open_type
         ];
 
