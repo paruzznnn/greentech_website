@@ -44,25 +44,21 @@ if ($action == 'uploadSlip') {
         $file = $_FILES['proof'];
         $uploadDir = "../../uploads/proofs/";
 
-        // สร้างโฟลเดอร์ถ้าไม่มี
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0777, true)) {
                 throw new Exception("Failed to create upload directory");
             }
         }
 
-        // ตั้งชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ
         // $fileName = time() . "_" . basename($file['name']);
         $fileName = time() . "_" . "slip";
         $targetPath = $uploadDir . $fileName;
         $fileUrl = $GLOBALS['BASE_WEB'] ."uploads/proofs/". $fileName;
         
-        // อัปโหลดไฟล์
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
             throw new Exception("Upload failed");
         }
 
-        // เตรียมข้อมูลสำหรับ insert
         $slip_data = [
             'member_id'  => $userId,
             'order_id'   => $orderId,
@@ -77,9 +73,7 @@ if ($action == 'uploadSlip') {
             'created_at' => $dateNow
         ];
 
-        // บันทึกลงฐานข้อมูล
         $ins_id = insertDataAndGetId($conn_cloudpanel, 'ecm_orders_slip', $slip_data);
-
         if (!$ins_id) {
             throw new Exception("Database insert failed");
         }
@@ -90,8 +84,7 @@ if ($action == 'uploadSlip') {
         ]);
 
     } catch (Exception $e) {
-
-        // ถ้าเกิดข้อผิดพลาดระหว่าง upload ไฟล์ → ลบไฟล์ที่อัปโหลดไปแล้ว
+        
         if (isset($targetPath) && file_exists($targetPath)) {
             unlink($targetPath);
         }

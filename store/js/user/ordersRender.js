@@ -169,7 +169,7 @@ const OrderSummaryRenderer = {
 
     bindPayEvents() {
         document.getElementById("payOrders").onclick = () => {
-            window.location.href = pathConfig.BASE_WEB + 'user/payment/?id=' + this.orderId;
+            window.location.href = window.AppConfig.BASE_WEB + 'user/payment/?id=' + this.orderId;
             // redirectGet(pathConfig.BASE_WEB + 'user/payment/');
         };
     },

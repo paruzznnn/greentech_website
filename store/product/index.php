@@ -339,7 +339,7 @@
 
                 // console.log('Cart');
                 
-                const url = pathConfig.BASE_WEB + "product/detail/";
+                const url = window.AppConfig.BASE_WEB + "product/detail/";
                 window.location.href = url;
             },
 

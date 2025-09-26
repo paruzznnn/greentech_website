@@ -16,7 +16,7 @@ const PaymentApp = {
     },
 
     loadOrder() {
-        const url = pathConfig.BASE_WEB + "service/user/payment-data.php?action=getOrdersItems";
+        const url = window.AppConfig.BASE_WEB + "service/user/payment-data.php?action=getOrdersItems";
         fetch(url, {
             method: "GET",
             headers: {
@@ -70,7 +70,7 @@ const PaymentApp = {
         if (paymentFirst) {
             bankLogoEl.src = (paymentFirst.type === "promptpay" && paymentFirst.pic) ?
                 paymentFirst.pic :
-                pathConfig.BASE_WEB + paymentFirst.pic;
+                window.AppConfig.BASE_WEB + paymentFirst.pic;
             bankLogoEl.style.display = 'block';
 
             // reset proof preview
@@ -137,7 +137,7 @@ const PaymentApp = {
             formData.append('action', "uploadSlip");
             formData.append('orderId', this.currentOrderId);
 
-            fetch(pathConfig.BASE_WEB + "service/user/payment-action.php", {
+            fetch(window.AppConfig.BASE_WEB + "service/user/payment-action.php", {
                 method: "POST",
                 body: formData,
                 headers: {

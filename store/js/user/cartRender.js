@@ -693,7 +693,7 @@ const CartApp = {
                 }
             }
             this.saveToStorage();
-            redirectGet(pathConfig.BASE_WEB + 'user/checkout/');
+            redirectGet(window.AppConfig.BASE_WEB + 'user/checkout/');
         };
     },
 
