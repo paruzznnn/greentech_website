@@ -105,7 +105,7 @@ const CheckoutApp = {
     async sendOrderToServer(data) {
         data.action = "payOrder";
         try {
-            const response = await fetch(pathConfig.BASE_WEB + "service/user/checkout-action.php", {
+            const response = await fetch(window.AppConfig.BASE_WEB + "service/user/checkout-action.php", {
                 method: "POST",
                 headers: {
                     'Authorization': 'Bearer my_secure_token_123',
@@ -119,7 +119,7 @@ const CheckoutApp = {
             savedData.order_id = responseData.order_id;
             localStorage.setItem("checkoutAppData", JSON.stringify(savedData));
 
-            redirectGet(pathConfig.BASE_WEB + 'user/');
+            redirectGet(window.AppConfig.BASE_WEB + 'user/');
         } catch (err) {
             console.error("Error sending order:", err);
             alert("เกิดข้อผิดพลาดในการส่งข้อมูลไป server");
@@ -438,7 +438,7 @@ const CheckoutApp = {
 
     async loadData(dataType) {
         try {
-            const response = await fetch(`${pathConfig.BASE_WEB}locales/${dataType}.json`, {
+            const response = await fetch(`${window.AppConfig.BASE_WEB}locales/${dataType}.json`, {
                 method: "GET",
                 headers: {
                     'Authorization': 'Bearer my_secure_token_123',
@@ -535,7 +535,7 @@ const CheckoutApp = {
 
     bindbackCartEvents() {
         document.getElementById("backCart").onclick = () => {
-            redirectGet(pathConfig.BASE_WEB + 'user/cart/');
+            redirectGet(window.AppConfig.BASE_WEB + 'user/cart/');
         };
     },
 

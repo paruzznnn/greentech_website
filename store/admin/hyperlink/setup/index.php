@@ -158,8 +158,8 @@
 
     <script type="module">
         Promise.all([
-                import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
-                import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
+                import(`${window.AppConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
+                import(`${window.AppConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
             ])
             .then(async ([formModule, linkModule]) => {
                 const {
@@ -215,7 +215,7 @@
                 };
 
                 if (linkId) {
-                    const service = pathConfig.BASE_WEB + 'service/admin/control/list-link-data.php?';
+                    const service = window.AppConfig.BASE_WEB + 'service/admin/control/list-link-data.php?';
                     const param = {
                         action: "getLinkItems",
                         id: linkId

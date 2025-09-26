@@ -1,17 +1,11 @@
-
-const StoreApp = {
-    // stores: [{
-    //     name: "แทรนดาร์ อะคูสติก",
-    //     logo: "https://www.trandar.com//public/img/logo_688c431f30bf3.png",
-    //     categories: ["Organic", "Groceries", "Butcher Shop"],
-    //     delivery: "Pickup available",
-    //     distance: "7.5 mi away"
-    // }
-    // ],
-
+import { redirectGet } from "../centerHandler.js";
+const StoresApp = {
     stores: [],
     currentPage: 1,
     itemsPerPage: 8,
+    pageStart: 0,
+    pageEnd: 0,
+
     containers: {
         storesContainer: document.getElementById('stores-container'),
         gridBtn: document.getElementById("gridViewBtn"),
@@ -20,87 +14,101 @@ const StoreApp = {
         showingEntries: document.getElementById("showing-entries")
     },
 
-    loadStores(){
-        const url = pathConfig.BASE_WEB + "service/partner/partner-data.php?action=getPartnerStores";
+    loadStores() {
+        this.pageStart = (this.currentPage - 1) * this.itemsPerPage;
+        this.pageEnd = this.pageStart + this.itemsPerPage;
+        const params = new URLSearchParams({
+            action: 'getPartnerStores',
+            start: this.pageStart,
+            end: this.pageEnd
+        });
+        const url = window.AppConfig.BASE_WEB + "service/partner/partner-data.php?" + params.toString();
         fetch(url, {
             method: "GET",
             headers: {
                 'Authorization': 'Bearer my_secure_token_123',
-                "Content-Type": "application/json"
+                'Content-Type': 'application/json'
             }
         })
         .then(res => res.json())
         .then(data => {
             if (data.data) {
                 this.stores = data.data;
+                this.renderStores();
             } else {
                 console.error('API response error:', data.message);
             }
         })
         .catch(err => {
-            console.error('Failed to load orders:', err);
+            console.error('Failed to load stores:', err);
         });
     },
 
     renderStores() {
-        const start = (this.currentPage - 1) * this.itemsPerPage;
-        const end = start + this.itemsPerPage;
-        const paginatedStores = this.stores.slice(start, end);
-
         this.containers.storesContainer.innerHTML = "";
 
-        paginatedStores.forEach(store => {
-            const categoriesHtml = store.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('');
+        this.stores.forEach(store => {
+
+            // console.log('store', store);
+            // const categoriesHtml = store.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('');
             const storeElement = document.createElement("div");
             storeElement.classList.add("stores-card");
 
+            // <div class="category-container">${categoriesHtml}</div>
+            // <div class="details-container">
+            //     <p class="delivery-info">${store.delivery}</p>
+            //     <p class="distance-info">${store.distance}</p>
+            // </div>
+
             storeElement.innerHTML = `
-                        <img src="${store.logo}" alt="${store.name}" class="store-logo" />
-                        <div>
-                            <h2 class="stores-name">${store.name}</h2>
-                            <div class="category-container">${categoriesHtml}</div>
-                            <div class="details-container">
-                                <p class="delivery-info">${store.delivery}</p>
-                                <p class="distance-info">${store.distance}</p>
-                            </div>
-                        </div>
-                    `;
+                <img src="${store.logo_url}" alt="${store.name}" class="store-logo" />
+                <div>
+                    <h2 class="stores-name">${store.name}</h2>
+                </div>
+            `;
 
-            // ใช้ฟังก์ชันแยก
             storeElement.addEventListener("click", () => this.handleCardClick(store));
-
             this.containers.storesContainer.appendChild(storeElement);
         });
 
+        const totalEntries = (this.pageEnd > this.pageStart + this.stores.length) ? this.pageStart + this.stores.length : this.pageEnd;
         this.containers.showingEntries.innerText =
-            `Showing ${start + 1} to ${Math.min(end, this.stores.length)} of ${this.stores.length} entries`;
+            `Showing ${this.pageStart + 1} to ${totalEntries} entries`;
+
         this.renderPagination();
     },
 
     handleCardClick(store) {
-        const url = pathConfig.BASE_WEB + `partner/detail/?name=${encodeURIComponent(store.name)}`;
-        window.location.href = url;
+        const url = window.AppConfig.BASE_WEB + `partner/detail/`;
+        redirectGet(url,
+            {
+                store: encodeURIComponent(store.store_id),
+                name: encodeURIComponent(store.name)
+            }
+        );
     },
 
     renderPagination() {
         this.containers.pagination.innerHTML = "";
-        const totalPages = Math.ceil(this.stores.length / this.itemsPerPage);
 
-        const prevBtn = `<button ${this.currentPage === 1 ? "disabled" : ""} onclick="StoreApp.changePage(${this.currentPage - 1})">Prev</button>`;
+        const hasNextPage = this.stores.length === this.itemsPerPage;
+        const totalPages = hasNextPage ? this.currentPage + 1 : this.currentPage;
+
+        const prevBtn = `<button ${this.currentPage === 1 ? "disabled" : ""} onclick="StoresApp.changePage(${this.currentPage - 1})">Prev</button>`;
         this.containers.pagination.insertAdjacentHTML("beforeend", prevBtn);
 
         for (let i = 1; i <= totalPages; i++) {
-            const pageBtn = `<button class="${i === this.currentPage ? "active" : ""}" onclick="StoreApp.changePage(${i})">${i}</button>`;
+            const pageBtn = `<button class="${i === this.currentPage ? "active" : ""}" onclick="StoresApp.changePage(${i})">${i}</button>`;
             this.containers.pagination.insertAdjacentHTML("beforeend", pageBtn);
         }
 
-        const nextBtn = `<button ${this.currentPage === totalPages ? "disabled" : ""} onclick="StoreApp.changePage(${this.currentPage + 1})">Next</button>`;
+        const nextBtn = `<button ${!hasNextPage ? "disabled" : ""} onclick="StoresApp.changePage(${this.currentPage + 1})">Next</button>`;
         this.containers.pagination.insertAdjacentHTML("beforeend", nextBtn);
     },
 
     changePage(page) {
         this.currentPage = page;
-        this.renderStores();
+        this.loadStores();
     },
 
     switchView(mode) {
@@ -118,15 +126,19 @@ const StoreApp = {
             this.itemsPerPage = 6;
         }
         this.currentPage = 1;
-        this.renderStores();
+        this.loadStores();
     },
 
     init() {
         this.containers.gridBtn.addEventListener("click", () => this.switchView('grid'));
         this.containers.listBtn.addEventListener("click", () => this.switchView('list'));
-        this.renderStores();
+        this.loadStores();
     },
-
 };
 
-StoreApp.init();
+document.addEventListener("DOMContentLoaded", () => {
+    StoresApp.init();
+});
+
+
+

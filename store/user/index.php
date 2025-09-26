@@ -65,22 +65,22 @@
                 {
                     icon: '<i class="bi bi-cart3"></i>',
                     text: "Cart",
-                    link: pathConfig.BASE_WEB+"user/cart/"
+                    link: window.AppConfig.BASE_WEB+"user/cart/"
                 },
                 {
                     icon: '<i class="bi bi-cash-coin"></i>',
                     text: "Payment",
-                    link: pathConfig.BASE_WEB+"user/payment/"
+                    link: window.AppConfig.BASE_WEB+"user/payment/"
                 },
                 {
                     icon: '<i class="bi bi-receipt"></i>',
                     text: "Coupon",
-                    link: pathConfig.BASE_WEB+"user/coupon/"
+                    link: window.AppConfig.BASE_WEB+"user/coupon/"
                 },
                 {
                     icon: '<i class="bi bi-box-arrow-right"></i>',
                     text: "Logout",
-                    link: pathConfig.BASE_WEB+"logout.php"
+                    link: window.AppConfig.BASE_WEB+"logout.php"
                 }]
             },
 
@@ -397,7 +397,7 @@
                 let trackLink = '';
                 if (totalItems > 1) {
                     trackLink += `
-                        <a href="${pathConfig.BASE_WEB}user/purchase/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
+                        <a href="${window.AppConfig.BASE_WEB}user/purchase/?id=" class="view-all-link" target="_blank">ดูสินค้าทั้งหมด ${totalItems} รายการ</a>
                     `;
                 }
 
@@ -413,7 +413,7 @@
                         <div class="product-summary">
                             ${productListHTML}
                             <div class="d-flex justify-content-between">
-                                <a href="${pathConfig.BASE_WEB}user/track/" class="view-all-link">ติดตาม</a>
+                                <a href="${window.AppConfig.BASE_WEB}user/track/" class="view-all-link">ติดตาม</a>
                                 ${trackLink}
                             </div>
                         </div>

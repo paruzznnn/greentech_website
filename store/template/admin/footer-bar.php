@@ -17,7 +17,7 @@
 </footer>
 
 <script type="module">
-    import(`${pathConfig.BASE_WEB}js/language.js?v=<?= time() ?>`)
+    import(`${window.AppConfig.BASE_WEB}js/language.js?v=<?= time() ?>`)
         .then(({
             loadLanguage,
             applyTranslations
@@ -25,7 +25,7 @@
 
             const langButtons = document.getElementById('langButtons');
             const defaultLang = localStorage.getItem('lang') || 'en';
-            let service = pathConfig.BASE_WEB + 'locales/';
+            let service = window.AppConfig.BASE_WEB + 'locales/';
 
             function updateActiveButton(activeLang) {
                 [...langButtons.children].forEach(btn => {

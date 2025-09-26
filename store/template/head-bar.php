@@ -406,9 +406,9 @@
 
       let link = '';
       if (url === "/store") {
-        link = pathConfig.BASE_WEB;
+        link = window.AppConfig.BASE_WEB;
       } else {
-        link =  pathConfig.BASE_WEB + url;
+        link =  window.AppConfig.BASE_WEB + url;
       }
 
       if (url && !isLast) {
@@ -457,9 +457,9 @@
 <script type="module">
 
   Promise.all([
-    import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time();?>`),
-    import(`${pathConfig.BASE_WEB}js/modalBuilder.js?v=<?php echo time();?>`),
-    import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time();?>`)
+    import(`${window.AppConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time();?>`),
+    import(`${window.AppConfig.BASE_WEB}js/modalBuilder.js?v=<?php echo time();?>`),
+    import(`${window.AppConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time();?>`)
   ])
   .then( async ([centerHandler, modalBuilder, menuBuilder]) => {
     const { handleFormSubmit } = centerHandler;
@@ -501,7 +501,7 @@
     formRegister?.addEventListener("submit", handleFormSubmit);
 
     //====================== Build Menu ==========================
-    const service = pathConfig.BASE_WEB + 'service/header-data.php?';
+    const service = window.AppConfig.BASE_WEB + 'service/header-data.php?';
     const data = await fetchHeader("getMenuHeaderItems", service);
     const contentArray = await fetchHeader("getMenuHeaderBox", service);
     const menuData = await fetchHeader("getMenuHeaderSideItems", service);
@@ -579,7 +579,7 @@
 <script>
   //================= SET TIME ZONE ================================
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  fetch(`${pathConfig.BASE_WEB}/time_zone/set-timezone.php`, {
+  fetch(`${window.AppConfig.BASE_WEB}/time_zone/set-timezone.php`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

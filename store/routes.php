@@ -9,7 +9,8 @@ if (isset($_SESSION['user_timezone'])) {
 $timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
 $dateNow = date('Y-m-d H:i:s');
 
-function getBasePath() {
+function getBasePath()
+{
 
     /*==== FILE SETUP BASE PATH =======
     parseRoute
@@ -20,7 +21,7 @@ function getBasePath() {
     ==================================*/
 
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+        || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
     $scheme = $isHttps ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $path = $isHttps ? '/store/' : '/trandar_website/store/';
@@ -28,7 +29,8 @@ function getBasePath() {
     return $base_path;
 }
 
-function getRelativePath() {
+function getRelativePath()
+{
     $base = getBasePath();
     $uri = $_SERVER['REQUEST_URI'];
     if (strpos($uri, $base) === 0) {
@@ -37,7 +39,8 @@ function getRelativePath() {
     return $uri;
 }
 
-function parseRoute($RELATIVEPath) {
+function parseRoute($RELATIVEPath)
+{
     $path = trim($RELATIVEPath, '/');
     $segments = explode('/', $path);
     return [
@@ -45,7 +48,8 @@ function parseRoute($RELATIVEPath) {
     ];
 }
 
-function buildUrl($path = '', $query = []) {
+function buildUrl($path = '', $query = [])
+{
     $base = getBasePath();
     $url = rtrim($base, '/') . '/' . ltrim($path, '/');
     if (!empty($query)) {
@@ -54,7 +58,8 @@ function buildUrl($path = '', $query = []) {
     return $url;
 }
 
-function requireLogin() {
+function requireLogin()
+{
     if (!isset($_SESSION['user'])) {
         $base = getBasePath();
         header("Location: " . $base);
@@ -62,7 +67,8 @@ function requireLogin() {
     }
 }
 
-function requireRole($roles = []) {
+function requireRole($roles = [])
+{
     requireLogin();
     $userRole = $_SESSION['user']['role'] ?? null;
     if (!in_array($userRole, $roles)) {
@@ -70,14 +76,16 @@ function requireRole($roles = []) {
     }
 }
 
-function show403() {
+function show403()
+{
     http_response_code(403);
     echo "<h1>403 Forbidden</h1>";
     echo "<p>You do not have permission to access this page.</p>";
     exit;
 }
 
-function redirectTo($path) {
+function redirectTo($path)
+{
     header("Location: " . buildUrl($path));
     exit;
 }
@@ -121,13 +129,32 @@ echo '
 //                 Name: Kittinanthanatch Seekaewnamsai        //
 //                     Phone: 083-894-5256 (FEI)               //
 //=============================================================//
-var pathConfig = {
-    BASE_WEB: ' . json_encode($GLOBALS['BASE_WEB']) . ',
-    LINE_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/line/login.php") . ',
-    FACE_BOOK_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/facebook/login.php") . ',
-    GOOGLE_REDIRECT: ' . json_encode("http://localhost:3000/trandar_website/store/auth/google/login.php") . '
-};
 </script>
 ';
 
 
+$cfg = [
+    "BASE_WEB" => $GLOBALS['BASE_WEB'],
+    "LINE_REDIRECT" => "http://localhost:3000/trandar_website/store/auth/line/login.php",
+    "FACE_BOOK_REDIRECT" => "http://localhost:3000/trandar_website/store/auth/facebook/login.php",
+    "GOOGLE_REDIRECT" => "http://localhost:3000/trandar_website/store/auth/google/login.php",
+    "STORE_ID" => isset($_GET['store']) ? $_GET['store'] : null
+];
+
+$json = json_encode($cfg, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$encoded = base64_encode($json);
+
+echo <<<HTML
+<script>
+(function(){
+    try {
+        const cfg_b64 = '{$encoded}';
+        const cfg_json = atob(cfg_b64);
+        window.AppConfig = Object.freeze(JSON.parse(cfg_json));
+        console.log(window.AppConfig);
+    } catch (e) {
+        console.error('Failed to parse config', e);
+    }
+})();
+</script>
+HTML;

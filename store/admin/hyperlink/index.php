@@ -52,8 +52,8 @@
 
     <script type="module">
         Promise.all([
-                import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
-                import(`${pathConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
+                import(`${window.AppConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
+                import(`${window.AppConfig.BASE_WEB}js/admin/control/linkBuilder.js?v=<?php echo time(); ?>`)
             ])
             .then(async ([formModule, linkModule]) => {
                 const { redirectGet } = formModule;
@@ -76,7 +76,7 @@
                         processing: true,
                         serverSide: true,
                         ajax: {
-                            url: pathConfig.BASE_WEB + "service/admin/control/list-link-data.php",
+                            url: window.AppConfig.BASE_WEB + "service/admin/control/list-link-data.php",
                             method: "GET",
                             dataType: "json",
                             data: function(d) {
@@ -139,7 +139,7 @@
                                 e.preventDefault();
                                 const rowData = table.row($(this).closest('tr')).data();
                                 redirectGet(
-                                    `${pathConfig.BASE_WEB}admin/hyperlink/setup/`, 
+                                    `${window.AppConfig.BASE_WEB}admin/hyperlink/setup/`, 
                                     {
                                         id: rowData.link_id
                                     },

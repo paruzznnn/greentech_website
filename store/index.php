@@ -24,7 +24,7 @@
   <?php include 'template/footer-bar.php'; ?>
 
   <script type="module">
-  import(`${pathConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
+  import(`${window.AppConfig.BASE_WEB}js/storeRender.js?v=<?= time() ?>`)
     .then(async (storeRenderModule) => {
 
       const {
@@ -39,7 +39,7 @@
         renderGridCardMD,
       } = storeRenderModule;
 
-      const service = pathConfig.BASE_WEB + 'service/index-data.php?';
+      const service = window.AppConfig.BASE_WEB + 'service/index-data.php?';
 
       // ดึง sections และ sort ก่อน render
       const sections = await fetchIndexData("getSectionItems", service);
@@ -50,13 +50,13 @@
       const renderMap = {
         crssm: (selector, data) => renderCarouselSM(selector, data.data),
         crsmd: (selector, data) => renderCarouselMD(selector, data.data, {
-          BASE_WEB: pathConfig.BASE_WEB,
+          BASE_WEB: window.AppConfig.BASE_WEB,
           user: data.member
         }),
         crslg: (selector, data) => renderCarouselLG(selector, data.data),
         gcsm: (selector, data) => renderGridCardSM(selector, data.data),
         gcmd: (selector, data) => renderGridCardMD(selector, data.data, {
-          BASE_WEB: pathConfig.BASE_WEB,
+          BASE_WEB: window.AppConfig.BASE_WEB,
           user: data.member
         }),
         bbn:  (selector, data) => renderBanners(selector, data.data),

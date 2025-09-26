@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (url && !isLast) {
             const a = document.createElement('a');
-            a.href = pathConfig.BASE_WEB + url;
+            a.href = window.AppConfig.BASE_WEB + url;
             a.textContent = displayText;
             a.setAttribute('data-lang', dataLang);
             li.appendChild(a);
@@ -161,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script type="module">
     Promise.all([
-        import(`${pathConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
-        import(`${pathConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
+        import(`${window.AppConfig.BASE_WEB}js/centerHandler.js?v=<?php echo time(); ?>`),
+        import(`${window.AppConfig.BASE_WEB}js/menuBuilder.js?v=<?php echo time(); ?>`)
     ])
     .then(async ([centerHandler, menuBuilder]) => {
         const {
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             buildLinkmenuSlideAdmin
         } = menuBuilder;
 
-        const service = pathConfig.BASE_WEB + 'service/admin/header-data.php?';
+        const service = window.AppConfig.BASE_WEB + 'service/admin/header-data.php?';
         const menuData = await fetchHeader("getMenuHeaderSideItems", service);
 
         if (menuData) {
