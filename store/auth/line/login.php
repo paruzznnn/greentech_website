@@ -94,9 +94,9 @@ if (!isset($_GET['code'])) {
 $line = new LineAuth($client_id, $client_secret, $redirect_uri);
 $token_response = $line->getAccessToken($_GET['code']);
 
-if (isset($token_response['access_token'])) {
+try {
 
-    try {
+    if (isset($token_response['access_token'])) {
         $profile = $line->getUserProfile($token_response['access_token']);
         if (!$profile) {
             throw new Exception("Failed to retrieve LINE user profile.");
@@ -170,20 +170,18 @@ if (isset($token_response['access_token'])) {
             ];
             echo '<script language="javascript">window.location = "../../user/";</script>';
         }
-    } catch (Exception $e) {
-        // บันทึกข้อผิดพลาดลง log
-        error_log("Error during LINE login: " . $e->getMessage());
-        echo '<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง."); window.location = "../../login/";</script>';
-    } finally {
-        $conn_cloudpanel->close();
-        exit;
+    } else {
+
+        echo '<pre>';
+        print_r($token_response);
+        echo '</pre>';
     }
 
-} else {
-
-    echo '<pre>';
-    print_r($token_response);
-    echo '</pre>';
+} catch (Exception $e) {
+    // บันทึกข้อผิดพลาดลง log
+    error_log("Error during LINE login: " . $e->getMessage());
+    echo '<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง."); window.location = "../../login/";</script>';
+} finally {
+    $conn_cloudpanel->close();
     exit;
 }
-

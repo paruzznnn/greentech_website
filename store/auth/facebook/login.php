@@ -65,8 +65,11 @@ if (!isset($_GET['code'])) {
 $fbAuth = new FacebookAuth($client_id, $client_secret, $redirect_uri);
 $access_token = $fbAuth->getAccessToken($_GET['code']);
 
-if (!empty($access_token)) {
-    try {
+
+
+try {
+
+    if (!empty($access_token)) {
         $profile = $fbAuth->getUserProfile($access_token);
         if (!$profile) {
             throw new Exception("Failed to retrieve Facebook user profile.");
@@ -141,18 +144,18 @@ if (!empty($access_token)) {
             ];
             echo '<script language="javascript">window.location = "../../user/";</script>';
         }
-    } catch (Exception $e) {
-        error_log("Error during Facebook login: " . $e->getMessage());
-        echo '<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง."); window.location = "../../login/";</script>';
-    } finally {
-        $conn_cloudpanel->close();
-        exit;
+
+    } else {
+        echo 'Failed to get access token.';
+        echo '<pre>';
+        print_r($access_token);
+        echo '</pre>';
     }
 
-} else {
-    echo 'Failed to get access token.';
-    echo '<pre>';
-    print_r($access_token);
-    echo '</pre>';
+} catch (Exception $e) {
+    error_log("Error during Facebook login: " . $e->getMessage());
+    echo '<script>alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง."); window.location = "../../login/";</script>';
+} finally {
+    $conn_cloudpanel->close();
     exit;
 }

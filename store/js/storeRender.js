@@ -1,5 +1,4 @@
-import { redirectGet, showNotification } from './centerHandler.js';
-import { formatPrice } from './formatHandler.js';
+import { formatPrice, redirectGet, showNotification } from './centerHandler.js';
 
 // ---------- API -----------------------------
 export async function fetchIndexData(req, call) {
@@ -48,11 +47,11 @@ export function renderSections(targetId, data) {
       const contentHtml = createContentHtml(section);
       const wrapperStyle = getWrapperStyle(section.id);
 
+      // <div class="container"></div>
+
       return `
         <section id="${section.id}" class="${sectionClass}">
-          <div class="container">
             <div ${wrapperStyle}>${contentHtml}</div>
-          </div>
         </section>
       `;
     })

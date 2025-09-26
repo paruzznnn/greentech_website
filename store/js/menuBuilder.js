@@ -317,6 +317,18 @@ export function buildLinkmenuSlideAdmin(menuData, config) {
         // { title: "ระบบสำรองข้อมูล", link: config.BASE_WEB + "admin/control_link/backup" }
       ]
     },
+    {
+      title: "ผลิตภัณฑ์", 
+      link: "#", 
+      icon: '<i class="fab fa-envira"></i>',
+      subMenu: [
+        { title: "รายการสินค้า", link: config.BASE_WEB + "admin/product/", icon: '<i class="bi bi-clipboard-check"></i>' },
+        { title: "กลุ่มสินค้า", link: config.BASE_WEB + "admin/product/group/", icon: '<i class="fas fa-boxes"></i>' },
+        { title: "ชนิดสินค้า", link: config.BASE_WEB + "admin/product/type/", icon: '<i class="fas fa-cube"></i>' },
+        { title: "หมวดหมู่สินค้า", link: config.BASE_WEB + "admin/product/category/", icon: '<i class="fas fa-cubes"></i>' },
+        { title: "เพิ่มสินค้า", link: config.BASE_WEB + "admin/product/setup/", icon: '<i class="fas fa-box-open"></i>' }
+      ]
+    },
     { 
       title: "ออกจากระบบ", 
       link: config.BASE_WEB + "logout.php", 

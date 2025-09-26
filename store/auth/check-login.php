@@ -36,10 +36,9 @@ if ($dataJson == null) {
 }
 $action = $dataJson['action'];
 
-if ($action == "checkLogin") {
+try {
 
-    try {
-
+    if ($action == "checkLogin") {
         $userId = isset($dataJson['user_id']) ? (int)$dataJson['user_id'] : 0;
         if ($userId > 0) {
             $jwtData = generateJWT($userId);
@@ -61,8 +60,7 @@ if ($action == "checkLogin") {
 
             http_response_code(200);
             echo json_encode(["status" => true]);
-        }
-        else {
+        } else {
             if (empty($dataJson['login_email']) || empty($dataJson['login_password'])) {
                 throw new Exception("ต้องระบุ login_email และ login_password");
             }
@@ -103,24 +101,21 @@ if ($action == "checkLogin") {
             // ]
 
         }
-    } catch (Exception $e) {
+    } else {
         http_response_code(400);
         echo json_encode([
-            "status" => false,
-            "error" => $e->getMessage()
+            "error" => "Unauthorized"
         ]);
-    } finally {
-        if ($conn_cloudpanel instanceof mysqli) {
-            $conn_cloudpanel->close();
-        }
-        exit;
     }
-
-} else {
-
+} catch (Exception $e) {
     http_response_code(400);
     echo json_encode([
-        "error" => "Unauthorized"
+        "status" => false,
+        "error" => $e->getMessage()
     ]);
+} finally {
+    if ($conn_cloudpanel instanceof mysqli) {
+        $conn_cloudpanel->close();
+    }
     exit;
 }

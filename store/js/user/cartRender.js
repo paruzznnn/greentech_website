@@ -9,6 +9,9 @@ const CartApp = {
         qty: 4,
         maxQty: 10,
         weight: 100.2,
+        length: 1, // สมมติขนาดเป็น 1 x 0.5 x 0.5 เมตร
+        width: 0.5,
+        height: 0.5,
         image: "https://www.trandar.com//public/shop_img/687a1a94a6f10_Trandar_AMF_Mercure.jpg"
     }, {
         id: 2,
@@ -18,6 +21,9 @@ const CartApp = {
         qty: 1,
         maxQty: 5,
         weight: 1.5,
+        length: 0.2, // สมมติขนาดเป็น 0.2 x 0.2 x 0.2 เมตร
+        width: 0.2,
+        height: 0.2,
         image: "https://www.trandar.com//public/shop_img/687a1aa984ae2_Trandar_AMF_Fine_Fresko.jpg"
     }, {
         id: 3,
@@ -27,6 +33,9 @@ const CartApp = {
         qty: 1,
         maxQty: 3,
         weight: 2.1,
+        length: 0,
+        width: 0,
+        height: 0,
         image: "https://www.trandar.com//public/shop_img/687a1a756ce6a_Trandar_AMF_Star.jpg"
     }, {
         id: 4,
@@ -36,6 +45,9 @@ const CartApp = {
         qty: 1,
         maxQty: 20,
         weight: 0.8,
+        length: 0,
+        width: 0,
+        height: 0,
         image: "https://www.trandar.com//public/shop_img/687b2f5b393b2_497eeb6fc69f5635590f41fc078dff98.jpg"
     }, {
         id: 5,
@@ -45,6 +57,9 @@ const CartApp = {
         qty: 1,
         maxQty: 10,
         weight: 0.5,
+        length: 0,
+        width: 0,
+        height: 0,
         image: "https://www.trandar.com//public/shop_img/687b31d91b97e_T24.png"
     }],
     coupons: [],
@@ -75,24 +90,21 @@ const CartApp = {
             value: "lalamove",
             name: "Lalamove",
             price: 500,
-            capacity: 1000
+            capacity: 1000,
+            volumeCapacity: 2 // สมมติว่า Lalamove บรรทุกได้ 2 ลบ.ม.
         }, {
             value: "truck4",
             name: "รถบรรทุก 4 ล้อ",
             price: 500,
-            capacity: 9500
+            capacity: 9500,
+            volumeCapacity: 20 // สมมติว่ารถ 4 ล้อ บรรทุกได้ 20 ลบ.ม.
         }, {
             value: "truck6",
             name: "รถบรรทุก 6 ล้อ",
             price: 1000,
-            capacity: 15000
+            capacity: 15000,
+            volumeCapacity: 40 // สมมติว่ารถ 6 ล้อ บรรทุกได้ 40 ลบ.ม.
         }
-            // {
-            //     value: "truck",
-            //     name: "ติดต่อเจ้าหน้าที่",
-            //     price: 0,
-            //     capacity: 20000
-            // }
         ],
         pickup: [{
             value: "branch1",
@@ -112,38 +124,7 @@ const CartApp = {
     selectedShippingOptions: {},
     appliedCoupon: {},
 
-    // =================== SUMMARY ===================
-    calculateSummary() {
-        let subtotal = this.cartItems.reduce((sum, item) => sum + item.qty * item.price, 0);
-        let shipping = this.selectedShippingType === 'delivery' || this.selectedShippingType === 'pickup' ? (this.selectedShippingOptions.price || 0) : 0;
-        let discount = 0;
-        if (this.appliedCoupon?.code) {
-            if (this.appliedCoupon.type === "percent") discount = subtotal * (this.appliedCoupon.value / 100);
-            else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
-            else if (this.appliedCoupon.type === "shipping") shipping = 0;
-        }
-        const service = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
-        const tax = (subtotal - discount + shipping + service) * 0.07;
-        const total = subtotal - discount + shipping + service + tax;
-
-        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
-
-        return {
-            subtotal,
-            discount,
-            shipping,
-            service,
-            tax,
-            total,
-            totalWeight
-        };
-    },
-
-    calculateItemWeight(item) {
-        return (item.weight * item.qty).toFixed(2);
-    },
-
-    // =================== STORAGE ===================
+    //===== ฟังก์ชันเกี่ยวกับ API และ Storage =========
     saveToStorage() {
         const summary = this.calculateSummary();
         const data = {
@@ -167,7 +148,6 @@ const CartApp = {
         const coupon = localStorage.getItem("couponsAppData");
 
         try {
-
             if (cart) {
                 const parsedCart = JSON.parse(cart);
                 this.cartItems = parsedCart.cartItems || this.cartItems;
@@ -178,18 +158,69 @@ const CartApp = {
                 this.viewMode = parsedCart.viewMode || "list";
                 this.shipping = parsedCart.shipping || this.shipping;
             }
-
             if (coupon) {
                 const parsedCoupon = JSON.parse(coupon);
                 this.coupons = parsedCoupon;
             }
-
         } catch (e) {
             console.error("localStorage ผิดพลาด", e);
         }
     },
+    //===== ฟังก์ชันเกี่ยวกับ API และ Storage ==========
 
-    // =================== RENDER CART ===================
+    //===== ฟังก์ชันในการคำนวณต่างๆ ================
+    calculateSummary() {
+        let subtotal = this.cartItems.reduce((sum, item) => sum + item.qty * item.price, 0);
+        let shipping = this.selectedShippingType === 'delivery' || this.selectedShippingType === 'pickup' ? (this.selectedShippingOptions.price || 0) : 0;
+        let discount = 0;
+        if (this.appliedCoupon?.code) {
+            if (this.appliedCoupon.type === "percent") discount = subtotal * (this.appliedCoupon.value / 100);
+            else if (this.appliedCoupon.type === "fixed") discount = this.appliedCoupon.value;
+            else if (this.appliedCoupon.type === "shipping") shipping = 0;
+        }
+        const service = this.selectedServices.reduce((sum, s) => sum + s.price, 0);
+        const tax = (subtotal - discount + shipping + service) * 0.07;
+        const total = subtotal - discount + shipping + service + tax;
+        const totalWeight = this.calculateTotalWeight();
+
+        return {
+            subtotal,
+            discount,
+            shipping,
+            service,
+            tax,
+            total,
+            totalWeight
+        };
+    },
+
+    calculateItemWeight(item) {
+        return (item.weight * item.qty).toFixed(2);
+    },
+
+    calculateTotalWeight() {
+        return this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
+    },
+
+    calculateTotalVolume() {
+        return this.cartItems.reduce((sum, item) => {
+            const itemVolume = (item.length || 0) * (item.width || 0) * (item.height || 0);
+            return sum + item.qty * itemVolume;
+        }, 0);
+    },
+
+    calculateDeliveryRounds(opt) {
+        const totalWeight = this.calculateSummary().totalWeight;
+        const totalVolume = this.calculateTotalVolume();
+        if (!opt.capacity || !opt.volumeCapacity) {
+            return 1;
+        }
+        const roundsByWeight = Math.ceil(totalWeight / opt.capacity);
+        const roundsByVolume = Math.ceil(totalVolume / opt.volumeCapacity);
+        return Math.max(roundsByWeight, roundsByVolume);
+    },
+    //===== ฟังก์ชันในการคำนวณต่างๆ ===============
+
     renderCart() {
         const list = document.getElementById("cartItemList");
         list.innerHTML = "";
@@ -244,6 +275,348 @@ const CartApp = {
         this.renderTotalWeight();
     },
 
+    renderCouponList() {
+        const container = document.getElementById("couponList");
+        container.innerHTML = "";
+        this.coupons.forEach(coupon => {
+            const btn = document.createElement("button");
+            btn.className = "coupon-btn";
+            btn.classList.toggle("active", this.appliedCoupon?.code === coupon.code);
+            btn.innerText = coupon.label;
+            btn.onclick = () => this.applyCoupon(coupon.code);
+            container.appendChild(btn);
+        });
+        const msg = document.getElementById("discountMessage");
+        if (this.appliedCoupon?.code) {
+            msg.innerText = `ใช้คูปอง ${this.appliedCoupon.label} แล้ว`;
+            msg.style.color = "green";
+        } else {
+            msg.innerText = "";
+        }
+    },
+
+    applyCoupon(code) {
+        const coupon = this.coupons.find(c => c.code === code);
+        const msg = document.getElementById("discountMessage");
+        if (coupon) {
+            this.appliedCoupon = coupon;
+            msg.innerText = `ใช้คูปอง ${coupon.label} แล้ว`;
+            msg.style.color = "green";
+        } else {
+            this.appliedCoupon = {};
+            msg.innerText = "คูปองไม่ถูกต้อง";
+            msg.style.color = "red";
+        }
+        this.saveToStorage();
+        this.renderCouponList();
+        this.renderSummary();
+    },
+
+    renderSummary() {
+        const {
+            subtotal,
+            discount,
+            shipping,
+            service,
+            tax,
+            total,
+        } = this.calculateSummary();
+        document.getElementById("summaryDetails").innerHTML = `
+            <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
+            <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
+            <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
+            <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
+            <div class="summary-row summary-total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
+        `;
+    },
+
+    renderTotalWeight() {
+        const totalWeight = this.calculateTotalWeight();
+        const weightDisplay = document.getElementById("totalWeightDisplay");
+        if (weightDisplay) {
+            weightDisplay.innerText = `${totalWeight.toFixed(2)} กก.`;
+        }
+        this.getRecommendedShipping();
+    },
+
+    getRecommendedShipping() {
+        const recElement = document.getElementById("shippingRecommendation");
+        if (!recElement) return;
+
+        const shippingType = this.selectedShippingType;
+        if (shippingType === "pickup") {
+            recElement.style.display = 'none';
+            return;
+        }
+
+        recElement.style.display = 'block';
+        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
+        let recommendation = "";
+
+        const deliveryOptions = this.shippingOptionsData.delivery.sort((a, b) => b.capacity - a.capacity);
+        if (totalWeight > deliveryOptions[0].capacity) {
+            recommendation = "กรุณาติดต่อเจ้าหน้าที่เพื่อสอบถามค่าขนส่งสำหรับสินค้าขนาดใหญ่";
+        } else {
+            for (const option of deliveryOptions) {
+                if (totalWeight <= option.capacity) {
+                    recommendation = `แนะนำให้จัดส่งด้วย ${option.name}`;
+                }
+            }
+        }
+
+        if (!recommendation) {
+            recommendation = "ไม่พบตัวเลือกการจัดส่งที่เหมาะสม";
+        }
+
+        recElement.innerHTML = `<p class="recommendation-text">คำแนะนำ: ${recommendation}</p>`;
+    },
+
+    renderShipping() {
+        const container = document.getElementById("shipping");
+        container.innerHTML = "";
+        this.shipping.forEach(item => {
+            const checked = this.selectedShippingType === item.value ? "checked" : "";
+            const label = document.createElement("label");
+            label.classList.add("shipping-label");
+            label.innerHTML = `<input type="radio" name="shipping" value="${item.value}" ${checked}> ${item.label}`;
+            container.appendChild(label);
+        });
+        container.querySelectorAll('input[name="shipping"]').forEach(radio => {
+            radio.onchange = (e) => {
+                this.selectedShippingType = e.target.value;
+                this.selectedShippingOptions = {};
+                this.saveToStorage();
+                this.renderDeliveryOptions();
+                this.renderPickupOptions();
+                this.renderSummary();
+                this.getRecommendedShipping();
+            };
+        });
+        this.getRecommendedShipping();
+        this.renderPickupOptions();
+    },
+
+    renderDeliveryOptions() {
+        const container = document.getElementById("deliveryOptions");
+        container.innerHTML = "";
+
+        if (this.selectedShippingType !== "delivery") {
+            return;
+        }
+
+        const options = this.shippingOptionsData.delivery || [];
+        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
+        const totalVolume = this.calculateTotalVolume();
+
+        const currentSelected = this.selectedShippingOptions;
+        if (currentSelected?.capacity && totalWeight > currentSelected.capacity) {
+            this.selectedShippingOptions = {};
+        }
+
+        let recommendedOption = null;
+        const sortedOptions = [...options].sort((a, b) => a.capacity - b.capacity);
+        const suitableOption = sortedOptions.find(opt => totalWeight <= opt.capacity);
+
+        if (suitableOption) {
+            recommendedOption = suitableOption;
+        } else {
+            recommendedOption = sortedOptions[sortedOptions.length - 1];
+        }
+
+        if (!this.selectedShippingOptions.name) {
+            this.selectedShippingOptions = recommendedOption;
+        }
+
+        if (!options.length) {
+            container.innerHTML = `<p>ไม่มีตัวเลือกการจัดส่ง</p>`;
+        } else {
+            options.forEach(opt => {
+                const isTooHeavy = totalWeight > opt.capacity;
+                const label = document.createElement("label");
+                label.classList.add("delivery-label");
+                const disabled = isTooHeavy ? "disabled" : "";
+                const checked = this.selectedShippingOptions?.value === opt.value && !isTooHeavy ? "checked" : "";
+                label.innerHTML = `<input type="radio" name="deliveryOption" value="${opt.value}" ${checked} ${disabled}> ${opt.name} (+${opt.price})`;
+                container.appendChild(label);
+            });
+
+            // options.forEach(opt => {
+            //     // คำนวณจำนวนรอบสำหรับรถแต่ละคัน
+            //     const rounds = this.calculateDeliveryRounds(opt);
+            //     const pricePerRound = opt.price;
+            //     const finalPrice = rounds * pricePerRound;
+
+            //     console.log('finalPrice', finalPrice);
+            //     console.log('rounds', rounds);
+            //     console.log('opt', opt);
+                
+            //     const isTooHeavy = totalWeight > opt.capacity || totalVolume > opt.volumeCapacity; // เพิ่มการเช็คปริมาตร
+            //     const label = document.createElement("label");
+            //     label.classList.add("delivery-label");
+            //     const disabled = isTooHeavy ? "disabled" : "";
+            //     const checked = this.selectedShippingOptions?.value === opt.value && !isTooHeavy ? "checked" : "";
+
+            //     let labelText = `${opt.name} (+${finalPrice.toFixed(2)} บาท, ${rounds} รอบ)`;
+            //     if (isTooHeavy) {
+            //         labelText = `${opt.name} (+${finalPrice.toFixed(2)} บาท, ${rounds} รอบ)`;
+            //         // labelText = `${opt.name} (สินค้ามีขนาดเกินพิกัด)`;
+            //     }
+
+            //     label.innerHTML = `<input type="radio" name="deliveryOption" value="${opt.value}" ${checked} ${disabled}> ${labelText}`;
+            //     container.appendChild(label);
+            // });
+
+        }
+
+        container.querySelectorAll('input[name="deliveryOption"]').forEach(input => {
+            input.onchange = (e) => {
+                const selected = options.find(o => o.value === e.target.value);
+                if (selected) this.selectedShippingOptions = selected;
+                this.saveToStorage();
+                this.renderSummary();
+            };
+        });
+        this.renderSummary();
+    },
+
+    renderPickupOptions() {
+        const container = document.getElementById("pickupOptions");
+        container.innerHTML = "";
+        if (this.selectedShippingType !== "pickup") {
+            container.style.display = 'none';
+            return;
+        }
+        container.style.display = 'block';
+        const options = this.shippingOptionsData.pickup || [];
+        if (options.length === 0) {
+            container.innerHTML = `<p class="alert alert-warning">ไม่พบตัวเลือกสาขา</p>`;
+            return;
+        }
+        const dateContainer = document.createElement("div");
+        const dateLabel = document.createElement("label");
+        dateLabel.setAttribute("for", "pickupDateSelect");
+        dateLabel.className = "form-label";
+        dateLabel.innerHTML = `<strong>เลือกวันที่รับสินค้า:</strong>`;
+
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.id = "pickupDateSelect";
+        dateInput.className = "form-input mb-2";
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        if (this.selectedShippingOptions?.pickupDate) {
+            dateInput.value = this.selectedShippingOptions.pickupDate;
+        }
+        dateInput.onchange = (e) => {
+            if (!this.selectedShippingOptions) {
+                this.selectedShippingOptions = {};
+            }
+            this.selectedShippingOptions.pickupDate = e.target.value;
+            this.saveToStorage();
+        };
+
+        dateContainer.appendChild(dateLabel);
+        dateContainer.appendChild(dateInput);
+        container.appendChild(dateContainer);
+
+        const branchSelect = document.createElement("select");
+        branchSelect.id = "pickupBranchSelect";
+        branchSelect.className = "form-input mb-2";
+        branchSelect.innerHTML = `<option value="">เลือกสาขา</option>`;
+
+        options.forEach(branch => {
+            const option = document.createElement("option");
+            option.value = branch.value;
+            option.innerText = branch.name;
+            if (this.selectedShippingOptions?.value === branch.value) {
+                option.selected = true;
+            }
+            branchSelect.appendChild(option);
+        });
+
+        const branchContainer = document.createElement("div");
+        const branchLabel = document.createElement("label");
+        branchLabel.setAttribute("for", "pickupBranchSelect");
+        branchLabel.className = "form-label";
+        branchLabel.innerHTML = `<strong>เลือกสาขา:</strong>`;
+        branchContainer.appendChild(branchLabel);
+        branchContainer.appendChild(branchSelect);
+        container.appendChild(branchContainer);
+
+        const timeSlotContainer = document.createElement("div");
+        timeSlotContainer.id = "pickupTimeSlotContainer";
+        container.appendChild(timeSlotContainer);
+
+        branchSelect.onchange = (e) => {
+            const selectedBranch = options.find(b => b.value === e.target.value);
+            this.selectedShippingOptions = {
+                ...selectedBranch,
+                pickupDate: this.selectedShippingOptions?.pickupDate || "",
+                timeSlot: ""
+            };
+            this.saveToStorage();
+            this.renderPickupTimeSlots();
+            this.renderSummary();
+        };
+        this.renderPickupTimeSlots();
+    },
+
+    renderPickupTimeSlots() {
+        const container = document.getElementById("pickupTimeSlotContainer");
+        container.innerHTML = "";
+
+        const selectedTimeSlots = this.selectedShippingOptions?.timeSlots;
+        if (!selectedTimeSlots || selectedTimeSlots.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'block';
+        const timeSlotSelect = document.createElement("select");
+        timeSlotSelect.id = "pickupTimeSlotSelect";
+        timeSlotSelect.className = "form-input mb-3";
+        timeSlotSelect.innerHTML = `<option value="">เลือกช่วงเวลา</option>`;
+
+        selectedTimeSlots.forEach(slot => {
+            const option = document.createElement("option");
+            option.value = slot;
+            option.innerText = slot;
+            if (this.selectedShippingOptions?.timeSlot === slot) {
+                option.selected = true;
+            }
+            timeSlotSelect.appendChild(option);
+        });
+
+        const timeSlotLabel = document.createElement("label");
+        timeSlotLabel.setAttribute("for", "pickupTimeSlotSelect");
+        timeSlotLabel.className = "form-label";
+        timeSlotLabel.innerHTML = `<strong>เลือกช่วงเวลา:</strong>`;
+
+        container.appendChild(timeSlotLabel);
+        container.appendChild(timeSlotSelect);
+
+        timeSlotSelect.onchange = (e) => {
+            this.selectedShippingOptions.timeSlot = e.target.value;
+            this.saveToStorage();
+            this.renderSummary();
+        };
+    },
+
+    renderServiceOptions() {
+        const container = document.querySelector(".service-section .service-options");
+        if (!container) return;
+        container.innerHTML = "";
+        this.services.forEach(service => {
+            const label = document.createElement("label");
+            label.classList.add("service-label");
+            const isChecked = this.selectedServices.some(s => s.name === service.name) ? "checked" : "";
+            label.innerHTML = `<input type="checkbox" name="service" value="${service.name}" data-price="${service.price}" ${isChecked}> ${service.label} (+${service.price})`;
+            container.appendChild(label);
+        });
+        this.bindServiceEvents();
+    },
+
     updateItemDisplay(item) {
         const div = document.querySelector(`.cart-item[data-id='${item.id}']`);
         if (!div) return;
@@ -259,7 +632,6 @@ const CartApp = {
         this.saveToStorage();
     },
 
-    // =================== EVENTS ===================
     bindQuantityEvents() {
         const list = document.getElementById("cartItemList");
         list.addEventListener("click", (e) => {
@@ -312,389 +684,17 @@ const CartApp = {
         };
     },
 
-    // =================== EVENTS ===================
     bindCheckoutEvents() {
         document.getElementById("checkoutOrders").onclick = () => {
             if (this.selectedShippingType === "pickup") {
-                // MODIFIED: Check for both pickupDate and timeSlot
                 if (!this.selectedShippingOptions?.pickupDate || !this.selectedShippingOptions?.timeSlot) {
-                    // MODIFIED: Updated alert message
                     alert("กรุณาเลือกวันที่ สาขา และช่วงเวลาในการรับสินค้าให้ครบถ้วน");
-                    return; // หยุดการทำงาน
+                    return;
                 }
             }
             this.saveToStorage();
             redirectGet(pathConfig.BASE_WEB + 'user/checkout/');
         };
-    },
-
-    bindEvents() {
-        this.bindQuantityEvents();
-        this.bindRemoveEvents();
-        this.bindCouponEvents();
-        this.bindCheckoutEvents();
-    },
-
-    bindViewToggle() {
-        const listBtn = document.getElementById("listModeBtn");
-        const gridBtn = document.getElementById("gridModeBtn");
-        const setActive = (mode) => {
-            this.viewMode = mode;
-            listBtn.classList.toggle("active", mode === "list");
-            gridBtn.classList.toggle("active", mode === "grid");
-            this.renderCart();
-        };
-        listBtn.onclick = () => setActive("list");
-        gridBtn.onclick = () => setActive("grid");
-        setActive(this.viewMode);
-    },
-
-    // =================== COUPONS ===================
-    renderCouponList() {
-        const container = document.getElementById("couponList");
-        container.innerHTML = "";
-        this.coupons.forEach(coupon => {
-            const btn = document.createElement("button");
-            btn.className = "coupon-btn";
-            btn.classList.toggle("active", this.appliedCoupon?.code === coupon.code);
-            btn.innerText = coupon.label;
-            btn.onclick = () => this.applyCoupon(coupon.code);
-            container.appendChild(btn);
-        });
-        const msg = document.getElementById("discountMessage");
-        if (this.appliedCoupon?.code) {
-            msg.innerText = `ใช้คูปอง ${this.appliedCoupon.label} แล้ว`;
-            msg.style.color = "green";
-        } else {
-            msg.innerText = "";
-        }
-    },
-
-    applyCoupon(code) {
-        const coupon = this.coupons.find(c => c.code === code);
-        const msg = document.getElementById("discountMessage");
-        if (coupon) {
-            this.appliedCoupon = coupon;
-            msg.innerText = `ใช้คูปอง ${coupon.label} แล้ว`;
-            msg.style.color = "green";
-        } else {
-            this.appliedCoupon = {};
-            msg.innerText = "คูปองไม่ถูกต้อง";
-            msg.style.color = "red";
-        }
-        this.saveToStorage();
-        this.renderCouponList();
-        this.renderSummary();
-    },
-
-    // =================== SUMMARY ===================
-    renderSummary() {
-        const {
-            subtotal,
-            discount,
-            shipping,
-            service,
-            tax,
-            total,
-        } = this.calculateSummary();
-        document.getElementById("summaryDetails").innerHTML = `
-            <div class="summary-row"><span>รวม</span><span>${subtotal.toFixed(2)}</span></div>
-            <div class="summary-row"><span>ส่วนลด</span><span>-${discount.toFixed(2)}</span></div>
-            <div class="summary-row"><span>จัดส่ง</span><span>${shipping.toFixed(2)}</span></div>
-            <div class="summary-row"><span>บริการเสริม</span><span>${service.toFixed(2)}</span></div>
-            <div class="summary-row"><span>ภาษามูลค่าเพิ่ม 7%</span><span>${tax.toFixed(2)}</span></div>
-            <div class="summary-row summary-total"><span>ทั้งหมด</span><span>${total.toFixed(2)}</span></div>
-        `;
-    },
-
-    // =================== TOTAL WEIGHT ===================
-    renderTotalWeight() {
-        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
-        const weightDisplay = document.getElementById("totalWeightDisplay");
-        if (weightDisplay) {
-            weightDisplay.innerText = `${totalWeight.toFixed(2)} กก.`;
-        }
-        this.getRecommendedShipping();
-    },
-
-    // =================== SHIPPING RECOMMENDATION ===================
-    getRecommendedShipping() {
-        const recElement = document.getElementById("shippingRecommendation");
-        if (!recElement) return;
-
-        const shippingType = this.selectedShippingType;
-
-        if (shippingType === "pickup") {
-            recElement.style.display = 'none';
-            return;
-        }
-
-        recElement.style.display = 'block';
-        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
-        let recommendation = "";
-
-        const deliveryOptions = this.shippingOptionsData.delivery.sort((a, b) => b.capacity - a.capacity);
-
-        if (totalWeight > deliveryOptions[0].capacity) {
-            recommendation = "กรุณาติดต่อเจ้าหน้าที่เพื่อสอบถามค่าขนส่งสำหรับสินค้าขนาดใหญ่";
-        } else {
-            for (const option of deliveryOptions) {
-                if (totalWeight <= option.capacity) {
-                    recommendation = `แนะนำให้จัดส่งด้วย ${option.name}`;
-                }
-            }
-        }
-
-        if (!recommendation) {
-            recommendation = "ไม่พบตัวเลือกการจัดส่งที่เหมาะสม";
-        }
-
-        recElement.innerHTML = `<p class="recommendation-text">คำแนะนำ: ${recommendation}</p>`;
-    },
-
-    // =================== SHIPPING ===================
-    renderShipping() {
-        const container = document.getElementById("shipping");
-        container.innerHTML = "";
-        this.shipping.forEach(item => {
-            const checked = this.selectedShippingType === item.value ? "checked" : "";
-            const label = document.createElement("label");
-            label.classList.add("shipping-label");
-            label.innerHTML = `<input type="radio" name="shipping" value="${item.value}" ${checked}> ${item.label}`;
-            container.appendChild(label);
-        });
-        container.querySelectorAll('input[name="shipping"]').forEach(radio => {
-            radio.onchange = (e) => {
-                this.selectedShippingType = e.target.value;
-                this.selectedShippingOptions = {};
-                this.saveToStorage();
-                this.renderDeliveryOptions();
-                this.renderPickupOptions();
-                this.renderSummary();
-                this.getRecommendedShipping();
-            };
-        });
-        this.getRecommendedShipping();
-        this.renderPickupOptions();
-    },
-
-    renderDeliveryOptions() {
-        const container = document.getElementById("deliveryOptions");
-        container.innerHTML = "";
-
-        if (this.selectedShippingType !== "delivery") {
-            return;
-        }
-
-        const options = this.shippingOptionsData.delivery || [];
-        const totalWeight = this.cartItems.reduce((sum, item) => sum + item.qty * (item.weight || 0), 0);
-
-        const currentSelected = this.selectedShippingOptions;
-        if (currentSelected?.capacity && totalWeight > currentSelected.capacity) {
-            this.selectedShippingOptions = {};
-        }
-
-        let recommendedOption = null;
-        const sortedOptions = [...options].sort((a, b) => a.capacity - b.capacity);
-        const suitableOption = sortedOptions.find(opt => totalWeight <= opt.capacity);
-
-        if (suitableOption) {
-            recommendedOption = suitableOption;
-        } else {
-            recommendedOption = sortedOptions[sortedOptions.length - 1];
-        }
-
-        if (!this.selectedShippingOptions.name) {
-            this.selectedShippingOptions = recommendedOption;
-        }
-
-        if (!options.length) {
-            container.innerHTML = `<p>ไม่มีตัวเลือกการจัดส่ง</p>`;
-        } else {
-            options.forEach(opt => {
-                const isTooHeavy = totalWeight > opt.capacity;
-                const label = document.createElement("label");
-                label.classList.add("delivery-label");
-                const disabled = isTooHeavy ? "disabled" : "";
-                const checked = this.selectedShippingOptions?.value === opt.value && !isTooHeavy ? "checked" : "";
-                label.innerHTML = `<input type="radio" name="deliveryOption" value="${opt.value}" ${checked} ${disabled}> ${opt.name} (+${opt.price})`;
-                container.appendChild(label);
-            });
-        }
-
-        container.querySelectorAll('input[name="deliveryOption"]').forEach(input => {
-            input.onchange = (e) => {
-                const selected = options.find(o => o.value === e.target.value);
-                if (selected) this.selectedShippingOptions = selected;
-                this.saveToStorage();
-                this.renderSummary();
-            };
-        });
-        this.renderSummary();
-    },
-
-    // =================== PICKUP OPTIONS ===================
-    renderPickupOptions() {
-        const container = document.getElementById("pickupOptions");
-        container.innerHTML = "";
-
-        if (this.selectedShippingType !== "pickup") {
-            container.style.display = 'none';
-            return;
-        }
-
-        container.style.display = 'block';
-
-        const options = this.shippingOptionsData.pickup || [];
-
-        if (options.length === 0) {
-            container.innerHTML = `<p class="alert alert-warning">ไม่พบตัวเลือกสาขา</p>`;
-            return;
-        }
-
-        // =================== START: ADDED CODE ===================
-        // Render วันที่
-        const dateContainer = document.createElement("div");
-        const dateLabel = document.createElement("label");
-        dateLabel.setAttribute("for", "pickupDateSelect");
-        dateLabel.className = "form-label";
-        dateLabel.innerHTML = `<strong>เลือกวันที่รับสินค้า:</strong>`;
-
-        const dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.id = "pickupDateSelect";
-        dateInput.className = "form-input mb-2";
-
-        // Set min date to today to prevent selecting past dates
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-
-        // Set the value from storage if it exists
-        if (this.selectedShippingOptions?.pickupDate) {
-            dateInput.value = this.selectedShippingOptions.pickupDate;
-        }
-
-        // Event listener สำหรับการเลือกวันที่
-        dateInput.onchange = (e) => {
-            // Create selectedShippingOptions if it doesn't exist
-            if (!this.selectedShippingOptions) {
-                this.selectedShippingOptions = {};
-            }
-            this.selectedShippingOptions.pickupDate = e.target.value;
-            this.saveToStorage();
-        };
-
-        dateContainer.appendChild(dateLabel);
-        dateContainer.appendChild(dateInput);
-        container.appendChild(dateContainer);
-        // =================== END: ADDED CODE ===================
-
-        // Render สาขา
-        const branchSelect = document.createElement("select");
-        branchSelect.id = "pickupBranchSelect";
-        branchSelect.className = "form-input mb-2";
-        branchSelect.innerHTML = `<option value="">เลือกสาขา</option>`;
-
-        options.forEach(branch => {
-            const option = document.createElement("option");
-            option.value = branch.value;
-            option.innerText = branch.name;
-            if (this.selectedShippingOptions?.value === branch.value) {
-                option.selected = true;
-            }
-            branchSelect.appendChild(option);
-        });
-
-        const branchContainer = document.createElement("div");
-        const branchLabel = document.createElement("label");
-        branchLabel.setAttribute("for", "pickupBranchSelect");
-        branchLabel.className = "form-label";
-        branchLabel.innerHTML = `<strong>เลือกสาขา:</strong>`;
-        branchContainer.appendChild(branchLabel);
-        branchContainer.appendChild(branchSelect);
-        container.appendChild(branchContainer);
-
-        // Render ช่วงเวลา
-        const timeSlotContainer = document.createElement("div");
-        timeSlotContainer.id = "pickupTimeSlotContainer";
-        container.appendChild(timeSlotContainer);
-
-        // Event listener สำหรับการเปลี่ยนสาขา
-        branchSelect.onchange = (e) => {
-            const selectedBranch = options.find(b => b.value === e.target.value);
-            // Preserve the selected date, but reset the time slot
-            this.selectedShippingOptions = {
-                ...selectedBranch,
-                pickupDate: this.selectedShippingOptions?.pickupDate || "",
-                timeSlot: ""
-            };
-            this.saveToStorage();
-            this.renderPickupTimeSlots();
-            this.renderSummary();
-        };
-
-        this.renderPickupTimeSlots();
-    },
-
-    renderPickupTimeSlots() {
-        const container = document.getElementById("pickupTimeSlotContainer");
-        container.innerHTML = "";
-
-        // Check the selectedShippingOptions object for a timeSlots array
-        const selectedTimeSlots = this.selectedShippingOptions?.timeSlots;
-
-        if (!selectedTimeSlots || selectedTimeSlots.length === 0) {
-            container.style.display = 'none';
-            return;
-        }
-
-        container.style.display = 'block';
-
-        const timeSlotSelect = document.createElement("select");
-        timeSlotSelect.id = "pickupTimeSlotSelect";
-        timeSlotSelect.className = "form-input mb-3";
-        timeSlotSelect.innerHTML = `<option value="">เลือกช่วงเวลา</option>`;
-
-        selectedTimeSlots.forEach(slot => {
-            const option = document.createElement("option");
-            option.value = slot;
-            option.innerText = slot;
-            if (this.selectedShippingOptions?.timeSlot === slot) {
-                option.selected = true;
-            }
-            timeSlotSelect.appendChild(option);
-        });
-
-        const timeSlotLabel = document.createElement("label");
-        timeSlotLabel.setAttribute("for", "pickupTimeSlotSelect");
-        timeSlotLabel.className = "form-label";
-        timeSlotLabel.innerHTML = `<strong>เลือกช่วงเวลา:</strong>`;
-
-        container.appendChild(timeSlotLabel);
-        container.appendChild(timeSlotSelect);
-
-        // Event listener สำหรับการเลือกช่วงเวลา
-        timeSlotSelect.onchange = (e) => {
-            // Update the timeSlot property on the existing selectedShippingOptions object
-            this.selectedShippingOptions.timeSlot = e.target.value;
-            this.saveToStorage();
-            this.renderSummary();
-        };
-    },
-
-    // =================== SERVICE ===================
-    renderServiceOptions() {
-        const container = document.querySelector(".service-section .service-options");
-        if (!container) return;
-        container.innerHTML = "";
-        this.services.forEach(service => {
-            const label = document.createElement("label");
-            label.classList.add("service-label");
-            const isChecked = this.selectedServices.some(s => s.name === service.name) ? "checked" : "";
-            label.innerHTML = `<input type="checkbox" name="service" value="${service.name}" data-price="${service.price}" ${isChecked}> ${service.label} (+${service.price})`;
-            container.appendChild(label);
-        });
-        this.bindServiceEvents();
     },
 
     bindServiceEvents() {
@@ -719,7 +719,27 @@ const CartApp = {
         });
     },
 
-    // =================== INIT ===================
+    bindViewToggle() {
+        const listBtn = document.getElementById("listModeBtn");
+        const gridBtn = document.getElementById("gridModeBtn");
+        const setActive = (mode) => {
+            this.viewMode = mode;
+            listBtn.classList.toggle("active", mode === "list");
+            gridBtn.classList.toggle("active", mode === "grid");
+            this.renderCart();
+        };
+        listBtn.onclick = () => setActive("list");
+        gridBtn.onclick = () => setActive("grid");
+        setActive(this.viewMode);
+    },
+
+    bindEvents() {
+        this.bindQuantityEvents();
+        this.bindRemoveEvents();
+        this.bindCouponEvents();
+        this.bindCheckoutEvents();
+    },
+
     init() {
         this.loadFromStorage();
         this.renderServiceOptions();

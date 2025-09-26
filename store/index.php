@@ -15,7 +15,11 @@
 
   <?php include 'template/head-bar.php'; ?>
   <main>
-    <div id="sections_root_store"></div>
+    <div id="sections_root_store">
+      <div class="container">
+          <div id="mainContent"></div>
+      </div>
+    </div>
   </main>
   <?php include 'template/footer-bar.php'; ?>
 
@@ -40,7 +44,7 @@
       // ดึง sections และ sort ก่อน render
       const sections = await fetchIndexData("getSectionItems", service);
       sections.data.sort((a, b) => a.sort - b.sort);
-      renderSections("#sections_root_store", sections.data);
+      renderSections("#mainContent", sections.data);
 
       // เก็บ mapping renderer
       const renderMap = {

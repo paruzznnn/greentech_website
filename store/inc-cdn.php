@@ -15,10 +15,11 @@ define('BASE_PATH', $scheme . '://' . $host . $path);
 <!-- <link href="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="<?php echo BASE_PATH ?>node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script> -->
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script> -->
 
 <!-- Bootstrap 4 + Popper -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
 
@@ -40,7 +41,7 @@ define('BASE_PATH', $scheme . '://' . $host . $path);
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-<link rel="stylesheet" href="<?php echo BASE_PATH ?>node_modules/owlcarousel/dist/assets/owlcarousel.min.css"/>
+<link rel="stylesheet" href="<?php echo BASE_PATH ?>node_modules/owlcarousel/dist/assets/owlcarousel.min.css" />
 <script src="<?php echo BASE_PATH ?>node_modules/owlcarousel/dist/owlcarousel.min.js"></script>
 
 <link href="<?php echo BASE_PATH ?>node_modules/datatables/media/css/dataTables.min.css" rel="stylesheet">
@@ -50,3 +51,9 @@ define('BASE_PATH', $scheme . '://' . $host . $path);
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 <!-- Fancybox JS -->
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-fileinput/themes/fas/theme.min.js"></script>

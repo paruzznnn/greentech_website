@@ -38,9 +38,9 @@ $action = $dataJson['action'];
 $timeZone = isset($_SESSION['user_timezone']) ? $_SESSION['user_timezone'] : '';
 $dateNow = date('Y-m-d H:i:s');
 
-if ($action == "checkRegister") {
+try {
 
-    try {
+    if ($action == "checkRegister") {
         $register_email = isset($dataJson['register_email']) ? (string) $dataJson['register_email'] : '';
         $register_password = isset($dataJson['register_password']) ? (string) $dataJson['register_password'] : '';
         $accept_policy = isset($dataJson['accept_policy']) && $dataJson['accept_policy'] == "on" ? 1 : 0;
@@ -55,7 +55,7 @@ if ($action == "checkRegister") {
         $ins_id = insertDataAndGetId($conn_cloudpanel, 'ecm_member', $register_data);
         $checkIns = $ins_id ? true : false;
         $data = [
-            "id" => $ins_id, 
+            "id" => $ins_id,
             "action" => "checkLogin"
         ];
         http_response_code(200);
@@ -64,25 +64,21 @@ if ($action == "checkRegister") {
             "status" => $checkIns
         ];
         echo json_encode($response);
-    } catch (mysqli_sql_exception $e) {
-        http_response_code(400);
-        $response = [
-            "error" => "An error occurred.: " . $e->getMessage()
-        ];
-        echo json_encode($response);
-        exit;
-    } finally {
-        $conn_cloudpanel->close();
-        exit;
-    }
-    
-} else {
 
+    } else {
+        http_response_code(400);
+        echo json_encode([
+            "error" => "Unauthorized"
+        ]);
+    }
+
+} catch (mysqli_sql_exception $e) {
     http_response_code(400);
-    echo json_encode([
-        "error" => "Unauthorized"
-    ]);
+    $response = [
+        "error" => "An error occurred.: " . $e->getMessage()
+    ];
+    echo json_encode($response);
+} finally {
+    $conn_cloudpanel->close();
     exit;
 }
-
-?>
