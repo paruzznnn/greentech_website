@@ -1171,6 +1171,7 @@ Sidenav
 /* ไอคอนซ้ายในเมนู */
 .menu-list a i,
 .submenu-list a i {
+    color: #555;
     margin-right: 10px;
     min-width: 18px;
 }

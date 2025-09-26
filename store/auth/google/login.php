@@ -97,8 +97,10 @@ if (!isset($_GET['code'])) {
 }
 
 $tokenData = $googleAuth->getAccessToken($_GET['code']);
-if (isset($tokenData['access_token'])) {
-    try {
+
+try {
+    
+    if (isset($tokenData['access_token'])) {
         $profile = $googleAuth->getUserProfile($tokenData['access_token']);
         if (!$profile) {
             throw new Exception("Failed to retrieve Google user profile.");
@@ -173,19 +175,18 @@ if (isset($tokenData['access_token'])) {
             ];
             echo '<script language="javascript">window.location = "../../user/";</script>';
         }
-    } catch (Exception $e) {
-        // Log the error message
-        error_log("Error during Google login: " . $e->getMessage());
-        echo '<script>alert("An error occurred during login. Please try again later."); window.location = "../../login/";</script>';
-    } finally {
-        $conn_cloudpanel->close();
-        exit;
+    } else {
+        echo "Failed to get access token.";
+        echo '<pre>';
+        print_r($tokenData);
+        echo '</pre>';
     }
 
-} else {
-    echo "Failed to get access token.";
-    echo '<pre>';
-    print_r($tokenData);
-    echo '</pre>';
+} catch (Exception $e) {
+    // Log the error message
+    error_log("Error during Google login: " . $e->getMessage());
+    echo '<script>alert("An error occurred during login. Please try again later."); window.location = "../../login/";</script>';
+} finally {
+    $conn_cloudpanel->close();
     exit;
 }
