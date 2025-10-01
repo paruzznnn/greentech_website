@@ -1,6 +1,6 @@
 <?php
 session_start();
-include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
 
 $user_id = $_SESSION['user_id'];
 $first = $_POST['first_name'] ?? '';
@@ -24,7 +24,7 @@ $old_img = $row['profile_img'];
 
 // ถ้ามีการอัปโหลด
 if (!empty($profile_img) && is_uploaded_file($tmp_img)) {
-    move_uploaded_file($tmp_img, $_SERVER['DOCUMENT_ROOT'] . "/trandar/public/img/" . $profile_img);
+    move_uploaded_file($tmp_img, $_SERVER['DOCUMENT_ROOT'] . "/greentech/public/img/" . $profile_img);
 } else {
     $profile_img = $old_img;
 }

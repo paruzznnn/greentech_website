@@ -215,60 +215,7 @@ $contentSections = [
     <?php include 'template/header.php' ?>
     <?php include 'template/navbar_slide.php' ?>
 
-    <?php
-    $content = '<div class="content-sticky" id="page_about">';
-    $content .= '<div class="container" style="max-width: 90%;">';
-    $content .= '<div class="box-content">';
-
-    foreach ($contentSections as $section) {
-        $content .= '<div class="row">';
-
-        if (isset($section['image'])) {
-            $content .= '<div class="col-md-6">';
-            $content .= '<img style="width: 100%;" src="' . $section['image'] . '" alt="">';
-            $content .= '</div>';
-        }
-
-        if (isset($section['texts']) && is_array($section['texts'])) {
-            $content .= '<div class="col-md-' . (isset($section['image']) ? '6' : '12') . '">';
-            $content .= '<div class="d-flex justify-content-between">';
-            foreach ($section['texts'] as $text) {
-                $content .= '<div style="width: 32%; padding: 0 10px;">' . $text . '</div>';
-            }
-            $content .= '</div></div>';
-            $content .= '<div class="col-12"><hr></div>';
-        }
-
-        if (isset($section['quote'])) {
-            $quote = $section['quote'];
-            $content .= '
-            <div style="text-align: center; padding: 40px 20px; font-style: italic; font-size: 25px; position: relative; width: 100%;">
-                <div style="font-size: 40px; color: #ccc; position: absolute; left: 10px; top: 0;">“</div>
-                <p style="margin: 0 40px;">' . $quote['text'] . '</p>
-                <div style="margin-top: 20px; font-style: normal;">
-                    <strong>' . $quote['author'] . '</strong><br>' . $quote['position'] . '
-                </div>
-            </div>';
-        }
-
-        if (isset($section['text']) && !isset($section['texts'])) {
-            $content .= '<div class="col-md-' . (isset($section['image']) ? '6' : '12') . '">';
-            $content .= '<p>' . $section['text'] . '</p>';
-            $content .= '</div>';
-        }
-
-        $content .= '</div>';
-
-        if (isset($section['image'])) {
-        }
-    }
-
-    $content .= '</div>';
-    $content .= '</div>';
-    $content .= '</div>';
-
-    echo $content;
-    ?>
+  
 
     <?php include 'template/footer.php' ?>
 

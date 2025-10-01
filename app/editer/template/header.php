@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // เชื่อมต่อฐานข้อมูล
 // include '../../lib/connect.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
 
 // ตรวจสอบว่า session มี user_id หรือไม่
 if (isset($_SESSION['user_id'])) {

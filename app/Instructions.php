@@ -136,37 +136,7 @@ function getTextByLang($key) {
     <?php include 'template/header.php'?>
     <?php include 'template/navbar_slide.php'?>
 
-    <div class="container my-5" style="color: #555; max-width: 90%;">
-        <h2 class="text-center fw-bold mb-4"><?= getTextByLang('instructions_title') ?></h2>
-        <h4 class="text-center mb-4"><?= getTextByLang('software_subtitle') ?></h4>
-
-        <div class="mb-4">
-            <p><a href="https://www.insul.co.nz/media/45381/insul10-setup-signed.msi" class="text-primary"><?= getTextByLang('link_win') ?></a></p>
-            <p><a href="https://www.insul.co.nz/media/45384/Insul1006.dmg" class="text-primary"><?= getTextByLang('link_mac') ?></a></p>
-            <p><a href="https://www.trandar.com/wp-content/uploads/2021/05/Instructions-for-Upgrading-the-key-RemoteUtility.pdf" class="text-primary"><?= getTextByLang('link_update') ?></a></p>
-        </div>
-
-        <hr>
-
-        <h5 class="fw-bold mt-4"><?= getTextByLang('install_title') ?></h5>
-        <p><?= getTextByLang('install_pre_text') ?></p>
-
-        <p><strong><?= getTextByLang('how_to_install') ?></strong></p>
-        <ol>
-            <li>
-                <?= getTextByLang('step1') ?>
-            </li>
-            <li>
-                <?= getTextByLang('step2') ?> <a href="https://www.trandar.com/wp-content/uploads/2021/05/HASPUserSetup-1.zip" class="text-primary">HASPUserSetup.exe</a> <?= getTextByLang('step2_link_text') ?>
-            </li>
-            <li>
-                <?= getTextByLang('step3') ?> <a href="https://www.trandar.com/wp-content/uploads/2021/05/Update90r23.zip" class="text-primary"><?= getTextByLang('step3_link_text') ?></a>
-            </li>
-            <li>
-                <?= getTextByLang('step4') ?>
-            </li>
-        </ol>
-    </div>
+   
 
     <?php include 'template/footer.php'?>
 

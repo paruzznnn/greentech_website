@@ -54,7 +54,7 @@
     <?php include 'template/header.php'; ?>
         <?php
     if (session_status() === PHP_SESSION_NONE) session_start();
-    include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
 
     $user_id = $_SESSION['user_id']; // ต้องแน่ใจว่า login แล้ว
 
@@ -77,7 +77,7 @@
                 <div class="card-body text-center">
                     <h3 class="mb-4">ข้อมูลส่วนตัว</h3>
                     <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-                        <img src="/trandar/public/img/<?php echo htmlspecialchars($user['profile_img']); ?>" alt="รูปโปรไฟล์" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                        <img src="/greentech/public/img/<?php echo htmlspecialchars($user['profile_img']); ?>" alt="รูปโปรไฟล์" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                         <!-- <img src="img/<?php echo htmlspecialchars($user['profile_img']); ?>" alt="รูปโปรไฟล์" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;"> -->
                         <div class="form-group text-start">
                             <label for="profile_img">เปลี่ยนรูปภาพ:</label>

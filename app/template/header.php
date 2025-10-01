@@ -108,7 +108,7 @@ if ($result->num_rows > 0) {
     $meta = $result->fetch_assoc();
 }
 
-$logo_path = '../public/img/LOGOTRAND.png';
+$logo_path = 'https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png';
 $logo_id_for_display = 1;
 
 $stmt_logo = $conn->prepare("SELECT image_path FROM logo_settings WHERE id = ?");
@@ -157,11 +157,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 <meta property="og:description"
     content="<?= $meta['og_description'] ?? $meta['meta_description'] ?? 'Trandar ราคาถูก มีบริการหลังการขาย' ?>">
 <meta property="og:type" content="website">
-<meta property="og:image" content="<?= $meta['og_image'] ?? '../../public/img/LOGO TRANDAR.png' ?>">
+<meta property="og:image" content="<?= $meta['og_image'] ?? 'https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png' ?>">
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XB331XFZKJ"></script>
-<script>
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB331XFZKJ"></script> -->
+<!-- <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 </div>
 
 
-<div id="background-blur"></div>
+<div id="background-blur"></div> -->
 
 <style>
 /* ------------------------------------------------------------- */
@@ -566,9 +566,9 @@ a {
             <a href="#" id="logout-btn" style="display:none;">
                 <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
             </a>
-            <a href="https://www.trandar.com/store/" target="_blank" class="store-btn">
+            <!-- <a href="https://www.trandar.com/store/" target="_blank" class="store-btn">
                 Trandar Store <i class="fas fa-shopping-cart" style="margin-left: 8px;"></i>
-            </a>
+            </a> -->
         </div>
 
           <div>
@@ -581,19 +581,19 @@ a {
         </select>
     </div>
         <div class="header-social-links">
-            <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+            <a href="#" target="_blank">
                 <i class="fab fa-facebook-square"></i>
             </a>
-            <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+            <a href="#" target="_blank">
                 <i class="fab fa-youtube"></i>
             </a>
-            <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+            <a href="#" target="_blank">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="https://lin.ee/yoSCNwF" target="_blank">
+            <a href="#" target="_blank">
                 <i class="fab fa-line"></i>
             </a>
-            <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+            <a href="#" target="_blank">
                 <i class="fab fa-tiktok"></i>
             </a>
         </div>
@@ -605,7 +605,7 @@ a {
         <div class="hamburger" style="color: #555;" onclick="toggleMobileNav()">☰</div>
     </div>
     <div class="mobile-logo-container">
-        <a href="https://www.trandar.com">
+        <a href="https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
     </div>
@@ -629,8 +629,8 @@ a {
                     <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
                 </a>
                 <hr style="margin: 10px 0; border-color: #ddd;">
-                <a href="https://www.trandar.com/store/" target="_blank"><i class="fas fa-shopping-cart"></i>Trandar
-                    Store</a>
+                <!-- <a href="https://www.trandar.com/store/" target="_blank"><i class="fas fa-shopping-cart"></i>Trandar
+                    Store</a> -->
                 <div class="language-select-container" style="padding: 12px 16px;">
                     <img id="current-flag-mobile" src="https://flagcdn.com/th.svg" alt="Thai Flag" class="flag-icon"
                         onclick="toggleFlagDropdown('mobile')">
@@ -653,19 +653,19 @@ a {
                     </div>
                 </div>
                 <div class="header-social-links" style="padding: 12px 16px;">
-                    <a href="https://www.facebook.com/trandaracoustic/" target="_blank">
+                    <a href="#" target="_blank">
                         <i class="fab fa-facebook-square"></i>
                     </a>
-                    <a href="https://www.youtube.com/channel/UCewsEEtw8DOwSWoQ6ae_Uwg/" target="_blank">
+                    <a href="#" target="_blank">
                         <i class="fab fa-youtube"></i>
                     </a>
-                    <a href="https://www.instagram.com/trandaracoustics/" target="_blank">
+                    <a href="#" target="_blank">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="https://lin.ee/yoSCNwF" target="_blank">
+                    <a href="#" target="_blank">
                         <i class="fab fa-line"></i>
                     </a>
-                    <a href="https://www.tiktok.com/@trandaracoustics" target="_blank">
+                    <a href="#" target="_blank">
                         <i class="fab fa-tiktok"></i>
                     </a>
                 </div>
@@ -716,11 +716,11 @@ a {
                 <div class="card">
                     <section class="card-body">
                         <div style="text-align: center;">
-                            <img class="" style="width: 70%;" src="../public/img/trandar.jpg" alt="">
+                            <img class="" style="width: 70%" src="https://www.trandar.com//public/news_img/Green%20Tech%20Leadership%20(png).png" alt="">
                         </div>
                         <h6 style="text-align: center; color: #555;" class="mt-2">
                             <span><i class="fas fa-unlock"></i></span>
-                            <span data-key-lang="Pleaselogin" lang="US">Please log in</span>
+                            <span data-key-lang="Pleaselogin" lang="US">Please login</span>
                         </h6>
                         <hr>
                         <form id="loginModal" action="" method="post">

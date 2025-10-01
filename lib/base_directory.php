@@ -13,8 +13,8 @@ $port = isset($urlParts['port']) ? ':' . $urlParts['port'] : '';
 
 // ตั้งค่าตาม scheme
 if ($scheme === 'http') {
-    $fixedPath = '/trandar/app/admin/';
-    $newPath = '/trandar/';
+    $fixedPath = '/greentech/app/admin/';
+    $newPath = '/greentech/';
 } else {
     $fixedPath = '/app/admin/';
     $newPath = '/';

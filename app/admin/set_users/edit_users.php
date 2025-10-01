@@ -196,7 +196,7 @@ $text = [
 <html lang="<?php echo $lang; ?>">
 <head>
     <title><?php echo $text[$lang]['page_title']; ?></title>
-    <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
+    <link rel="icon" type="image/x-icon" href="https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png">
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
     <script src="../../../inc/jquery/js/jquery-ui.min.js"></script>

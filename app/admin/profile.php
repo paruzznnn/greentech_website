@@ -146,7 +146,7 @@ $currentLang = $translations[$lang];
 
     <?php include 'template/header.php'; ?>
         <?php
-    include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
 
     $user_id = $_SESSION['user_id']; // ต้องแน่ใจว่า login แล้ว
 

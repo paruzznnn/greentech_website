@@ -21,8 +21,8 @@ if (isset($_GET['lang'])) {
     }
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/connect.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/trandar/lib/base_directory.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/base_directory.php';
 
 // กำหนด URL ของรูปโปรไฟล์เริ่มต้น
 $default_profile_img = 'https://as1.ftcdn.net/jpg/01/12/09/12/1000_F_112091233_xghsriqmHzk4sq71lWBL4q0e7n9QJKX6.jpg';
@@ -78,7 +78,7 @@ function getTranslation($key, $lang, $translations) {
             <span class="toggle-button" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </span>
-            <a href="https://www.trandar.com/app/admin/dashboard.php"><img class="logo" src="<?php echo $new_path; ?>public/img/LOGOTRAND.png" alt=""></a>
+            <a href="#"><img class="logo" src="https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png" alt=""></a>
         </div>
 
         <div class="header-top-right dropdown-wrapper">

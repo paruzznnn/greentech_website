@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>editer Dashboard</title>
-    <link rel="icon" type="image/x-icon" href="../public/img/q-removebg-preview1.png">
+    <link rel="icon" type="image/x-icon" href="../public/img/greentechlogo.png">
     <?php include 'inc_head.php'; ?>
     <link href="css/index_.css?v=<?= time(); ?>" rel="stylesheet">
     <style>

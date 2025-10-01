@@ -144,7 +144,7 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $text['page_title'] ?></title>
 
-    <link rel="icon" type="image/x-icon" href="../../../public/img/q-removebg-preview1.png">
+    <link rel="icon" type="image/x-icon" href="https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png">
 
     <link href="../../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
     <script src="../../../inc/jquery/js/jquery-3.6.0.min.js"></script>
@@ -219,7 +219,7 @@ if (isset($_GET['id'])) {
                         <label><?= $text['og_image'] ?></label>
                         <input type="file" name="og_image" class="form-control">
                         <?php
-                        $defaultImage = '../../public/img/q-removebg-preview1.png';
+                        $defaultImage = '../../public/img/greentechlogo.png';
                         $ogImagePath = !empty($meta['og_image']) ? htmlspecialchars($meta['og_image']) : $defaultImage;
                         ?>
                         <img src="<?= $ogImagePath ?>" style="max-height: 100px; max-width: 150px; object-fit: contain; border:1px solid #ccc; padding: 4px;" class="mt-2">

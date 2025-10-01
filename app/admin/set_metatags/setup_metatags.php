@@ -51,7 +51,7 @@ $og_title = $_POST['og_title'] ?? '';
 $og_description = $_POST['og_description'] ?? '';
 $id = $_POST['id'] ?? null;
 
-$default_image = '../../public/img/q-removebg-preview1.png'; // ✅ default
+$default_image = '../../public/img/greentechlogo.png'; // ✅ default
 $og_image_path = $default_image;
 
 if (isset($_FILES['og_image']) && $_FILES['og_image']['error'] === UPLOAD_ERR_OK) {

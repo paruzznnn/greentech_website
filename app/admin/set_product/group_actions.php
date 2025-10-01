@@ -15,8 +15,8 @@ $script_name = $_SERVER['SCRIPT_NAME'];
 $base_uri = str_replace(basename($script_name), '', $script_name);
 
 $root_app_uri = '/';
-if (strpos($base_uri, '/trandar/') !== false) {
-    $root_app_uri = '/trandar/';
+if (strpos($base_uri, '/greentech/') !== false) {
+    $root_app_uri = '/greentech/';
 }
 
 $root_url = $scheme . '://' . $host . $port . $root_app_uri;

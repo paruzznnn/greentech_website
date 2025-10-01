@@ -1,4 +1,4 @@
-<link rel="icon" type="image/x-icon" href="../../public/img/q-removebg-preview1.png">
+<link rel="icon" type="image/x-icon" href="../../public/img/greentechlogo.png">
 
     <link href="../../inc/jquery/css/jquery-ui.css" rel="stylesheet">
 
