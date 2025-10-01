@@ -13,9 +13,9 @@
         header("Location: index.php");
         exit;
     } 
-  
-    $oid       = trim($data['oid']        ?? '');
-    $redirect_url       = trim($data['redirect_url']        ?? '');
+ 
+    $oid        = trim($data['oid']         ?? '');
+    $redirect_url        = trim($data['redirect_url']         ?? '');
     $firstname  = trim($data['firstname']   ?? '');
     $lastname   = trim($data['lastname']    ?? '');
     $email      = trim($data['email']       ?? '');
@@ -38,11 +38,11 @@
         $row = $result->fetch_assoc();
         session_regenerate_id(true);
         $_SESSION['email'] = $email;
-        $_SESSION['role_id']  = (int) $role_id;
-        $_SESSION['logged_in']  = true;
+        $_SESSION['role_id']   = (int) $role_id;
+        $_SESSION['logged_in']   = true;
         
         $_SESSION['oid']       = $oid;
-        $_SESSION['redirect_url']       = $redirect_url;
+        $_SESSION['redirect_url']        = $redirect_url;
         header("Location: admin/dashboard.php");
         exit;
     }
@@ -70,13 +70,33 @@
         echo json_encode(['status' => false, 'message' => 'Insert failed: ' . $insert->error]);
         exit;
     }
+
+    // ส่วนโค้ดที่เพิ่มเข้าไปเพื่อบันทึกข้อมูลในตาราง acc_user_roles
+    $new_user_id = $conn->insert_id; 
+    $insert_role = $conn->prepare("INSERT INTO acc_user_roles (user_id, role_id) VALUES (?, ?)");
+    if (!$insert_role) {
+        http_response_code(500);
+        echo json_encode(['status' => false, 'message' => 'Prepare failed for acc_user_roles: ' . $conn->error]);
+        exit;
+    }
+    $insert_role->bind_param(
+        "ii",
+        $new_user_id,
+        $role_id
+    );
+    if (!$insert_role->execute()) {
+        http_response_code(500);
+        echo json_encode(['status' => false, 'message' => 'Insert failed for acc_user_roles: ' . $insert_role->error]);
+        exit;
+    }
+    
     session_regenerate_id(true);
-    $_SESSION['email']      = $email;
-    $_SESSION['role_id']    = $role_id;
-    $_SESSION['logged_in']  = true;
+    $_SESSION['email']       = $email;
+    $_SESSION['role_id']     = $role_id;
+    $_SESSION['logged_in']   = true;
     
     $_SESSION['oid']       = $oid;
-    $_SESSION['redirect_url']       = $redirect_url;
+    $_SESSION['redirect_url']        = $redirect_url;
     header("Location: admin/dashboard.php");
     exit;
 ?>
