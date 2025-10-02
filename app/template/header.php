@@ -605,8 +605,8 @@ a {
         <div class="hamburger" style="color: #555;" onclick="toggleMobileNav()">☰</div>
     </div>
     <div class="mobile-logo-container">
-        <a href="https://www.trandar.com//public/news_img/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD_5.png">
-            <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
+        <a href="https://www.greentechleadership.com">
+            <img class="logo" src="https://www.trandar.com//public/news_img/photo_2025-09-24_12-52-19.jpg">
         </a>
     </div>
     <div class="header-mobile-right">
