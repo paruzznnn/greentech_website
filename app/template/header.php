@@ -546,7 +546,7 @@ a {
 
 <div class="header-top">
     <div class="header-top-left">
-        <a href="https://www.trandar.com">
+        <a href="https://www.greentechleadership.com">
             <img class="logo" src="<?= $logo_path ?>" alt="Website Logo">
         </a>
         <div id="current-date" style="margin-left: 20px; color:#555; font-size: 16px; font-weight: 500;"></div>
