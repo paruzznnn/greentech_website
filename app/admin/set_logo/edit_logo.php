@@ -303,7 +303,7 @@ $stmt_contact->close();
             </h4>
             <input type="hidden" name="contact_settings_id" value="<?= htmlspecialchars($contact_settings_id) ?>">
 
-            <div class="row mb-3">
+            <!-- <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="trandar_store_link" class="form-label"><?= $text['link_trandar_store'] ?></label>
                     <input type="url" class="form-control" id="trandar_store_link" name="trandar_store_link" value="<?= htmlspecialchars($contact_settings['trandar_store_link']) ?>">
@@ -312,7 +312,7 @@ $stmt_contact->close();
                     <label for="trandar_store_text" class="form-label"><?= $text['text_trandar_store'] ?></label>
                     <input type="text" class="form-control" id="trandar_store_text" name="trandar_store_text" value="<?= htmlspecialchars($contact_settings['trandar_store_text']) ?>">
                 </div>
-            </div>
+            </div> -->
 
             <div class="row mb-3">
                 <div class="col-md-6">
