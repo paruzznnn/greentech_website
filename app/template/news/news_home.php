@@ -24,6 +24,7 @@ $descriptionCol = 'description_news' . ($lang !== 'th' ? '_' . $lang : '');
 $contentCol = 'content_news' . ($lang !== 'th' ? '_' . $lang : '');
 
 // --- MODIFIED: Select all four language columns for news content and ADD 'kr' columns ---
+// ดึงมา 5 ข่าวเหมือนเดิม (1 ข่าวหลัก + 4 ข่าวรอง)
 $sql = "SELECT 
             dn.news_id, 
             dn.subject_news, 
@@ -85,7 +86,7 @@ if ($result->num_rows > 0) {
 ?>
 
 <style>
-    /* ... (CSS styles remain the same) ... */
+    /* ... (CSS styles ที่มีอยู่) ... */
     .card-premium {
         border: none;
         border-radius: 6px;
@@ -242,6 +243,47 @@ if ($result->num_rows > 0) {
     .carousel-control-next-icon {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
+
+    /* === NEW/MODIFIED STYLES FOR SUB NEWS LAYOUT FIX === */
+    .sub-news-container {
+        /* กำหนดความสูงสูงสุดให้เท่ากับความสูงของ col-md-4 และกำหนดให้มี Scrollbar */
+        height: 100%; /* ให้มีความสูงเท่ากับ col-md-4 ที่เป็น flex-column */
+        max-height: 100%;
+        overflow-y: auto;
+        /* ปรับ padding ให้ดูดีขึ้น */
+        padding-right: 5px; 
+    }
+
+    .sub-news-grid {
+        /* ใช้ CSS Grid เพื่อจัดเรียงเป็น 2 คอลัมน์อย่างสม่ำเสมอ */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 2 คอลัมน์เท่ากัน */
+        gap: 1rem; /* ใช้ค่า gap แทน g-4 ของ bootstrap */
+        padding: 15px;
+        margin: 0;
+        list-style: none;
+    }
+    
+    .sub-news-grid > li {
+        display: flex;
+        /* item-box ที่อยู่ข้างในจะมีความสูงเท่ากันทั้งหมดในแถว */
+    }
+    
+    /* ปรับปรุง card-premium ใน sub-news ให้เหมาะสม */
+    .sub-news-grid .card-premium {
+        height: 100%; /* สำคัญมากเพื่อให้ card มีความสูงเท่ากับ li */
+    }
+
+    /* ซ่อน scrollbar สำหรับ Chrome, Safari และ Opera */
+    .sub-news-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    /* ซ่อน scrollbar สำหรับ IE และ Edge */
+    .sub-news-container {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    /* === END NEW/MODIFIED STYLES === */
 </style>
 
 <?php if (!empty($boxesNews)): ?>
@@ -250,8 +292,19 @@ if ($result->num_rows > 0) {
             <div id="mainNewsCarousel" class="carousel slide h-100 d-flex flex-column" data-bs-ride="carousel">
                 <div class="card-premium">
                     <div class="carousel-inner flex-grow-1">
-                        <?php foreach (array_slice($boxesNews, 0, 4) as $i => $box): ?>
-                            <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+                        <?php foreach (array_slice($boxesNews, 0, 1) as $i => $box): ?>
+                            <div class="carousel-item active">
+                                <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
+                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px 6px 0 0; height: 450px; object-fit: cover;">
+                                </a>
+                                <div class="p-3 bg-light">
+                                    <h4 class="news-box-title"><?= htmlspecialchars($box['title']) ?></h4>
+                                    <p class="mb-0 text-muted main-news-description"><?= htmlspecialchars($box['description']) ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach (array_slice($boxesNews, 1, 3) as $i => $box): ?>
+                            <div class="carousel-item">
                                 <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark">
                                     <img src="<?= htmlspecialchars($box['image']) ?>" class="d-block w-100" style="border-radius: 6px 6px 0 0; height: 450px; object-fit: cover;">
                                 </a>
@@ -275,22 +328,24 @@ if ($result->num_rows > 0) {
         </div>
 
         <div class="col-md-4 d-flex flex-column">
-            <div class="row row-cols-1 row-cols-md-2 g-4 h-100">
-                <?php foreach (array_slice($boxesNews, offset: 1) as $box): ?>
-                    <div class="col d-flex">
-                        <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
-                            <div class="card-premium p-0 d-flex flex-column">
-                                <div class="sub-news-image-wrapper flex-shrink-0">
-                                    <img src="<?= htmlspecialchars($box['image']) ?>" class="sub-news-img">
+            <div class="sub-news-container">
+                <ul class="sub-news-grid">
+                    <?php foreach (array_slice($boxesNews, offset: 1, length: 4) as $box): ?>
+                        <li>
+                            <a href="news_detail.php?id=<?= urlencode(base64_encode($box['id'])) ?>&lang=<?= htmlspecialchars($lang) ?>" class="text-decoration-none text-dark w-100">
+                                <div class="card-premium p-0 d-flex flex-column">
+                                    <div class="sub-news-image-wrapper flex-shrink-0">
+                                        <img src="<?= htmlspecialchars($box['image']) ?>" class="sub-news-img">
+                                    </div>
+                                    <div class="card-body sub-news d-flex flex-column">
+                                        <h6 class="sub-news-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
+                                    </div>
                                 </div>
-                                <div class="card-body sub-news d-flex flex-column">
-                                    <h6 class="sub-news-title flex-grow-1"><?= htmlspecialchars($box['title']) ?></h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                <?php endforeach; ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
-        </div>
+            </div>
     </div>
 <?php endif; ?>

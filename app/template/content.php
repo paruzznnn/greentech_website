@@ -91,8 +91,10 @@ $blocks_content = [
     'video' => function() {
         ob_start();
         ?>
-            <div class="box-content">
+            
+            
                 <h4 data-translate="video" lang="th" class="line-ref">วิดีโอแนะนำ</h4>
+            <div class="box-content">
                 <?php include 'template/video/video_home.php'; ?>
             </div>
         <?php
@@ -113,7 +115,7 @@ $blocks_content = [
 
 
 // *******************************************************************
-// ****************** ส่วนที่ 2: โค้ด CSS ที่แก้ไข (คงเดิม) **************
+// ****************** ส่วนที่ 2: โค้ด CSS ที่แก้ไข **********************
 // *******************************************************************
 ?>
 <style>
@@ -183,8 +185,8 @@ body, html {
 
 /* สไตล์สำหรับบล็อกเนื้อหาหลักแบบมีขอบ (content-block) */
 .content-block {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding: 1.5rem;
+    
     width: 100%;
     /* ********** แก้ไข: เพิ่มระยะห่างด้านล่าง 3em ********** */
     margin-bottom: 3em; 
@@ -207,10 +209,11 @@ body, html {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    /* padding-top: 3rem;
+    padding-bottom: 3rem; */
     /* ********** แก้ไข: เพิ่มระยะห่างด้านล่าง 3em ********** */
     margin-bottom: 3em; 
+    margin-top: 2em; 
 }
 .full-width-content-inner {
     max-width: 90%;
@@ -229,8 +232,9 @@ body, html {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    /* ********** แก้ไข: ลดขนาดปุ่ม ********** */
+    width: 36px; 
+    height: 36px;
     border: 1px solid #ccc;
     background-color: #fff;
     color: #666;
@@ -238,7 +242,8 @@ body, html {
     cursor: pointer;
     transition: all 0.3s ease;
     padding: 0;
-    font-size: 1.5rem;
+    /* ********** แก้ไข: ลดขนาด font ********** */
+    font-size: 1.2rem;
 }
 
 .copy-link-btn:hover {
@@ -270,12 +275,31 @@ body, html {
     padding-bottom: 3em;
 }
 
+/* ********** โค้ดที่เพิ่ม: สไตล์สำหรับไอคอนแชร์ใน mobile ********** */
+/* กำหนดขนาดไอคอนที่ 36px เพื่อให้พอดีกับหน้าจอมือถือ */
+.social-share a img {
+    /* ใช้ max-width/max-height แทน width/height เพื่อควบคุมขนาดของรูปภาพไอคอน */
+    max-width: 36px; 
+    max-height: 36px;
+    width: 100%; /* ใช้ width: 100% เพื่อให้ max-width มีผล */
+    height: auto;
+    display: block; /* แก้ปัญหาช่องว่างด้านล่างรูปภาพ */
+}
+
+/* ปรับขนาดไอคอน Twitter/X ที่มีการกำหนด style="height: 37px;" */
+.social-share a img[alt="Share on Twitter"] {
+    max-height: 28px !important;
+    height: auto !important;
+    width: auto !important; /* ปรับ width ให้พอดีกับ height */
+}
+
 /* Responsive (คงเดิม) */
 @media (max-width: 992px) {
     .news-wrapper {
         grid-template-columns: 1fr;
     }
 }
+/* ********** แก้ไข: ปรับการจัดเรียงในโหมดมือถือ ********** */
 @media (max-width: 576px) {
     .news-wrapper {
         padding: 0 20px;
@@ -283,8 +307,31 @@ body, html {
     .news-side-img-wrapper {
         width: 100px;
     }
+    /* ปรับ padding ของ content-wrapper ให้เหลือพื้นที่ขอบน้อยลง (หากจำเป็น) */
+    .content-wrapper, .full-width-content-inner {
+         max-width: 95%;
+         margin: 0 auto;
+    }
+    .content-wrapper1 {
+        /* ตรงนี้ใช้ 90% และ 10% อาจจะทำให้ชิดขวามากไป ปรับเป็น auto เพื่ออยู่ตรงกลาง */
+        max-width: 95%;
+        margin: 0 auto;
+    }
+    /* ********** เพิ่ม: ปรับระยะห่างระหว่างปุ่มแชร์ในโหมดมือถือ ********** */
+    .social-share div {
+        gap: 5px !important; /* ลดระยะห่างระหว่างปุ่ม */
+    }
+    /* ปรับขนาดตัวอักษร "แชร์หน้านี้" ในโหมดมือถือ */
+    .share-container-left p, .share-container-right p {
+        font-size: 16px !important;
+    }
 }
-
+.box-content {
+    background-color: transparent;
+    padding: 0px 0px 20px 0px;
+    border-radius: 8px;
+    color: #555;
+}
 
 </style>
 
@@ -296,7 +343,7 @@ body, html {
 
 <div class="content-sticky1" id="" style=" margin: 0 auto;">
     <div class="content-wrapper1">
-      
+        
                 <div class="share-container-right">
                     <div class="social-share" style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
                         <p data-translate="share" lang="th" style="margin: 0; font-size:18px; font-family: sans-serif;">แชร์หน้านี้:</p>
@@ -308,7 +355,7 @@ body, html {
                                 <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                             </a>
                             <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                                <img style="height: 37px; border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
+                                <img src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
                             </a>
                             <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                                 <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">
@@ -324,7 +371,7 @@ body, html {
                             </a>
                         </div>
                     </div>
-             
+                
         </div>
     </div>
 </div>
@@ -413,7 +460,7 @@ foreach ($layout_blocks as $block_name => $config) {
                              <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Share on Facebook">
                          </a>
                          <a href="https://twitter.com/intent/tweet?url=<?= urlencode($pageUrl) ?>&text=<?= urlencode($subjectTitle) ?>" target="_blank">
-                             <img style="height: 37px; border-radius: 6px;"src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
+                             <img src="https://cdn.prod.website-files.com/5d66bdc65e51a0d114d15891/64cebdd90aef8ef8c749e848_X-EverythingApp-Logo-Twitter.jpg" alt="Share on Twitter">
                          </a>
                          <a href="https://social-plugins.line.me/lineit/share?url=<?= urlencode($pageUrl) ?>" target="_blank">
                              <img src="https://img.icons8.com/color/48/000000/line-me.png" alt="Share on Line">

@@ -267,7 +267,7 @@ $blocks_content = [
 <div class="container-fluid mt-5">
     <h2 class="mb-4">⚙️ จัดการเลย์เอาต์หน้าหลัก (Homepage Layout)</h2>
     
-    <div class="row justify-content-center"> <div class="col-lg-10"> <p class="text-muted mb-3">ลากบล็อกในพื้นที่ตัวอย่างเพื่อสลับลำดับ, คลิกปุ่มสลับเพื่อเปิด/ปิด, และเลือกสีพื้นหลัง</p>
+    <div class="row justify-content-center"> <div class="col-lg-10"> <p class="text-muted mb-3">ลากบล็อกในพื้นที่ตัวอย่างเพื่อสลับลำดับ, คลิกปุ่มสลับเพื่อเปิด/ปิด, และเลือกสีพื้นหลัง(แก้เสร็จแล้วกดปุ่มันทึกด้านล่างสุดด้วยนะครับ)</p>
             
             <div class="card shadow-sm">
                 <div class="card-header live-preview-title">
