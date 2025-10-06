@@ -27,7 +27,9 @@ include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/base_directory.php';
 // กำหนด URL ของรูปโปรไฟล์เริ่มต้น
 $default_profile_img = 'https://as1.ftcdn.net/jpg/01/12/09/12/1000_F_112091233_xghsriqmHzk4sq71lWBL4q0e7n9QJKX6.jpg';
 $profile_img_src = $default_profile_img; // กำหนดค่าเริ่มต้นเป็นรูปภาพ default
-
+if(isset($_SESSION['avatar'])) {
+            $profile_img_src = $_SESSION['avatar'];
+        } else {
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $sql = "SELECT profile_img FROM mb_user WHERE user_id = ?";
@@ -38,11 +40,13 @@ if (isset($_SESSION['user_id'])) {
 
     if ($row = $result->fetch_assoc()) {
         // ตรวจสอบว่า profile_img มีค่าหรือไม่ ถ้ามีให้ใช้ path นั้น
-        if (!empty($row['profile_img'])) {
-            $profile_img_src = $new_path . 'public/img/' . htmlspecialchars($row['profile_img']);
-        }
+            if (!empty($row['profile_img'])) {
+                $profile_img_src = $new_path . 'public/img/' . htmlspecialchars($row['profile_img']);
+            }
+        
     }
 }
+        }
 
 if (!isset($base_path_admin)) {
     $base_path_admin = '/app/admin/';
@@ -99,7 +103,6 @@ function getTranslation($key, $lang, $translations) {
             <div>
                 <select id="language-select" class="language-select"></select>
             </div>
-
             <div class="profile-container dropdown-parent" onclick="toggleDropdown('globalProfileDropdown', event)">
                 <img src="<?php echo $profile_img_src; ?>" alt="Profile Picture" class="profile-pic">
                 <div id="globalProfileDropdown" class="dropdown-box hidden">
@@ -282,7 +285,6 @@ function switchLanguage() {
     border-radius: 4px;
     padding: 5px 0;
 }
-
 .flag-dropdown a {
     color: black;
     padding: 8px 16px;

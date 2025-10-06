@@ -21,6 +21,7 @@
     // *** แก้ไข: อนุญาตให้ Email เป็นค่าว่างได้ แต่ยังคงดึงมาเก็บไว้ในตัวแปร
     $email          = trim($data['email']        ?? ''); 
     $telephone      = trim($data['telephone']    ?? '');
+    $avatar      = trim($data['avatar']    ?? '');
     $role_id        = 1;
     
     // ตรวจสอบหลักคือต้องมี OID เท่านั้น
@@ -52,6 +53,7 @@
         
         $_SESSION['oid']         = $oid;
         $_SESSION['redirect_url'] = $redirect_url;
+        $_SESSION['avatar'] = $avatar;
         header("Location: admin/dashboard.php");
         exit;
     }
@@ -83,7 +85,6 @@
         echo json_encode(['status' => false, 'message' => 'Insert failed: ' . $insert->error]);
         exit;
     }
-
     // บันทึกข้อมูลในตาราง acc_user_roles
     $new_user_id = $conn->insert_id; 
     $insert_role = $conn->prepare("INSERT INTO acc_user_roles (user_id, role_id) VALUES (?, ?)");
@@ -111,6 +112,7 @@
     
     $_SESSION['oid']           = $oid;
     $_SESSION['redirect_url']  = $redirect_url;
+    $_SESSION['avatar']  = $avatar;
     header("Location: admin/dashboard.php");
     exit;
 ?>

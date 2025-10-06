@@ -118,36 +118,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($result_check_contact->num_rows > 0) {
                 // ถ้ามีอยู่แล้ว ให้อัปเดต
                 $stmt_contact = $conn->prepare("UPDATE contact_settings SET 
-                                                trandar_store_link = ?, 
-                                                trandar_store_text = ?, 
-                                                facebook_link = ?, 
-                                                youtube_link = ?, 
-                                                instagram_link = ?, 
-                                                line_link = ?, 
-                                                tiktok_link = ?, 
-                                                updated_at = NOW() 
-                                                WHERE id = ?");
+                                                    trandar_store_link = ?, 
+                                                    trandar_store_text = ?, 
+                                                    facebook_link = ?, 
+                                                    youtube_link = ?, 
+                                                    instagram_link = ?, 
+                                                    line_link = ?, 
+                                                    tiktok_link = ?, 
+                                                    updated_at = NOW() 
+                                                    WHERE id = ?");
                 $stmt_contact->bind_param("sssssssi", 
-                                          $trandar_store_link, 
-                                          $trandar_store_text, 
-                                          $facebook_link, 
-                                          $youtube_link, 
-                                          $instagram_link, 
-                                          $line_link, 
-                                          $tiktok_link, 
-                                          $contact_settings_id);
+                                             $trandar_store_link, 
+                                             $trandar_store_text, 
+                                             $facebook_link, 
+                                             $youtube_link, 
+                                             $instagram_link, 
+                                             $line_link, 
+                                             $tiktok_link, 
+                                             $contact_settings_id);
             } else {
                 // ถ้ายังไม่มี ให้ insert
                 $stmt_contact = $conn->prepare("INSERT INTO contact_settings (id, trandar_store_link, trandar_store_text, facebook_link, youtube_link, instagram_link, line_link, tiktok_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt_contact->bind_param("isssssss",
-                                          $contact_settings_id,
-                                          $trandar_store_link,
-                                          $trandar_store_text,
-                                          $facebook_link,
-                                          $youtube_link,
-                                          $instagram_link,
-                                          $line_link,
-                                          $tiktok_link);
+                                             $contact_settings_id,
+                                             $trandar_store_link,
+                                             $trandar_store_text,
+                                             $facebook_link,
+                                             $youtube_link,
+                                             $instagram_link,
+                                             $line_link,
+                                             $tiktok_link);
             }
             $stmt_check_contact->close();
 

@@ -4,6 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// ต้องแน่ใจว่าไฟล์เหล่านี้ถูกเรียกก่อนการใช้งานตัวแปรเช่น $new_path
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/base_directory.php'; // กำหนด $new_path และอื่นๆ
+
 // กำหนดภาษาเริ่มต้นเป็น 'th' หากไม่มีการกำหนดใน Session
 $lang = $_SESSION['lang'] ?? 'th';
 
@@ -99,6 +103,7 @@ $currentLang = $translations[$lang];
 <html lang="<?= $lang ?>">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="../public/img/greentechlogo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $currentLang['title'] ?></title>
 
@@ -145,8 +150,9 @@ $currentLang = $translations[$lang];
 <body>
 
     <?php include 'template/header.php'; ?>
-        <?php
-    include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php';
+    <?php
+    // include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/connect.php'; // ย้ายไปด้านบนแล้ว
+    // include $_SERVER['DOCUMENT_ROOT'] . '/greentech/lib/base_directory.php'; // ย้ายไปด้านบนแล้ว
 
     $user_id = $_SESSION['user_id']; // ต้องแน่ใจว่า login แล้ว
 
@@ -160,8 +166,27 @@ $currentLang = $translations[$lang];
     // กำหนด URL ของรูปโปรไฟล์เริ่มต้น
     $default_profile_img = 'https://as1.ftcdn.net/jpg/01/12/09/12/1000_F_112091233_xghsriqmHzk4sq71lWBL4q0e7n9QJKX6.jpg';
 
-    // ตรวจสอบว่ามีรูปโปรไฟล์หรือไม่ ถ้าไม่มีหรือเป็นค่าว่าง ให้ใช้รูปเริ่มต้น
-    $profile_img_src = !empty($user['profile_img']) ? '/public/img/' . htmlspecialchars($user['profile_img']) : $default_profile_img;
+    // *** ส่วนที่แก้ไขเพื่อให้เหมือนกับใน header.php โดยใช้ $new_path ***
+    $profile_img_src = $default_profile_img; // กำหนดค่าเริ่มต้นเป็น default
+    
+    // ตรวจสอบว่ามีรูปโปรไฟล์ในฐานข้อมูลหรือไม่
+    if (!empty($user['profile_img'])) {
+        // ใช้ $new_path ในการสร้าง URL เหมือนกับใน header.php
+        $profile_img_src = $new_path . 'public/img/' . htmlspecialchars($user['profile_img']);
+    }
+
+    // หมายเหตุ: โค้ดใน header.php มีการดึงจาก $_SESSION['avatar'] ก่อนด้วย
+    // ในหน้านี้เราดึงจาก DB โดยตรงซึ่งสมเหตุสมผลกว่าสำหรับหน้า Profile
+    // ถ้าต้องการให้เหมือน 100% คือเพิ่มเงื่อนไขจาก $_SESSION['avatar'] ก่อน
+    /*
+    if(isset($_SESSION['avatar'])) {
+        $profile_img_src = $_SESSION['avatar'];
+    } else {
+        //... logic ดึงจาก DB ตามด้านบน
+    }
+    */
+    // แต่สำหรับหน้านี้ การดึงจาก DB ล่าสุดก็เพียงพอแล้ว
+    // -----------------------------------------------------------------
     ?>
     <?php if (isset($_GET['updated'])): ?>
     <div style="text-align: center; color: green; font-weight: bold; margin-bottom: 20px;">
