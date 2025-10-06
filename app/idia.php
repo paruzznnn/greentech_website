@@ -67,7 +67,8 @@ global $conn;
 </head>
 
 <body>
-
+ <ul id="flag-dropdown-list" class="flag-dropdown" style="left: 74%;">
+        </ul>
     <?php include 'template/header.php' ?>
     <?php include 'template/navbar_slide.php' ?>
 

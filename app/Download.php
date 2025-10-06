@@ -223,7 +223,8 @@ function getTextByLang($key) {
     <link href="css/index_.css?v=<?php echo time();?>" rel="stylesheet">
 </head>
 <body>
-
+ <ul id="flag-dropdown-list" class="flag-dropdown" style="left: 74%;">
+        </ul>
 <?php include 'template/header.php'?>
 <?php include 'template/navbar_slide.php'?>
 

@@ -542,6 +542,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
 a {
     color: #ffffff;;
 }
+.language-select-container {
+    position: relative;
+    display: inline-block;
+    z-index: 1001;
+}
+
+/* สไตล์สำหรับปุ่มแสดงภาษาที่เลือกในปัจจุบัน (ใน Header) */
+.language-display {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: #fff; 
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 80px; 
+}
+
+/* สไตล์สำหรับ Dropdown List ที่ถูกย้ายไป body */
+#flag-dropdown-list {
+    display: none; /* ซ่อนไว้ก่อน */
+    position: absolute; /* สำคัญมาก: ให้มันลอยอยู่บนสุด */
+    background-color: #fff;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    /* ตั้ง z-index สูงสุดที่นี่ */
+    z-index: 9999999; 
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* สไตล์ตัวเลือกใน Dropdown List */
+#flag-dropdown-list li a {
+    color: black;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+#flag-dropdown-list .flag-icon {
+    width: 24px;
+    height: 18px;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
 </style>
 
 <div class="header-top">
@@ -572,13 +626,13 @@ a {
         </div>
 
           <div>
-        <select id="language-select" class="language-select">
-            <option value="th" data-flag="https://flagcdn.com/th.svg">ไทย</option>
-            <option value="en" data-flag="https://flagcdn.com/us.svg">English</option>
-            <option value="cn" data-flag="https://flagcdn.com/cn.svg">简体中文</option>
-            <option value="jp" data-flag="https://flagcdn.com/jp.svg">日本語</option>
-            <option value="kr" data-flag="https://flagcdn.com/kr.svg">한국어</option>
-        </select>
+       <div class="language-select-container">
+    <div id="language-display" class="language-display">
+        </div>
+    
+    <div id="dropdown-anchor" style="position: absolute; right: 0; top: 100%;"></div>
+</div>
+
     </div>
         <div class="header-social-links">
             <a href="#" target="_blank">

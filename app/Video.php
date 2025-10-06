@@ -173,6 +173,8 @@ if (!$result) {
 </head>
 
 <body>
+     <ul id="flag-dropdown-list" class="flag-dropdown" style="left: 74%;">
+        </ul>
     <div class="container" style="max-width: 90%;">
         <div class="row align-items-center" style="padding: 40px 0;">
             <div class="col-md-6">

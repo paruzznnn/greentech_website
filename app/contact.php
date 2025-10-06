@@ -24,6 +24,8 @@ global $conn;
     </style>
 </head>
 <body>
+     <ul id="flag-dropdown-list" class="flag-dropdown" style="left: 74%;">
+        </ul>
     <?php
     global $conn;
     global $base_path;

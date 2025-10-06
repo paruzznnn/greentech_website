@@ -49,31 +49,40 @@ function updateSelectedLanguageFlag(langAbbr) {
 }
 
 // Function to populate the language dropdown
+// Function to populate the language dropdown
 function nationLanguages() {
     $.getJSON("../api/languages/nation.json" + '?' + new Date().getTime(), function (data) {
         let nationalities = data.nationalities;
-        let $select = $('#language-select');
-        $select.empty();
+        let $dropdownList = $('#flag-dropdown-list'); // ul ที่เป็น Dropdown ใหม่
+        $dropdownList.empty();
 
         $.each(nationalities, function (index, entry) {
             let abbreviation = entry.abbreviation.toLowerCase();
-            let option = $('<option></option>')
-                .attr('value', abbreviation)
-                .attr('data-flag', entry.flag)
-                .text(entry.name);
-            $select.append(option);
+            
+            // สร้าง Dropdown List Item
+            let listItem = $(`<li>
+                <a href="#" data-lang="${abbreviation}" data-flag="${entry.flag}" data-name="${entry.name}">
+                    <img src="${entry.flag}" class="flag-icon"  alt="${entry.name} flag">
+                    <span>${entry.name}</span>
+                </a>
+            </li>`);
+            $dropdownList.append(listItem);
         });
 
         // Get language from URL or localStorage, default to 'th'
         let langToSelect = getUrlParameter('lang') || localStorage.getItem('selectedLanguage') || 'th';
         
-        $select.val(langToSelect);
-
-        // Update the flag and change the language based on the selected value
-        updateSelectedLanguageFlag(langToSelect);
+        // Update การแสดงผลภาษาปัจจุบัน
+        let selectedEntry = nationalities.find(n => n.abbreviation.toLowerCase() === langToSelect);
+        if (selectedEntry) {
+            updateSelectedLanguageDisplay(langToSelect, selectedEntry.name, selectedEntry.flag);
+        }
+        
+        // เรียก changeLanguage (ถ้ามี)
         changeLanguage(langToSelect);
     });
 }
+
 
 // Function to change the content's language
 function changeLanguage(lang) {
@@ -97,6 +106,35 @@ function changeLanguage(lang) {
             localStorage.setItem('selectedLanguage', lang);
         })
         .catch(error => console.error('Error loading language file:', error));
+}
+
+// Function to update the selected language flag and text
+function updateSelectedLanguageDisplay(langAbbr, langName, flagUrl) {
+    const $display = $('#language-display');
+    
+    // ตั้งค่า HTML ภายในปุ่มแสดงผล
+    $display.html(`
+        <img src="${flagUrl}" class="flag-icon-display" style="height: 24px;" alt="${langName} flag">
+        <span>${langName}</span>
+        <i class="fas fa-chevron-down arrow-icon"></i>
+    `);
+}
+
+// Function เพื่อวางตำแหน่ง Dropdown List
+function positionDropdown() {
+    const $anchor = $('#dropdown-anchor');
+    const $dropdownList = $('#flag-dropdown-list');
+    
+    // คำนวณตำแหน่งของ Anchor เทียบกับ viewport
+    const offset = $anchor.offset();
+    const anchorHeight = $anchor.outerHeight();
+    
+    // กำหนดตำแหน่ง absolute ให้กับ Dropdown List ที่อยู่ภายนอก Header
+    $dropdownList.css({
+        'left': 80% + 'px',
+        'top': offset.top + anchorHeight + 5 + 'px', // 5px คือระยะห่าง
+        'right': 'auto' // รีเซ็ต right เพื่อใช้ left/top
+    });
 }
 
 
@@ -126,20 +164,49 @@ $(document).ready(function () {
     $('#loading-overlay').fadeIn();
     $('#loading-overlay').fadeOut();
 
-    // Set up the language dropdown and flags
-    nationLanguages();
+    nationLanguages(); 
+
+    // Event handler for TOGGLING the custom dropdown
+    $('#language-display').on('click', function (e) {
+        e.stopPropagation();
+        const $dropdownList = $('#flag-dropdown-list');
+        
+        // 1. วางตำแหน่งก่อนเปิดเสมอ
+        positionDropdown(); 
+        
+        // 2. สลับการแสดงผล
+        $dropdownList.toggle();
+    });
+
+    // Event handler for selecting a language from the custom dropdown
+    $('#flag-dropdown-list').on('click', 'a', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const newLang = $(this).data('lang');
+        
+        // 1. ซ่อน Dropdown
+        $('#flag-dropdown-list').hide();
+
+        // 2. สั่งเปลี่ยนภาษาและรีโหลดหน้า (ใช้ logic เดิม)
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('lang', newLang);
+        window.location.href = currentUrl.toString();
+    });
+
+    // Event handler to close the dropdown when clicking outside
+    $(window).on('click', function (e) {
+        // ตรวจสอบว่าไม่ได้คลิกในปุ่มแสดงผล
+        if (!$(e.target).closest('.language-select-container').length) {
+            $('#flag-dropdown-list').hide();
+        }
+    });
     
-    // Event handler for language change
-    $('#language-select').on('change', function () {
-        const newLang = $(this).val().toLowerCase();
-        // Change the language on the current page immediately
-       
-    // สร้าง URL ใหม่ที่มีพารามิเตอร์ lang
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('lang', newLang);
-    
-    // สั่งให้รีโหลดหน้าไปยัง URL ใหม่
-    window.location.href = currentUrl.toString();
+    // ถ้าหน้าจอถูกปรับขนาด ให้คำนวณตำแหน่งใหม่ (สำคัญสำหรับ Responsive)
+    $(window).on('resize', function() {
+        if ($('#flag-dropdown-list').is(':visible')) {
+            positionDropdown();
+        }
     });
 
     setupModal("myModal-sign-in", "myBtn-sign-in", "modal-close-sign-in");

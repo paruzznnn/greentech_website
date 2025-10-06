@@ -1,7 +1,7 @@
 {
     "nationalities": [
         {
-            "name": "Thai",
+            "name": "ไทย",
             "abbreviation": "TH",
             "flag": "https://flagcdn.com/w320/th.png"
         },
@@ -11,17 +11,17 @@
             "flag": "https://flagcdn.com/w320/gb.png"
         },
         {
-            "name": "Chinese",
+            "name": "中文",
             "abbreviation": "CN",
             "flag": "https://flagcdn.com/w320/cn.png"
         },
         {
-            "name": "Japanese",
+            "name": "日本語",
             "abbreviation": "JP",
             "flag": "https://flagcdn.com/w320/jp.png"
         },
         {
-            "name": "Korean",
+            "name": "한국어",
             "abbreviation": "KR",
             "flag": "https://flagcdn.com/w320/kr.png"
         }
